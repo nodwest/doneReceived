@@ -1,0 +1,6 @@
+node_modules
+.expo
+dist
+obsidian-done
+canvases
+package-lock.json
