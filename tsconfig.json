@@ -1,15 +1,6 @@
 {
-  "extends": "@react-native/typescript-config",
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "types": ["jest"]
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": [
-    "**/node_modules",
-    "**/Pods",
-    "**/canvases/**",
-    "**/*.canvas.tsx",
-    "doc/**",
-    "obsidian-done/**"
-  ]
+    "strict": true
+  }
 }
