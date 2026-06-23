@@ -25,13 +25,14 @@
             "id": "56be3c812802726d",
             "type": "leaf",
             "state": {
-              "type": "bases",
+              "type": "markdown",
               "state": {
-                "file": "Без названия.base",
-                "viewName": "Таблица"
+                "file": "Сделал-получил/ПРОВЕРКА ГИТА.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-table",
-              "title": "Без названия"
+              "icon": "lucide-file",
+              "title": "ПРОВЕРКА ГИТА"
             }
           }
         ],
@@ -194,16 +195,18 @@
       "daily-notes:Сегодняшняя заметка": false,
       "templates:Вставить шаблон": false,
       "command-palette:Открыть палитру команд": false,
-      "bases:Создать новую базу": false
+      "bases:Создать новую базу": false,
+      "github-sync:Sync with Remote": false
     }
   },
   "active": "56be3c812802726d",
   "lastOpenFiles": [
+    "Сделал-получил/Идеи.md",
+    "Сделал-получил/ПРОВЕРКА ГИТА.md",
     "Без названия.base",
     "Сделал-получил/СТЕК.md",
     "Сделал-получил/MVP.md",
     "C4.md",
-    "Сделал-получил/Идеи.md",
     "mvp-c4-business-logic.canvas.tsx",
     "Сделал-получил/MVP.canvas",
     "Без названия",
