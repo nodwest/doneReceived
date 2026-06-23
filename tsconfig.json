@@ -4,5 +4,12 @@
     "types": ["jest"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["**/node_modules", "**/Pods"]
+  "exclude": [
+    "**/node_modules",
+    "**/Pods",
+    "**/canvases/**",
+    "**/*.canvas.tsx",
+    "doc/**",
+    "obsidian-done/**"
+  ]
 }
