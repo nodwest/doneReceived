@@ -1,20 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { TaskShortView } from '@widgets/task-short-view';
+import './app.css';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Ну и что?122</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <TaskShortView />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
