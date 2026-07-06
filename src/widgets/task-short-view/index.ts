@@ -1,1 +1,1 @@
-export { TaskShortView } from './ui/task-short-view';
+export * from './ui/task-short-view';

@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@rn-primitives/aspect-ratio": "^1.5.2",
+    "@rn-primitives/separator": "^1.5.2",
     "@rn-primitives/slot": "^1.5.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -14,6 +16,7 @@
     "react-native": "0.85.3",
     "react-native-reanimated": "^4.3.1",
     "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "^15.15.5",
     "react-native-web": "^0.21.2",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7"
