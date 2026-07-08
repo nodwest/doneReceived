@@ -21,4 +21,10 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#8d90e7',
   },
+  reward: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+  },
 });

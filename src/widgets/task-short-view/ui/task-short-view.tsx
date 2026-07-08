@@ -1,16 +1,14 @@
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Button } from '@app/components/ui/button';
 import { Text } from '@app/components/ui/text';
 import { styles } from '@widgets/task-short-view/ui/task-short-view.styled';
 import { TaskShortViewProps } from '@shared/lib';
 import { RewardButton } from '@app/components/ui/trophy';
+import { Icon } from '@shared/ui/icons/icon';
 
 export function TaskShortView({
   taskName,
   taskDescription,
-  taskAward,
-  taskPenalty,
   autor,
 }: TaskShortViewProps) {
   return (
@@ -20,7 +18,10 @@ export function TaskShortView({
         <Text>{taskDescription || 'Описание задачи'}</Text>
         <Text>{autor || 1}</Text>
         <StatusBar style="auto" />
-        <RewardButton />
+        <View style={styles.reward}>
+          <RewardButton amount={100} variant="reward" />
+          <RewardButton amount={200} variant="penalty" />
+        </View>
       </View>
     </View>
   );
