@@ -21,8 +21,8 @@ export function RewardButton({
   const isReward = variant === 'reward';
 
   const containerClasses = isReward
-    ? 'flex-row items-center gap-3 rounded-xl bg-green-100 px-4 py-3 shadow-sm'
-    : 'flex-row items-center gap-3 rounded-xl bg-red-100 px-4 py-3 shadow-sm';
+    ? 'flex-row items-center gap-3 rounded-xl bg-green-100 px-4 py-3 shadow-sm w-[130]'
+    : 'flex-row items-center gap-3 rounded-xl bg-red-100 px-4 py-3 shadow-sm w-[130]';
 
   const circleClasses = isReward
     ? 'w-10 h-10 rounded-full items-center justify-center bg-green-300'
