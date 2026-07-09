@@ -20,13 +20,14 @@ export function RewardButton({
 }: RewardButtonProps) {
   const isReward = variant === 'reward';
 
-  const containerClasses = isReward
-    ? 'flex-row items-center gap-3 rounded-xl bg-green-100 px-4 py-3 shadow-sm w-[130]'
-    : 'flex-row items-center gap-3 rounded-xl bg-red-100 px-4 py-3 shadow-sm w-[130]';
+  const containerBase =
+    'flex-row items-center gap-3 rounded-xl px-4 py-3 shadow-sm w-[130]';
+  const containerVariant = isReward ? 'bg-green-100' : 'bg-red-100';
+  const containerClasses = `${containerBase} ${containerVariant}`;
 
-  const circleClasses = isReward
-    ? 'w-10 h-10 rounded-full items-center justify-center bg-green-300'
-    : 'w-10 h-10 rounded-full items-center justify-center bg-red-300';
+  const circleBase = 'w-10 h-10 rounded-full items-center justify-center';
+  const circleVariant = isReward ? 'bg-green-300' : 'bg-red-300';
+  const circleClasses = `${circleBase} ${circleVariant}`;
 
   const labelText = isReward ? 'Награда' : 'Штраф';
 
@@ -51,5 +52,3 @@ export function RewardButton({
     </Pressable>
   );
 }
-
-export { RewardButton };

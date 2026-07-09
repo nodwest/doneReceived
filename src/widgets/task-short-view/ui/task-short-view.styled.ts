@@ -1,22 +1,21 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   content: {
     gap: 8,
     borderRadius: 12,
-    backgroundColor: '#f4f4f4',
+    backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingVertical: 12,
     shadowColor: '#000',
     shadowOpacity: 0.35,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 8,
   },
   icon: {
     width: 32,
@@ -29,5 +28,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'space-between',
+  },
+  textDescription: {
+    color: '#8d90e7',
   },
 });
