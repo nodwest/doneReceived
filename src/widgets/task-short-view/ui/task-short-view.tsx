@@ -7,11 +7,9 @@ import { RewardButton } from '@app/components/ui/trophy';
 import { Icon } from '@shared/ui/icons/icon';
 import React from 'react';
 
-export function TaskShortView({
-  taskName,
-  taskDescription,
-  autor,
-}: TaskShortViewProps) {
+export function TaskShortView(prop: TaskShortViewProps) {
+  const { taskName, taskDescription, autor } = prop;
+
   return (
     <View>
       <View style={styles.content}>
