@@ -9,6 +9,7 @@ import React from 'react';
 
 export function TaskShortView(props: TaskShortViewProps) {
   const { title, description } = props;
+
   return (
     <View>
       <View style={styles.content}>
