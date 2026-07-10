@@ -8,7 +8,7 @@ import { Icon } from '@shared/ui/icons/icon';
 import React from 'react';
 
 export function TaskShortView(props: TaskShortViewProps) {
-  const { taskName, taskDescription, autor } = props;
+  const { title, description } = props;
   return (
     <View>
       <View style={styles.content}>
@@ -16,10 +16,10 @@ export function TaskShortView(props: TaskShortViewProps) {
           <View style={styles.headerIcon}>
             <Icon name="сheque" size={30} color="blue" />
           </View>
-          <Text variant={'large'}>{taskName || 'Название задачи'}</Text>
+          <Text variant={'large'}>{title || 'Название задачи'}</Text>
         </View>
         <Text variant={'small'} className={'text-gray-400'}>
-          {taskDescription || 'Описание задачи'}
+          {description || 'Описание задачи'}
         </Text>
         <StatusBar style="auto" />
         <View style={styles.reward}>

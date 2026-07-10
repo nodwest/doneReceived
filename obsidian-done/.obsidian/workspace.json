@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Сделал-получил/СТЕК.md",
+                "file": "Features/DR-TaskCreator.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "СТЕК"
+              "title": "DR-TaskCreator"
             }
           }
         ],
@@ -201,18 +201,29 @@
   },
   "active": "56be3c812802726d",
   "lastOpenFiles": [
-    "Сделал-получил/Идеи.md",
-    "Сделал-получил/ПРОВЕРКА ГИТА.md",
-    "Сделал-получил/СТЕК.md",
+    "z_Исходники/картинки/Pasted image 20260710155420.png",
+    "Features/DR-Registration.md",
+    "Features/DR-TaskCreator.md",
+    "Features/DR-User.md",
+    "z_Исходники/картинки/Pasted image 20260710153839.png",
     "Сделал-получил/MVP.md",
+    "C4.md",
+    "Pasted image 20260710153557.png",
+    "Сделал-получил/СТЕК.md",
+    "Без названия.base",
+    "z_Исходники/картинки/Pasted image 20260710153438.png",
+    "z_Исходники/картинки",
+    "z_Исходники",
+    "Сделал-получил/Идеи.md",
+    "Pasted image 20260710153259.png",
+    "Pasted image 20260710153243.png",
+    "Pasted image 20260710153246.png",
+    "Сделал-получил/ПРОВЕРКА ГИТА.md",
     "Features/DR-Назавние_Фичи/СДЕСЬ ОПИСАНИЕ.md",
     "Features/DR-Назавние_Фичи",
     "Features",
-    "C4.md",
-    "Без названия.base",
     "mvp-c4-business-logic.canvas.tsx",
     "Сделал-получил/MVP.canvas",
-    "Без названия",
     "Сделал-получил",
     "Добро пожаловать.md",
     "2026-06-22.md"
