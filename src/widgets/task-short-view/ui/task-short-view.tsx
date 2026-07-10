@@ -7,20 +7,13 @@ import { RewardButton } from '@app/components/ui/trophy';
 import { Icon } from '@shared/ui/icons/icon';
 import React from 'react';
 
-export function TaskShortView({
-  taskName,
-  taskDescription,
-  autor,
-}: TaskShortViewProps) {
+export function TaskShortView(props: TaskShortViewProps) {
+  const { taskName, taskDescription, autor } = props;
   return (
     <View>
       <View style={styles.content}>
         <View style={styles.header}>
-          <View
-            className={
-              'w-10 h-10 rounded-full items-center justify-center bg-blue-300'
-            }
-          >
+          <View style={styles.headerIcon}>
             <Icon name="сheque" size={30} color="blue" />
           </View>
           <Text variant={'large'}>{taskName || 'Название задачи'}</Text>

@@ -17,6 +17,14 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
+  headerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#93c5fd',
+  },
   icon: {
     width: 32,
     height: 32,
