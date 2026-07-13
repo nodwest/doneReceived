@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
+    margin: 24,
   },
   headerIcon: {
     width: 88,
@@ -26,10 +27,14 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.h1,
   },
   titleDescription: {
+    textAlign: 'center',
     fontSize: theme.fontSize.sm,
   },
   inputName: {
     fontSize: theme.fontSize.inputName,
     color: theme.colors.grey,
+  },
+  field: {
+    gap: 8,
   },
 });

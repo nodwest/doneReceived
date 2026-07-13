@@ -35,19 +35,19 @@ export function Registration() {
       </CardHeader>
       <CardContent>
         <View className="w-full justify-center gap-4">
-          <View className="gap-2">
+          <View style={styles.field}>
             <Label htmlFor="Full Name" style={styles.inputName}>
               Full Name
             </Label>
             <InputWithIcon id="name" placeholder="Full Name" iconName="user" />
           </View>
-          <View className="gap-2">
+          <View style={styles.field}>
             <Label htmlFor="Email" style={styles.inputName}>
               Email
             </Label>
             <InputWithIcon id="email" placeholder="Email" iconName="message" />
           </View>
-          <View className="gap-2">
+          <View style={styles.field}>
             <Label htmlFor="Password" style={styles.inputName}>
               Email
             </Label>
@@ -72,7 +72,7 @@ export function Registration() {
           }}
         >
           <Button variant="void" size={'default'}>
-            <Text>Subscribe</Text>
+            <Text>Create Account</Text>
           </Button>
         </LinearGradient>
       </CardFooter>

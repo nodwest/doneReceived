@@ -8,13 +8,8 @@ type InputWithIconProps = React.ComponentProps<typeof Input> & {
   iconName?: string;
 };
 
-function InputWithIcon({
-  iconName,
-  className,
-  value,
-  onChangeText,
-  ...props
-}: InputWithIconProps) {
+function InputWithIcon(prop: InputWithIconProps) {
+  const { iconName, className, value, onChangeText, ...props } = prop;
   const [innerValue, setInnerValue] = useState('');
 
   const raw = value ?? innerValue;
