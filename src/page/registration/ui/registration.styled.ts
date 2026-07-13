@@ -25,4 +25,11 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: theme.fontSize.h1,
   },
+  titleDescription: {
+    fontSize: theme.fontSize.sm,
+  },
+  inputName: {
+    fontSize: theme.fontSize.inputName,
+    color: theme.colors.grey,
+  },
 });

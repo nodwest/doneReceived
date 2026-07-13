@@ -16,6 +16,7 @@ import { theme } from '@shared/theme/theme';
 import { InputWithIcon } from '@app/components/ui/Input-with-icon/InputWithIcon';
 
 export function Registration() {
+  //TODO убрать Tailwind, вынести в css
   return (
     <Card style={styles.base}>
       <CardHeader style={styles.header}>
@@ -28,22 +29,28 @@ export function Registration() {
           <Icon name="star" size={44} color={theme.colors.primarYellow} />
         </LinearGradient>
         <Text variant={'h1'}>Welcome to Kids Tascks</Text>
-        <CardDescription>
+        <CardDescription style={styles.titleDescription}>
           Turn everyday chores into fun rewards for the whole family.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <View className="w-full justify-center gap-4">
           <View className="gap-2">
-            <Label htmlFor="Full Name">Full Name</Label>
+            <Label htmlFor="Full Name" style={styles.inputName}>
+              Full Name
+            </Label>
             <InputWithIcon id="name" placeholder="Full Name" iconName="user" />
           </View>
           <View className="gap-2">
-            <Label htmlFor="Email">Name</Label>
+            <Label htmlFor="Email" style={styles.inputName}>
+              Email
+            </Label>
             <InputWithIcon id="email" placeholder="Email" iconName="message" />
           </View>
           <View className="gap-2">
-            <Label htmlFor="Password">Email</Label>
+            <Label htmlFor="Password" style={styles.inputName}>
+              Email
+            </Label>
             <InputWithIcon
               secureTextEntry={true}
               id="password"

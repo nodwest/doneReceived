@@ -4,6 +4,7 @@ export const theme = {
     primeViolet: '#6C5CE7',
     primeBlue: '#4A90E2',
     primarYellow: '#FFB930',
+    grey: '#8A8FA3',
     danger: '#ef4444',
     dangerForeground: '#ffffff',
 
@@ -31,6 +32,7 @@ export const theme = {
   },
   fontSize: {
     xs: 12,
+    inputName: 13,
     sm: 14,
     md: 16,
     lg: 18,
