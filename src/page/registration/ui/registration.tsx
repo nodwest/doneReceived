@@ -54,9 +54,20 @@ export function Registration() {
         </View>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button variant="defaultBlue" size={'default'}>
-          <Text>Subscribe</Text>
-        </Button>
+        <LinearGradient
+          colors={[theme.colors.primeViolet, theme.colors.primeBlue]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: `100%`,
+            borderRadius: 30,
+            overflow: 'hidden',
+          }}
+        >
+          <Button variant="void" size={'default'}>
+            <Text>Subscribe</Text>
+          </Button>
+        </LinearGradient>
       </CardFooter>
     </Card>
   );

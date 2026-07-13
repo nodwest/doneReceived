@@ -19,7 +19,7 @@ function InputWithIcon({
 
   const raw = value ?? innerValue;
   const text = typeof raw === 'string' ? raw : String(raw ?? '');
-  const padding = text.length === 0 ? 10 : 3;
+  const padding = text.length === 0 ? 40 : 12;
 
   const handleChangeText = (t: string) => {
     setInnerValue(t);
@@ -39,9 +39,9 @@ function InputWithIcon({
         onChangeText={handleChangeText}
         className={cn(
           'flex-1 border-0 px-0 py-0 shadow-none bg-transparent',
-          `pl-${padding}`, //TODO переделать хуйню на css
           className,
         )}
+        style={{ paddingLeft: padding }}
       />
     </View>
   );

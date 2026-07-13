@@ -4,6 +4,10 @@ import { theme } from '@shared/theme/theme';
 export const styles = StyleSheet.create({
   base: {
     backgroundColor: theme.colors.prime,
+    display: 'flex',
+    gap: 32,
+    justifyContent: 'center',
+    height: '100%',
   },
   header: {
     display: 'flex',

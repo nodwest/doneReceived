@@ -17,7 +17,7 @@ const buttonVariants = cva(
           'rounded-[30] h-14 w-full shadow-sm shadow-black/5',
           Platform.select({
             web: 'bg-gradient-to-r from-[#6C5CE7] to-[#4A90E2] hover:opacity-90 active:opacity-80',
-            native: 'bg-[#4A90E2] active:bg-[#6C5CE7]',
+            native: 'bg-[#6C5CE7] active:bg-[#4A90E2]',
           }),
         ),
         default: cn(
@@ -43,6 +43,13 @@ const buttonVariants = cva(
         ghost: cn(
           'active:bg-accent dark:active:bg-accent/50',
           Platform.select({ web: 'hover:bg-accent dark:hover:bg-accent/50' }),
+        ),
+        void: cn(
+          '',
+          Platform.select({
+            web: 'hover:bg-[#6C5CE7] opacity-100 active:opacity-10',
+            native: 'active:bg-[#6C5CE7] opacity-100',
+          }),
         ),
         link: '',
       },
@@ -92,6 +99,7 @@ const buttonTextVariants = cva(
             web: 'underline-offset-4 hover:underline group-hover:underline',
           }),
         ),
+        void: 'text-white',
       },
       size: {
         default: '',
