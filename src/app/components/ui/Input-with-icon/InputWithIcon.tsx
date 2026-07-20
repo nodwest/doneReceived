@@ -12,10 +12,6 @@ function InputWithIcon(prop: InputWithIconProps) {
   const { iconName, className, value, onChangeText, ...props } = prop;
   const [innerValue, setInnerValue] = useState('');
 
-  const raw = value ?? innerValue;
-  const text = typeof raw === 'string' ? raw : String(raw ?? '');
-  const padding = text.length === 0 ? 40 : 12;
-
   const handleChangeText = (t: string) => {
     setInnerValue(t);
     onChangeText?.(t);
@@ -23,20 +19,17 @@ function InputWithIcon(prop: InputWithIconProps) {
 
   return (
     <View className="flex-row items-center rounded-[14] border border-input bg-background  h-14 shadow-sm shadow-black/5">
-      {text.length === 0 && (
-        <View className="absolute items-center justify-center mr-2 p-3">
-          <Icon name={iconName} size={20} color="#9CA3AF" />
-        </View>
-      )}
+      <View className="absolute items-center justify-center mr-2 p-3">
+        <Icon name={iconName} size={20} color="#9CA3AF" />
+      </View>
       <Input
         {...props}
         value={value ?? innerValue}
         onChangeText={handleChangeText}
         className={cn(
-          'flex-1 border-0 px-0 py-0 shadow-none bg-transparent',
+          'flex-1 border-0 px-0 py-0 shadow-none bg-transparent pl-10',
           className,
         )}
-        style={{ paddingLeft: padding }}
       />
     </View>
   );

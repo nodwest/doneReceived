@@ -9,11 +9,10 @@ import {
 import { Label } from '@app/components/ui/label';
 import { Text } from '@app/components/ui/text';
 import { Icon } from '@shared/ui/icons/icon';
-import { Button } from '@app/components';
+import { Button, InputWithIcon } from '@app/components';
 import { styles } from './registration.styled';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@shared/theme/theme';
-import { InputWithIcon } from '@app/components/ui/Input-with-icon/InputWithIcon';
 
 export function Registration() {
   //TODO убрать Tailwind, вынести в css
@@ -21,12 +20,12 @@ export function Registration() {
     <Card style={styles.base}>
       <CardHeader style={styles.header}>
         <LinearGradient
-          colors={[theme.colors.primeViolet, theme.colors.primeBlue]}
+          style={styles.headerIcon}
+          colors={[theme.colors.violet, theme.colors.blue]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.headerIcon}
         >
-          <Icon name="star" size={44} color={theme.colors.primarYellow} />
+          <Icon name="star" size={44} color={theme.colors.yellow} />
         </LinearGradient>
         <Text variant={'h1'}>Welcome to Kids Tascks</Text>
         <CardDescription style={styles.titleDescription}>
@@ -62,7 +61,7 @@ export function Registration() {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <LinearGradient
-          colors={[theme.colors.primeViolet, theme.colors.primeBlue]}
+          colors={[theme.colors.violet, theme.colors.blue]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={{

@@ -1,9 +1,9 @@
 export const theme = {
   colors: {
     prime: '#F5F6FA',
-    primeViolet: '#6C5CE7',
-    primeBlue: '#4A90E2',
-    primarYellow: '#FFB930',
+    violet: '#6C5CE7',
+    blue: '#4A90E2',
+    yellow: '#FFB930',
     grey: '#8A8FA3',
     danger: '#ef4444',
     dangerForeground: '#ffffff',
