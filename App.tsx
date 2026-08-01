@@ -1,6 +1,11 @@
-import { TaskShortView } from '@widgets/task-short-view';
 import './app.css';
+import { Registration } from './src/page/registration';
+import { View } from 'react-native';
 
 export default function App() {
-  return <TaskShortView />;
+  return (
+    <View>
+      <Registration />
+    </View>
+  );
 }
