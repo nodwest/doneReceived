@@ -16,7 +16,7 @@ const textVariants = cva(
       variant: {
         default: '',
         h1: cn(
-          'text-center text-4xl font-extrabold tracking-tight',
+          'text-center text-3xl font-bold tracking-tight',
           Platform.select({ web: 'scroll-m-20 text-balance' }),
         ),
         h2: cn(
@@ -70,7 +70,7 @@ const ARIA_LEVEL: Partial<Record<TextVariant, string>> = {
 
 const TextClassContext = React.createContext<string | undefined>(undefined);
 
-function Text({
+function ButtonText({
   className,
   asChild = false,
   variant = 'default',
@@ -92,4 +92,4 @@ function Text({
   );
 }
 
-export { Text, TextClassContext };
+export { ButtonText, TextClassContext };
