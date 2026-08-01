@@ -70,7 +70,7 @@ const ARIA_LEVEL: Partial<Record<TextVariant, string>> = {
 
 const TextClassContext = React.createContext<string | undefined>(undefined);
 
-function Text({
+function ButtonText({
   className,
   asChild = false,
   variant = 'default',
@@ -92,4 +92,4 @@ function Text({
   );
 }
 
-export { Text, TextClassContext };
+export { ButtonText, TextClassContext };

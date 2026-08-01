@@ -1,4 +1,4 @@
-import { Text, TextClassContext } from '@app/components/ui/text';
+import { ButtonText, TextClassContext } from '@app/components/ui/text';
 import { cn } from '@app/lib/utils';
 import { View } from 'react-native';
 
@@ -24,9 +24,9 @@ function CardTitle({
   className,
   ref,
   ...props
-}: React.ComponentProps<typeof Text> & React.RefAttributes<typeof Text>) {
+}: React.ComponentProps<typeof ButtonText> & React.RefAttributes<typeof Text>) {
   return (
-    <Text
+    <ButtonText
       ref={ref}
       role="heading"
       aria-level={3}
@@ -39,9 +39,9 @@ function CardTitle({
 function CardDescription({
   className,
   ...props
-}: React.ComponentProps<typeof Text> & React.RefAttributes<typeof Text>) {
+}: React.ComponentProps<typeof ButtonText> & React.RefAttributes<typeof Text>) {
   return (
-    <Text
+    <ButtonText
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
     />

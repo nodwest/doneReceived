@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { theme } from '@shared/theme/theme';
 
 export const styles = StyleSheet.create({
-  base: {
+  container: {
     backgroundColor: theme.colors.prime,
     display: 'flex',
     gap: 32,
@@ -10,13 +10,14 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
   header: {
+    maxWidth: 320,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
     margin: 24,
   },
-  headerIcon: {
+  iconWrapper: {
     width: 88,
     height: 88,
     borderRadius: 25,
@@ -24,15 +25,32 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
+    textAlign: 'center',
     fontSize: theme.fontSize.h1,
+    fontWeight: 'bold',
   },
-  titleDescription: {
+  subtitle: {
     textAlign: 'center',
     fontSize: theme.fontSize.sm,
+    color: theme.colors.grey,
   },
-  inputName: {
+  buttontitle: {
+    textAlign: 'center',
+    fontSize: theme.fontSize.lg,
+    color: theme.colors.prime,
+    fontWeight: 'bold',
+  },
+  linktitle: {
+    color: theme.colors.violet,
+    fontWeight: 'bold',
+  },
+  label: {
     fontSize: theme.fontSize.inputName,
     color: theme.colors.grey,
+  },
+  content: {
+    width: '100%',
+    gap: 16,
   },
   field: {
     gap: 8,
