@@ -2,7 +2,6 @@ import { View, Text, Pressable } from 'react-native';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
 } from '@app/components/ui/card';

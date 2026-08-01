@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "C4.md",
+                "file": "Features/DR-Profile.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "C4"
+              "title": "DR-Profile"
             }
           }
         ],
@@ -201,15 +201,16 @@
   },
   "active": "56be3c812802726d",
   "lastOpenFiles": [
-    "Features/DR-User.md",
     "Features/DR-Registration.md",
+    "Features/DR-Profile.md",
     "Features/DR-TaskCreator.md",
-    "z_Исходники/картинки/Pasted image 20260710155420.png",
-    "z_Исходники/картинки/Pasted image 20260710153839.png",
+    "Features/DR-User.md",
+    "Сделал-получил/СТЕК.md",
     "Сделал-получил/MVP.md",
     "C4.md",
+    "z_Исходники/картинки/Pasted image 20260710155420.png",
+    "z_Исходники/картинки/Pasted image 20260710153839.png",
     "Pasted image 20260710153557.png",
-    "Сделал-получил/СТЕК.md",
     "Без названия.base",
     "z_Исходники/картинки/Pasted image 20260710153438.png",
     "z_Исходники/картинки",
