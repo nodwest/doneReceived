@@ -5,7 +5,7 @@ export const buildingLayer: MapLayer = {
   type: 'fill',
   source: 'osm',
   'source-layer': 'building',
-  minzoom: 13,
+  minzoom: 12,
   paint: {
     'fill-color': '#d9d0c7',
     'fill-opacity': 0.8,

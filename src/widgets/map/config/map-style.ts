@@ -22,7 +22,8 @@ import {
   waterwayLayer,
 } from '@widgets/map/layers';
 
-import { usersSource, usersLayer } from '@widgets/map/layers/dynamic/users';
+import { userLayer } from '@widgets/map/layers/dynamic/user-layer';
+import { userSource } from '@widgets/map/layers/dynamic/user-source';
 
 export const MAP_STYLE: StyleSpecification = {
   version: 8,
@@ -31,7 +32,7 @@ export const MAP_STYLE: StyleSpecification = {
 
   sources: {
     osm: OSM_SOURCE,
-    users: usersSource,
+    users: userSource,
   },
 
   layers: [
@@ -52,6 +53,6 @@ export const MAP_STYLE: StyleSpecification = {
     roadLabelsLayer,
     citiesMediumLayer,
     settlementsSmallLayer,
-    usersLayer,
+    userLayer,
   ],
 };

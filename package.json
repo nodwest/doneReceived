@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@deck.gl/core": "^9.4.0",
+    "@deck.gl/layers": "^9.4.0",
+    "@deck.gl/mapbox": "^9.4.0",
     "@maplibre/maplibre-react-native": "^11.4.0",
     "@rn-primitives/aspect-ratio": "^1.5.2",
     "@rn-primitives/separator": "^1.5.2",
@@ -12,7 +15,7 @@
     "expo": "~56.0.22",
     "expo-dev-client": "~56.0.27",
     "expo-status-bar": "~56.0.4",
-    "maplibre-gl": "^6.10.0",
+    "maplibre-gl": "6.10.0",
     "nativewind": "^4.2.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",

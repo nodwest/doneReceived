@@ -5,4 +5,3 @@ export * from './buildings';
 export * from './roads';
 export * from './places';
 export * from './poi';
-export * from './dynamic';
