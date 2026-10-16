@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
   header: {
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   headerIcon: {

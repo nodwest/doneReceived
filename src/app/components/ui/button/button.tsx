@@ -13,6 +13,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        defaultBlue: cn(
+          'rounded-[30] h-14 w-full shadow-sm shadow-black/5',
+          Platform.select({
+            web: 'bg-gradient-to-r from-[#6C5CE7] to-[#4A90E2] hover:opacity-90 active:opacity-80',
+            native: 'bg-[#6C5CE7] active:bg-[#4A90E2]',
+          }),
+        ),
         default: cn(
           'bg-primary active:bg-primary/90 shadow-sm shadow-black/5',
           Platform.select({ web: 'hover:bg-primary/90' }),
@@ -37,11 +44,18 @@ const buttonVariants = cva(
           'active:bg-accent dark:active:bg-accent/50',
           Platform.select({ web: 'hover:bg-accent dark:hover:bg-accent/50' }),
         ),
+        void: cn(
+          '',
+          Platform.select({
+            web: 'hover:bg-[#6C5CE7] opacity-100 active:opacity-10',
+            native: 'active:bg-[#6C5CE7] opacity-100',
+          }),
+        ),
         link: '',
       },
       size: {
         default: cn(
-          'h-10 px-4 py-2 sm:h-9',
+          'h-14 sm:h-18',
           Platform.select({ web: 'has-[>svg]:px-3' }),
         ),
         sm: cn(
@@ -56,7 +70,7 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'defaultBlue',
       size: 'default',
     },
   },
@@ -70,6 +84,7 @@ const buttonTextVariants = cva(
   {
     variants: {
       variant: {
+        defaultBlue: 'text-white',
         default: 'text-primary-foreground',
         destructive: 'text-white',
         outline: cn(
@@ -84,6 +99,7 @@ const buttonTextVariants = cva(
             web: 'underline-offset-4 hover:underline group-hover:underline',
           }),
         ),
+        void: 'text-white',
       },
       size: {
         default: '',
@@ -93,7 +109,7 @@ const buttonTextVariants = cva(
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'defaultBlue',
       size: 'default',
     },
   },
