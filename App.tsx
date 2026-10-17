@@ -6,9 +6,11 @@ import { View } from 'react-native';
 
 export default function App() {
   return (
-    <View>
+    <>
+      <View>
+        <Registration />
+      </View>
       <MapWeb />
-      <Registration />
-    </View>
+    </>
   );
 }
