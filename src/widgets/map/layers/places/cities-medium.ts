@@ -1,4 +1,4 @@
-import { MapLayer } from '@widgets/map/types/types';
+import { MapLayer } from '../../model/types';
 
 export const citiesMediumLayer: MapLayer = {
   id: 'cities-medium',

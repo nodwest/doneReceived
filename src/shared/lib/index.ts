@@ -1,3 +1,2 @@
-export * from './types/task';
-export * from './types/location';
-export * from './types/pikas';
+export * from './utils';
+export * from './geolocation';

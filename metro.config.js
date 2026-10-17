@@ -7,6 +7,6 @@ const config = getDefaultConfig(__dirname);
 config.resolver.sourceExts = [...config.resolver.sourceExts, 'mjs'];
 
 module.exports = withNativeWind(config, {
-  input: './app.css',
+  input: './src/app/styles/app.css',
   inlineRem: 16,
 });

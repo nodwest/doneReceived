@@ -1,5 +1,5 @@
 import React from 'react';
-import { icons } from '@shared/ui/icons/index';
+import { icons } from './icon-map';
 
 export type IconName = keyof typeof icons;
 
