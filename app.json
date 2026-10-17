@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "donereceived",
     "name": "doneReceived",
     "slug": "doneReceived",
     "version": "1.0.0",
@@ -23,7 +24,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-router",
+        {
+          "root": "./app"
+        }
+      ]
     ]
   }
 }

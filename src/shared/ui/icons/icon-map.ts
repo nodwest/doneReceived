@@ -5,6 +5,13 @@ import { StarIcon } from './star';
 import { UserIcon } from './men';
 import { MessageIcon } from './message';
 import { CastleIcon } from './castle';
+import { CoinsIcon } from './coins';
+import { TasksIcon } from './tasks';
+import { ChildrenIcon } from './children';
+import { PlusIcon } from './plus';
+import { HomeIcon } from './home';
+import { WalletIcon } from './wallet';
+import { ProfileIcon } from './profile';
 
 export const icons = {
   price: PriceIcon,
@@ -14,4 +21,11 @@ export const icons = {
   user: UserIcon,
   message: MessageIcon,
   castle: CastleIcon,
+  coins: CoinsIcon,
+  tasks: TasksIcon,
+  children: ChildrenIcon,
+  plus: PlusIcon,
+  home: HomeIcon,
+  wallet: WalletIcon,
+  profile: ProfileIcon,
 };
