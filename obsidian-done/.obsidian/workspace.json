@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "C4.md",
+                "file": "Сделал-получил/Соглашения.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "C4"
+              "title": "Соглашения"
             }
           }
         ],
@@ -56,7 +56,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Файловый менеджер"
@@ -201,24 +203,24 @@
   },
   "active": "56be3c812802726d",
   "lastOpenFiles": [
+    "Сделал-получил/СТЕК.md",
+    "Сделал-получил/MVP.md",
+    "Сделал-получил/Идеи.md",
+    "Сделал-получил/Соглашения.md",
+    "C4.md",
     "Features/DR-User.md",
     "Features/DR-Registration.md",
     "Features/DR-TaskCreator.md",
     "z_Исходники/картинки/Pasted image 20260710155420.png",
     "z_Исходники/картинки/Pasted image 20260710153839.png",
-    "Сделал-получил/MVP.md",
-    "C4.md",
     "Pasted image 20260710153557.png",
-    "Сделал-получил/СТЕК.md",
     "Без названия.base",
     "z_Исходники/картинки/Pasted image 20260710153438.png",
     "z_Исходники/картинки",
     "z_Исходники",
-    "Сделал-получил/Идеи.md",
     "Pasted image 20260710153259.png",
     "Pasted image 20260710153243.png",
     "Pasted image 20260710153246.png",
-    "Сделал-получил/ПРОВЕРКА ГИТА.md",
     "Features/DR-Назавние_Фичи/СДЕСЬ ОПИСАНИЕ.md",
     "Features/DR-Назавние_Фичи",
     "Features",
