@@ -1,5 +1,5 @@
 import { IconLayer } from '@deck.gl/layers';
-import type { PikasVehicle } from '@shared/lib';
+import type { PikasVehicle } from '@entities/vehicle';
 import { vehicleIcon } from './vehicle-icon';
 export function createVehiclesLayer(vehicles: PikasVehicle[]) {
   return new IconLayer<PikasVehicle>({

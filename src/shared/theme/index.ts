@@ -1,1 +1,1 @@
-import { theme } from '@shared/theme/theme';
+export * from './theme';

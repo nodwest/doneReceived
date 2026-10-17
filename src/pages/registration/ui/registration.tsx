@@ -1,17 +1,17 @@
 import { View, Text, Pressable } from 'react-native';
 import {
+  Button,
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-} from '@app/components/ui/card';
-import { Label } from '@app/components/ui/label';
-import { Icon } from '@shared/ui/icons/icon';
-import { Button, InputWithIcon } from '@app/components';
+  Icon,
+  InputWithIcon,
+  Label,
+} from '@shared/ui';
 import { styles } from './registration.styled';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme } from '@shared/theme/theme';
+import { theme } from '@shared/theme';
 
 export function Registration() {
   return (

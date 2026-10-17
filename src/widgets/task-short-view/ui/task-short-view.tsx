@@ -1,10 +1,9 @@
 import { View } from 'react-native';
-import { ButtonText } from '@app/components/ui/text';
+import { ButtonText, Icon } from '@shared/ui';
 import { StatusBar } from 'expo-status-bar';
-import { styles } from '@widgets/task-short-view/ui/task-short-view.styled';
-import { TaskShortViewProps } from '@shared/lib';
-import { RewardButton } from '@app/components/ui/trophy';
-import { Icon } from '@shared/ui/icons/icon';
+import { styles } from './task-short-view.styled';
+import type { TaskShortViewProps } from '@entities/task';
+import { RewardButton } from '@entities/task';
 import React from 'react';
 
 export function TaskShortView(props: TaskShortViewProps) {
@@ -15,7 +14,7 @@ export function TaskShortView(props: TaskShortViewProps) {
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.headerIcon}>
-            <Icon name="сheque" size={30} color="blue" />
+            <Icon name="cheque" size={30} color="blue" />
           </View>
           <ButtonText variant={'large'}>
             {title || 'Название задачи'}

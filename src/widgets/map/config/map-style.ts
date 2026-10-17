@@ -1,6 +1,6 @@
 import type { StyleSpecification } from 'maplibre-gl';
 
-import { OSM_SOURCE } from '@widgets/map/config/map-source';
+import { OSM_SOURCE } from './map-source';
 
 import {
   backgroundLayer,
@@ -20,10 +20,10 @@ import {
   poiLayer,
   buildings3dLayer,
   waterwayLayer,
-} from '@widgets/map/layers';
+} from '../layers';
 
-import { userLayer } from '@widgets/map/layers/dynamic/user-layer';
-import { userSource } from '@widgets/map/layers/dynamic/user-source';
+import { userLayer } from '../layers/dynamic/user-layer';
+import { userSource } from '../layers/dynamic/user-source';
 
 export const MAP_STYLE: StyleSpecification = {
   version: 8,
