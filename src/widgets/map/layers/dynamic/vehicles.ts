@@ -1,8 +1,8 @@
 import { IconLayer } from '@deck.gl/layers';
-import type { BusesVehicle } from '@entities/vehicle';
+import type { Bus } from '@entities/vehicle';
 import { vehicleIcon } from './vehicle-icon';
-export function createVehiclesLayer(vehicles: BusesVehicle[]) {
-  return new IconLayer<BusesVehicle>({
+export function createVehiclesLayer(vehicles: Bus[]) {
+  return new IconLayer<Bus>({
     id: 'buses-vehicles',
 
     data: vehicles,

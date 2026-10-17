@@ -1,4 +1,4 @@
-export interface BusesVehicle {
+export interface Bus {
   type: number;
   route: string;
   longitude: number;

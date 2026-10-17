@@ -39,7 +39,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pages/` — `registration`, `map` (собирает виджеты).
 - `widgets/` — `map` (карта), `task-short-view`.
 - `features/` — `location` и `buses`: WebSocket-хуки в сегменте `model`.
-- `entities/` — `task` (типы и `RewardButton`), `user` (`User`, `Location`), `vehicle` (`BusesVehicle`).
+- `entities/` — `task` (типы и `RewardButton`), `user` (`User`, `Location`), `vehicle` (`Bus`).
 - `shared/` — `ui` (UI-кит shadcn и иконки), `lib` (`cn()`, геолокация), `config` (`WS_URL`), `theme`.
 
 **UI-кит и shadcn.** Компоненты shadcn лежат в `src/shared/ui` (плоско, как их кладёт CLI), `cn()` — в `src/shared/lib/utils.ts`. Пути задаёт `components.json` (`aliases` указывают на `@shared/...`), поэтому `npx shadcn add ...` / CLI Reusables добавляет компоненты прямо туда. Доменные компоненты (например, `RewardButton`) в `shared/ui` не кладите — им место в `entities`.

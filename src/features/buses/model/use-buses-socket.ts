@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
 
 import { WS_URL } from '@shared/config';
-import type { BusesVehicle } from '@entities/vehicle';
+import type { Bus } from '@entities/vehicle';
 
-export const useBusesSocket = (
-  onVehicles: (vehicles: BusesVehicle[]) => void,
-) => {
+export const useBusesSocket = (onVehicles: (vehicles: Bus[]) => void) => {
   useEffect(() => {
     const socket = new WebSocket(WS_URL);
 

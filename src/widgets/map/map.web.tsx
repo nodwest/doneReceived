@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import type { GeoJSONSource } from 'maplibre-gl';
 import { useMap } from './model/use-map';
 import type { Location } from '@entities/user';
-import type { BusesVehicle } from '@entities/vehicle';
+import type { Bus } from '@entities/vehicle';
 import { updateUserLocation } from './layers/dynamic/user-update';
 import { createVehiclesLayer } from './layers/dynamic/vehicles';
 import { useLocationSocket } from '@features/location';
@@ -30,7 +30,7 @@ export function MapWeb() {
   );
 
   const handleVehicles = useCallback(
-    (vehicles: BusesVehicle[]) => {
+    (vehicles: Bus[]) => {
       const layer = createVehiclesLayer(vehicles);
 
       deckOverlayRef.current?.setProps({
