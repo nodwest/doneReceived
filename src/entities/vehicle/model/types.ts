@@ -1,4 +1,4 @@
-export interface PikasVehicle {
+export interface BusesVehicle {
   type: number;
   route: string;
   longitude: number;

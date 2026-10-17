@@ -34,11 +34,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Архитектура
 
 **Структура Feature-Sliced Design в `src/`**, алиасы заданы в tsconfig через `baseUrl: "src"`: `@app/*`, `@pages/*`, `@widgets/*`, `@features/*`, `@entities/*`, `@shared/*`. Слой может импортировать только слои ниже себя (`app` → `pages` → `widgets` → `features` → `entities` → `shared`), внутри слайса используйте относительные пути, а между слайсами — только публичный API (`index.ts`).
+
 - `app/` — точка входа: `App.tsx`, `providers/` (React Query), `styles/app.css` (подключается в `metro.config.js`). Корневой `index.ts` регистрирует `src/app/App`.
 - `pages/` — `registration`, `map` (собирает виджеты).
 - `widgets/` — `map` (карта), `task-short-view`.
-- `features/` — `location` и `pikas`: WebSocket-хуки в сегменте `model`.
-- `entities/` — `task` (типы и `RewardButton`), `user` (`User`, `Location`), `vehicle` (`PikasVehicle`).
+- `features/` — `location` и `buses`: WebSocket-хуки в сегменте `model`.
+- `entities/` — `task` (типы и `RewardButton`), `user` (`User`, `Location`), `vehicle` (`BusesVehicle`).
 - `shared/` — `ui` (UI-кит shadcn и иконки), `lib` (`cn()`, геолокация), `config` (`WS_URL`), `theme`.
 
 **UI-кит и shadcn.** Компоненты shadcn лежат в `src/shared/ui` (плоско, как их кладёт CLI), `cn()` — в `src/shared/lib/utils.ts`. Пути задаёт `components.json` (`aliases` указывают на `@shared/...`), поэтому `npx shadcn add ...` / CLI Reusables добавляет компоненты прямо туда. Доменные компоненты (например, `RewardButton`) в `shared/ui` не кладите — им место в `entities`.
@@ -46,15 +47,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Стили смешанные.** NativeWind v4 + Tailwind 3 (CSS-переменные темы в `app.css`, в Babel задан `jsxImportSource: 'nativewind'`, Metro обёрнут в `withNativeWind`) используются вместе с обычными объектами `StyleSheet` в файлах `*.styled.ts`, которые берут цвета из захардкоженной палитры `src/shared/theme/theme.ts` (например, `src/pages/registration`). Придерживайтесь того способа, который уже используется в модуле. UI-компоненты построены на `@rn-primitives/*`, `class-variance-authority` и `cn()` и реэкспортируются из `src/shared/ui/index.ts`.
 
 **Зависимости, о которых стоит знать:**
+
 - Установлены и `expo-linear-gradient`, и `react-native-linear-gradient`; в коде используется Expo-версия.
 - `@tanstack/react-query`, `zustand`, `react-native-mmkv` и `expo-secure-store` установлены для данных, состояния и хранилища, но пока не подключены.
 - `babel-preset-expo` имеет версию `^57`, а `expo` — `~56`. Учитывайте это, если появятся ошибки Babel или Metro.
 
 **Виджет карты (`src/widgets/map`)** — только веб (`map.web.tsx`, DOM-версия `maplibre-gl`, наружу отдаётся через `index.ts`). Нативный `@maplibre/maplibre-react-native` установлен, но не используется и больше не указан в плагинах `app.json` (там остался только `expo-secure-store`).
+
 - `model/use-map.ts` создаёт карту MapLibre GL и подключает оверлей deck.gl `MapboxOverlay`; возвращает `mapRef` и `deckOverlayRef`. Воркер раздаётся из `public/maplibre/maplibre-gl-worker.mjs` (`setWorkerUrl('/maplibre/...')`), его версия должна совпадать с закреплённой `maplibre-gl` 6.10.0.
 - `config/map-style.ts` собирает стиль из тематических модулей в `layers/` (base, land, water, buildings, roads, places, poi), каждый из которых реэкспортируется через `index.ts`.
 - `layers/dynamic/` отвечает за живые данные: позиции пользователей идут через GeoJSON-источник `users`, который обновляет `updateUserLocation`; транспорт рисуется слоем deck.gl (`createVehiclesLayer`) и передаётся через `deckOverlayRef.setProps`.
 
-**Данные в реальном времени:** `src/features/location` и `src/features/pikas` открывают обычные WebSocket к локальному бэкенду (адрес `WS_URL` в `shared/config`, по умолчанию `ws://localhost:3001`, переопределяется `EXPO_PUBLIC_WS_URL`; сообщения вида `{ event, data }`). Бэкенда в этом репозитории нет. В эмуляторе Android `localhost` — это сам эмулятор (нужен `10.0.2.2`), на реальном устройстве нужен IP компьютера. `useLocationSocket` дополнительно запускает браузерную геолокацию и отправляет её от имени захардкоженного пользователя `user-1`. Доменные типы лежат в `entities/*/model`.
+**Данные в реальном времени:** `src/features/location` и `src/features/buses` открывают обычные WebSocket к локальному бэкенду (адрес `WS_URL` в `shared/config`, по умолчанию `ws://localhost:3001`, переопределяется `EXPO_PUBLIC_WS_URL`; сообщения вида `{ event, data }`). Бэкенда в этом репозитории нет. В эмуляторе Android `localhost` — это сам эмулятор (нужен `10.0.2.2`), на реальном устройстве нужен IP компьютера. `useLocationSocket` дополнительно запускает браузерную геолокацию и отправляет её от имени захардкоженного пользователя `user-1`. Доменные типы лежат в `entities/*/model`.
 
 **Прочее:** плагин `react-native-reanimated/plugin` в `babel.config.js` должен оставаться последним; `userInterfaceStyle` зафиксирован как `light`.

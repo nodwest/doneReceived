@@ -1,16 +1,16 @@
 import { useEffect } from 'react';
 
 import { WS_URL } from '@shared/config';
-import type { PikasVehicle } from '@entities/vehicle';
+import type { BusesVehicle } from '@entities/vehicle';
 
-export const usePikasSocket = (
-  onVehicles: (vehicles: PikasVehicle[]) => void,
+export const useBusesSocket = (
+  onVehicles: (vehicles: BusesVehicle[]) => void,
 ) => {
   useEffect(() => {
     const socket = new WebSocket(WS_URL);
 
     socket.onopen = () => {
-      console.log('PIKAS WebSocket connected');
+      console.log('BUSES WebSocket connected');
     };
 
     socket.onmessage = (event) => {
@@ -24,11 +24,11 @@ export const usePikasSocket = (
     };
 
     socket.onclose = () => {
-      console.log('PIKAS WebSocket disconnected');
+      console.log('BUSES WebSocket disconnected');
     };
 
     socket.onerror = (error) => {
-      console.error('PIKAS WebSocket error:', error);
+      console.error('BUSES WebSocket error:', error);
     };
 
     return () => {
