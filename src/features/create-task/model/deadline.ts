@@ -2,7 +2,6 @@ export type DeadlinePreset =
   | 'none'
   | 'in1h'
   | 'in2h'
-  | 'in3h'
   | 'today'
   | 'tomorrow'
   | 'custom';
@@ -24,7 +23,6 @@ export const deadlineRows: DeadlineOption[][] = [
     { key: 'none', label: 'No deadline' },
     { key: 'in1h', label: '1 hour' },
     { key: 'in2h', label: '2 hours' },
-    { key: 'in3h', label: '3 hours' },
   ],
   [
     { key: 'today', label: 'Today' },
@@ -55,8 +53,6 @@ export function resolveDeadline(
       return new Date(now.getTime() + HOUR_MS);
     case 'in2h':
       return new Date(now.getTime() + 2 * HOUR_MS);
-    case 'in3h':
-      return new Date(now.getTime() + 3 * HOUR_MS);
     case 'today':
       return endOfDay(now, 0);
     case 'tomorrow':

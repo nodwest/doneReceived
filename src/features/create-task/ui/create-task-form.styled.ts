@@ -86,13 +86,26 @@ export const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 10,
   },
+  chipRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  chipRowCompact: {
+    gap: 8,
+  },
   chip: {
+    flexGrow: 1,
+    flexShrink: 1,
+    alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: theme.colors.line,
     backgroundColor: theme.colors.white,
+  },
+  chipCompact: {
+    paddingHorizontal: 14,
   },
   chipSelected: {
     borderColor: theme.colors.violet,

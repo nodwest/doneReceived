@@ -10,6 +10,7 @@ import {
   MIN_DEADLINE_MS,
   resolveDeadline,
 } from '../model/deadline';
+import { ChipRow } from './chip-row';
 import { FormField } from './form-field';
 import { OptionChip } from './option-chip';
 import { styles } from './create-task-form.styled';
@@ -38,7 +39,7 @@ export function DeadlineField() {
   return (
     <FormField label="Time to complete" optional>
       {deadlineRows.map((row) => (
-        <View key={row[0].key} style={styles.chips}>
+        <ChipRow key={row[0].key}>
           {row.map(({ key, label }) => (
             <OptionChip
               key={key}
@@ -50,7 +51,7 @@ export function DeadlineField() {
               }}
             />
           ))}
-        </View>
+        </ChipRow>
       ))}
       {resolved && (
         <View style={styles.deadlineRow}>

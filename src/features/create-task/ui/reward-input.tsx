@@ -1,9 +1,10 @@
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { useCreateTaskStore } from '../model/create-task-store';
+import { ChipRow } from './chip-row';
 import { FormField } from './form-field';
 import { OptionChip } from './option-chip';
 import { styles } from './create-task-form.styled';
@@ -44,7 +45,7 @@ export function RewardInput({ presets }: RewardInputProps) {
         />
         <Icon name="coin" size={28} color={theme.colors.yellow} />
       </LinearGradient>
-      <View style={styles.chips}>
+      <ChipRow>
         {presets.map((preset) => (
           <OptionChip
             key={preset}
@@ -53,7 +54,7 @@ export function RewardInput({ presets }: RewardInputProps) {
             onPress={() => pickRewardPreset(preset)}
           />
         ))}
-      </View>
+      </ChipRow>
     </FormField>
   );
 }
