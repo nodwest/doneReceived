@@ -147,30 +147,26 @@ export const styles = StyleSheet.create({
   deadlineError: {
     color: theme.colors.danger,
   },
+  deadlineRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 6,
+  },
   dateButton: {
-    alignSelf: 'flex-start',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: theme.colors.line,
+    borderColor: theme.colors.violet,
     backgroundColor: theme.colors.white,
   },
-  dateButtonText: {
-    fontSize: theme.fontSize.sm,
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+  dateButtonInvalid: {
+    borderColor: theme.colors.danger,
   },
-  dateInputWeb: {
-    alignSelf: 'flex-start',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: theme.colors.line,
-    fontSize: theme.fontSize.sm,
+  dateButtonText: {
+    fontSize: theme.fontSize.xs,
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: theme.colors.violet,
   },
 });

@@ -1,4 +1,7 @@
-import { Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { DateTimePickerSheet } from '@shared/ui';
+import { ceilToMinute } from '@shared/lib';
 import { useCreateTaskStore } from '../model/create-task-store';
 import {
   deadlineRows,
@@ -7,7 +10,6 @@ import {
   MIN_DEADLINE_MS,
   resolveDeadline,
 } from '../model/deadline';
-import { DateTimeField } from './date-time-field';
 import { FormField } from './form-field';
 import { OptionChip } from './option-chip';
 import { styles } from './create-task-form.styled';
@@ -19,7 +21,17 @@ export function DeadlineField() {
     (state) => state.setCustomDeadline,
   );
 
+  const [pickerOpen, setPickerOpen] = useState(false);
+
   const now = new Date();
+  const minimumDate = ceilToMinute(new Date(now.getTime() + MIN_DEADLINE_MS));
+  const maximumDate = new Date(
+    now.getFullYear() + 1,
+    now.getMonth(),
+    now.getDate(),
+    now.getHours(),
+    now.getMinutes(),
+  );
   const resolved = resolveDeadline(deadline, now);
   const valid = isDeadlineValid(deadline, now);
 
@@ -32,24 +44,48 @@ export function DeadlineField() {
               key={key}
               label={label}
               selected={deadline.preset === key}
-              onPress={() => selectDeadline(key)}
+              onPress={() => {
+                selectDeadline(key);
+                if (key === 'custom') setPickerOpen(true);
+              }}
             />
           ))}
         </View>
       ))}
-      {deadline.preset === 'custom' && resolved && (
-        <DateTimeField
-          value={resolved}
-          minimumDate={new Date(now.getTime() + MIN_DEADLINE_MS)}
-          onChange={setCustomDeadline}
-        />
+      {resolved && (
+        <View style={styles.deadlineRow}>
+          <Text style={styles.deadlineHint}>Task expires:</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Change deadline"
+            onPress={() => setPickerOpen(true)}
+            style={[styles.dateButton, !valid && styles.dateButtonInvalid]}
+          >
+            <Text
+              style={[styles.dateButtonText, !valid && styles.deadlineError]}
+            >
+              {formatDeadline(resolved, now)}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+      {resolved && !valid && (
+        <Text style={[styles.deadlineHint, styles.deadlineError]}>
+          Pick a time at least 1 minute from now
+        </Text>
       )}
       {resolved && (
-        <Text style={[styles.deadlineHint, !valid && styles.deadlineError]}>
-          {valid
-            ? `Task expires: ${formatDeadline(resolved, now)}`
-            : 'Pick a time at least 1 minute from now'}
-        </Text>
+        <DateTimePickerSheet
+          visible={pickerOpen}
+          value={resolved}
+          minimumDate={minimumDate}
+          maximumDate={maximumDate}
+          onCancel={() => setPickerOpen(false)}
+          onConfirm={(date) => {
+            setCustomDeadline(date);
+            setPickerOpen(false);
+          }}
+        />
       )}
     </FormField>
   );
