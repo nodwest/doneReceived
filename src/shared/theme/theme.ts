@@ -8,6 +8,9 @@ export const theme = {
     ink: '#1A1A2E',
     success: '#2ECC71',
     white: '#FFFFFF',
+    line: '#ECEDF3',
+    placeholder: '#CDD0DB',
+    yellowSoft: '#FFF7E6',
     danger: '#ef4444',
     dangerForeground: '#ffffff',
 

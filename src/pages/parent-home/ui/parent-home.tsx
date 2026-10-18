@@ -30,7 +30,7 @@ export function ParentHomePage() {
             avatar={parentMock.avatar}
           />
           <HomeSummary {...familySummaryMock} />
-          <CreateTaskButton />
+          <CreateTaskButton onPress={() => router.push('/create-task')} />
           <RecentActivity items={recentActivityMock} />
         </ScrollView>
         <BottomNav

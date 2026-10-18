@@ -14,3 +14,12 @@ export interface TaskShortViewProps {
   authorId?: number;
   workerId?: number;
 }
+
+export interface CreateTaskPayload {
+  title: string;
+  reward: number;
+  description: string;
+  /** ISO-время, когда задача перестаёт быть активной; null — без срока. */
+  expiresAt: string | null;
+  assigneeId: number;
+}

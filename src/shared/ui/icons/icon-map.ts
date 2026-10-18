@@ -12,6 +12,8 @@ import { PlusIcon } from './plus';
 import { HomeIcon } from './home';
 import { WalletIcon } from './wallet';
 import { ProfileIcon } from './profile';
+import { CloseIcon } from './close';
+import { CoinIcon } from './coin';
 
 export const icons = {
   price: PriceIcon,
@@ -28,4 +30,6 @@ export const icons = {
   home: HomeIcon,
   wallet: WalletIcon,
   profile: ProfileIcon,
+  close: CloseIcon,
+  coin: CoinIcon,
 };

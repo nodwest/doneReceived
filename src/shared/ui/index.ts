@@ -7,3 +7,4 @@ export * from './input-with-icon';
 export * from './label';
 export * from './separator';
 export * from './text';
+export * from './toast-host';

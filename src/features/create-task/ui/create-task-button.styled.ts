@@ -8,8 +8,18 @@ export const styles = StyleSheet.create({
     borderRadius: 28,
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.1)',
   },
+  disabled: {
+    opacity: 0.5,
+  },
+  buttonDisabled: {
+    opacity: 1,
+  },
   button: {
     height: 56,
+    // variant="void" красит фон при hover/нажатии со скруглением rounded-md:
+    // повторяем радиус градиента, иначе углы становятся прямоугольными.
+    borderRadius: 28,
+    overflow: 'hidden',
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
