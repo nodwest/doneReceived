@@ -41,7 +41,7 @@ export function ToastHost() {
   if (!message) return null;
 
   return (
-    <View style={styles.overlay} pointerEvents="none">
+    <View style={[styles.overlay, { pointerEvents: 'none' }]}>
       <Animated.View style={[styles.toast, { opacity }]}>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>✓</Text>

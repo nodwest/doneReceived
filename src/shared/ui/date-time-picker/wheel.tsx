@@ -102,8 +102,7 @@ export function Wheel({
   return (
     <View style={{ width, height: WHEEL_ITEM_HEIGHT * visibleRows }}>
       <View
-        style={[styles.wheelBand, { top: edgePadding }]}
-        pointerEvents="none"
+        style={[styles.wheelBand, { top: edgePadding, pointerEvents: 'none' }]}
       />
       <ScrollView
         ref={scrollRef}

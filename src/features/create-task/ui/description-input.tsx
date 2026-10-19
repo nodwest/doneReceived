@@ -32,8 +32,11 @@ export function DescriptionInput({
     <View style={styles.textareaBox}>
       <Text
         aria-hidden
-        pointerEvents="none"
-        style={[styles.textareaInput, styles.textareaMirror]}
+        style={[
+          styles.textareaInput,
+          styles.textareaMirror,
+          { pointerEvents: 'none' },
+        ]}
         onLayout={(event) =>
           setContentHeight(Math.ceil(event.nativeEvent.layout.height))
         }
