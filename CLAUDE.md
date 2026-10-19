@@ -22,9 +22,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Команды
 
-Тест-раннер не настроен. Менеджер пакетов не определён: в репозитории лежат и `yarn.lock`, и `package-lock.json`, поля `packageManager` в `package.json` нет, а `.yarnrc.yml` задаёт `nodeLinker: node-modules`. Команда ещё не выбрала менеджер, поэтому пока ставим через `npx expo install --npm <пакет>` (обновляется только `package-lock.json`, `yarn.lock` не трогаем) и не создаём второй lock-файл. Если Expo или yarn изменили `yarn.lock`, откатите его (`git checkout yarn.lock`).
+Тест-раннер не настроен. Менеджер пакетов — npm, единственный lock-файл — `package-lock.json` (`yarn.lock` и `.yarnrc.yml` удалены по решению команды). Зависимости ставим через `npm ci` / `npx expo install <пакет>`; yarn не используем и второй lock-файл не создаём.
 
-- `npm run lint` (`expo lint`) из-за `yarn.lock` пытается вызвать yarn и падает, поэтому линтим напрямую: `npx eslint app src`.
 - `npm start` (`expo start`) — dev-сервер. Проект использует `expo-dev-client`, поэтому для нативного запуска нужен dev-билд, Expo Go не подойдёт (нативные модули: MapLibre, Reanimated 4, MMKV, secure-store).
 - `npm run web` / `npm run ios` / `npm run android` — `ios` и `android` вызывают `expo run:*` и при первом запуске генерируют папки `ios/` и `android/`.
 - `npm run lint` / `lint:fix` — `expo lint` (плоский конфиг ESLint 9: `eslint-config-expo` + Prettier как правило).
