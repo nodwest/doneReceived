@@ -16,8 +16,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   footer: {
-    paddingTop: 12,
-    backgroundColor: theme.colors.prime,
+    paddingTop: 8,
   },
 
   field: {

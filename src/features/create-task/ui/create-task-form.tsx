@@ -67,7 +67,13 @@ export function CreateTaskForm({
     >
       <ScrollView
         style={styles.flex}
-        contentContainerStyle={[styles.content, { paddingHorizontal: gutter }]}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingHorizontal: gutter,
+            paddingBottom: Math.max(insets.bottom, 24),
+          },
+        ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -102,24 +108,16 @@ export function CreateTaskForm({
             ))}
           </View>
         </FormField>
-      </ScrollView>
 
-      <View
-        style={[
-          styles.footer,
-          {
-            paddingHorizontal: gutter,
-            paddingBottom: Math.max(insets.bottom, 24),
-          },
-        ]}
-      >
-        <CreateTaskButton
-          label="Create Task"
-          withIcon={false}
-          disabled={!canSubmit}
-          onPress={submit}
-        />
-      </View>
+        <View style={styles.footer}>
+          <CreateTaskButton
+            label="Create Task"
+            withIcon={false}
+            disabled={!canSubmit}
+            onPress={submit}
+          />
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
