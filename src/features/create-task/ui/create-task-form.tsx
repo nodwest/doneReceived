@@ -1,0 +1,125 @@
+import { useEffect } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ChildChip, type Child } from '@entities/user';
+import { Input } from '@shared/ui';
+import { useIsCompact } from '@shared/lib';
+import { theme } from '@shared/theme';
+import {
+  buildCreateTaskPayload,
+  useCreateTaskStore,
+} from '../model/create-task-store';
+import { isDeadlineValid } from '../model/deadline';
+import { useCreateTask } from '../model/use-create-task';
+import { CreateTaskButton } from './create-task-button';
+import { DeadlineField } from './deadline-field';
+import { DescriptionInput } from './description-input';
+import { FormField } from './form-field';
+import { RewardInput } from './reward-input';
+import { styles } from './create-task-form.styled';
+
+type CreateTaskFormProps = {
+  assignees: readonly Child[];
+  rewardPresets: readonly number[];
+  onCreated: () => void;
+};
+
+export function CreateTaskForm({
+  assignees,
+  rewardPresets,
+  onCreated,
+}: CreateTaskFormProps) {
+  const insets = useSafeAreaInsets();
+  const gutter = useIsCompact() ? 16 : 24;
+  const { mutateAsync, isPending } = useCreateTask();
+
+  const title = useCreateTaskStore((state) => state.title);
+  const description = useCreateTaskStore((state) => state.description);
+  const reward = useCreateTaskStore((state) => state.reward);
+  const deadline = useCreateTaskStore((state) => state.deadline);
+  const assigneeId = useCreateTaskStore((state) => state.assigneeId);
+  const setTitle = useCreateTaskStore((state) => state.setTitle);
+  const setDescription = useCreateTaskStore((state) => state.setDescription);
+  const setAssignee = useCreateTaskStore((state) => state.setAssignee);
+  const reset = useCreateTaskStore((state) => state.reset);
+
+  // Форма начинается с чистого листа при каждом открытии.
+  useEffect(() => reset, [reset]);
+
+  const canSubmit =
+    !isPending &&
+    Number(reward) > 0 &&
+    title.trim().length > 0 &&
+    assigneeId !== null &&
+    isDeadlineValid(deadline);
+
+  const submit = async () => {
+    const payload = buildCreateTaskPayload(useCreateTaskStore.getState());
+    if (!payload || isPending) return;
+    await mutateAsync(payload);
+    onCreated();
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={[styles.content, { paddingHorizontal: gutter }]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <FormField label="Task Title">
+          <Input
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Clean your room"
+            placeholderTextColor={theme.colors.placeholder}
+            className="placeholder:text-[#CDD0DB]"
+            style={styles.input}
+          />
+        </FormField>
+
+        <DeadlineField />
+
+        <RewardInput presets={rewardPresets} />
+
+        <FormField label="Description" optional>
+          <DescriptionInput value={description} onChangeText={setDescription} />
+        </FormField>
+
+        <FormField label="Assign to">
+          <View style={styles.chips}>
+            {assignees.map((child) => (
+              <ChildChip
+                key={child.id}
+                child={child}
+                selected={assigneeId === child.id}
+                onPress={({ id }) => setAssignee(id)}
+              />
+            ))}
+          </View>
+        </FormField>
+      </ScrollView>
+
+      <View
+        style={[
+          styles.footer,
+          {
+            paddingHorizontal: gutter,
+            paddingBottom: Math.max(insets.bottom, 24),
+          },
+        ]}
+      >
+        <CreateTaskButton
+          label="Create Task"
+          withIcon={false}
+          disabled={!canSubmit}
+          onPress={submit}
+        />
+      </View>
+    </KeyboardAvoidingView>
+  );
+}

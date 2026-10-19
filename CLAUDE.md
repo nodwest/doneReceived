@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 «doneReceived» («Сделал-получил», в интерфейсе — «Kids Tasks») — приложение на Expo 56 / React Native 0.85. Родитель создаёт задачу с наградой, ребёнок отмечает её выполненной, родитель подтверждает, и деньги попадают на баланс ребёнка. Описание продукта лежит на русском в `obsidian-done/Сделал-получил/` (это хранилище Obsidian, оно исключено из ESLint). В `canvases/` лежат макеты и вайрфреймы, они тоже исключены из линтера.
 
-Проект на ранней стадии: `src/app/App.tsx` сейчас рендерит страницы `Registration` и `MapPage` (веб-виджет карты) рядом друг с другом. Виджет `task-short-view` пока нигде не используется.
+Проект на ранней стадии: главный экран (`/`) — `ParentHomePage` (дашборд родителя), карта (`/map`, веб-виджет) и регистрация (`/registration`) — отдельные роуты. Виджет `task-short-view` пока нигде не используется.
 
 ## Коммиты
 
@@ -22,8 +22,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Команды
 
-Тест-раннер не настроен. Менеджер пакетов не определён: в репозитории лежат и `yarn.lock`, и `package-lock.json`, поля `packageManager` в `package.json` нет, а `.yarnrc.yml` задаёт `nodeLinker: node-modules`. Перед установкой или добавлением зависимостей уточняйте у пользователя и не создавайте второй lock-файл.
+Тест-раннер не настроен. Менеджер пакетов не определён: в репозитории лежат и `yarn.lock`, и `package-lock.json`, поля `packageManager` в `package.json` нет, а `.yarnrc.yml` задаёт `nodeLinker: node-modules`. Команда ещё не выбрала менеджер, поэтому пока ставим через `npx expo install --npm <пакет>` (обновляется только `package-lock.json`, `yarn.lock` не трогаем) и не создаём второй lock-файл. Если Expo или yarn изменили `yarn.lock`, откатите его (`git checkout yarn.lock`).
 
+- `npm run lint` (`expo lint`) из-за `yarn.lock` пытается вызвать yarn и падает, поэтому линтим напрямую: `npx eslint app src`.
 - `npm start` (`expo start`) — dev-сервер. Проект использует `expo-dev-client`, поэтому для нативного запуска нужен dev-билд, Expo Go не подойдёт (нативные модули: MapLibre, Reanimated 4, MMKV, secure-store).
 - `npm run web` / `npm run ios` / `npm run android` — `ios` и `android` вызывают `expo run:*` и при первом запуске генерируют папки `ios/` и `android/`.
 - `npm run lint` / `lint:fix` — `expo lint` (плоский конфиг ESLint 9: `eslint-config-expo` + Prettier как правило).
@@ -35,12 +36,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Структура Feature-Sliced Design в `src/`**, алиасы заданы в tsconfig через `baseUrl: "src"`: `@app/*`, `@pages/*`, `@widgets/*`, `@features/*`, `@entities/*`, `@shared/*`. Слой может импортировать только слои ниже себя (`app` → `pages` → `widgets` → `features` → `entities` → `shared`), внутри слайса используйте относительные пути, а между слайсами — только публичный API (`index.ts`).
 
-- `app/` — точка входа: `App.tsx`, `providers/` (React Query), `styles/app.css` (подключается в `metro.config.js`). Корневой `index.ts` регистрирует `src/app/App`.
-- `pages/` — `registration`, `map` (собирает виджеты).
-- `widgets/` — `map` (карта), `task-short-view`.
-- `features/` — `location` и `buses`: WebSocket-хуки в сегменте `model`.
-- `entities/` — `task` (типы и `RewardButton`), `user` (`User`, `Location`), `vehicle` (`Bus`).
-- `shared/` — `ui` (UI-кит shadcn и иконки), `lib` (`cn()`, геолокация), `config` (`WS_URL`), `theme`.
+- `app/` — слой FSD: `root-layout.tsx` (`RootLayout`: `Providers` + `Stack` из expo-router, импорт `app.css`), `providers/` (React Query), `styles/app.css` (подключается в `metro.config.js`).
+- `pages/` — `parent-home` (главный экран родителя), `registration`, `map` (собирает виджеты).
+- `widgets/` — `map` (карта), `task-short-view`, `home-header`, `home-summary`, `recent-activity`, `bottom-nav`.
+- `features/` — `location` и `buses`: WebSocket-хуки в сегменте `model`; `create-task` (кнопка «Create Task»).
+- `entities/` — `task` (типы и `RewardButton`), `user` (`User`, `Location`), `vehicle` (`Bus`), `activity` (`Activity`, `ActivityItem`).
+- `shared/` — `ui` (UI-кит shadcn и иконки), `lib` (`cn()`, геолокация), `config` (`WS_URL`), `theme`, `mocks` (моковые данные).
+
+**Роутинг (Expo Router).** Файлы-роуты лежат в корневой папке `app/` (не путать со слоем FSD `src/app/`): `_layout.tsx`, `index.tsx` (`/`), `map.tsx` (`/map`), `registration.tsx` (`/registration`). Это тонкие реэкспорты страниц из `src/pages/*` (`export { XPage as default } from '@pages/x'`), никакой логики в них нет. Папка роутов задана плагином в `app.json`: `["expo-router", { "root": "./app" }]`. Без этого Expo Router брал бы `src/app` (она приоритетнее корневой `app/`) и принял бы за роуты `providers/` и `styles/`. `main` в `package.json` — `expo-router/entry`. Новый экран: страница в `src/pages/<name>`, реэкспорт в `app/<route>.tsx`.
+
+**Моки.** Пока нет бэкенда, данные для отрисовки берём из моков в `src/shared/mocks/` (один файл на предметную область: `parent.ts`, `summary.ts`, `activity.ts`, всё реэкспортируется через `index.ts`; картинки — в `mocks/images/`). При вёрстке нового экрана или виджета создавайте там недостающие моки, если реальных данных нет. Моки лежат в `shared`, поэтому не импортируют типы из `entities`: используйте `as const` и структурную совместимость, а типы данных объявляйте в `entities/*/model`. Страница берёт моки из `@shared/mocks` и передаёт их в виджеты через props; сами виджеты моки не импортируют. Когда появится API, заменяем только источник данных на странице.
 
 **UI-кит и shadcn.** Компоненты shadcn лежат в `src/shared/ui` (плоско, как их кладёт CLI), `cn()` — в `src/shared/lib/utils.ts`. Пути задаёт `components.json` (`aliases` указывают на `@shared/...`), поэтому `npx shadcn add ...` / CLI Reusables добавляет компоненты прямо туда. Доменные компоненты (например, `RewardButton`) в `shared/ui` не кладите — им место в `entities`.
 

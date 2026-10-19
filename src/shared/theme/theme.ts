@@ -5,6 +5,12 @@ export const theme = {
     blue: '#4A90E2',
     yellow: '#FFB930',
     grey: '#8A8FA3',
+    ink: '#1A1A2E',
+    success: '#2ECC71',
+    white: '#FFFFFF',
+    line: '#ECEDF3',
+    placeholder: '#CDD0DB',
+    yellowSoft: '#FFF7E6',
     danger: '#ef4444',
     dangerForeground: '#ffffff',
 
@@ -29,6 +35,10 @@ export const theme = {
     md: 8,
     lg: 12,
     full: 999,
+  },
+  fonts: {
+    medium: 'Inter_500Medium',
+    bold: 'Inter_700Bold',
   },
   fontSize: {
     xs: 12,
