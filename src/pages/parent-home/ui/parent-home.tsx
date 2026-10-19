@@ -33,10 +33,7 @@ export function ParentHomePage() {
           <CreateTaskButton onPress={() => router.push('/create-task')} />
           <RecentActivity items={recentActivityMock} />
         </ScrollView>
-        <BottomNav
-          activeKey="home"
-          onNavigate={(key) => key === 'home' && router.replace('/')}
-        />
+        <BottomNav activeKey="home" />
       </SafeAreaView>
     </View>
   );
