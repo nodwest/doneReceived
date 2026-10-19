@@ -15,6 +15,9 @@ import { ProfileIcon } from './profile';
 import { CloseIcon } from './close';
 import { CoinIcon } from './coin';
 import { MapIcon } from './map';
+import { LockIcon } from './lock';
+import { EyeIcon } from './eye';
+import { EyeOffIcon } from './eye-off';
 
 export const icons = {
   price: PriceIcon,
@@ -34,4 +37,7 @@ export const icons = {
   close: CloseIcon,
   coin: CoinIcon,
   map: MapIcon,
+  lock: LockIcon,
+  eye: EyeIcon,
+  'eye-off': EyeOffIcon,
 };
