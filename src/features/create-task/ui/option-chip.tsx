@@ -1,5 +1,4 @@
 import { Pressable, Text } from 'react-native';
-import { useIsCompact } from '@shared/lib';
 import { styles } from './create-task-form.styled';
 
 // 360pt-телефоны тоже считаем узкими: три чипа в ряд впритык.
@@ -12,18 +11,12 @@ type OptionChipProps = {
 };
 
 export function OptionChip({ label, selected, onPress }: OptionChipProps) {
-  const compact = useIsCompact(CHIP_COMPACT_WIDTH);
-
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[
-        styles.chip,
-        compact && styles.chipCompact,
-        selected && styles.chipSelected,
-      ]}
+      style={[styles.chip, selected && styles.chipSelected]}
     >
       <Text
         numberOfLines={1}

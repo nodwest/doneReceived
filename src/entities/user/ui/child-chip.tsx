@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text } from 'react-native';
 import type { Child } from '../model/child';
 import { styles } from './child-chip.styled';
 
@@ -16,9 +16,7 @@ export function ChildChip({ child, selected, onPress }: ChildChipProps) {
       onPress={() => onPress?.(child)}
       style={[styles.chip, selected && styles.chipSelected]}
     >
-      <View style={[styles.dot, { backgroundColor: child.color }]}>
-        <Text style={styles.initial}>{child.name.charAt(0).toUpperCase()}</Text>
-      </View>
+      <Image source={child.avatar} style={styles.avatar} />
       <Text style={styles.name}>{child.name}</Text>
     </Pressable>
   );

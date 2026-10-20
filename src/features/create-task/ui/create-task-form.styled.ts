@@ -11,11 +11,16 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    // Растягиваем контент на весь экран: короткая форма прижимает кнопку ко дну.
+    flexGrow: 1,
     gap: 24,
+    paddingHorizontal: 12,
     paddingTop: 16,
     paddingBottom: 24,
   },
   footer: {
+    // Автоотступ толкает кнопку вниз; если контента много, она остаётся в конце потока.
+    marginTop: 'auto',
     paddingTop: 8,
   },
 
@@ -54,7 +59,8 @@ export const styles = StyleSheet.create({
   // Рамка и отступы на обёртке, чтобы высота TextInput равнялась высоте текста.
   textareaBox: {
     minHeight: 88,
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: theme.colors.line,
@@ -74,8 +80,8 @@ export const styles = StyleSheet.create({
   textareaMirror: {
     position: 'absolute',
     top: 16,
-    left: 16,
-    right: 16,
+    left: 18,
+    right: 18,
     minHeight: 0,
     opacity: 0,
   },
@@ -97,14 +103,11 @@ export const styles = StyleSheet.create({
     flexShrink: 1,
     alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: theme.colors.line,
     backgroundColor: theme.colors.white,
-  },
-  chipCompact: {
-    paddingHorizontal: 14,
   },
   chipSelected: {
     borderColor: theme.colors.violet,

@@ -3,7 +3,6 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChildChip, type Child } from '@entities/user';
 import { Input } from '@shared/ui';
-import { useIsCompact } from '@shared/lib';
 import { theme } from '@shared/theme';
 import {
   buildCreateTaskPayload,
@@ -30,7 +29,6 @@ export function CreateTaskForm({
   onCreated,
 }: CreateTaskFormProps) {
   const insets = useSafeAreaInsets();
-  const gutter = useIsCompact() ? 16 : 24;
   const { mutateAsync, isPending } = useCreateTask();
 
   const title = useCreateTaskStore((state) => state.title);
@@ -70,7 +68,6 @@ export function CreateTaskForm({
         contentContainerStyle={[
           styles.content,
           {
-            paddingHorizontal: gutter,
             paddingBottom: Math.max(insets.bottom, 24),
           },
         ]}
