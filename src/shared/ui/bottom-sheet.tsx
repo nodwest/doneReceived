@@ -2,7 +2,9 @@ import { useEffect, useState, type ReactNode } from 'react';
 import {
   Animated,
   Easing,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   useWindowDimensions,
@@ -59,7 +61,11 @@ export function BottomSheet({
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <View style={styles.root}>
+      {/* Шторка с полем ввода поднимается над клавиатурой. */}
+      <KeyboardAvoidingView
+        style={styles.root}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         <Animated.View
           style={[
             StyleSheet.absoluteFill,
@@ -93,7 +99,7 @@ export function BottomSheet({
           <View style={styles.handle} />
           {children}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

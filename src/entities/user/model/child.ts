@@ -1,6 +1,7 @@
+import type { ImageSourcePropType } from 'react-native';
+
 export interface Child {
   id: number;
   name: string;
-  /** Цвет кружка с инициалом. */
-  color: string;
+  avatar: ImageSourcePropType;
 }

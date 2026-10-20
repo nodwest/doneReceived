@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChildChip, type Child } from '@entities/user';
+import type { UpdateTaskPayload } from '@entities/task';
 import { Input } from '@shared/ui';
-import { useIsCompact } from '@shared/lib';
 import { theme } from '@shared/theme';
 import {
   buildCreateTaskPayload,
@@ -11,6 +11,7 @@ import {
 } from '../model/create-task-store';
 import { isDeadlineValid } from '../model/deadline';
 import { useCreateTask } from '../model/use-create-task';
+import { useUpdateTask } from '../model/use-update-task';
 import { CreateTaskButton } from './create-task-button';
 import { DeadlineField } from './deadline-field';
 import { DescriptionInput } from './description-input';
@@ -21,17 +22,25 @@ import { styles } from './create-task-form.styled';
 type CreateTaskFormProps = {
   assignees: readonly Child[];
   rewardPresets: readonly number[];
-  onCreated: () => void;
+  /** Задача для редактирования; без неё форма создаёт новую. Берётся при открытии. */
+  task?: UpdateTaskPayload;
+  /** Задача создана или обновлена. */
+  onSubmitted: () => void;
 };
 
 export function CreateTaskForm({
   assignees,
   rewardPresets,
-  onCreated,
+  task,
+  onSubmitted,
 }: CreateTaskFormProps) {
   const insets = useSafeAreaInsets();
-  const gutter = useIsCompact() ? 16 : 24;
-  const { mutateAsync, isPending } = useCreateTask();
+  const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
+  const isPending = createTask.isPending || updateTask.isPending;
+  // Снимок задачи на момент открытия: фоновое перечитывание списка не должно
+  // затирать то, что родитель уже начал править.
+  const [initialTask] = useState(task);
 
   const title = useCreateTaskStore((state) => state.title);
   const description = useCreateTaskStore((state) => state.description);
@@ -41,10 +50,15 @@ export function CreateTaskForm({
   const setTitle = useCreateTaskStore((state) => state.setTitle);
   const setDescription = useCreateTaskStore((state) => state.setDescription);
   const setAssignee = useCreateTaskStore((state) => state.setAssignee);
+  const fill = useCreateTaskStore((state) => state.fill);
   const reset = useCreateTaskStore((state) => state.reset);
 
-  // Форма начинается с чистого листа при каждом открытии.
-  useEffect(() => reset, [reset]);
+  // Форма начинается с чистого листа при каждом открытии, а при редактировании
+  // сразу заполняется данными задачи (до отрисовки, чтобы пустая форма не мелькала).
+  useLayoutEffect(() => {
+    if (initialTask) fill(initialTask);
+    return reset;
+  }, [initialTask, fill, reset]);
 
   const canSubmit =
     !isPending &&
@@ -56,8 +70,12 @@ export function CreateTaskForm({
   const submit = async () => {
     const payload = buildCreateTaskPayload(useCreateTaskStore.getState());
     if (!payload || isPending) return;
-    await mutateAsync(payload);
-    onCreated();
+    if (initialTask) {
+      await updateTask.mutateAsync({ ...payload, id: initialTask.id });
+    } else {
+      await createTask.mutateAsync(payload);
+    }
+    onSubmitted();
   };
 
   return (
@@ -67,7 +85,12 @@ export function CreateTaskForm({
     >
       <ScrollView
         style={styles.flex}
-        contentContainerStyle={[styles.content, { paddingHorizontal: gutter }]}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingBottom: Math.max(insets.bottom, 24),
+          },
+        ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -102,24 +125,16 @@ export function CreateTaskForm({
             ))}
           </View>
         </FormField>
-      </ScrollView>
 
-      <View
-        style={[
-          styles.footer,
-          {
-            paddingHorizontal: gutter,
-            paddingBottom: Math.max(insets.bottom, 24),
-          },
-        ]}
-      >
-        <CreateTaskButton
-          label="Create Task"
-          withIcon={false}
-          disabled={!canSubmit}
-          onPress={submit}
-        />
-      </View>
+        <View style={styles.footer}>
+          <CreateTaskButton
+            label={initialTask ? 'Save changes' : 'Create Task'}
+            withIcon={false}
+            disabled={!canSubmit}
+            onPress={submit}
+          />
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

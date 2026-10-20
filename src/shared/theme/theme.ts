@@ -11,8 +11,32 @@ export const theme = {
     line: '#ECEDF3',
     placeholder: '#CDD0DB',
     yellowSoft: '#FFF7E6',
+    // Подсветка «на проверке»: плитка Tasks to Review и запись Pending review.
+    reviewFrom: '#FFF3D1',
+    reviewTo: '#FFE2C4',
+    reviewAccent: '#E67E00',
+    reviewChip: '#FFE9CC',
+    reviewChipText: '#B8650A',
+    reviewBorder: '#F8CC94',
+    // Подтверждённая запись активности.
+    approvedFrom: '#E0F8E7',
+    approvedTo: '#C5EFD5',
+    approvedBorder: '#AFDDC0',
+    // Значок «ребёнок дома» на карточке ребёнка.
+    homeFrom: '#FFF4D6',
+    homeTo: '#FFE3B3',
+    homeBrown: '#B8791A',
     danger: '#ef4444',
+    dangerFrom: '#FF7A7A',
     dangerForeground: '#ffffff',
+    // Экран заданий: второстепенный текст, обводка аватара, чип Active, текст «на проверке».
+    inkSoft: '#55586E',
+    violetSoft: '#EEEBFF',
+    violetChip: '#EFEDFC',
+    reviewText: '#B26A00',
+    // Заглушка фото-отчёта, когда ребёнок не приложил снимок.
+    photoFrom: '#EFEAE0',
+    photoTo: '#DCD3C8',
 
     background: '#0b1120',
     surface: '#111827',

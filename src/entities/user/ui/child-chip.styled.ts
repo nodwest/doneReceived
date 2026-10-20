@@ -17,17 +17,10 @@ export const styles = StyleSheet.create({
   chipSelected: {
     borderColor: theme.colors.violet,
   },
-  dot: {
+  avatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  initial: {
-    fontSize: 14,
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
   },
   name: {
     fontSize: 15,

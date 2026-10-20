@@ -7,31 +7,38 @@ import { styles } from './home-summary.styled';
 type HomeSummaryProps = {
   rewardsPaid: number;
   activeTasks: number;
-  childrenCount: number;
+  tasksToReview: number;
+  onActiveTasksPress?: () => void;
+  onTasksToReviewPress?: () => void;
 };
 
 export function HomeSummary({
   rewardsPaid,
   activeTasks,
-  childrenCount,
+  tasksToReview,
+  onActiveTasksPress,
+  onTasksToReviewPress,
 }: HomeSummaryProps) {
   return (
     <View style={styles.container}>
       <StatCard
         accent
-        icon={<Icon name="coins" size={22} color={theme.colors.white} />}
+        icon={<Icon name="coins" size={20} color={theme.colors.white} />}
         value={`$${rewardsPaid}`}
         label="Rewards paid"
       />
       <StatCard
-        icon={<Icon name="tasks" size={22} color={theme.colors.blue} />}
+        icon={<Icon name="tasks" size={20} color={theme.colors.blue} />}
         value={String(activeTasks)}
         label="Active tasks"
+        onPress={onActiveTasksPress}
       />
       <StatCard
-        icon={<Icon name="children" size={22} color={theme.colors.violet} />}
-        value={String(childrenCount)}
-        label="Children"
+        highlight
+        icon={<Icon name="cheque" size={20} color={theme.colors.violet} />}
+        value={String(tasksToReview)}
+        label="Tasks to Review"
+        onPress={onTasksToReviewPress}
       />
     </View>
   );

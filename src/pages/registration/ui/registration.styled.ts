@@ -2,15 +2,24 @@ import { StyleSheet } from 'react-native';
 import { theme } from '@shared/theme';
 
 export const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.prime,
+  },
   container: {
     backgroundColor: theme.colors.prime,
     display: 'flex',
     gap: 32,
     justifyContent: 'center',
-    height: '100%',
+    flexGrow: 1,
+  },
+  scroll: {
+    flexGrow: 1,
   },
   header: {
+    width: '100%',
     maxWidth: 320,
+    alignSelf: 'center',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

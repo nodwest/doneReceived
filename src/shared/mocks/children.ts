@@ -1,6 +1,4 @@
-import { theme } from '../theme';
-
 export const childrenMock = [
-  { id: 1, name: 'Emma', color: theme.colors.violet },
-  { id: 2, name: 'Liam', color: theme.colors.blue },
+  { id: 1, name: 'Emma', avatar: require('./images/avatar-emma.jpg') },
+  { id: 2, name: 'Liam', avatar: require('./images/avatar-liam.jpg') },
 ];

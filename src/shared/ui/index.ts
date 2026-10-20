@@ -5,6 +5,7 @@ export * from './icons';
 export * from './input';
 export * from './input-with-icon';
 export * from './label';
+export * from './pill-button';
 export * from './separator';
 export * from './text';
 export * from './toast-host';
