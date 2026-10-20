@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { TabScreen } from '@widgets/bottom-nav';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Icon, type IconName } from '@shared/ui';
 import { theme } from '@shared/theme';
 import { styles } from './role-select.styled';
@@ -34,7 +34,7 @@ export function RoleSelectPage() {
   const [role, setRole] = useState<Role>('parent');
 
   return (
-    <TabScreen activeKey="wallet">
+    <SafeAreaView style={styles.screen}>
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -100,6 +100,6 @@ export function RoleSelectPage() {
           </Button>
         </LinearGradient>
       </ScrollView>
-    </TabScreen>
+    </SafeAreaView>
   );
 }

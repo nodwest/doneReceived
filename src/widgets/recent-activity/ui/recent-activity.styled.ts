@@ -21,6 +21,6 @@ export const styles = StyleSheet.create({
     color: theme.colors.violet,
   },
   list: {
-    gap: 12,
+    gap: 6,
   },
 });

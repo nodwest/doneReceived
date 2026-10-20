@@ -10,9 +10,9 @@ export type BottomNavItem = {
 
 export const NAV_ITEMS: readonly BottomNavItem[] = [
   { key: 'home', label: 'Home', icon: 'home', href: '/' },
-  { key: 'tasks', label: 'Tasks', icon: 'tasks', href: '/registration' },
-  { key: 'family', label: 'Family', icon: 'children', href: '/login' },
-  { key: 'wallet', label: 'Wallet', icon: 'wallet', href: '/role-select' },
+  { key: 'tasks', label: 'Tasks', icon: 'tasks', href: '/tasks' },
+  { key: 'family', label: 'Family', icon: 'children', href: '/family' },
+  { key: 'wallet', label: 'Wallet', icon: 'wallet', href: '/wallet' },
   { key: 'map', label: 'Map', icon: 'map', href: '/map' },
   { key: 'profile', label: 'Profile', icon: 'profile', href: '/profile' },
 ];

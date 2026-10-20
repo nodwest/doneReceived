@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '@shared/ui';
 import { theme } from '@shared/theme';
 import { NAV_ITEMS } from '../config/nav-items';
-import { styles } from './bottom-nav.styled';
+import { NAV_PADDING_VERTICAL, styles } from './bottom-nav.styled';
 
 type BottomNavProps = {
   activeKey: string;
@@ -16,7 +16,12 @@ export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
   const { bottom } = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingBottom: Math.max(24, bottom) }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingBottom: Math.max(NAV_PADDING_VERTICAL, bottom) },
+      ]}
+    >
       {NAV_ITEMS.map(({ key, label, icon, href }) => {
         const active = key === activeKey;
         return (

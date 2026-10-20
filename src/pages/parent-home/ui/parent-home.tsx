@@ -3,10 +3,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskButton } from '@features/create-task';
 import { BottomNav } from '@widgets/bottom-nav';
+import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import {
+  childrenOverviewMock,
   familySummaryMock,
   parentMock,
   recentActivityMock,
@@ -30,6 +32,7 @@ export function ParentHomePage() {
             avatar={parentMock.avatar}
           />
           <HomeSummary {...familySummaryMock} />
+          <ChildrenCarousel items={childrenOverviewMock} />
           <CreateTaskButton onPress={() => router.push('/create-task')} />
           <RecentActivity items={recentActivityMock} />
         </ScrollView>

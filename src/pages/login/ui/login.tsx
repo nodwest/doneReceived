@@ -1,6 +1,6 @@
 import { ScrollView, View, Text } from 'react-native';
 import { Link } from 'expo-router';
-import { TabScreen } from '@widgets/bottom-nav';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Button,
   Card,
@@ -17,7 +17,7 @@ import { theme } from '@shared/theme';
 
 export function Login() {
   return (
-    <TabScreen activeKey="family">
+    <SafeAreaView style={styles.screen}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -102,6 +102,6 @@ export function Login() {
           </Text>
         </Card>
       </ScrollView>
-    </TabScreen>
+    </SafeAreaView>
   );
 }

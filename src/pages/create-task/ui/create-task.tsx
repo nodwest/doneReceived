@@ -25,6 +25,9 @@ export function CreateTaskPage() {
     <View style={styles.screen}>
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={[styles.header, { paddingHorizontal: gutter }]}>
+          {/* Пустышка слева держит заголовок по центру: справа стоит кнопка закрытия. */}
+          <View style={styles.spacer} />
+          <Text style={styles.title}>Create Task</Text>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Close"
@@ -33,8 +36,6 @@ export function CreateTaskPage() {
           >
             <Icon name="close" size={22} color={theme.colors.ink} />
           </Pressable>
-          <Text style={styles.title}>Create Task</Text>
-          <View style={styles.spacer} />
         </View>
         <CreateTaskForm
           assignees={childrenMock}

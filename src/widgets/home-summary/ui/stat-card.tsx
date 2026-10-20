@@ -9,13 +9,23 @@ type StatCardProps = {
   value: string;
   label: string;
   accent?: boolean;
+  /** Тёплая подсветка: есть задания, ожидающие проверки. */
+  highlight?: boolean;
 };
 
-export function StatCard({ icon, value, label, accent }: StatCardProps) {
+export function StatCard({
+  icon,
+  value,
+  label,
+  accent,
+  highlight,
+}: StatCardProps) {
   const content = (
     <>
-      {icon}
-      <Text style={[styles.value, accent && styles.textAccent]}>{value}</Text>
+      <View style={styles.valueRow}>
+        <Text style={[styles.value, accent && styles.textAccent]}>{value}</Text>
+        {icon}
+      </View>
       <Text style={[styles.label, accent && styles.textAccent]}>{label}</Text>
     </>
   );
@@ -28,6 +38,20 @@ export function StatCard({ icon, value, label, accent }: StatCardProps) {
         end={{ x: 1, y: 1 }}
         locations={[0, 0.7071]}
         style={styles.cardAccent}
+      >
+        {content}
+      </LinearGradient>
+    );
+  }
+
+  if (highlight) {
+    return (
+      <LinearGradient
+        colors={[theme.colors.reviewFrom, theme.colors.reviewTo]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        locations={[0, 0.7071]}
+        style={styles.cardReview}
       >
         {content}
       </LinearGradient>

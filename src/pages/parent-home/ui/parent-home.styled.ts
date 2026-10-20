@@ -17,9 +17,9 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   body: {
-    gap: 24,
+    gap: 18,
     paddingTop: 16,
     paddingBottom: 24,
-    paddingHorizontal: 24,
+    paddingHorizontal: 12,
   },
 });
