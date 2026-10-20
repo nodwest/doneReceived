@@ -23,3 +23,7 @@ export interface CreateTaskPayload {
   expiresAt: string | null;
   assigneeId: number;
 }
+
+export interface UpdateTaskPayload extends CreateTaskPayload {
+  id: number;
+}

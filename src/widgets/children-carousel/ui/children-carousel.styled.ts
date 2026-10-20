@@ -20,6 +20,9 @@ export const styles = StyleSheet.create({
     // Запас под тень: бокс-тень карточки не должна обрезаться лентой.
     paddingVertical: SHADOW_ROOM,
   },
+  hidden: {
+    opacity: 0,
+  },
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',

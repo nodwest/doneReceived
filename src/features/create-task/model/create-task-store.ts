@@ -28,6 +28,8 @@ type FormActions = {
   setAssignee: (id: number) => void;
   selectDeadline: (preset: DeadlinePreset) => void;
   setCustomDeadline: (date: Date) => void;
+  /** Предзаполняет форму данными существующей задачи (режим редактирования). */
+  fill: (task: CreateTaskPayload) => void;
   reset: () => void;
 };
 
@@ -68,6 +70,18 @@ export const useCreateTaskStore = create<FormState & FormActions>((set) => ({
     })),
   setCustomDeadline: (date) =>
     set({ deadline: { preset: 'custom', customAt: date.toISOString() } }),
+  // Срок задачи становится пресетом Custom с её датой, без срока — No deadline.
+  fill: (task) =>
+    set({
+      title: task.title,
+      reward: String(task.reward),
+      rewardPreset: null,
+      description: task.description,
+      assigneeId: task.assigneeId,
+      deadline: task.expiresAt
+        ? { preset: 'custom', customAt: task.expiresAt }
+        : initialDeadline,
+    }),
   reset: () => set(initialState),
 }));
 

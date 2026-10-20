@@ -18,6 +18,12 @@ import { MapIcon } from './map';
 import { LockIcon } from './lock';
 import { EyeIcon } from './eye';
 import { EyeOffIcon } from './eye-off';
+import { ArrowLeftIcon } from './arrow-left';
+import { ListIcon } from './list';
+import { CardsIcon } from './cards';
+import { BroomIcon } from './broom';
+import { CameraIcon } from './camera';
+import { StepDotIcon } from './step-dot';
 
 export const icons = {
   price: PriceIcon,
@@ -40,4 +46,10 @@ export const icons = {
   lock: LockIcon,
   eye: EyeIcon,
   'eye-off': EyeOffIcon,
+  'arrow-left': ArrowLeftIcon,
+  list: ListIcon,
+  cards: CardsIcon,
+  broom: BroomIcon,
+  camera: CameraIcon,
+  'step-dot': StepDotIcon,
 };

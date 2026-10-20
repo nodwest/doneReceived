@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@shared/theme';
 import { styles } from './home-summary.styled';
@@ -11,6 +11,7 @@ type StatCardProps = {
   accent?: boolean;
   /** Тёплая подсветка: есть задания, ожидающие проверки. */
   highlight?: boolean;
+  onPress?: () => void;
 };
 
 export function StatCard({
@@ -19,6 +20,7 @@ export function StatCard({
   label,
   accent,
   highlight,
+  onPress,
 }: StatCardProps) {
   const content = (
     <>
@@ -30,8 +32,9 @@ export function StatCard({
     </>
   );
 
+  let card = <View style={styles.card}>{content}</View>;
   if (accent) {
-    return (
+    card = (
       <LinearGradient
         colors={[theme.colors.violet, theme.colors.blue]}
         start={{ x: 0, y: 0 }}
@@ -42,10 +45,8 @@ export function StatCard({
         {content}
       </LinearGradient>
     );
-  }
-
-  if (highlight) {
-    return (
+  } else if (highlight) {
+    card = (
       <LinearGradient
         colors={[theme.colors.reviewFrom, theme.colors.reviewTo]}
         start={{ x: 0, y: 0 }}
@@ -58,5 +59,16 @@ export function StatCard({
     );
   }
 
-  return <View style={styles.card}>{content}</View>;
+  if (!onPress) return card;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${value} ${label}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}
+    >
+      {card}
+    </Pressable>
+  );
 }

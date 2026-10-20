@@ -16,6 +16,13 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 6,
   },
+  // Кликабельная плитка занимает ту же долю ряда, что и обычная.
+  pressable: {
+    flex: 1,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
   card: {
     ...card,
     borderColor: theme.colors.line,

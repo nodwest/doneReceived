@@ -27,7 +27,16 @@ export const theme = {
     homeTo: '#FFE3B3',
     homeBrown: '#B8791A',
     danger: '#ef4444',
+    dangerFrom: '#FF7A7A',
     dangerForeground: '#ffffff',
+    // Экран заданий: второстепенный текст, обводка аватара, чип Active, текст «на проверке».
+    inkSoft: '#55586E',
+    violetSoft: '#EEEBFF',
+    violetChip: '#EFEDFC',
+    reviewText: '#B26A00',
+    // Заглушка фото-отчёта, когда ребёнок не приложил снимок.
+    photoFrom: '#EFEAE0',
+    photoTo: '#DCD3C8',
 
     background: '#0b1120',
     surface: '#111827',
