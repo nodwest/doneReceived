@@ -1,4 +1,5 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
+import { sortTasksByUrgency } from '../model/sort-tasks';
 import { fetchTasks } from './tasks-api';
 
 /** Ключи кэша задач: мутации инвалидируют taskKeys.all. */
@@ -10,7 +11,8 @@ export const taskKeys = {
 export const tasksQueryOptions = () =>
   queryOptions({ queryKey: taskKeys.list(), queryFn: fetchTasks });
 
-/** Все задачи родителя. */
+/** Все задачи родителя, отсортированные по срочности. */
 export function useTasks() {
-  return useQuery(tasksQueryOptions());
+  // select со стабильной функцией: список пересортировывается только при новых данных.
+  return useQuery({ ...tasksQueryOptions(), select: sortTasksByUrgency });
 }

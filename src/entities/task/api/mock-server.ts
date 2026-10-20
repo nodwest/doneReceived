@@ -34,7 +34,7 @@ export const mockServer = {
       doneAt: null,
       photo: null,
     };
-    // Новые задачи — в начале списка.
+    // Порядок хранения не важен: клиент сортирует список сам (sortTasksByUrgency).
     tasks = [task, ...tasks];
     return { ...task };
   },
