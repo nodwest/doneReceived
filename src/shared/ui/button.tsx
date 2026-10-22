@@ -1,139 +1,64 @@
-import { TextClassContext } from './text';
-import { cn } from '../lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Platform, Pressable } from 'react-native';
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  type PressableProps,
+  type PressableStateCallbackType,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import { theme } from '../theme';
 
-const buttonVariants = cva(
-  cn(
-    'group shrink-0 flex-row items-center justify-center gap-2 rounded-md shadow-none',
-    Platform.select({
-      web: "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive whitespace-nowrap outline-none transition-all focus-visible:ring-[3px] disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-    }),
-  ),
-  {
-    variants: {
-      variant: {
-        defaultBlue: cn(
-          'rounded-[30] h-14 w-full shadow-sm shadow-black/5',
-          Platform.select({
-            web: 'bg-gradient-to-r from-[#6C5CE7] to-[#4A90E2] hover:opacity-90 active:opacity-80',
-            native: 'bg-[#6C5CE7] active:bg-[#4A90E2]',
-          }),
-        ),
-        default: cn(
-          'bg-primary active:bg-primary/90 shadow-sm shadow-black/5',
-          Platform.select({ web: 'hover:bg-primary/90' }),
-        ),
-        destructive: cn(
-          'bg-destructive active:bg-destructive/90 dark:bg-destructive/60 shadow-sm shadow-black/5',
-          Platform.select({
-            web: 'hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
-          }),
-        ),
-        outline: cn(
-          'border-border bg-background active:bg-accent dark:bg-input/30 dark:border-input dark:active:bg-input/50 border shadow-sm shadow-black/5',
-          Platform.select({
-            web: 'hover:bg-accent dark:hover:bg-input/50',
-          }),
-        ),
-        secondary: cn(
-          'bg-secondary active:bg-secondary/80 shadow-sm shadow-black/5',
-          Platform.select({ web: 'hover:bg-secondary/80' }),
-        ),
-        ghost: cn(
-          'active:bg-accent dark:active:bg-accent/50',
-          Platform.select({ web: 'hover:bg-accent dark:hover:bg-accent/50' }),
-        ),
-        void: cn(
-          '',
-          Platform.select({
-            web: 'hover:bg-[#6C5CE7] opacity-100 active:opacity-10',
-            native: 'active:bg-[#6C5CE7] opacity-100',
-          }),
-        ),
-        link: '',
-      },
-      size: {
-        default: cn(
-          'h-14 sm:h-18',
-          Platform.select({ web: 'has-[>svg]:px-3' }),
-        ),
-        sm: cn(
-          'h-9 gap-1.5 rounded-md px-3 sm:h-8',
-          Platform.select({ web: 'has-[>svg]:px-2.5' }),
-        ),
-        lg: cn(
-          'h-11 rounded-md px-6 sm:h-10',
-          Platform.select({ web: 'has-[>svg]:px-4' }),
-        ),
-        icon: 'h-10 w-10 sm:h-9 sm:w-9',
-      },
-    },
-    defaultVariants: {
-      variant: 'defaultBlue',
-      size: 'default',
-    },
-  },
-);
+// react-native-web добавляет к состоянию Pressable наведение мыши.
+type ButtonState = PressableStateCallbackType & { hovered?: boolean };
 
-const buttonTextVariants = cva(
-  cn(
-    'text-foreground text-sm font-medium',
-    Platform.select({ web: 'pointer-events-none transition-colors' }),
-  ),
-  {
-    variants: {
-      variant: {
-        defaultBlue: 'text-white',
-        default: 'text-primary-foreground',
-        destructive: 'text-white',
-        outline: cn(
-          'group-active:text-accent-foreground',
-          Platform.select({ web: 'group-hover:text-accent-foreground' }),
-        ),
-        secondary: 'text-secondary-foreground',
-        ghost: 'group-active:text-accent-foreground',
-        link: cn(
-          'text-primary group-active:underline',
-          Platform.select({
-            web: 'underline-offset-4 hover:underline group-hover:underline',
-          }),
-        ),
-        void: 'text-white',
-      },
-      size: {
-        default: '',
-        sm: '',
-        lg: '',
-        icon: '',
-      },
-    },
-    defaultVariants: {
-      variant: 'defaultBlue',
-      size: 'default',
-    },
-  },
-);
+type ButtonProps = Omit<PressableProps, 'style'> & {
+  style?: StyleProp<ViewStyle> | ((state: ButtonState) => StyleProp<ViewStyle>);
+};
 
-type ButtonProps = React.ComponentProps<typeof Pressable> &
-  React.RefAttributes<typeof Pressable> &
-  VariantProps<typeof buttonVariants>;
-
-function Button({ className, variant, size, ...props }: ButtonProps) {
+// Прозрачная кнопка поверх градиента: при наведении (веб) и нажатии
+// (натив) заливается фиолетовым, на вебе при нажатии почти гаснет.
+function Button({ style, ...props }: ButtonProps) {
   return (
-    <TextClassContext.Provider value={buttonTextVariants({ variant, size })}>
-      <Pressable
-        className={cn(
-          props.disabled && 'opacity-50',
-          buttonVariants({ variant, size }),
-          className,
-        )}
-        role="button"
-        {...props}
-      />
-    </TextClassContext.Provider>
+    <Pressable
+      role="button"
+      {...props}
+      style={(state: ButtonState) => [
+        styles.base,
+        state.hovered && styles.hovered,
+        state.pressed && styles.pressed,
+        typeof style === 'function' ? style(state) : style,
+      ]}
+    />
   );
 }
 
-export { Button, buttonTextVariants, buttonVariants };
+const styles = StyleSheet.create({
+  base: {
+    height: 56,
+    flexShrink: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 6,
+    ...Platform.select<ViewStyle>({
+      web: {
+        outlineWidth: 0,
+        transitionProperty: 'all',
+        transitionDuration: '150ms',
+        transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      } as ViewStyle,
+    }),
+  },
+  hovered: {
+    backgroundColor: theme.colors.violet,
+  },
+  pressed: Platform.select<ViewStyle>({
+    web: { opacity: 0.1 },
+    default: { backgroundColor: theme.colors.violet },
+  }),
+});
+
+export { Button };
 export type { ButtonProps };

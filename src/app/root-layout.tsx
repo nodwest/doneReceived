@@ -3,7 +3,6 @@ import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { ToastHost } from '@shared/ui';
 import { Providers } from './providers';
-import './styles/app.css';
 
 export function RootLayout() {
   const [fontsLoaded, fontsError] = useFonts({

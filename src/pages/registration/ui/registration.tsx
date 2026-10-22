@@ -1,16 +1,7 @@
 import { ScrollView, View, Text } from 'react-native';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  Icon,
-  InputWithIcon,
-  Label,
-} from '@shared/ui';
+import { Button, Icon, InputWithIcon, Label } from '@shared/ui';
 import { styles } from './registration.styled';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@shared/theme';
@@ -22,8 +13,8 @@ export function Registration() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Card style={styles.container}>
-          <CardHeader style={styles.header}>
+        <View style={styles.container}>
+          <View style={styles.header}>
             <LinearGradient
               style={styles.iconWrapper}
               colors={[theme.colors.violet, theme.colors.blue]}
@@ -36,8 +27,8 @@ export function Registration() {
             <Text style={styles.subtitle}>
               Turn everyday chores into fun rewards for the whole family.
             </Text>
-          </CardHeader>
-          <CardContent>
+          </View>
+          <View style={styles.body}>
             <View style={styles.content}>
               <View style={styles.field}>
                 <Label htmlFor="name" style={styles.label}>
@@ -71,8 +62,8 @@ export function Registration() {
                 />
               </View>
             </View>
-          </CardContent>
-          <CardFooter>
+          </View>
+          <View style={styles.footer}>
             <LinearGradient
               colors={[theme.colors.violet, theme.colors.blue]}
               start={{ x: 0, y: 0 }}
@@ -83,18 +74,18 @@ export function Registration() {
                 overflow: 'hidden',
               }}
             >
-              <Button variant="void" size={'default'}>
+              <Button>
                 <Text style={styles.buttontitle}>Create Account</Text>
               </Button>
             </LinearGradient>
-          </CardFooter>
+          </View>
           <Text style={styles.subtitle}>
             Already have an account?{' '}
             <Link href="/login" style={styles.linktitle}>
               Log In
             </Link>
           </Text>
-        </Card>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

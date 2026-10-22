@@ -100,7 +100,6 @@ export function CreateTaskForm({
             onChangeText={setTitle}
             placeholder="Clean your room"
             placeholderTextColor={theme.colors.placeholder}
-            className="placeholder:text-[#CDD0DB]"
             style={styles.input}
           />
         </FormField>

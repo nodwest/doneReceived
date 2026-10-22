@@ -1,9 +1,8 @@
-import { cn } from '../lib/utils';
 import * as LabelPrimitive from '@rn-primitives/label';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 function Label({
-  className,
+  style,
   onPress,
   onLongPress,
   onPressIn,
@@ -11,15 +10,13 @@ function Label({
   disabled,
   ...props
 }: React.ComponentProps<typeof LabelPrimitive.Text>) {
+  // На вебе межстрочный интервал равен размеру шрифта, в том числе
+  // переданному снаружи.
+  const fontSize = StyleSheet.flatten([styles.text, style]).fontSize;
+
   return (
     <LabelPrimitive.Root
-      className={cn(
-        'flex select-none flex-row items-center gap-2',
-        Platform.select({
-          web: 'cursor-default leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50 group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50',
-        }),
-        disabled && 'opacity-50',
-      )}
+      style={StyleSheet.flatten([styles.root, disabled && styles.disabled])}
       onPress={onPress}
       onLongPress={onLongPress}
       onPressIn={onPressIn}
@@ -27,15 +24,31 @@ function Label({
       disabled={disabled}
     >
       <LabelPrimitive.Text
-        className={cn(
-          'text-sm font-medium',
-          Platform.select({ web: 'leading-none' }),
-          className,
-        )}
+        style={[
+          styles.text,
+          Platform.OS === 'web' && { lineHeight: fontSize },
+          style,
+        ]}
         {...props}
       />
     </LabelPrimitive.Root>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    userSelect: 'none',
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+});
 
 export { Label };
