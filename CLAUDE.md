@@ -52,7 +52,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Зависимости, о которых стоит знать:**
 
-- Установлены и `expo-linear-gradient`, и `react-native-linear-gradient`; в коде используется Expo-версия.
 - `@tanstack/react-query`, `zustand`, `react-native-mmkv` и `expo-secure-store` установлены для данных, состояния и хранилища, но пока не подключены.
 - `babel-preset-expo` имеет версию `^57`, а `expo` — `~56`. Учитывайте это, если появятся ошибки Babel или Metro.
 
