@@ -151,9 +151,6 @@ export const styles = StyleSheet.create({
     fontSize: 36,
   },
 
-  deadlineBox: {
-    gap: 8,
-  },
   deadlineHint: {
     fontSize: theme.fontSize.xs,
     fontFamily: theme.fonts.medium,

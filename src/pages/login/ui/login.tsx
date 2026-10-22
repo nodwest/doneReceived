@@ -74,11 +74,7 @@ export function Login() {
               colors={[theme.colors.violet, theme.colors.blue]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={{
-                width: `100%`,
-                borderRadius: 30,
-                overflow: 'hidden',
-              }}
+              style={styles.buttonGradient}
             >
               <Button>
                 <Text style={styles.buttontitle}>Log In</Text>

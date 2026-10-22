@@ -24,6 +24,11 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
   },
+  buttonGradient: {
+    width: '100%',
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
   header: {
     width: '100%',
     maxWidth: 320,
