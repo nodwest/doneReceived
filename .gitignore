@@ -40,3 +40,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# JetBrains code style (Prettier is the source of truth)
+/.idea/codeStyles/
