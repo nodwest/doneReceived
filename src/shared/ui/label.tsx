@@ -1,9 +1,8 @@
-import { cn } from '../lib/utils';
 import * as LabelPrimitive from '@rn-primitives/label';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 function Label({
-  className,
+  style,
   onPress,
   onLongPress,
   onPressIn,
@@ -11,15 +10,13 @@ function Label({
   disabled,
   ...props
 }: React.ComponentProps<typeof LabelPrimitive.Text>) {
+  // Стиль только плоским объектом: на вебе без htmlFor Radix Slot склеивает
+  // стили через spread, и массив превращается в { 0: …, 1: … }.
+  const textStyle = StyleSheet.flatten([styles.text, style]);
+
   return (
     <LabelPrimitive.Root
-      className={cn(
-        'flex select-none flex-row items-center gap-2',
-        Platform.select({
-          web: 'cursor-default leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50 group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50',
-        }),
-        disabled && 'opacity-50',
-      )}
+      style={StyleSheet.flatten([styles.root, disabled && styles.disabled])}
       onPress={onPress}
       onLongPress={onLongPress}
       onPressIn={onPressIn}
@@ -27,15 +24,33 @@ function Label({
       disabled={disabled}
     >
       <LabelPrimitive.Text
-        className={cn(
-          'text-sm font-medium',
-          Platform.select({ web: 'leading-none' }),
-          className,
-        )}
+        style={
+          // На вебе межстрочный интервал равен размеру шрифта, в том числе
+          // переданному снаружи.
+          Platform.OS === 'web'
+            ? { lineHeight: textStyle.fontSize, ...textStyle }
+            : textStyle
+        }
         {...props}
       />
     </LabelPrimitive.Root>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    userSelect: 'none',
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+});
 
 export { Label };

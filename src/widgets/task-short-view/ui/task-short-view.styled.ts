@@ -26,19 +26,22 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#93c5fd',
   },
-  icon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#8d90e7',
-  },
   reward: {
     display: 'flex',
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'space-between',
   },
-  textDescription: {
-    color: '#8d90e7',
+  title: {
+    fontSize: 18,
+    lineHeight: 28,
+    fontWeight: '600',
+    color: '#0A0A0A',
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 14,
+    fontWeight: '500',
+    color: '#9CA3AF',
   },
 });

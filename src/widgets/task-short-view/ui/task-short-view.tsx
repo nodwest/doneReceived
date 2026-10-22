@@ -1,5 +1,5 @@
-import { View } from 'react-native';
-import { ButtonText, Icon } from '@shared/ui';
+import { Text, View } from 'react-native';
+import { Icon } from '@shared/ui';
 import { StatusBar } from 'expo-status-bar';
 import { styles } from './task-short-view.styled';
 import type { TaskShortViewProps } from '@entities/task';
@@ -16,13 +16,11 @@ export function TaskShortView(props: TaskShortViewProps) {
           <View style={styles.headerIcon}>
             <Icon name="cheque" size={30} color="blue" />
           </View>
-          <ButtonText variant={'large'}>
-            {title || 'Название задачи'}
-          </ButtonText>
+          <Text style={styles.title}>{title || 'Название задачи'}</Text>
         </View>
-        <ButtonText variant={'small'} className={'text-gray-400'}>
+        <Text style={styles.description}>
           {description || 'Описание задачи'}
-        </ButtonText>
+        </Text>
         <StatusBar style="auto" />
         <View style={styles.reward}>
           <RewardButton amount={100} variant="reward" />

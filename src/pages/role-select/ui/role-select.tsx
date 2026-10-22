@@ -91,11 +91,7 @@ export function RoleSelectPage() {
           end={{ x: 1, y: 1 }}
           style={styles.button}
         >
-          <Button
-            variant="void"
-            size="default"
-            onPress={() => router.replace('/')}
-          >
+          <Button onPress={() => router.replace('/')}>
             <Text style={styles.buttonTitle}>Continue</Text>
           </Button>
         </LinearGradient>

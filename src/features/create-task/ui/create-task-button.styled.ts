@@ -11,12 +11,9 @@ export const styles = StyleSheet.create({
   disabled: {
     opacity: 0.5,
   },
-  buttonDisabled: {
-    opacity: 1,
-  },
   button: {
     height: 56,
-    // variant="void" красит фон при hover/нажатии со скруглением rounded-md:
+    // Button красит фон при нажатии со своим скруглением 6:
     // повторяем радиус градиента, иначе углы становятся прямоугольными.
     borderRadius: 28,
     overflow: 'hidden',
@@ -25,6 +22,15 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  // На вебе наведение не перекрашивает градиент, а нажатие заливает
+  // кнопку фиолетовым без затухания — как на нативе.
+  buttonHovered: {
+    backgroundColor: 'transparent',
+  },
+  buttonPressed: {
+    backgroundColor: theme.colors.violet,
+    opacity: 1,
   },
   title: {
     fontSize: 17,

@@ -16,6 +16,19 @@ export const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
   },
+  body: {
+    paddingHorizontal: 24,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  buttonGradient: {
+    width: '100%',
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
   header: {
     width: '100%',
     maxWidth: 320,

@@ -26,9 +26,11 @@ export function CreateTaskButton({
       style={[styles.gradient, disabled && styles.disabled]}
     >
       <Button
-        variant="void"
-        className="overflow-hidden rounded-[28px] hover:bg-transparent active:bg-[#6C5CE7] active:opacity-100"
-        style={[styles.button, disabled && styles.buttonDisabled]}
+        style={({ pressed, hovered }) => [
+          styles.button,
+          hovered && styles.buttonHovered,
+          pressed && styles.buttonPressed,
+        ]}
         onPress={onPress}
         disabled={disabled}
       >

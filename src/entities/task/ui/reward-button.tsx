@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
-import { ButtonText as Text, Icon } from '@shared/ui';
+import { Pressable, Text, View } from 'react-native';
+import { Icon } from '@shared/ui';
+import { styles } from './reward-button.styled';
 
 type RewardVariant = 'reward' | 'penalty';
 
@@ -19,20 +20,7 @@ export function RewardButton({
 }: RewardButtonProps) {
   const isReward = variant === 'reward';
 
-  const containerBase =
-    'flex-row items-center gap-3 rounded-xl px-4 py-3 shadow-sm w-[130]';
-  const containerVariant = isReward ? 'bg-green-100' : 'bg-red-100';
-  const containerClasses = `${containerBase} ${containerVariant}`;
-
-  const circleBase = 'w-10 h-10 rounded-full items-center justify-center';
-  const circleVariant = isReward ? 'bg-green-300' : 'bg-red-300';
-  const circleClasses = `${circleBase} ${circleVariant}`;
-
   const labelText = isReward ? 'Награда' : 'Штраф';
-
-  const amountClasses = isReward
-    ? 'text-[18px] font-semibold text-green-400'
-    : 'text-[18px] font-semibold text-red-400';
 
   const defaultIcon = isReward ? (
     <Icon name="price" size={35} color="green" />
@@ -41,12 +29,32 @@ export function RewardButton({
   );
 
   return (
-    <Pressable onPress={onPress} className={containerClasses}>
-      <View className={circleClasses}>{icon ?? defaultIcon}</View>
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.container,
+        isReward ? styles.containerReward : styles.containerPenalty,
+      ]}
+    >
+      <View
+        style={[
+          styles.circle,
+          isReward ? styles.circleReward : styles.circlePenalty,
+        ]}
+      >
+        {icon ?? defaultIcon}
+      </View>
 
-      <View className="gap-1">
-        <Text className="text-[13px] text-[#555]">{labelText}</Text>
-        <Text className={amountClasses}>{amount}</Text>
+      <View style={styles.texts}>
+        <Text style={styles.label}>{labelText}</Text>
+        <Text
+          style={[
+            styles.amount,
+            isReward ? styles.amountReward : styles.amountPenalty,
+          ]}
+        >
+          {amount}
+        </Text>
       </View>
     </Pressable>
   );
