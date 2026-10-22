@@ -10,9 +10,9 @@ function Label({
   disabled,
   ...props
 }: React.ComponentProps<typeof LabelPrimitive.Text>) {
-  // На вебе межстрочный интервал равен размеру шрифта, в том числе
-  // переданному снаружи.
-  const fontSize = StyleSheet.flatten([styles.text, style]).fontSize;
+  // Стиль только плоским объектом: на вебе без htmlFor Radix Slot склеивает
+  // стили через spread, и массив превращается в { 0: …, 1: … }.
+  const textStyle = StyleSheet.flatten([styles.text, style]);
 
   return (
     <LabelPrimitive.Root
@@ -24,11 +24,13 @@ function Label({
       disabled={disabled}
     >
       <LabelPrimitive.Text
-        style={[
-          styles.text,
-          Platform.OS === 'web' && { lineHeight: fontSize },
-          style,
-        ]}
+        style={
+          // На вебе межстрочный интервал равен размеру шрифта, в том числе
+          // переданному снаружи.
+          Platform.OS === 'web'
+            ? { lineHeight: textStyle.fontSize, ...textStyle }
+            : textStyle
+        }
         {...props}
       />
     </LabelPrimitive.Root>
