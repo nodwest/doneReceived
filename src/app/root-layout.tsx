@@ -1,4 +1,9 @@
-import { Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { ToastHost } from '@shared/ui';
@@ -6,7 +11,9 @@ import { Providers } from './providers';
 
 export function RootLayout() {
   const [fontsLoaded, fontsError] = useFonts({
+    Inter_400Regular,
     Inter_500Medium,
+    Inter_600SemiBold,
     Inter_700Bold,
   });
 
