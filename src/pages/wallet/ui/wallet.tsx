@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import {
   ChildrenFilter,
@@ -15,6 +16,7 @@ import {
   useOperations,
   type Operation,
 } from '@entities/operation';
+import { formatMonthDay } from '@shared/lib';
 import { childrenMock } from '@shared/mocks';
 import { styles } from './wallet.styled';
 
@@ -25,7 +27,13 @@ export function WalletPage() {
   const { data: operations = NO_OPERATIONS, isPending } = useOperations();
   // Сегодня фиксируем на время жизни экрана: от него строится лента дней.
   const [today] = useState(() => new Date());
-  const [filter, setFilter] = useState<ChildFilterValue>('all');
+  // «See all» в профиле ребёнка открывает историю сразу с его фильтром.
+  const { child: childParam } = useLocalSearchParams<{ child?: string }>();
+  const [filter, setFilter] = useState<ChildFilterValue>(
+    () =>
+      childrenMock.find((child) => String(child.id) === childParam)?.id ??
+      'all',
+  );
   // null — день не выбран, стоим на сегодняшнем (последнем).
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -73,7 +81,11 @@ export function WalletPage() {
               onSelect={setSelected}
             />
             <View style={styles.summary}>
-              <DaySummary {...day} />
+              <DaySummary
+                title={formatMonthDay(day.date)}
+                earned={day.earned}
+                missed={day.missed}
+              />
             </View>
             <View style={styles.list}>
               {dayOperations.length === 0 ? (

@@ -10,6 +10,10 @@ import {
 
 type ChildrenCarouselProps = {
   items: readonly ChildOverview[];
+  /** Тап по карточке ребёнка мимо чипов. */
+  onSelect?: (child: ChildOverview) => void;
+  /** Тап по чипу задач: active — все задачи ребёнка, review — на проверке. */
+  onTasksPress?: (child: ChildOverview, tab: 'all' | 'review') => void;
 };
 
 /**
@@ -17,7 +21,11 @@ type ChildrenCarouselProps = {
  * выглядывает у правого края и примагничивается после свайпа, под лентой
  * точки показывают текущую страницу.
  */
-export function ChildrenCarousel({ items }: ChildrenCarouselProps) {
+export function ChildrenCarousel({
+  items,
+  onSelect,
+  onTasksPress,
+}: ChildrenCarouselProps) {
   const {
     scrollRef,
     index,
@@ -60,7 +68,14 @@ export function ChildrenCarousel({ items }: ChildrenCarouselProps) {
           <ChildCard
             key={child.id}
             child={child}
-            style={{ width: single ? undefined : cardWidth || undefined }}
+            onPress={onSelect && (() => onSelect(child))}
+            onActiveTasksPress={
+              onTasksPress && (() => onTasksPress(child, 'all'))
+            }
+            onReviewTasksPress={
+              onTasksPress && (() => onTasksPress(child, 'review'))
+            }
+            style={{ width: cardWidth || undefined }}
           />
         ))}
       </ScrollView>

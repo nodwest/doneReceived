@@ -1,12 +1,11 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskForm } from '@features/create-task';
 import type { UpdateTaskPayload } from '@entities/task';
-import { Icon } from '@shared/ui';
+import { RoundButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
 import { childrenMock, rewardPresetsMock } from '@shared/mocks';
-import { theme } from '@shared/theme';
 import { styles } from './create-task.styled';
 
 type TaskFormScreenProps = {
@@ -41,14 +40,11 @@ export function TaskFormScreen({
           {/* Пустышка слева держит заголовок по центру: справа стоит кнопка закрытия. */}
           <View style={styles.spacer} />
           <Text style={styles.title}>{title}</Text>
-          <Pressable
-            accessibilityRole="button"
+          <RoundButton
+            icon="close"
             accessibilityLabel="Close"
             onPress={close}
-            style={styles.close}
-          >
-            <Icon name="close" size={22} color={theme.colors.ink} />
-          </Pressable>
+          />
         </View>
         <CreateTaskForm
           assignees={childrenMock}

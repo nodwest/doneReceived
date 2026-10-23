@@ -20,12 +20,4 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: theme.colors.white,
-    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
-  },
 });

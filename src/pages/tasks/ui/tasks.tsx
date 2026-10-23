@@ -4,7 +4,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { ReviewActions } from '@features/review-task';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
@@ -17,22 +17,38 @@ import {
 import { useTasks, type Task } from '@entities/task';
 import { PillButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
+import { childrenMock } from '@shared/mocks';
 import { FOOTER_PADDING_VERTICAL, styles } from './tasks.styled';
 
 const NO_TASKS: Task[] = [];
 
+/**
+ * Экран заданий. На вкладке Tasks — задачи всех детей; из профиля ребёнка
+ * (/child/[id]/tasks) — только его: в шапке строка с аватаром, «назад»
+ * возвращает в профиль, в навбаре подсвечен Family.
+ */
 export function TasksPage() {
   const router = useRouter();
+  // Плитка Tasks to Review открывает экран сразу на вкладке проверки.
+  const { tab: initialTab, id: ownerId } = useLocalSearchParams<{
+    tab?: string;
+    id?: string;
+  }>();
+  const owner = ownerId
+    ? childrenMock.find((child) => String(child.id) === ownerId)
+    : undefined;
   // Список из кэша React Query: после создания или правки он перечитывается сам.
-  const { data: allTasks = NO_TASKS, isPending } = useTasks();
+  const { data = NO_TASKS, isPending } = useTasks();
+  const allTasks = useMemo(
+    () => (owner ? data.filter((task) => task.assignee.id === owner.id) : data),
+    [data, owner],
+  );
   const reviewTasks = useMemo(
     () => allTasks.filter((task) => task.status === 'review'),
     [allTasks],
   );
   const { bottom } = useSafeAreaInsets();
   const gutter = useIsCompact() ? 16 : 24;
-  // Плитка Tasks to Review на главной открывает экран сразу на вкладке проверки.
-  const { tab: initialTab } = useLocalSearchParams<{ tab?: string }>();
   const [tab, setTab] = useState<TasksTab>(
     initialTab === 'review' ? 'review' : 'all',
   );
@@ -54,6 +70,14 @@ export function TasksPage() {
   const current: Task | undefined = tasks[currentIndex];
   const showFooter = view === 'cards' && current;
 
+  if (ownerId && !owner) return <Redirect href="/tasks" />;
+
+  const emptyText = owner
+    ? `${owner.name} has no tasks${tab === 'review' ? ' to review' : ' yet'}`
+    : tab === 'review'
+      ? 'No tasks to review'
+      : 'No tasks yet';
+
   return (
     <View style={styles.screen}>
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -66,7 +90,10 @@ export function TasksPage() {
             onToggleView={() =>
               setView((prev) => (prev === 'cards' ? 'list' : 'cards'))
             }
-            onBack={() => router.replace('/')}
+            onBack={() =>
+              owner && router.canGoBack() ? router.back() : router.replace('/')
+            }
+            owner={owner}
           />
         </View>
         <ScrollView
@@ -78,9 +105,7 @@ export function TasksPage() {
           showsVerticalScrollIndicator={false}
         >
           {isPending ? null : tasks.length === 0 ? (
-            <Text style={styles.empty}>
-              {tab === 'review' ? 'No tasks to review' : 'No tasks yet'}
-            </Text>
+            <Text style={styles.empty}>{emptyText}</Text>
           ) : view === 'cards' ? (
             <TaskCarousel
               tasks={tasks}
@@ -135,7 +160,7 @@ export function TasksPage() {
             )}
           </View>
         ) : (
-          <BottomNav activeKey="tasks" />
+          <BottomNav activeKey={owner ? 'family' : 'tasks'} />
         )}
       </SafeAreaView>
     </View>

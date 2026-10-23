@@ -66,9 +66,15 @@ export function useSnapCarousel({
     setIndex(initialIndex);
   }
 
-  const cardWidth = Math.max(width - gutter - peek - gap, 0);
-  const interval = cardWidth + gap;
   const single = count < 2;
+  // Одна карточка занимает всю ширину между отступами: соседней нет. Ширина
+  // всегда явная — '100%' внутри горизонтальной ленты считался бы от её
+  // содержимого, и карточка с длинным текстом вылезала бы за экран.
+  const cardWidth = Math.max(
+    single ? width - 2 * gutter : width - gutter - peek - gap,
+    0,
+  );
+  const interval = cardWidth + gap;
   // Запас справа, чтобы последняя карточка тоже вставала к левому отступу.
   const trackPaddingRight = Math.max(width - cardWidth - gutter, gutter);
   // Пока ширина не измерена или лента не на месте, кадр был бы неверным.

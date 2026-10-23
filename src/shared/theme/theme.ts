@@ -53,6 +53,8 @@ export const theme = {
     missedInk: '#1F52A8',
     missedLabel: '#123380',
     missedSoft: 'rgba(97, 163, 237, 0.16)',
+    // Заглушка карты там, где карты нет (нативные платформы).
+    mapPlaceholder: '#EFEAE0',
 
     background: '#0b1120',
     surface: '#111827',

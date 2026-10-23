@@ -7,9 +7,9 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
-import { useTasks } from '@entities/task';
+import { countTasks, useTasks } from '@entities/task';
 import {
-  childrenOverviewMock,
+  childProfilesMock,
   familySummaryMock,
   parentMock,
   recentActivityMock,
@@ -18,17 +18,22 @@ import { styles } from './parent-home.styled';
 
 export function ParentHomePage() {
   const router = useRouter();
-  // Счётчики заданий — из того же запроса, что и экран Tasks: созданная задача
-  // сразу видна на плитке, а кэш уже прогрет к переходу. Пока список грузится,
-  // показываем значения из сводки.
+  // Счётчики заданий — из того же запроса, что и экран Tasks и профиль
+  // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
+  // Пока список грузится, показываем значения из сводки.
   const { data: tasks } = useTasks();
-  const summary = tasks
-    ? {
-        rewardsPaid: familySummaryMock.rewardsPaid,
-        activeTasks: tasks.filter((task) => task.status === 'active').length,
-        tasksToReview: tasks.filter((task) => task.status === 'review').length,
-      }
-    : familySummaryMock;
+  const total = tasks && countTasks(tasks);
+  const children = childProfilesMock.map((child) => {
+    const counts = countTasks(tasks ?? [], child.id);
+    return {
+      id: child.id,
+      name: child.name,
+      avatar: child.avatar,
+      activeTasks: counts.active,
+      reviewTasks: counts.review,
+      atHome: child.presence.atHome,
+    };
+  });
 
   return (
     <View style={styles.screen}>
@@ -44,7 +49,9 @@ export function ParentHomePage() {
             avatar={parentMock.avatar}
           />
           <HomeSummary
-            {...summary}
+            amount={familySummaryMock.rewardsPaid}
+            activeTasks={total?.active ?? familySummaryMock.activeTasks}
+            tasksToReview={total?.review ?? familySummaryMock.tasksToReview}
             onActiveTasksPress={() =>
               router.replace({ pathname: '/tasks', params: { tab: 'all' } })
             }
@@ -52,7 +59,21 @@ export function ParentHomePage() {
               router.replace({ pathname: '/tasks', params: { tab: 'review' } })
             }
           />
-          <ChildrenCarousel items={childrenOverviewMock} />
+          <ChildrenCarousel
+            items={children}
+            onSelect={(child) =>
+              router.push({
+                pathname: '/child/[id]',
+                params: { id: String(child.id) },
+              })
+            }
+            onTasksPress={(child, tab) =>
+              router.push({
+                pathname: '/child/[id]/tasks',
+                params: { id: String(child.id), tab },
+              })
+            }
+          />
           <CreateTaskButton onPress={() => router.push('/create-task')} />
           <RecentActivity items={recentActivityMock} />
         </ScrollView>

@@ -25,19 +25,35 @@ export function getHistoryDays(operations: Operation[], today: Date): Date[] {
   return days;
 }
 
+/** Суммы earned и missed по всем операциям. */
+export function sumTotals(operations: Operation[]) {
+  const totals = { earned: 0, missed: 0 };
+  for (const operation of operations) {
+    totals[operation.kind] += operation.amount;
+  }
+  return totals;
+}
+
+/** Операции начиная с полуночи дня `from` (включительно). */
+export const operationsSince = (operations: Operation[], from: Date) =>
+  operations.filter((operation) => new Date(operation.at) >= from);
+
 /** Суммы earned и missed по каждому дню; дни без операций — нули. */
 export function getDayTotals(
   days: Date[],
   operations: Operation[],
 ): DayTotals[] {
-  const totals = new Map(
-    days.map((date) => [date.getTime(), { date, earned: 0, missed: 0 }]),
-  );
+  const byDay = new Map<number, Operation[]>();
   for (const operation of operations) {
-    const day = totals.get(startOfDay(new Date(operation.at)).getTime());
-    if (day) day[operation.kind] += operation.amount;
+    const key = startOfDay(new Date(operation.at)).getTime();
+    const day = byDay.get(key);
+    if (day) day.push(operation);
+    else byDay.set(key, [operation]);
   }
-  return [...totals.values()];
+  return days.map((date) => ({
+    date,
+    ...sumTotals(byDay.get(date.getTime()) ?? []),
+  }));
 }
 
 export const isSameDay = (operation: Operation, day: Date) =>

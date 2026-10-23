@@ -5,7 +5,9 @@ import { StatCard } from './stat-card';
 import { styles } from './home-summary.styled';
 
 type HomeSummaryProps = {
-  rewardsPaid: number;
+  /** Сумма на первой плитке: выплачено семьёй или баланс ребёнка. */
+  amount: number;
+  amountLabel?: string;
   activeTasks: number;
   tasksToReview: number;
   onActiveTasksPress?: () => void;
@@ -13,7 +15,8 @@ type HomeSummaryProps = {
 };
 
 export function HomeSummary({
-  rewardsPaid,
+  amount,
+  amountLabel = 'Rewards paid',
   activeTasks,
   tasksToReview,
   onActiveTasksPress,
@@ -24,8 +27,8 @@ export function HomeSummary({
       <StatCard
         accent
         icon={<Icon name="coins" size={20} color={theme.colors.white} />}
-        value={`$${rewardsPaid}`}
-        label="Rewards paid"
+        value={`$${amount}`}
+        label={amountLabel}
       />
       <StatCard
         icon={<Icon name="tasks" size={20} color={theme.colors.blue} />}

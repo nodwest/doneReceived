@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  date: {
+  title: {
     fontSize: theme.fontSize.xl,
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
