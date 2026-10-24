@@ -37,6 +37,30 @@ export const theme = {
     // Заглушка фото-отчёта, когда ребёнок не приложил снимок.
     photoFrom: '#EFEAE0',
     photoTo: '#DCD3C8',
+    // История операций: заработано (зелёный) и упущено (синий). Грани
+    // 3D-столбиков: лицевая, боковая (тёмная) и верхняя (светлая).
+    earned: '#2EB873',
+    earnedDark: '#1A854F',
+    earnedLight: '#80E0A8',
+    earnedInk: '#0D6638',
+    earnedLabel: '#084524',
+    earnedSoft: 'rgba(46, 184, 115, 0.16)',
+    rewardText: '#1F995C',
+    rewardSoft: 'rgba(46, 184, 115, 0.14)',
+    missed: '#61A3ED',
+    missedDark: '#3875C2',
+    missedLight: '#A3D1FA',
+    missedInk: '#1F52A8',
+    missedLabel: '#123380',
+    missedSoft: 'rgba(97, 163, 237, 0.16)',
+    // Заглушка карты там, где карты нет (нативные платформы).
+    mapPlaceholder: '#EFEAE0',
+    // Роли в семье: родитель (тёмно-синий) и ребёнок (голубой) — иконки,
+    // блоки кодов и карточки участников на вкладке Family.
+    parentFrom: '#17215E',
+    parentTo: '#4254AD',
+    childFrom: '#4A9EF0',
+    childTo: '#A8D9FF',
 
     background: '#0b1120',
     surface: '#111827',
@@ -61,7 +85,9 @@ export const theme = {
     full: 999,
   },
   fonts: {
+    regular: 'Inter_400Regular',
     medium: 'Inter_500Medium',
+    semibold: 'Inter_600SemiBold',
     bold: 'Inter_700Bold',
   },
   fontSize: {

@@ -1,6 +1,10 @@
 import { childrenMock } from './children';
+import { coParentMock, parentMock } from './parent';
 
 const [emma, liam] = childrenMock;
+// Кто из родителей создал задачу.
+const sarah = parentMock.id;
+const george = coParentMock.id;
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -17,6 +21,7 @@ const at = (offsetMs: number) => new Date(now + offsetMs).toISOString();
 export const tasksMock = [
   {
     id: 1,
+    createdBy: sarah,
     title: 'Clean your room',
     description:
       'Make the bed, put toys away, and vacuum the floor. Wipe the desk, sort the books by size, and take the laundry basket to the hallway.',
@@ -30,6 +35,7 @@ export const tasksMock = [
   },
   {
     id: 2,
+    createdBy: sarah,
     title: 'Finish homework',
     description:
       'Finish the math workbook, pages 12 to 14. Check every answer twice, then read one chapter of your book and tell me what it was about.',
@@ -43,6 +49,7 @@ export const tasksMock = [
   },
   {
     id: 3,
+    createdBy: george,
     title: 'Make the bed',
     description:
       'Straighten the sheets and fold the blanket, then arrange the pillows neatly.',
@@ -56,6 +63,7 @@ export const tasksMock = [
   },
   {
     id: 4,
+    createdBy: george,
     title: 'Walk the dog',
     description:
       'Take Max for a 20 minute walk around the block and do not forget a bag.',
@@ -69,6 +77,7 @@ export const tasksMock = [
   },
   {
     id: 5,
+    createdBy: sarah,
     title: 'Practice piano',
     description: 'Play the new piece three times from start to finish.',
     reward: 4,
@@ -81,6 +90,7 @@ export const tasksMock = [
   },
   {
     id: 6,
+    createdBy: sarah,
     title: 'Feed the cat',
     description: 'Fill the bowl with dry food and change the water.',
     reward: 1,
@@ -93,6 +103,7 @@ export const tasksMock = [
   },
   {
     id: 7,
+    createdBy: sarah,
     title: 'Tidy the bedroom',
     description:
       'Make the bed, put toys away, and vacuum the floor. Wipe the desk and sort the books by size.',
@@ -106,6 +117,7 @@ export const tasksMock = [
   },
   {
     id: 8,
+    createdBy: george,
     title: 'Take out the trash',
     description:
       'Empty all the bins in the house and take the bags to the container in the yard.',

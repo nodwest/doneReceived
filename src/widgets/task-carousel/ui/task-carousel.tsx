@@ -70,7 +70,7 @@ export function TaskCarousel({
       >
         {tasks.map((task, i) => {
           const style: ViewStyle = {
-            width: single ? '100%' : cardWidth || undefined,
+            width: cardWidth || undefined,
           };
           // Рисуем только видимую карточку и соседние: остальные — пустые места
           // той же ширины. Вход на экран и смена вкладки не ждут всех карточек.

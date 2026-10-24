@@ -1,4 +1,5 @@
-import { Image, Text, View, type ImageSourcePropType } from 'react-native';
+import { Text, View, type ImageSourcePropType } from 'react-native';
+import { HeaderAvatar } from '@shared/ui';
 import { styles } from './home-header.styled';
 
 type HomeHeaderProps = {
@@ -14,7 +15,7 @@ export function HomeHeader({ greeting, name, avatar }: HomeHeaderProps) {
         <Text style={styles.greetingText}>{greeting}</Text>
         <Text style={styles.name}>{name}</Text>
       </View>
-      <Image source={avatar} style={styles.avatar} />
+      <HeaderAvatar source={avatar} />
     </View>
   );
 }

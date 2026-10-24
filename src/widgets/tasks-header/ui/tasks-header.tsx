@@ -1,13 +1,16 @@
 import {
+  Image,
   Pressable,
   StyleSheet,
   Text,
   View,
+  type ImageSourcePropType,
   type StyleProp,
   type TextStyle,
+  type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Icon } from '@shared/ui';
+import { RoundButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { styles } from './tasks-header.styled';
@@ -23,7 +26,16 @@ type TasksHeaderProps = {
   view: TasksView;
   onToggleView: () => void;
   onBack: () => void;
+  /** Чей список: строка с аватаром и «Emma's tasks». */
+  owner?: Owner;
+  /**
+   * Переключатель All / Review. Без него (задачи родителя — только активные)
+   * «George's tasks» стоит по центру шапки, а не строкой под ней.
+   */
+  tabs?: boolean;
 };
+
+type Owner = { name: string; avatar: ImageSourcePropType };
 
 /** Шапка экрана заданий: назад, переключатель All / Review и вид списком. */
 export function TasksHeader({
@@ -33,103 +45,136 @@ export function TasksHeader({
   view,
   onToggleView,
   onBack,
+  owner,
+  tabs = true,
 }: TasksHeaderProps) {
+  return (
+    <View>
+      <View style={[styles.container, !tabs && styles.containerInline]}>
+        <RoundButton
+          icon="arrow-left"
+          accessibilityLabel="Back"
+          onPress={onBack}
+        />
+
+        {tabs ? (
+          <Segments
+            tab={tab}
+            onTabChange={onTabChange}
+            reviewCount={reviewCount}
+          />
+        ) : (
+          owner && <OwnerTitle {...owner} style={styles.ownerInline} />
+        )}
+
+        <RoundButton
+          icon={view === 'cards' ? 'list' : 'cards'}
+          accessibilityLabel={
+            view === 'cards' ? 'Show as list' : 'Show as cards'
+          }
+          onPress={onToggleView}
+        />
+      </View>
+      {tabs && owner && <OwnerTitle {...owner} style={styles.owner} />}
+    </View>
+  );
+}
+
+type SegmentsProps = Pick<
+  TasksHeaderProps,
+  'tab' | 'onTabChange' | 'reviewCount'
+>;
+
+/** Переключатель All / Review с бейджем задач на проверке. */
+function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
   const compact = useIsCompact();
   const allActive = tab === 'all';
   const reviewActive = tab === 'review';
 
   return (
-    <View style={styles.container}>
+    <View style={styles.segments} accessibilityRole="tablist">
       <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Back"
-        onPress={onBack}
-        style={styles.roundButton}
+        accessibilityRole="tab"
+        accessibilityLabel="All tasks"
+        accessibilityState={{ selected: allActive }}
+        onPress={() => onTabChange('all')}
+        style={[
+          styles.segment,
+          compact && styles.segmentCompact,
+          allActive && styles.segmentAllActive,
+        ]}
       >
-        <Icon name="arrow-left" size={22} color={theme.colors.ink} />
-      </Pressable>
-
-      <View style={styles.segments} accessibilityRole="tablist">
-        <Pressable
-          accessibilityRole="tab"
-          accessibilityLabel="All tasks"
-          accessibilityState={{ selected: allActive }}
-          onPress={() => onTabChange('all')}
-          style={[
-            styles.segment,
-            compact && styles.segmentCompact,
-            allActive && styles.segmentAllActive,
-          ]}
-        >
-          {allActive && (
-            <LinearGradient
-              colors={[theme.colors.violet, theme.colors.blue]}
-              start={{ x: 0, y: 0.1 }}
-              end={{ x: 1, y: 0.9 }}
-              locations={[0, 0.7071]}
-              style={StyleSheet.absoluteFill}
-            />
-          )}
-          <SegmentLabel
-            label="All tasks"
-            compact={compact}
-            activeStyle={allActive && styles.segmentLabelAll}
+        {allActive && (
+          <LinearGradient
+            colors={[theme.colors.violet, theme.colors.blue]}
+            start={{ x: 0, y: 0.1 }}
+            end={{ x: 1, y: 0.9 }}
+            locations={[0, 0.7071]}
+            style={StyleSheet.absoluteFill}
           />
-        </Pressable>
-
-        <Pressable
-          accessibilityRole="tab"
-          accessibilityLabel="Review Tasks"
-          accessibilityState={{ selected: reviewActive }}
-          onPress={() => onTabChange('review')}
-          style={[
-            styles.segment,
-            compact && styles.segmentCompact,
-            reviewCount > 0 && styles.segmentWithBadge,
-            reviewActive && styles.segmentReviewActive,
-          ]}
-        >
-          {reviewActive && (
-            <LinearGradient
-              colors={[theme.colors.reviewFrom, theme.colors.reviewTo]}
-              start={{ x: 0, y: 0.1 }}
-              end={{ x: 1, y: 0.9 }}
-              locations={[0, 0.7071]}
-              style={StyleSheet.absoluteFill}
-            />
-          )}
-          {/* На узких экранах полная подпись не помещается рядом с кнопками. */}
-          <SegmentLabel
-            label={compact ? 'Review' : 'Review Tasks'}
-            compact={compact}
-            activeStyle={reviewActive && styles.segmentLabelReview}
-          />
-          {reviewCount > 0 && (
-            <LinearGradient
-              colors={[theme.colors.violet, theme.colors.blue]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              locations={[0, 0.7071]}
-              style={styles.badge}
-            >
-              <Text style={styles.badgeText}>{reviewCount}</Text>
-            </LinearGradient>
-          )}
-        </Pressable>
-      </View>
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={view === 'cards' ? 'Show as list' : 'Show as cards'}
-        onPress={onToggleView}
-        style={styles.roundButton}
-      >
-        <Icon
-          name={view === 'cards' ? 'list' : 'cards'}
-          size={22}
-          color={theme.colors.ink}
+        )}
+        <SegmentLabel
+          label="All tasks"
+          compact={compact}
+          activeStyle={allActive && styles.segmentLabelAll}
         />
       </Pressable>
+
+      <Pressable
+        accessibilityRole="tab"
+        accessibilityLabel="Review Tasks"
+        accessibilityState={{ selected: reviewActive }}
+        onPress={() => onTabChange('review')}
+        style={[
+          styles.segment,
+          compact && styles.segmentCompact,
+          reviewCount > 0 && styles.segmentWithBadge,
+          reviewActive && styles.segmentReviewActive,
+        ]}
+      >
+        {reviewActive && (
+          <LinearGradient
+            colors={[theme.colors.reviewFrom, theme.colors.reviewTo]}
+            start={{ x: 0, y: 0.1 }}
+            end={{ x: 1, y: 0.9 }}
+            locations={[0, 0.7071]}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
+        {/* На узких экранах полная подпись не помещается рядом с кнопками. */}
+        <SegmentLabel
+          label={compact ? 'Review' : 'Review Tasks'}
+          compact={compact}
+          activeStyle={reviewActive && styles.segmentLabelReview}
+        />
+        {reviewCount > 0 && (
+          <LinearGradient
+            colors={[theme.colors.violet, theme.colors.blue]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            locations={[0, 0.7071]}
+            style={styles.badge}
+          >
+            <Text style={styles.badgeText}>{reviewCount}</Text>
+          </LinearGradient>
+        )}
+      </Pressable>
+    </View>
+  );
+}
+
+/** Аватар и «Emma's tasks». */
+function OwnerTitle({
+  name,
+  avatar,
+  style,
+}: Owner & { style: StyleProp<ViewStyle> }) {
+  return (
+    <View style={style}>
+      <Image source={avatar} style={styles.ownerAvatar} />
+      <Text style={styles.ownerName} numberOfLines={1}>
+        {name}&apos;s tasks
+      </Text>
     </View>
   );
 }

@@ -1,11 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { theme } from '@shared/theme';
 
-const floating = {
-  backgroundColor: theme.colors.white,
-  boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
-} as const;
-
 export const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
@@ -14,17 +9,42 @@ export const styles = StyleSheet.create({
     gap: 8,
     paddingTop: 8,
   },
-  roundButton: {
-    ...floating,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+
+  // Строка «чей список». Снизу 6 + 12 отступа списка — те же 18, что сверху.
+  owner: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    paddingTop: 18,
+    paddingBottom: 6,
+  },
+  // Без переключателя: заголовок по центру шапки. Снизу 6 + 12 отступа
+  // списка — те же 18, что под строкой владельца у ребёнка.
+  ownerInline: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  containerInline: {
+    paddingBottom: 6,
+  },
+  ownerAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
+  ownerName: {
+    fontSize: 17,
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.ink,
   },
 
   segments: {
-    ...floating,
+    backgroundColor: theme.colors.white,
+    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
     flexShrink: 1,
     flexDirection: 'row',
     alignItems: 'center',

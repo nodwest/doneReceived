@@ -19,15 +19,6 @@ export const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
   },
-  close: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.white,
-    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
-  },
   title: {
     flex: 1,
     textAlign: 'center',

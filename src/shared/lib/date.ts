@@ -61,6 +61,22 @@ export function formatDayLabel(date: Date, now = new Date()) {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
+/** «Oct 15». */
+export const formatMonthDay = (date: Date) =>
+  date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+/** «Sun». */
+export const formatWeekdayShort = (date: Date) =>
+  date.toLocaleDateString([], { weekday: 'short' });
+
+/** «Oct». */
+export const formatMonthShort = (date: Date) =>
+  date.toLocaleDateString([], { month: 'short' });
+
+/** Полночь дня date + days (отрицательное — назад) по местному времени. */
+export const addDays = (date: Date, days: number) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
 /** Время по настройкам устройства: «6:00 PM» или «18:00». */
 export const formatClock = (date: Date) =>
   date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
