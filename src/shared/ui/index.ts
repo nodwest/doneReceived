@@ -13,3 +13,4 @@ export * from './section-header';
 export * from './toast-host';
 export * from './bottom-sheet';
 export * from './date-time-picker';
+export * from './toggle';

@@ -61,6 +61,9 @@ export const theme = {
     parentTo: '#4254AD',
     childFrom: '#4A9EF0',
     childTo: '#A8D9FF',
+    // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
+    heroSubtle: '#D9E0FF',
+    violetIcon: '#EDE8FC',
 
     background: '#0b1120',
     surface: '#111827',

@@ -27,6 +27,12 @@ import { StepDotIcon } from './step-dot';
 import { ParentIcon } from './parent';
 import { ChildIcon } from './child';
 import { CopyIcon } from './copy';
+import { PersonIcon } from './person';
+import { BellIcon } from './bell';
+import { KeyIcon } from './key';
+import { GlobeIcon } from './globe';
+import { HelpIcon } from './help';
+import { ChevronRightIcon } from './chevron-right';
 
 export const icons = {
   price: PriceIcon,
@@ -58,4 +64,10 @@ export const icons = {
   parent: ParentIcon,
   child: ChildIcon,
   copy: CopyIcon,
+  person: PersonIcon,
+  bell: BellIcon,
+  key: KeyIcon,
+  globe: GlobeIcon,
+  help: HelpIcon,
+  'chevron-right': ChevronRightIcon,
 };
