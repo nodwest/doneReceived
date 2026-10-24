@@ -15,6 +15,8 @@ export interface Operation {
   kind: OperationKind;
   amount: number;
   child: OperationChild;
+  /** id родителя, создавшего задачу. */
+  parentId: number;
   /** ISO-время операции. */
   at: string;
 }

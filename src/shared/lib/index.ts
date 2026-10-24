@@ -5,3 +5,5 @@ export * from './date';
 export * from './use-now';
 export * from './use-time-ago';
 export * from './use-snap-carousel';
+export * from './clipboard';
+export * from './color';

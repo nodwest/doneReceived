@@ -24,7 +24,7 @@ export function ParentHomePage() {
   const { data: tasks } = useTasks();
   const total = tasks && countTasks(tasks);
   const children = childProfilesMock.map((child) => {
-    const counts = countTasks(tasks ?? [], child.id);
+    const counts = countTasks(tasks ?? [], { assigneeId: child.id });
     return {
       id: child.id,
       name: child.name,
@@ -53,10 +53,10 @@ export function ParentHomePage() {
             activeTasks={total?.active ?? familySummaryMock.activeTasks}
             tasksToReview={total?.review ?? familySummaryMock.tasksToReview}
             onActiveTasksPress={() =>
-              router.replace({ pathname: '/tasks', params: { tab: 'all' } })
+              router.push({ pathname: '/tasks', params: { tab: 'all' } })
             }
             onTasksToReviewPress={() =>
-              router.replace({ pathname: '/tasks', params: { tab: 'review' } })
+              router.push({ pathname: '/tasks', params: { tab: 'review' } })
             }
           />
           <ChildrenCarousel

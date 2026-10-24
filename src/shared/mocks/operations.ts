@@ -1,4 +1,5 @@
 import { childrenMock } from './children';
+import { coParentMock, parentMock } from './parent';
 
 const [emma, liam] = childrenMock;
 
@@ -64,10 +65,14 @@ const rows = [
   [13, '21:00', liam, 'missed', 3, 'Take out the trash'],
 ] as const;
 
-/** История операций за две недели; даты считаются от сегодняшнего дня. */
+/**
+ * История операций за две недели; даты считаются от сегодняшнего дня.
+ * parentId — кто из родителей создал задачу: каждая третья — George.
+ */
 export const operationsMock = rows.map(
   ([daysAgo, time, child, kind, amount, title], index) => ({
     id: index + 1,
+    parentId: index % 3 === 2 ? coParentMock.id : parentMock.id,
     daysAgo,
     time,
     child,

@@ -7,9 +7,6 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 24,
   },
-  section: {
-    gap: 10,
-  },
   list: {
     gap: 6,
   },

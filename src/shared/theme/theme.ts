@@ -55,6 +55,12 @@ export const theme = {
     missedSoft: 'rgba(97, 163, 237, 0.16)',
     // Заглушка карты там, где карты нет (нативные платформы).
     mapPlaceholder: '#EFEAE0',
+    // Роли в семье: родитель (тёмно-синий) и ребёнок (голубой) — иконки,
+    // блоки кодов и карточки участников на вкладке Family.
+    parentFrom: '#17215E',
+    parentTo: '#4254AD',
+    childFrom: '#4A9EF0',
+    childTo: '#A8D9FF',
 
     background: '#0b1120',
     surface: '#111827',

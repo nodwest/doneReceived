@@ -14,35 +14,49 @@ import {
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
-import { useTasks, type Task } from '@entities/task';
+import { filterTasks, useTasks, type Task } from '@entities/task';
 import { PillButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
-import { childrenMock } from '@shared/mocks';
+import { childrenMock, parentProfilesMock } from '@shared/mocks';
 import { FOOTER_PADDING_VERTICAL, styles } from './tasks.styled';
 
 const NO_TASKS: Task[] = [];
 
 /**
- * Экран заданий. На вкладке Tasks — задачи всех детей; из профиля ребёнка
- * (/child/[id]/tasks) — только его: в шапке строка с аватаром, «назад»
- * возвращает в профиль, в навбаре подсвечен Family.
+ * Чей список: all — вкладка Tasks, задачи всех детей; child — задачи ребёнка
+ * (/child/[id]/tasks); parent — активные задачи, созданные родителем
+ * (/parent/[id]/tasks).
  */
-export function TasksPage() {
+type TasksScope = 'all' | 'child' | 'parent';
+
+/**
+ * Экран заданий. Из профиля ребёнка или родителя — только его задачи: в шапке
+ * аватар и «Emma's tasks», «назад» возвращает в профиль, в навбаре подсвечен
+ * Family. У родителя нет вкладки Review — показываем только активные.
+ */
+export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   const router = useRouter();
   // Плитка Tasks to Review открывает экран сразу на вкладке проверки.
   const { tab: initialTab, id: ownerId } = useLocalSearchParams<{
     tab?: string;
     id?: string;
   }>();
-  const owner = ownerId
-    ? childrenMock.find((child) => String(child.id) === ownerId)
-    : undefined;
+  const owner =
+    scope === 'child'
+      ? childrenMock.find((child) => String(child.id) === ownerId)
+      : scope === 'parent'
+        ? parentProfilesMock.find((parent) => String(parent.id) === ownerId)
+        : undefined;
   // Список из кэша React Query: после создания или правки он перечитывается сам.
   const { data = NO_TASKS, isPending } = useTasks();
-  const allTasks = useMemo(
-    () => (owner ? data.filter((task) => task.assignee.id === owner.id) : data),
-    [data, owner],
-  );
+  const allTasks = useMemo(() => {
+    if (!owner) return data;
+    return scope === 'parent'
+      ? filterTasks(data, { createdBy: owner.id }).filter(
+          (task) => task.status === 'active',
+        )
+      : filterTasks(data, { assigneeId: owner.id });
+  }, [data, scope, owner]);
   const reviewTasks = useMemo(
     () => allTasks.filter((task) => task.status === 'review'),
     [allTasks],
@@ -70,13 +84,16 @@ export function TasksPage() {
   const current: Task | undefined = tasks[currentIndex];
   const showFooter = view === 'cards' && current;
 
-  if (ownerId && !owner) return <Redirect href="/tasks" />;
+  if (scope !== 'all' && !owner) return <Redirect href="/" />;
 
-  const emptyText = owner
-    ? `${owner.name} has no tasks${tab === 'review' ? ' to review' : ' yet'}`
-    : tab === 'review'
-      ? 'No tasks to review'
-      : 'No tasks yet';
+  const emptyText =
+    scope === 'parent' && owner
+      ? `${owner.name} has no active tasks`
+      : owner
+        ? `${owner.name} has no tasks${tab === 'review' ? ' to review' : ' yet'}`
+        : tab === 'review'
+          ? 'No tasks to review'
+          : 'No tasks yet';
 
   return (
     <View style={styles.screen}>
@@ -90,10 +107,13 @@ export function TasksPage() {
             onToggleView={() =>
               setView((prev) => (prev === 'cards' ? 'list' : 'cards'))
             }
+            // Назад — туда, откуда пришли (главная, Family, профиль); без
+            // истории (открыли по ссылке) — на главную.
             onBack={() =>
-              owner && router.canGoBack() ? router.back() : router.replace('/')
+              router.canGoBack() ? router.back() : router.replace('/')
             }
             owner={owner}
+            tabs={scope !== 'parent'}
           />
         </View>
         <ScrollView
@@ -166,3 +186,9 @@ export function TasksPage() {
     </View>
   );
 }
+
+/** Задачи ребёнка: /child/[id]/tasks. */
+export const ChildTasksPage = () => <TasksPage scope="child" />;
+
+/** Активные задачи, созданные родителем: /parent/[id]/tasks. */
+export const ParentTasksPage = () => <TasksPage scope="parent" />;

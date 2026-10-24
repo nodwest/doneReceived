@@ -1,1 +1,1 @@
-export { TasksPage as default } from '@pages/tasks';
+export { ChildTasksPage as default } from '@pages/tasks';

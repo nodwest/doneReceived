@@ -6,9 +6,33 @@ import { theme } from '@shared/theme';
 import type { Presence } from '../model/presence';
 import { styles } from './presence-badge.styled';
 
+type PresenceBadgeProps = Presence & {
+  /** Строка без плашки — в карточке участника семьи. */
+  compact?: boolean;
+};
+
 /** «At home · 5 min ago» с домиком или серая «Away · 12 min ago». */
-export function PresenceBadge({ atHome, since }: Presence) {
+export function PresenceBadge({ atHome, since, compact }: PresenceBadgeProps) {
   const ago = useTimeAgo(since);
+
+  if (compact) {
+    return (
+      <View style={styles.compact}>
+        {atHome && (
+          <Icon name="home" size={14} color={theme.colors.homeBrown} />
+        )}
+        <Text
+          style={[
+            styles.compactText,
+            atHome ? styles.homeText : styles.compactAway,
+          ]}
+          numberOfLines={1}
+        >
+          {atHome ? 'At home' : 'Away'} · {ago}
+        </Text>
+      </View>
+    );
+  }
 
   if (!atHome) {
     return (

@@ -24,6 +24,9 @@ import { CardsIcon } from './cards';
 import { BroomIcon } from './broom';
 import { CameraIcon } from './camera';
 import { StepDotIcon } from './step-dot';
+import { ParentIcon } from './parent';
+import { ChildIcon } from './child';
+import { CopyIcon } from './copy';
 
 export const icons = {
   price: PriceIcon,
@@ -52,4 +55,7 @@ export const icons = {
   broom: BroomIcon,
   camera: CameraIcon,
   'step-dot': StepDotIcon,
+  parent: ParentIcon,
+  child: ChildIcon,
+  copy: CopyIcon,
 };

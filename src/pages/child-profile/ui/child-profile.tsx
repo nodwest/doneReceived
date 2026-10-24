@@ -7,6 +7,8 @@ import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
 import {
+  getWeekStart,
+  latestRewards,
   OperationRow,
   operationsSince,
   sumTotals,
@@ -14,16 +16,14 @@ import {
   type Operation,
 } from '@entities/operation';
 import { countTasks, useTasks, type Task } from '@entities/task';
-import { addDays } from '@shared/lib';
+import type { ChildProfile } from '@entities/user';
 import { childProfilesMock } from '@shared/mocks';
-import { SectionHeader } from '@shared/ui';
+import { ScreenSection } from '@shared/ui';
 import { styles } from './child-profile.styled';
 
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
 const RECENT_REWARDS = 3;
-// «This week» — последние 7 дней вместе с сегодняшним.
-const WEEK_DAYS = 7;
 
 /** Профиль ребёнка: статус, баланс, задачи, награды и место на карте. */
 export function ChildProfilePage() {
@@ -31,20 +31,19 @@ export function ChildProfilePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: tasks = NO_TASKS } = useTasks();
   const { data: operations = NO_OPERATIONS } = useOperations();
-  const [weekStart] = useState(() => addDays(new Date(), 1 - WEEK_DAYS));
+  const [weekStart] = useState(() => getWeekStart(new Date()));
 
-  const child = childProfilesMock.find((item) => String(item.id) === id);
+  const child: ChildProfile | undefined = childProfilesMock.find(
+    (item) => String(item.id) === id,
+  );
   if (!child) return <Redirect href="/" />;
 
-  const counts = countTasks(tasks, child.id);
+  const counts = countTasks(tasks, { assigneeId: child.id });
   const childOperations = operations.filter(
     (operation) => operation.child.id === child.id,
   );
   const week = sumTotals(operationsSince(childOperations, weekStart));
-  // История уже отсортирована: сначала новые.
-  const rewards = childOperations
-    .filter((operation) => operation.kind === 'earned')
-    .slice(0, RECENT_REWARDS);
+  const rewards = latestRewards(childOperations, RECENT_REWARDS);
 
   const openTasks = (tab: 'all' | 'review') =>
     router.push({
@@ -76,17 +75,16 @@ export function ChildProfilePage() {
           onTasksToReviewPress={() => openTasks('review')}
         />
         <DaySummary title="This week" {...week} />
-        <View style={styles.section}>
-          <SectionHeader
-            title="Recent rewards"
-            actionLabel="See all"
-            onAction={() =>
-              router.replace({
-                pathname: '/wallet',
-                params: { child: String(child.id) },
-              })
-            }
-          />
+        <ScreenSection
+          title="Recent rewards"
+          actionLabel="See all"
+          onAction={() =>
+            router.replace({
+              pathname: '/wallet',
+              params: { child: String(child.id) },
+            })
+          }
+        >
           {rewards.length === 0 ? (
             <Text style={styles.empty}>No rewards yet</Text>
           ) : (
@@ -96,20 +94,19 @@ export function ChildProfilePage() {
               ))}
             </View>
           )}
-        </View>
-        <View style={styles.section}>
-          <SectionHeader
-            title="Location"
-            actionLabel="Open map"
-            onAction={openMap}
-          />
+        </ScreenSection>
+        <ScreenSection
+          title="Location"
+          actionLabel="Open map"
+          onAction={openMap}
+        >
           <MapPreview
             position={child.position}
             avatar={child.avatar}
             presence={child.presence}
             onPress={openMap}
           />
-        </View>
+        </ScreenSection>
       </ScrollView>
     </TabScreen>
   );

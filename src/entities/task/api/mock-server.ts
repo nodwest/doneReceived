@@ -1,4 +1,4 @@
-import { childrenMock, tasksMock } from '@shared/mocks';
+import { childrenMock, parentMock, tasksMock } from '@shared/mocks';
 import type { Task } from '../model/task';
 import type { CreateTaskPayload, UpdateTaskPayload } from '../model/types';
 
@@ -29,6 +29,8 @@ export const mockServer = {
       reward: payload.reward,
       status: 'active',
       assignee: findAssignee(payload.assigneeId),
+      // Автора сервер берёт из сессии: задачу создаёт вошедший родитель.
+      createdBy: parentMock.id,
       createdAt: new Date().toISOString(),
       expiresAt: payload.expiresAt,
       doneAt: null,

@@ -19,6 +19,18 @@ export const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 6,
   },
+  // Без переключателя: заголовок по центру шапки. Снизу 6 + 12 отступа
+  // списка — те же 18, что под строкой владельца у ребёнка.
+  ownerInline: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  containerInline: {
+    paddingBottom: 6,
+  },
   ownerAvatar: {
     width: 24,
     height: 24,

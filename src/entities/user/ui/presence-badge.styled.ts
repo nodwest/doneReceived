@@ -23,4 +23,18 @@ export const styles = StyleSheet.create({
   awayText: {
     color: theme.colors.inkSoft,
   },
+  compact: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  compactText: {
+    flexShrink: 1,
+    fontSize: theme.fontSize.xs,
+    fontFamily: theme.fonts.semibold,
+  },
+  compactAway: {
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
+  },
 });

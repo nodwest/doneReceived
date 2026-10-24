@@ -16,6 +16,8 @@ export interface Task {
   reward: number;
   status: TaskState;
   assignee: TaskAssignee;
+  /** id родителя, создавшего задачу. */
+  createdBy: number;
   /** ISO-время создания. */
   createdAt: string;
   /** ISO-время, когда задача перестаёт быть активной; null — без срока. */

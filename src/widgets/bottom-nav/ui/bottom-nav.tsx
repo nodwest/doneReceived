@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '@shared/ui';
 import { theme } from '@shared/theme';
@@ -13,6 +13,7 @@ type BottomNavProps = {
 
 export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { bottom } = useSafeAreaInsets();
 
   return (
@@ -30,7 +31,11 @@ export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
             style={styles.item}
             onPress={() => {
               if (onNavigate) return onNavigate(key);
-              if (!active) router.replace(href);
+              // Вкладка уже в истории (Family → Tasks → Family) — откатываемся
+              // к ней, иначе она заменяет текущий экран. Подсвеченная вкладка
+              // на вложенном экране (профиль из Family) так же возвращает к
+              // своему корню.
+              if (pathname !== href) router.dismissTo(href);
             }}
           >
             <Icon

@@ -5,10 +5,19 @@ import { styles } from './operation-row.styled';
 
 type OperationRowProps = Operation & {
   /**
-   * Что стоит в подписи перед временем: имя ребёнка (общая история) или день
-   * (история одного ребёнка, где имя повторялось бы в каждой строке).
+   * Подпись перед временем: имя ребёнка (общая история по дням), день
+   * (история одного ребёнка, где имя повторялось бы в каждой строке) или
+   * имя и день (история родителя за разные дни).
    */
-  caption?: 'child' | 'day';
+  caption?: 'child' | 'day' | 'child-day';
+};
+
+const CAPTION = {
+  child: (name: string, date: Date) => `${name} · ${formatClock(date)}`,
+  day: (_name: string, date: Date) =>
+    `${formatDayLabel(date)} · ${formatClock(date)}`,
+  'child-day': (name: string, date: Date) =>
+    `${name} · ${formatDayLabel(date)} ${formatClock(date)}`,
 };
 
 /** Начисленная награда в истории: аватар, задача, подпись и время, сумма. */
@@ -29,8 +38,7 @@ export function OperationRow({
           {title}
         </Text>
         <Text style={styles.subtitle} numberOfLines={1}>
-          {caption === 'day' ? formatDayLabel(date) : child.name} ·{' '}
-          {formatClock(date)}
+          {CAPTION[caption](child.name, date)}
         </Text>
       </View>
       <View style={styles.reward}>
