@@ -11,7 +11,6 @@ export const parentMock = {
 /** Настройки вошедшего родителя на вкладке Profile. */
 export const profileSettingsMock = {
   notifications: true,
-  language: 'English',
 };
 
 /** Второй родитель в семье. */

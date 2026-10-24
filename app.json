@@ -30,7 +30,8 @@
         {
           "root": "./app"
         }
-      ]
+      ],
+      "expo-localization"
     ]
   }
 }

@@ -14,3 +14,4 @@ export * from './toast-host';
 export * from './bottom-sheet';
 export * from './date-time-picker';
 export * from './toggle';
+export * from './select-menu';

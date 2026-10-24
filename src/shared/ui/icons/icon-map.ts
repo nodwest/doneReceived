@@ -33,6 +33,7 @@ import { KeyIcon } from './key';
 import { GlobeIcon } from './globe';
 import { HelpIcon } from './help';
 import { ChevronRightIcon } from './chevron-right';
+import { CheckIcon } from './check';
 
 export const icons = {
   price: PriceIcon,
@@ -70,4 +71,5 @@ export const icons = {
   globe: GlobeIcon,
   help: HelpIcon,
   'chevron-right': ChevronRightIcon,
+  check: CheckIcon,
 };

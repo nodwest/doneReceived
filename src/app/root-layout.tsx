@@ -6,6 +6,9 @@ import {
 } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
+// Инициализация i18next до первого рендера.
+import '@shared/i18n';
+import './font-rendering';
 import { ToastHost } from '@shared/ui';
 import { Providers } from './providers';
 

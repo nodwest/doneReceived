@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   shadow: {
@@ -24,11 +24,13 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: theme.fontSize.sm,
     fontFamily: theme.fonts.bold,
+    letterSpacing: tracking(theme.fontSize.sm),
     color: theme.colors.ink,
   },
   hint: {
     fontSize: theme.fontSize.xs,
     fontFamily: theme.fonts.medium,
+    letterSpacing: tracking(theme.fontSize.xs),
     color: theme.colors.inkSoft,
   },
 });

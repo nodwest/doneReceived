@@ -1,28 +1,27 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { useTranslation } from '../i18n';
 import { copyText, showToast } from '../lib';
 import { theme } from '../theme';
 import { Icon } from './icons';
 
 type CopyableCodeProps = {
   code: string;
-  /** Тост после копирования. */
+  /** Тост после копирования; по умолчанию «Code copied» на языке интерфейса. */
   copiedMessage?: string;
 };
 
 /** Белая плашка с кодом: тап копирует код в буфер обмена. */
-export function CopyableCode({
-  code,
-  copiedMessage = 'Code copied',
-}: CopyableCodeProps) {
+export function CopyableCode({ code, copiedMessage }: CopyableCodeProps) {
+  const { t } = useTranslation();
   const copy = async () => {
     await copyText(code);
-    showToast(copiedMessage);
+    showToast(copiedMessage ?? t('copyableCode.copied'));
   };
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Copy code ${code}`}
+      accessibilityLabel={t('copyableCode.copy', { code })}
       onPress={copy}
       style={({ pressed }) => [styles.field, pressed && styles.pressed]}
     >

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Icon, type IconName } from '@shared/ui';
 import { theme } from '@shared/theme';
@@ -12,6 +12,8 @@ type SettingsRowProps = {
   /** Элемент справа вместо стрелки (тогл). */
   right?: ReactNode;
   onPress?: () => void;
+  /** Для меню, которое раскрывается у пункта (измерить его положение). */
+  ref?: Ref<View>;
 };
 
 /** Пункт меню профиля: иконка в фиолетовой плашке, название и стрелка. */
@@ -21,9 +23,11 @@ export function SettingsRow({
   value,
   right,
   onPress,
+  ref,
 }: SettingsRowProps) {
   return (
     <Pressable
+      ref={ref}
       style={({ pressed }) => [
         styles.row,
         pressed && onPress && styles.pressed,

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 // Отступ разделителя слева: иконка пункта (12 + 36 + 12) и ещё 10.
 const DIVIDER_INSET = 70;
@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: theme.fontSize.h1,
     fontFamily: theme.fonts.bold,
+    letterSpacing: tracking(theme.fontSize.h1),
     color: theme.colors.ink,
   },
   menu: {
@@ -42,6 +43,7 @@ export const styles = StyleSheet.create({
   logOutText: {
     fontSize: 15,
     fontFamily: theme.fonts.semibold,
+    letterSpacing: tracking(15),
     color: theme.colors.grey,
   },
 });

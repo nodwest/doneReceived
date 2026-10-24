@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   hero: {
@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
   name: {
     fontSize: 22,
     fontFamily: theme.fonts.bold,
+    letterSpacing: tracking(22),
     color: theme.colors.white,
   },
   avatar: {
@@ -26,6 +27,7 @@ export const styles = StyleSheet.create({
   email: {
     fontSize: theme.fontSize.inputName,
     fontFamily: theme.fonts.medium,
+    letterSpacing: tracking(theme.fontSize.inputName),
     color: theme.colors.heroSubtle,
   },
 });

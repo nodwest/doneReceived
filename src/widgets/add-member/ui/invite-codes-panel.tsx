@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import type { InviteCodes } from '@entities/family';
+import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
 import { InviteCodeCard } from './invite-code-card';
 import { styles } from './invite-codes-panel.styled';
@@ -16,33 +17,31 @@ type InviteCodesPanelProps = {
  * Family codes); крестик закрывает её.
  */
 export function InviteCodesPanel({ codes, onClose }: InviteCodesPanelProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.panel}>
       <View style={styles.head}>
-        <Text style={styles.title}>Add family member</Text>
+        <Text style={styles.title}>{t('inviteCodes.title')}</Text>
         <RoundButton
           size="sm"
           icon="close"
-          accessibilityLabel="Close"
+          accessibilityLabel={t('common.close')}
           onPress={onClose}
         />
       </View>
-      <Text style={styles.hint}>
-        Share a code with the new member. They enter it when signing up in Kids
-        Tasks — and join your family right away.
-      </Text>
+      <Text style={styles.hint}>{t('inviteCodes.hint')}</Text>
       {codes && (
         <>
           <InviteCodeCard
             role="parent"
-            title="For a parent"
-            hint="Can create tasks, approve them and pay rewards."
+            title={t('inviteCodes.parent.title')}
+            hint={t('inviteCodes.parent.hint')}
             code={codes.parent}
           />
           <InviteCodeCard
             role="child"
-            title="For a child"
-            hint="Sees own tasks, marks them done and earns rewards."
+            title={t('inviteCodes.child.title')}
+            hint={t('inviteCodes.child.hint')}
             code={codes.child}
           />
         </>
