@@ -7,7 +7,8 @@ export interface Activity {
   childName: string;
   avatar: ImageSourcePropType;
   action: string;
-  timeAgo: string;
+  /** ISO-время события. */
+  at: string;
   status: ActivityStatus;
   reward: number;
 }

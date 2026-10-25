@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -28,11 +28,13 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
+    letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   subtitle: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -41,6 +43,7 @@ export const styles = StyleSheet.create({
   },
   reward: {
     fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
     color: theme.colors.yellow,
   },

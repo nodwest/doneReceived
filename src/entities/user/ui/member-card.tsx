@@ -9,6 +9,7 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import type { Presence } from '../model/presence';
 import type { FamilyRole } from '../model/role';
 import { PresenceBadge } from './presence-badge';
@@ -44,6 +45,7 @@ export function MemberCard({
   onActiveTasksPress,
   onReviewTasksPress,
 }: MemberCardProps) {
+  const { t } = useTranslation();
   return (
     <Pressable
       // В вебе роль button делает из карточки <button>, а внутри неё кнопки-чипы:
@@ -63,7 +65,7 @@ export function MemberCard({
             </Text>
             {isYou && (
               <View style={styles.you}>
-                <Text style={styles.youText}>You</Text>
+                <Text style={styles.youText}>{t('member.you')}</Text>
               </View>
             )}
           </View>
@@ -72,15 +74,21 @@ export function MemberCard({
         <View style={styles.stats}>
           <TaskChip
             value={activeTasks}
-            label="active"
-            accessibilityLabel={`${name}: ${activeTasks} active tasks`}
+            label={t('member.active', { count: activeTasks })}
+            accessibilityLabel={t('childCard.activeTasksA11y', {
+              name,
+              count: activeTasks,
+            })}
             onPress={onActiveTasksPress}
           />
           {reviewTasks !== undefined && (
             <TaskChip
               value={reviewTasks}
-              label="to review"
-              accessibilityLabel={`${name}: ${reviewTasks} tasks to review`}
+              label={t('member.toReview')}
+              accessibilityLabel={t('childCard.tasksToReviewA11y', {
+                name,
+                count: reviewTasks,
+              })}
               onPress={onReviewTasksPress}
               chipStyle={styles.chipReview}
               textStyle={styles.chipReviewText}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import { Icon } from '@shared/ui';
 import { styles } from './reward-button.styled';
 
@@ -18,9 +19,10 @@ export function RewardButton({
   onPress,
   icon,
 }: RewardButtonProps) {
+  const { t } = useTranslation();
   const isReward = variant === 'reward';
 
-  const labelText = isReward ? 'Награда' : 'Штраф';
+  const labelText = isReward ? t('taskCard.reward') : t('taskCard.penalty');
 
   const defaultIcon = isReward ? (
     <Icon name="price" size={35} color="green" />

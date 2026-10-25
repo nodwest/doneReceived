@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import { theme } from '../theme';
+import { theme, tracking } from '../theme';
 import { useToastStore } from '../lib/toast';
 
 // Даём нативной модалке уехать вниз, прежде чем показывать тост.
@@ -79,12 +79,14 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 16,
+    letterSpacing: tracking(16),
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },
   message: {
     flexShrink: 1,
     fontSize: 16,
+    letterSpacing: tracking(16),
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },

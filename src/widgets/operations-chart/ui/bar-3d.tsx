@@ -5,8 +5,23 @@ import {
   OPERATION_KIND_COLORS,
   type OperationKind,
 } from '@entities/operation';
-import { DEPTH_X, DEPTH_Y, STACK_OVERLAP } from '../config/sizes';
+import { theme } from '@shared/theme';
+import {
+  DEPTH_X,
+  DEPTH_Y,
+  FUTURE_BAR_HEIGHT,
+  STACK_OVERLAP,
+} from '../config/sizes';
 import { styles } from './bar-3d.styled';
+
+type CubeColors = { front: string; side: string; top: string };
+
+// Будущий день: одинаковый серый кубик минимальной высоты.
+const FUTURE_COLORS: CubeColors = {
+  front: theme.colors.future,
+  side: theme.colors.futureDark,
+  top: theme.colors.futureLight,
+};
 
 // Подпись суммы помещается на лицевую грань не ниже этой высоты.
 const MIN_LABEL_HEIGHT = 16;
@@ -19,6 +34,8 @@ type Bar3DProps = {
   width: number;
   /** Суммы на гранях — у выбранного дня. */
   showLabels: boolean;
+  /** Будущий день: вместо сумм серый кубик-заглушка. */
+  future?: boolean;
 };
 
 type Block = {
@@ -35,7 +52,21 @@ export function Bar3D({
   scale,
   width,
   showLabels,
+  future,
 }: Bar3DProps) {
+  if (future) {
+    return (
+      <Svg width={width} height={FUTURE_BAR_HEIGHT}>
+        <Cube
+          top={0}
+          height={FUTURE_BAR_HEIGHT}
+          width={width}
+          colors={FUTURE_COLORS}
+        />
+      </Svg>
+    );
+  }
+
   const earnedHeight = earned > 0 ? earned * scale + DEPTH_Y : 0;
   const missedHeight = missed > 0 ? missed * scale + DEPTH_Y : 0;
   const height =
@@ -59,28 +90,15 @@ export function Bar3D({
   return (
     <View style={{ width, height }}>
       <Svg width={width} height={height}>
-        {blocks.map(({ kind, top, height: blockHeight }) => {
-          const colors = OPERATION_KIND_COLORS[kind];
-          const bottom = top + blockHeight;
-          return (
-            <G key={kind}>
-              <Rect
-                y={top + DEPTH_Y}
-                width={front}
-                height={blockHeight - DEPTH_Y}
-                fill={colors.front}
-              />
-              <Path
-                d={`M${front} ${top + DEPTH_Y}L${width} ${top}V${bottom - DEPTH_Y}L${front} ${bottom}Z`}
-                fill={colors.side}
-              />
-              <Path
-                d={`M0 ${top + DEPTH_Y}L${DEPTH_X} ${top}H${width}L${front} ${top + DEPTH_Y}Z`}
-                fill={colors.top}
-              />
-            </G>
-          );
-        })}
+        {blocks.map(({ kind, top, height: blockHeight }) => (
+          <Cube
+            key={kind}
+            top={top}
+            height={blockHeight}
+            width={width}
+            colors={OPERATION_KIND_COLORS[kind]}
+          />
+        ))}
       </Svg>
       {showLabels &&
         blocks
@@ -108,5 +126,36 @@ export function Bar3D({
             </View>
           ))}
     </View>
+  );
+}
+
+type CubeProps = {
+  top: number;
+  height: number;
+  width: number;
+  colors: CubeColors;
+};
+
+/** 3D-кубик: лицевая, боковая и верхняя грани. */
+function Cube({ top, height, width, colors }: CubeProps) {
+  const front = width - DEPTH_X;
+  const bottom = top + height;
+  return (
+    <G>
+      <Rect
+        y={top + DEPTH_Y}
+        width={front}
+        height={height - DEPTH_Y}
+        fill={colors.front}
+      />
+      <Path
+        d={`M${front} ${top + DEPTH_Y}L${width} ${top}V${bottom - DEPTH_Y}L${front} ${bottom}Z`}
+        fill={colors.side}
+      />
+      <Path
+        d={`M0 ${top + DEPTH_Y}L${DEPTH_X} ${top}H${width}L${front} ${top + DEPTH_Y}Z`}
+        fill={colors.top}
+      />
+    </G>
   );
 }

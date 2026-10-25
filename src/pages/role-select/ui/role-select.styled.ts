@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   screen: {
@@ -32,12 +32,14 @@ export const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     fontSize: theme.fontSize.h1,
+    letterSpacing: tracking(theme.fontSize.h1),
     fontWeight: 'bold',
     color: theme.colors.ink,
   },
   subtitle: {
     textAlign: 'center',
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     color: theme.colors.grey,
   },
   options: {
@@ -71,11 +73,13 @@ export const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: theme.fontSize.xl,
+    letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   cardDescription: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 20,
     color: theme.colors.grey,
   },
@@ -105,6 +109,7 @@ export const styles = StyleSheet.create({
   buttonTitle: {
     textAlign: 'center',
     fontSize: theme.fontSize.lg,
+    letterSpacing: tracking(theme.fontSize.lg),
     color: theme.colors.prime,
     fontWeight: 'bold',
   },

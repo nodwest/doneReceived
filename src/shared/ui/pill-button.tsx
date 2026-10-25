@@ -6,7 +6,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme } from '../theme';
+import { theme, tracking } from '../theme';
 
 type PillButtonVariant = 'primary' | 'danger' | 'dark' | 'outline' | 'ghost';
 
@@ -110,11 +110,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 17,
+    letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },
   labelMd: {
     fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
   },
   labelInk: {
     color: theme.colors.ink,

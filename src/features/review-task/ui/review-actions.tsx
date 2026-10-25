@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import { PillButton } from '@shared/ui';
 import type { RejectDecision } from '../model/reject-reasons';
 import { RejectReasonSheet } from './reject-reason-sheet';
@@ -17,16 +18,21 @@ export function ReviewActions({
   onApprove,
   onReject,
 }: ReviewActionsProps) {
+  const { t } = useTranslation();
   const [rejecting, setRejecting] = useState(false);
 
   return (
     <View style={styles.reviewActions}>
       <PillButton
-        label="Reject"
+        label={t('reviewTask.reject')}
         variant="danger"
         onPress={() => setRejecting(true)}
       />
-      <PillButton label="Approve" variant="primary" onPress={onApprove} />
+      <PillButton
+        label={t('reviewTask.approve')}
+        variant="primary"
+        onPress={onApprove}
+      />
       <RejectReasonSheet
         visible={rejecting}
         childName={childName}

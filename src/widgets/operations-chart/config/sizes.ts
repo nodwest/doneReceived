@@ -14,3 +14,5 @@ export const DEPTH_X = 8;
 export const DEPTH_Y = 6;
 /** На сколько кубик missed заходит на верхнюю грань earned. */
 export const STACK_OVERLAP = 2;
+/** Высота серого кубика будущего дня (вместе с верхней гранью). */
+export const FUTURE_BAR_HEIGHT = 14;

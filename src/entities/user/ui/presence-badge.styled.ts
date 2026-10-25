@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   badge: {
@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
   },
   text: {
     fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
   },
   homeText: {
@@ -25,12 +26,24 @@ export const styles = StyleSheet.create({
   },
   compact: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 4,
+    rowGap: 2,
+  },
+  compactPart: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  // Вложенный Text не поддерживает opacity на нативе — прячем цветом.
+  hidden: {
+    color: 'transparent',
   },
   compactText: {
     flexShrink: 1,
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
   },
   compactAway: {

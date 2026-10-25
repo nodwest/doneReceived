@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   pressable: {
@@ -33,6 +33,7 @@ export const styles = StyleSheet.create({
   name: {
     flexShrink: 1,
     fontSize: 17,
+    letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
@@ -44,6 +45,7 @@ export const styles = StyleSheet.create({
   },
   youText: {
     fontSize: 11,
+    letterSpacing: tracking(11),
     fontFamily: theme.fonts.semibold,
     color: theme.colors.violet,
   },
@@ -65,11 +67,13 @@ export const styles = StyleSheet.create({
   },
   chipValue: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   chipLabel: {
     fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
     color: theme.colors.ink,
   },

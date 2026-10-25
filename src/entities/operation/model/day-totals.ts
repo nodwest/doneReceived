@@ -38,11 +38,6 @@ export function sumTotals(operations: Operation[]) {
 export const operationsSince = (operations: Operation[], from: Date) =>
   operations.filter((operation) => new Date(operation.at) >= from);
 
-const WEEK_DAYS = 7;
-
-/** Полночь первого дня «This week»: последние 7 дней вместе с сегодняшним. */
-export const getWeekStart = (today: Date) => addDays(today, 1 - WEEK_DAYS);
-
 /** Последние начисленные награды; история уже отсортирована: сначала новые. */
 export const latestRewards = (operations: Operation[], count: number) =>
   operations.filter((operation) => operation.kind === 'earned').slice(0, count);

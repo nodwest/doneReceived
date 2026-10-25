@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { theme } from '../theme';
+import { theme, tracking } from '../theme';
 
 type SectionHeaderProps = {
   title: string;
@@ -34,11 +34,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: theme.fontSize.lg,
+    letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   action: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
     color: theme.colors.violet,
   },

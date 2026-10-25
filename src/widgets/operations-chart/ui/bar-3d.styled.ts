@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   labelBox: {
@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     fontSize: 11.2,
+    letterSpacing: tracking(11.2),
     fontFamily: theme.fonts.bold,
   },
 });

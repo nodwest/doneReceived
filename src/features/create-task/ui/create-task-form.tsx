@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChildChip, type Child } from '@entities/user';
 import type { UpdateTaskPayload } from '@entities/task';
+import { useTranslation } from '@shared/i18n';
 import { Input } from '@shared/ui';
 import { theme } from '@shared/theme';
 import {
@@ -34,6 +35,7 @@ export function CreateTaskForm({
   task,
   onSubmitted,
 }: CreateTaskFormProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
@@ -94,11 +96,11 @@ export function CreateTaskForm({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <FormField label="Task Title">
+        <FormField label={t('createTask.taskTitle')}>
           <Input
             value={title}
             onChangeText={setTitle}
-            placeholder="Clean your room"
+            placeholder={t('createTask.taskTitlePlaceholder')}
             placeholderTextColor={theme.colors.placeholder}
             style={styles.input}
           />
@@ -108,11 +110,11 @@ export function CreateTaskForm({
 
         <RewardInput presets={rewardPresets} />
 
-        <FormField label="Description" optional>
+        <FormField label={t('createTask.description')} optional>
           <DescriptionInput value={description} onChangeText={setDescription} />
         </FormField>
 
-        <FormField label="Assign to">
+        <FormField label={t('createTask.assignTo')}>
           <View style={styles.chips}>
             {assignees.map((child) => (
               <ChildChip
@@ -127,7 +129,7 @@ export function CreateTaskForm({
 
         <View style={styles.footer}>
           <CreateTaskButton
-            label={initialTask ? 'Save changes' : 'Create Task'}
+            label={initialTask ? t('createTask.save') : t('createTask.create')}
             withIcon={false}
             disabled={!canSubmit}
             onPress={submit}

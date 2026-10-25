@@ -2,8 +2,14 @@
 export const parentMock = {
   id: 101,
   name: 'Sarah',
-  greeting: 'Good morning 👋',
+  fullName: 'Sarah Miller',
+  email: 'sarah.miller@mail.com',
   avatar: require('./images/avatar-sarah.jpg'),
+};
+
+/** Настройки вошедшего родителя на вкладке Profile. */
+export const profileSettingsMock = {
+  notifications: true,
 };
 
 /** Второй родитель в семье. */

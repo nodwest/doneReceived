@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   screen: {
@@ -49,16 +49,19 @@ export const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     fontSize: theme.fontSize.h1,
+    letterSpacing: tracking(theme.fontSize.h1),
     fontWeight: 'bold',
   },
   subtitle: {
     textAlign: 'center',
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     color: theme.colors.grey,
   },
   buttontitle: {
     textAlign: 'center',
     fontSize: theme.fontSize.lg,
+    letterSpacing: tracking(theme.fontSize.lg),
     color: theme.colors.prime,
     fontWeight: 'bold',
   },
@@ -68,6 +71,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
     color: theme.colors.grey,
   },
   content: {

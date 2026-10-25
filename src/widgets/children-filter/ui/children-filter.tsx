@@ -8,6 +8,7 @@ import {
   type ImageSourcePropType,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { styles } from './children-filter.styled';
 
@@ -32,10 +33,11 @@ export function ChildrenFilter({
   value,
   onChange,
 }: ChildrenFilterProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container} accessibilityRole="tablist">
       <Segment
-        label="All"
+        label={t('wallet.all')}
         active={value === 'all'}
         onPress={() => onChange('all')}
       >

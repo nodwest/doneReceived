@@ -1,12 +1,14 @@
 import { ScrollView, View, Text } from 'react-native';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '@shared/i18n';
 import { Button, Icon, InputWithIcon, Label } from '@shared/ui';
 import { styles } from './registration.styled';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@shared/theme';
 
 export function Registration() {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView
@@ -23,41 +25,41 @@ export function Registration() {
             >
               <Icon name="star" size={44} color={theme.colors.yellow} />
             </LinearGradient>
-            <Text style={styles.title}>Welcome to Kids Tasks</Text>
+            <Text style={styles.title}>{t('auth.registrationTitle')}</Text>
             <Text style={styles.subtitle}>
-              Turn everyday chores into fun rewards for the whole family.
+              {t('auth.registrationSubtitle')}
             </Text>
           </View>
           <View style={styles.body}>
             <View style={styles.content}>
               <View style={styles.field}>
                 <Label htmlFor="name" style={styles.label}>
-                  Full Name
+                  {t('auth.fullName')}
                 </Label>
                 <InputWithIcon
                   id="name"
-                  placeholder="Full Name"
+                  placeholder={t('auth.fullName')}
                   iconName="user"
                 />
               </View>
               <View style={styles.field}>
                 <Label htmlFor="email" style={styles.label}>
-                  Email
+                  {t('auth.email')}
                 </Label>
                 <InputWithIcon
                   id="email"
-                  placeholder="Email"
+                  placeholder={t('auth.email')}
                   iconName="message"
                 />
               </View>
               <View style={styles.field}>
                 <Label htmlFor="password" style={styles.label}>
-                  Password
+                  {t('auth.password')}
                 </Label>
                 <InputWithIcon
                   secureTextEntry={true}
                   id="password"
-                  placeholder="Password"
+                  placeholder={t('auth.password')}
                   iconName="castle"
                 />
               </View>
@@ -71,14 +73,16 @@ export function Registration() {
               style={styles.buttonGradient}
             >
               <Button>
-                <Text style={styles.buttontitle}>Create Account</Text>
+                <Text style={styles.buttontitle}>
+                  {t('auth.createAccount')}
+                </Text>
               </Button>
             </LinearGradient>
           </View>
           <Text style={styles.subtitle}>
-            Already have an account?{' '}
+            {t('auth.haveAccount')}{' '}
             <Link href="/login" style={styles.linktitle}>
-              Log In
+              {t('auth.logIn')}
             </Link>
           </Text>
         </View>

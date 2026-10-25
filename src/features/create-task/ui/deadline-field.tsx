@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import { DateTimePickerSheet } from '@shared/ui';
 import { ceilToMinute } from '@shared/lib';
 import { useCreateTaskStore } from '../model/create-task-store';
@@ -16,6 +17,7 @@ import { OptionChip } from './option-chip';
 import { styles } from './create-task-form.styled';
 
 export function DeadlineField() {
+  const { t } = useTranslation();
   const deadline = useCreateTaskStore((state) => state.deadline);
   const selectDeadline = useCreateTaskStore((state) => state.selectDeadline);
   const setCustomDeadline = useCreateTaskStore(
@@ -37,13 +39,13 @@ export function DeadlineField() {
   const valid = isDeadlineValid(deadline, now);
 
   return (
-    <FormField label="Time to complete" optional>
+    <FormField label={t('createTask.timeToComplete')} optional>
       {deadlineRows.map((row) => (
-        <ChipRow key={row[0].key}>
-          {row.map(({ key, label }) => (
+        <ChipRow key={row[0]}>
+          {row.map((key) => (
             <OptionChip
               key={key}
-              label={label}
+              label={t(`createTask.deadline.${key}`)}
               selected={deadline.preset === key}
               onPress={() => {
                 selectDeadline(key);
@@ -55,10 +57,10 @@ export function DeadlineField() {
       ))}
       {resolved && (
         <View style={styles.deadlineRow}>
-          <Text style={styles.deadlineHint}>Task expires:</Text>
+          <Text style={styles.deadlineHint}>{t('createTask.expires')}</Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Change deadline"
+            accessibilityLabel={t('createTask.changeDeadline')}
             onPress={() => setPickerOpen(true)}
             style={[styles.dateButton, !valid && styles.dateButtonInvalid]}
           >
@@ -72,7 +74,7 @@ export function DeadlineField() {
       )}
       {resolved && !valid && (
         <Text style={[styles.deadlineHint, styles.deadlineError]}>
-          Pick a time at least 1 minute from now
+          {t('createTask.deadlineError')}
         </Text>
       )}
       {resolved && (

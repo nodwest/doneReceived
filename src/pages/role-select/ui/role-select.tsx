@@ -3,33 +3,21 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '@shared/i18n';
 import { Button, Icon, type IconName } from '@shared/ui';
 import { theme } from '@shared/theme';
 import { styles } from './role-select.styled';
 
 type Role = 'parent' | 'kid';
 
-const ROLES: readonly {
-  key: Role;
-  title: string;
-  description: string;
-  icon: IconName;
-}[] = [
-  {
-    key: 'parent',
-    title: 'Parent',
-    description: 'You can create tasks for your children and set up rewards.',
-    icon: 'profile',
-  },
-  {
-    key: 'kid',
-    title: 'Kid',
-    description: "You can complete your parents' tasks and earn rewards.",
-    icon: 'children',
-  },
+// Подписи — roleSelect.<key> и roleSelect.<key>Description.
+const ROLES: readonly { key: Role; icon: IconName }[] = [
+  { key: 'parent', icon: 'profile' },
+  { key: 'kid', icon: 'children' },
 ];
 
 export function RoleSelectPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<Role>('parent');
 
@@ -48,14 +36,12 @@ export function RoleSelectPage() {
           >
             <Icon name="star" size={44} color={theme.colors.yellow} />
           </LinearGradient>
-          <Text style={styles.title}>Who&apos;s joining?</Text>
-          <Text style={styles.subtitle}>
-            Are you signing up as a parent or as a child?
-          </Text>
+          <Text style={styles.title}>{t('roleSelect.title')}</Text>
+          <Text style={styles.subtitle}>{t('roleSelect.subtitle')}</Text>
         </View>
 
         <View style={styles.options}>
-          {ROLES.map(({ key, title, description, icon }) => {
+          {ROLES.map(({ key, icon }) => {
             const selected = role === key;
             return (
               <Pressable
@@ -74,8 +60,10 @@ export function RoleSelectPage() {
                   <Icon name={icon} size={28} color={theme.colors.white} />
                 </LinearGradient>
                 <View style={styles.cardText}>
-                  <Text style={styles.cardTitle}>{title}</Text>
-                  <Text style={styles.cardDescription}>{description}</Text>
+                  <Text style={styles.cardTitle}>{t(`roleSelect.${key}`)}</Text>
+                  <Text style={styles.cardDescription}>
+                    {t(`roleSelect.${key}Description`)}
+                  </Text>
                 </View>
                 <View style={[styles.radio, selected && styles.radioSelected]}>
                   {selected && <View style={styles.radioDot} />}
@@ -92,7 +80,7 @@ export function RoleSelectPage() {
           style={styles.button}
         >
           <Button onPress={() => router.replace('/')}>
-            <Text style={styles.buttonTitle}>Continue</Text>
+            <Text style={styles.buttonTitle}>{t('roleSelect.continue')}</Text>
           </Button>
         </LinearGradient>
       </ScrollView>

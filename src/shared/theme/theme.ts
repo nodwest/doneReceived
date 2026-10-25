@@ -53,6 +53,10 @@ export const theme = {
     missedInk: '#1F52A8',
     missedLabel: '#123380',
     missedSoft: 'rgba(97, 163, 237, 0.16)',
+    // Будущие дни на графике: серый кубик-заглушка.
+    future: '#E1E3EC',
+    futureDark: '#CDD0DB',
+    futureLight: '#EEEFF4',
     // Заглушка карты там, где карты нет (нативные платформы).
     mapPlaceholder: '#EFEAE0',
     // Роли в семье: родитель (тёмно-синий) и ребёнок (голубой) — иконки,
@@ -61,6 +65,9 @@ export const theme = {
     parentTo: '#4254AD',
     childFrom: '#4A9EF0',
     childTo: '#A8D9FF',
+    // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
+    heroSubtle: '#D9E0FF',
+    violetIcon: '#EDE8FC',
 
     background: '#0b1120',
     surface: '#111827',

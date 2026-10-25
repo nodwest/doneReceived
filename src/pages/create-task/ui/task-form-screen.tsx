@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskForm } from '@features/create-task';
 import type { UpdateTaskPayload } from '@entities/task';
+import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
 import { childrenMock, rewardPresetsMock } from '@shared/mocks';
@@ -21,6 +22,7 @@ export function TaskFormScreen({
   successMessage,
   task,
 }: TaskFormScreenProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const gutter = useIsCompact() ? 16 : 24;
 
@@ -42,7 +44,7 @@ export function TaskFormScreen({
           <Text style={styles.title}>{title}</Text>
           <RoundButton
             icon="close"
-            accessibilityLabel="Close"
+            accessibilityLabel={t('common.close')}
             onPress={close}
           />
         </View>

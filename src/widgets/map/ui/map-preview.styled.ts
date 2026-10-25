@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 const PIN_SIZE = 44;
 const PHOTO_SIZE = 36;
@@ -53,11 +53,13 @@ export const styles = StyleSheet.create({
   },
   placeName: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
     color: theme.colors.ink,
   },
   placeTime: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },

@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
 import type { InviteCodes } from '@entities/family';
-import { GradientButton, RoundButton } from '@shared/ui';
-import { InviteCodeCard } from './invite-code-card';
-import { styles } from './add-member.styled';
+import { useTranslation } from '@shared/i18n';
+import { GradientButton } from '@shared/ui';
+import { InviteCodesPanel } from './invite-codes-panel';
 
 type AddMemberProps = {
   /** Коды приглашения; пока грузятся — панель без карточек кодов. */
@@ -15,49 +14,18 @@ type AddMemberProps = {
  * кодами для второго родителя и для ребёнка, крестик возвращает кнопку.
  */
 export function AddMember({ codes }: AddMemberProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   if (!open) {
     return (
       <GradientButton
-        label="Family member"
+        label={t('family.addMember')}
         icon="plus"
         onPress={() => setOpen(true)}
       />
     );
   }
 
-  return (
-    <View style={styles.panel}>
-      <View style={styles.head}>
-        <Text style={styles.title}>Add family member</Text>
-        <RoundButton
-          size="sm"
-          icon="close"
-          accessibilityLabel="Close"
-          onPress={() => setOpen(false)}
-        />
-      </View>
-      <Text style={styles.hint}>
-        Share a code with the new member. They enter it when signing up in Kids
-        Tasks — and join your family right away.
-      </Text>
-      {codes && (
-        <>
-          <InviteCodeCard
-            role="parent"
-            title="For a parent"
-            hint="Can create tasks, approve them and pay rewards."
-            code={codes.parent}
-          />
-          <InviteCodeCard
-            role="child"
-            title="For a child"
-            hint="Sees own tasks, marks them done and earns rewards."
-            code={codes.child}
-          />
-        </>
-      )}
-    </View>
-  );
+  return <InviteCodesPanel codes={codes} onClose={() => setOpen(false)} />;
 }

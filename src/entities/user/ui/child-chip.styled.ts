@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   chip: {
@@ -24,6 +24,7 @@ export const styles = StyleSheet.create({
   },
   name: {
     fontSize: 15,
+    letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },

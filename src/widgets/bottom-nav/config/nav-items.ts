@@ -2,17 +2,17 @@ import type { Href } from 'expo-router';
 import type { IconName } from '@shared/ui';
 
 export type BottomNavItem = {
-  key: string;
-  label: string;
+  /** Ключ вкладки; подпись — nav.<key>. */
+  key: 'home' | 'tasks' | 'family' | 'wallet' | 'map' | 'profile';
   icon: IconName;
   href: Href;
 };
 
 export const NAV_ITEMS: readonly BottomNavItem[] = [
-  { key: 'home', label: 'Home', icon: 'home', href: '/' },
-  { key: 'tasks', label: 'Tasks', icon: 'tasks', href: '/tasks' },
-  { key: 'family', label: 'Family', icon: 'children', href: '/family' },
-  { key: 'wallet', label: 'Wallet', icon: 'wallet', href: '/wallet' },
-  { key: 'map', label: 'Map', icon: 'map', href: '/map' },
-  { key: 'profile', label: 'Profile', icon: 'profile', href: '/profile' },
+  { key: 'home', icon: 'home', href: '/' },
+  { key: 'tasks', icon: 'tasks', href: '/tasks' },
+  { key: 'family', icon: 'children', href: '/family' },
+  { key: 'wallet', icon: 'wallet', href: '/wallet' },
+  { key: 'map', icon: 'map', href: '/map' },
+  { key: 'profile', icon: 'profile', href: '/profile' },
 ];

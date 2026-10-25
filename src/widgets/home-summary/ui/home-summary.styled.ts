@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 const card = {
   flex: 1,
@@ -16,9 +16,11 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 6,
   },
-  // Кликабельная плитка занимает ту же долю ряда, что и обычная.
-  pressable: {
+  // Обёртка плитки: доли ряда равные; minWidth: 0 — длинная подпись
+  // переносится, а не расширяет плитку.
+  slot: {
     flex: 1,
+    minWidth: 0,
   },
   pressed: {
     opacity: 0.85,
@@ -43,11 +45,13 @@ export const styles = StyleSheet.create({
   },
   value: {
     fontSize: 22,
+    letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   label: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },

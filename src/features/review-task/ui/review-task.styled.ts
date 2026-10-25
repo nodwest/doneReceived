@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, type TextStyle } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 // Убирает браузерную рамку фокуса и ручку ресайза; в типах RN этих значений нет.
 const webInputReset = Platform.select({
@@ -30,11 +30,13 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: theme.fontSize.xl,
+    letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   subtitle: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
     textAlign: 'center',
@@ -81,6 +83,7 @@ export const styles = StyleSheet.create({
   },
   reasonLabel: {
     fontSize: 15,
+    letterSpacing: tracking(15),
     fontFamily: theme.fonts.medium,
     color: theme.colors.ink,
   },
@@ -98,11 +101,13 @@ export const styles = StyleSheet.create({
   },
   label: {
     fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   optional: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -115,6 +120,7 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.line,
     backgroundColor: theme.colors.white,
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 20,
     fontFamily: theme.fonts.medium,
     color: theme.colors.ink,

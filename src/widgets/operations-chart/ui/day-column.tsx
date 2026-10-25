@@ -69,3 +69,32 @@ export function DayColumn({ day, scale, selected, onPress }: DayColumnProps) {
     </Pressable>
   );
 }
+
+/**
+ * Будущий день справа от сегодня: серая дата и одинаковый серый кубик. Не
+ * выбирается — нужен, чтобы лента не обрывалась пустотой и было видно, какие
+ * дни впереди.
+ */
+export function FutureDayColumn({ date }: { date: Date }) {
+  return (
+    <View style={styles.column} accessibilityElementsHidden>
+      <Bar3D
+        earned={0}
+        missed={0}
+        scale={0}
+        width={COLUMN_WIDTH}
+        showLabels={false}
+        future
+      />
+      <View style={[styles.chip, styles.chipFuture]}>
+        <Text style={[styles.weekday, styles.textFuture]}>
+          {formatWeekdayShort(date)}
+        </Text>
+        <Text style={[styles.day, styles.textFuture]}>{date.getDate()}</Text>
+        <Text style={[styles.month, styles.textFuture]}>
+          {formatMonthShort(date)}
+        </Text>
+      </View>
+    </View>
+  );
+}

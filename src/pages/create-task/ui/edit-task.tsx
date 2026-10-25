@@ -1,8 +1,10 @@
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useTasks } from '@entities/task';
+import { useTranslation } from '@shared/i18n';
 import { TaskFormScreen } from './task-form-screen';
 
 export function EditTaskPage() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { data: tasks, isPending } = useTasks();
 
@@ -14,8 +16,8 @@ export function EditTaskPage() {
 
   return (
     <TaskFormScreen
-      title="Edit Task"
-      successMessage="Task updated"
+      title={t('createTask.editTitle')}
+      successMessage={t('createTask.updatedToast')}
       task={{
         id: task.id,
         title: task.title,

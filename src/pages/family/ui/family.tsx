@@ -10,14 +10,11 @@ import {
   parentMock,
   parentProfilesMock,
 } from '@shared/mocks';
+import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './family.styled';
 
 const NO_TASKS: Task[] = [];
-
-/** «1 parent» / «2 parents». */
-const countLabel = (count: number, one: string, many: string) =>
-  `${count} ${count === 1 ? one : many}`;
 
 /**
  * Вкладка Family: кнопка приглашения и карточки родителей и детей. Тап по
@@ -25,6 +22,7 @@ const countLabel = (count: number, one: string, many: string) =>
  * (владелец аккаунта) ведёт на главную и вкладку Tasks.
  */
 export function FamilyPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   // Счётчики — из того же списка задач, что на главной и в профилях.
   const { data: tasks = NO_TASKS } = useTasks();
@@ -39,14 +37,14 @@ export function FamilyPage() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Family</Text>
+          <Text style={styles.title}>{t('family.title')}</Text>
           <Text style={styles.count}>
-            {countLabel(parents.length, 'parent', 'parents')} ·{' '}
-            {countLabel(children.length, 'child', 'children')}
+            {t('family.parents', { count: parents.length })} ·{' '}
+            {t('family.children', { count: children.length })}
           </Text>
         </View>
         <AddMember codes={codes} />
-        <ScreenSection title="Parents">
+        <ScreenSection title={t('family.parentsSection')}>
           <View style={styles.list}>
             {parents.map((parent) => {
               const id = String(parent.id);
@@ -99,7 +97,7 @@ export function FamilyPage() {
             })}
           </View>
         </ScreenSection>
-        <ScreenSection title="Children">
+        <ScreenSection title={t('family.childrenSection')}>
           <View style={styles.list}>
             {children.map((child) => {
               const id = String(child.id);

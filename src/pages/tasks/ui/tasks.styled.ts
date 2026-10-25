@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const FOOTER_PADDING_VERTICAL = 12;
 
@@ -32,6 +32,7 @@ export const styles = StyleSheet.create({
     marginTop: 48,
     textAlign: 'center',
     fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
