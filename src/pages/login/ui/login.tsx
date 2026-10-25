@@ -1,12 +1,14 @@
 import { ScrollView, View, Text } from 'react-native';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '@shared/i18n';
 import { Button, Icon, InputWithIcon, Label } from '@shared/ui';
 import { styles } from './login.styled';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@shared/theme';
 
 export function Login() {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView
@@ -23,32 +25,29 @@ export function Login() {
             >
               <Icon name="lock" size={44} color={theme.colors.yellow} />
             </LinearGradient>
-            <Text style={styles.title}>Welcome back!</Text>
-            <Text style={styles.subtitle}>
-              Log in to keep turning everyday chores into fun rewards for the
-              whole family.
-            </Text>
+            <Text style={styles.title}>{t('auth.loginTitle')}</Text>
+            <Text style={styles.subtitle}>{t('auth.loginSubtitle')}</Text>
           </View>
           <View style={styles.body}>
             <View style={styles.content}>
               <View style={styles.field}>
                 <Label htmlFor="email" style={styles.label}>
-                  Email
+                  {t('auth.email')}
                 </Label>
                 <InputWithIcon
                   id="email"
-                  placeholder="Email"
+                  placeholder={t('auth.email')}
                   iconName="message"
                 />
               </View>
               <View style={styles.field}>
                 <Label htmlFor="password" style={styles.label}>
-                  Password
+                  {t('auth.password')}
                 </Label>
                 <InputWithIcon
                   secureTextEntry={true}
                   id="password"
-                  placeholder="Password"
+                  placeholder={t('auth.password')}
                   iconName="castle"
                 />
               </View>
@@ -59,11 +58,11 @@ export function Login() {
                 importantForAccessibility="no-hide-descendants"
               >
                 <Label htmlFor="name" style={styles.label}>
-                  Full Name
+                  {t('auth.fullName')}
                 </Label>
                 <InputWithIcon
                   editable={false}
-                  placeholder="Full Name"
+                  placeholder={t('auth.fullName')}
                   iconName="user"
                 />
               </View>
@@ -77,14 +76,14 @@ export function Login() {
               style={styles.buttonGradient}
             >
               <Button>
-                <Text style={styles.buttontitle}>Log In</Text>
+                <Text style={styles.buttontitle}>{t('auth.logIn')}</Text>
               </Button>
             </LinearGradient>
           </View>
           <Text style={styles.subtitle}>
-            Don&apos;t have an account yet?{' '}
+            {t('auth.noAccount')}{' '}
             <Link href="/registration" style={styles.linktitle}>
-              Sign up
+              {t('auth.signUp')}
             </Link>
           </Text>
         </View>

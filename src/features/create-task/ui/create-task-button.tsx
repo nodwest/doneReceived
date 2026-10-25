@@ -1,3 +1,4 @@
+import { useTranslation } from '@shared/i18n';
 import { GradientButton } from '@shared/ui';
 
 type CreateTaskButtonProps = {
@@ -9,13 +10,14 @@ type CreateTaskButtonProps = {
 
 export function CreateTaskButton({
   onPress,
-  label = 'Create Task',
+  label,
   withIcon = true,
   disabled,
 }: CreateTaskButtonProps) {
+  const { t } = useTranslation();
   return (
     <GradientButton
-      label={label}
+      label={label ?? t('createTask.create')}
       icon={withIcon ? 'plus' : undefined}
       onPress={onPress}
       disabled={disabled}

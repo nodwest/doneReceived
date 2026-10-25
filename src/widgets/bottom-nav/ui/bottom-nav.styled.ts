@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 // Отступ под кнопками равен отступу над ними (как в макете).
 export const NAV_PADDING_VERTICAL = 12;
@@ -19,6 +19,7 @@ export const styles = StyleSheet.create({
   },
   label: {
     fontSize: 11,
+    letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },

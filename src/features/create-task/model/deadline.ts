@@ -1,3 +1,6 @@
+import { i18n } from '@shared/i18n';
+import { formatClock, formatDayLabel } from '@shared/lib';
+
 export type DeadlinePreset =
   | 'none'
   | 'in1h'
@@ -15,20 +18,10 @@ export type DeadlineChoice = {
 export const MIN_DEADLINE_MS = 60_000;
 const HOUR_MS = 60 * 60 * 1000;
 
-type DeadlineOption = { key: DeadlinePreset; label: string };
-
-/** Чипы выбора срока, сгруппированные по строкам. */
-export const deadlineRows: DeadlineOption[][] = [
-  [
-    { key: 'none', label: 'No deadline' },
-    { key: 'in1h', label: '1 hour' },
-    { key: 'in2h', label: '2 hours' },
-  ],
-  [
-    { key: 'today', label: 'Today' },
-    { key: 'tomorrow', label: 'Tomorrow' },
-    { key: 'custom', label: 'Custom' },
-  ],
+/** Чипы выбора срока, сгруппированные по строкам; подписи — createTask.deadline.*. */
+export const deadlineRows: DeadlinePreset[][] = [
+  ['none', 'in1h', 'in2h'],
+  ['today', 'tomorrow', 'custom'],
 ];
 
 export const initialDeadline: DeadlineChoice = {
@@ -72,21 +65,10 @@ export function isDeadlineValid(choice: DeadlineChoice, now = new Date()) {
   );
 }
 
+/** «Today, 18:00» / «Сегодня, 18:00» или «Oct 22, 18:00». */
 export function formatDeadline(deadline: Date, now = new Date()) {
-  const time = deadline.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
+  return i18n.t('time.dayAndTime', {
+    day: formatDayLabel(deadline, now),
+    time: formatClock(deadline),
   });
-  const dayDiff = Math.round(
-    (new Date(deadline).setHours(0, 0, 0, 0) -
-      new Date(now).setHours(0, 0, 0, 0)) /
-      (24 * HOUR_MS),
-  );
-  if (dayDiff === 0) return `Today, ${time}`;
-  if (dayDiff === 1) return `Tomorrow, ${time}`;
-  const date = deadline.toLocaleDateString([], {
-    month: 'short',
-    day: 'numeric',
-  });
-  return `${date}, ${time}`;
 }

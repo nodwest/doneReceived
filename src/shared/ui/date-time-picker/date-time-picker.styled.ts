@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '../../theme';
+import { theme, tracking } from '../../theme';
 
 export const WHEEL_ITEM_HEIGHT = 44;
 
@@ -16,11 +16,13 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: theme.fontSize.lg,
+    letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   summary: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
     color: theme.colors.violet,
   },
@@ -33,6 +35,7 @@ export const styles = StyleSheet.create({
   },
   colon: {
     fontSize: 24,
+    letterSpacing: tracking(24),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
@@ -51,6 +54,7 @@ export const styles = StyleSheet.create({
   },
   wheelText: {
     fontSize: 22,
+    letterSpacing: tracking(22),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -78,6 +82,7 @@ export const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
     color: theme.colors.grey,
   },
@@ -97,6 +102,7 @@ export const styles = StyleSheet.create({
   },
   confirmText: {
     fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },

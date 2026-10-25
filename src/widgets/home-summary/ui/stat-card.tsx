@@ -59,14 +59,16 @@ export function StatCard({
     );
   }
 
-  if (!onPress) return card;
+  // Каждая плитка в одинаковой обёртке без отступов: иначе у карточки без
+  // нажатия её padding добавляется к доле ряда, и она выходит шире других.
+  if (!onPress) return <View style={styles.slot}>{card}</View>;
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${value} ${label}`}
       onPress={onPress}
-      style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.slot, pressed && styles.pressed]}
     >
       {card}
     </Pressable>

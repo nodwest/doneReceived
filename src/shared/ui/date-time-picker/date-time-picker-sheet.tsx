@@ -2,7 +2,14 @@ import { useMemo, useState } from 'react';
 import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BottomSheet } from '../bottom-sheet';
-import { clampDate, endOfDay, is24HourClock, startOfDay } from '../../lib/date';
+import { useTranslation } from '../../i18n';
+import {
+  clampDate,
+  endOfDay,
+  formatDate,
+  is24HourClock,
+  startOfDay,
+} from '../../lib/date';
 import { theme } from '../../theme';
 import { Wheel, type WheelItem } from './wheel';
 import { styles } from './date-time-picker.styled';
@@ -62,6 +69,7 @@ function PickerBody({
   onConfirm,
   onCancel,
 }: PickerBodyProps) {
+  const { t } = useTranslation();
   const { height } = useWindowDimensions();
   const visibleRows = height >= TALL_SCREEN ? 5 : 3;
   const [is24Hour] = useState(is24HourClock);
@@ -97,17 +105,18 @@ function PickerBody({
       );
       const label =
         offset === 0
-          ? 'Today'
+          ? t('time.today')
           : offset === 1
-            ? 'Tomorrow'
-            : day.toLocaleDateString([], {
+            ? t('time.tomorrow')
+            : formatDate(day, {
                 weekday: 'short',
                 month: 'short',
                 day: 'numeric',
               });
       return { label, value: offset, disabled: endOfDay(day) < minimumDate };
     });
-  }, [today, lastDayTime, minimumDate]);
+    // t меняется вместе с языком: подписи дней пересчитываются.
+  }, [today, lastDayTime, minimumDate, t]);
 
   const dayOffset = Math.round(
     (startOfDay(draft).getTime() - today.getTime()) / DAY_MS,
@@ -134,7 +143,7 @@ function PickerBody({
     ),
   }));
 
-  const summary = draft.toLocaleString([], {
+  const summary = formatDate(draft, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -145,7 +154,7 @@ function PickerBody({
   return (
     <View style={styles.body}>
       <View style={styles.header}>
-        <Text style={styles.title}>Time to complete</Text>
+        <Text style={styles.title}>{t('createTask.timeToComplete')}</Text>
         <Text style={styles.summary}>{summary}</Text>
       </View>
 
@@ -198,7 +207,7 @@ function PickerBody({
 
       <View style={styles.footer}>
         <Pressable style={styles.cancel} onPress={onCancel}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t('common.cancel')}</Text>
         </Pressable>
         <LinearGradient
           colors={[theme.colors.violet, theme.colors.blue]}
@@ -214,7 +223,7 @@ function PickerBody({
             ]}
             onPress={() => onConfirm(draft)}
           >
-            <Text style={styles.confirmText}>Done</Text>
+            <Text style={styles.confirmText}>{t('common.done')}</Text>
           </Pressable>
         </LinearGradient>
       </View>

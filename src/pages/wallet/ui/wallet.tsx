@@ -16,6 +16,7 @@ import {
   useOperations,
   type Operation,
 } from '@entities/operation';
+import { useTranslation } from '@shared/i18n';
 import { formatMonthDay } from '@shared/lib';
 import { childrenMock } from '@shared/mocks';
 import { styles } from './wallet.styled';
@@ -24,6 +25,7 @@ const NO_OPERATIONS: Operation[] = [];
 
 /** Вкладка Wallet: история операций по дням. */
 export function WalletPage() {
+  const { t } = useTranslation();
   const { data: operations = NO_OPERATIONS, isPending } = useOperations();
   // Сегодня фиксируем на время жизни экрана: от него строится лента дней.
   const [today] = useState(() => new Date());
@@ -65,7 +67,7 @@ export function WalletPage() {
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Operations history</Text>
+        <Text style={styles.title}>{t('wallet.title')}</Text>
         <View style={styles.filter}>
           <ChildrenFilter
             items={childrenMock}
@@ -82,6 +84,7 @@ export function WalletPage() {
             />
             <View style={styles.summary}>
               <DaySummary
+                inline
                 title={formatMonthDay(day.date)}
                 earned={day.earned}
                 missed={day.missed}
@@ -89,7 +92,7 @@ export function WalletPage() {
             </View>
             <View style={styles.list}>
               {dayOperations.length === 0 ? (
-                <Text style={styles.empty}>No rewards this day</Text>
+                <Text style={styles.empty}>{t('wallet.noRewardsThisDay')}</Text>
               ) : (
                 dayOperations.map((operation) => (
                   <OperationRow key={operation.id} {...operation} />

@@ -7,17 +7,19 @@ import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
 import {
-  getWeekStart,
   latestRewards,
   OperationRow,
-  operationsSince,
+  operationsInPeriod,
+  PeriodSelect,
   sumTotals,
   useOperations,
   type Operation,
+  type SummaryPeriod,
 } from '@entities/operation';
 import { countTasks, useTasks, type Task } from '@entities/task';
 import type { ParentProfile } from '@entities/user';
 import { parentProfilesMock } from '@shared/mocks';
+import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './parent-profile.styled';
 
@@ -30,11 +32,14 @@ const RECENT_REWARDS = 3;
  * задач на проверке нет, а итоги и награды — по задачам, которые он создал.
  */
 export function ParentProfilePage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: tasks = NO_TASKS } = useTasks();
   const { data: operations = NO_OPERATIONS } = useOperations();
-  const [weekStart] = useState(() => getWeekStart(new Date()));
+  // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
+  const [today] = useState(() => new Date());
+  const [period, setPeriod] = useState<SummaryPeriod>('week');
 
   const parent: ParentProfile | undefined = parentProfilesMock.find(
     (item) => String(item.id) === id,
@@ -45,7 +50,7 @@ export function ParentProfilePage() {
   const parentOperations = operations.filter(
     (operation) => operation.parentId === parent.id,
   );
-  const week = sumTotals(operationsSince(parentOperations, weekStart));
+  const totals = sumTotals(operationsInPeriod(parentOperations, period, today));
   const rewards = latestRewards(parentOperations, RECENT_REWARDS);
 
   const openMap = () => router.replace('/map');
@@ -74,14 +79,22 @@ export function ParentProfilePage() {
             })
           }
         />
-        <DaySummary title="This week" {...week} />
+        {/* У родителя earned — выплаченные награды, missed — невыплаченные. */}
+        <DaySummary
+          title={<PeriodSelect value={period} onChange={setPeriod} />}
+          labels={{
+            earned: t('memberProfile.paid'),
+            missed: t('memberProfile.notPaid'),
+          }}
+          {...totals}
+        />
         <ScreenSection
-          title="Recent rewards"
-          actionLabel="See all"
+          title={t('memberProfile.recentRewards')}
+          actionLabel={t('common.seeAll')}
           onAction={() => router.replace('/wallet')}
         >
           {rewards.length === 0 ? (
-            <Text style={styles.empty}>No rewards yet</Text>
+            <Text style={styles.empty}>{t('memberProfile.noRewards')}</Text>
           ) : (
             <View style={styles.list}>
               {/* Награды по его задачам получают разные дети: в подписи имя. */}
@@ -96,8 +109,8 @@ export function ParentProfilePage() {
           )}
         </ScreenSection>
         <ScreenSection
-          title="Location"
-          actionLabel="Open map"
+          title={t('memberProfile.location')}
+          actionLabel={t('memberProfile.openMap')}
           onAction={openMap}
         >
           <MapPreview

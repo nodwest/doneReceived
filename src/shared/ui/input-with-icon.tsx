@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useTranslation } from '../i18n';
 import { Input } from './input';
 import { Icon, type IconName } from './icons';
 
@@ -10,6 +11,7 @@ type InputWithIconProps = React.ComponentProps<typeof Input> & {
 function InputWithIcon(prop: InputWithIconProps) {
   const { iconName, style, value, onChangeText, secureTextEntry, ...props } =
     prop;
+  const { t } = useTranslation();
   const [innerValue, setInnerValue] = useState('');
   // Для паролей показываем кнопку «глазок», она переключает точки и текст.
   const [hidden, setHidden] = useState(true);
@@ -34,7 +36,7 @@ function InputWithIcon(prop: InputWithIconProps) {
       {secureTextEntry && (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={hidden ? 'Show password' : 'Hide password'}
+          accessibilityLabel={hidden ? t('password.show') : t('password.hide')}
           hitSlop={8}
           onPress={() => setHidden((v) => !v)}
           style={styles.eye}

@@ -1,11 +1,11 @@
 export type RejectReasonKey = 'not-done-properly' | 'not-finished' | 'other';
 
-export const rejectReasons: readonly { key: RejectReasonKey; label: string }[] =
-  [
-    { key: 'not-done-properly', label: 'Not done properly' },
-    { key: 'not-finished', label: 'Not finished' },
-    { key: 'other', label: 'Other' },
-  ];
+/** Причины отказа по порядку; подписи — reviewTask.reasons.*. */
+export const rejectReasons: readonly RejectReasonKey[] = [
+  'not-done-properly',
+  'not-finished',
+  'other',
+];
 
 export type RejectDecision = {
   reason: RejectReasonKey;

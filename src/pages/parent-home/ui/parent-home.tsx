@@ -8,6 +8,7 @@ import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import { countTasks, useTasks } from '@entities/task';
+import { useTranslation } from '@shared/i18n';
 import {
   childProfilesMock,
   familySummaryMock,
@@ -16,7 +17,15 @@ import {
 } from '@shared/mocks';
 import { styles } from './parent-home.styled';
 
+/** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
+function greetingKey(hour: number) {
+  if (hour >= 5 && hour < 12) return 'home.greetingMorning' as const;
+  if (hour >= 12 && hour < 18) return 'home.greetingAfternoon' as const;
+  return 'home.greetingEvening' as const;
+}
+
 export function ParentHomePage() {
+  const { t } = useTranslation();
   const router = useRouter();
   // Счётчики заданий — из того же запроса, что и экран Tasks и профиль
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
@@ -44,7 +53,7 @@ export function ParentHomePage() {
           showsVerticalScrollIndicator={false}
         >
           <HomeHeader
-            greeting={parentMock.greeting}
+            greeting={t(greetingKey(new Date().getHours()))}
             name={parentMock.name}
             avatar={parentMock.avatar}
           />

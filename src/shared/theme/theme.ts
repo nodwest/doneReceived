@@ -53,6 +53,10 @@ export const theme = {
     missedInk: '#1F52A8',
     missedLabel: '#123380',
     missedSoft: 'rgba(97, 163, 237, 0.16)',
+    // Будущие дни на графике: серый кубик-заглушка.
+    future: '#E1E3EC',
+    futureDark: '#CDD0DB',
+    futureLight: '#EEEFF4',
     // Заглушка карты там, где карты нет (нативные платформы).
     mapPlaceholder: '#EFEAE0',
     // Роли в семье: родитель (тёмно-синий) и ребёнок (голубой) — иконки,

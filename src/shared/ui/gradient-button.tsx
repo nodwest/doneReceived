@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme } from '../theme';
+import { theme, tracking } from '../theme';
 import { Button } from './button';
 import { Icon, type IconName } from './icons';
 
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
+    letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },

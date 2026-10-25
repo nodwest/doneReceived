@@ -6,6 +6,7 @@ import {
   type ImageSourcePropType,
 } from 'react-native';
 import type { GeoPoint, Presence } from '@entities/user';
+import { useTranslation } from '@shared/i18n';
 import { useTimeAgo } from '@shared/lib';
 import { MiniMap } from './mini-map';
 import { styles } from './map-preview.styled';
@@ -27,12 +28,13 @@ export function MapPreview({
   presence,
   onPress,
 }: MapPreviewProps) {
+  const { t } = useTranslation();
   const ago = useTimeAgo(presence.since);
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Open map"
+      accessibilityLabel={t('memberProfile.openMap')}
       onPress={onPress}
       style={styles.card}
     >
@@ -44,7 +46,7 @@ export function MapPreview({
       </View>
       <View style={styles.place}>
         <Text style={styles.placeName}>
-          {presence.atHome ? 'Home' : 'Away'}
+          {presence.atHome ? t('presence.home') : t('presence.away')}
         </Text>
         <Text style={styles.placeTime}>· {ago}</Text>
       </View>

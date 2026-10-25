@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -38,6 +38,7 @@ export const styles = StyleSheet.create({
   },
   ownerName: {
     fontSize: 17,
+    letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
@@ -75,11 +76,13 @@ export const styles = StyleSheet.create({
   },
   segmentLabel: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
   segmentLabelCompact: {
     fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
   },
   segmentLabelBold: {
     fontFamily: theme.fonts.bold,
@@ -111,6 +114,7 @@ export const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     lineHeight: 20,
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,

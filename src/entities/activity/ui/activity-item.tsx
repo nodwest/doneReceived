@@ -1,22 +1,21 @@
 import { Image, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from '@shared/i18n';
+import { useTimeAgo } from '@shared/lib';
 import { theme } from '@shared/theme';
 import type { Activity } from '../model';
 import { styles } from './activity-item.styled';
-
-const STATUS_LABEL = {
-  pending: 'Pending review',
-  approved: 'Approved',
-} as const;
 
 export function ActivityItem({
   childName,
   avatar,
   action,
-  timeAgo,
+  at,
   status,
   reward,
 }: Omit<Activity, 'id'>) {
+  const { t } = useTranslation();
+  const timeAgo = useTimeAgo(at);
   const pending = status === 'pending';
 
   // Запись на проверке подсвечена тёплым градиентом, подтверждённая — зелёным.
@@ -38,7 +37,7 @@ export function ActivityItem({
           {childName} {action}
         </Text>
         <Text style={[styles.subtitle, !pending && styles.subtitleApproved]}>
-          {timeAgo} · {STATUS_LABEL[status]}
+          {timeAgo} · {t(`activity.${status}`)}
         </Text>
       </View>
       <Text style={[styles.reward, pending && styles.rewardPending]}>

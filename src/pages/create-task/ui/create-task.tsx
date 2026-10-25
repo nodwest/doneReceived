@@ -1,5 +1,12 @@
+import { useTranslation } from '@shared/i18n';
 import { TaskFormScreen } from './task-form-screen';
 
 export function CreateTaskPage() {
-  return <TaskFormScreen title="Create Task" successMessage="Task created" />;
+  const { t } = useTranslation();
+  return (
+    <TaskFormScreen
+      title={t('createTask.createTitle')}
+      successMessage={t('createTask.createdToast')}
+    />
+  );
 }

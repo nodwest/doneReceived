@@ -1,4 +1,5 @@
 import { View } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import { Icon } from '@shared/ui';
 import { theme } from '@shared/theme';
 import { StatCard } from './stat-card';
@@ -17,24 +18,25 @@ type HomeSummaryProps = {
 
 export function HomeSummary({
   amount,
-  amountLabel = 'Rewards paid',
+  amountLabel,
   activeTasks,
   tasksToReview,
   onActiveTasksPress,
   onTasksToReviewPress,
 }: HomeSummaryProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <StatCard
         accent
         icon={<Icon name="coins" size={20} color={theme.colors.white} />}
         value={`$${amount}`}
-        label={amountLabel}
+        label={amountLabel ?? t('summary.rewardsPaid')}
       />
       <StatCard
         icon={<Icon name="tasks" size={20} color={theme.colors.blue} />}
         value={String(activeTasks)}
-        label="Active tasks"
+        label={t('summary.activeTasks')}
         onPress={onActiveTasksPress}
       />
       {tasksToReview !== undefined && (
@@ -42,7 +44,7 @@ export function HomeSummary({
           highlight
           icon={<Icon name="cheque" size={20} color={theme.colors.violet} />}
           value={String(tasksToReview)}
-          label="Tasks to Review"
+          label={t('summary.tasksToReview')}
           onPress={onTasksToReviewPress}
         />
       )}

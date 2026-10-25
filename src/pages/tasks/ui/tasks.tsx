@@ -15,6 +15,7 @@ import {
   type TasksView,
 } from '@widgets/tasks-header';
 import { filterTasks, useTasks, type Task } from '@entities/task';
+import { useTranslation } from '@shared/i18n';
 import { PillButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
 import { childrenMock, parentProfilesMock } from '@shared/mocks';
@@ -35,6 +36,7 @@ type TasksScope = 'all' | 'child' | 'parent';
  * Family. У родителя нет вкладки Review — показываем только активные.
  */
 export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
+  const { t } = useTranslation();
   const router = useRouter();
   // Плитка Tasks to Review открывает экран сразу на вкладке проверки.
   const { tab: initialTab, id: ownerId } = useLocalSearchParams<{
@@ -88,12 +90,14 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
 
   const emptyText =
     scope === 'parent' && owner
-      ? `${owner.name} has no active tasks`
+      ? t('tasks.ownerNoActive', { name: owner.name })
       : owner
-        ? `${owner.name} has no tasks${tab === 'review' ? ' to review' : ' yet'}`
+        ? tab === 'review'
+          ? t('tasks.ownerEmptyReview', { name: owner.name })
+          : t('tasks.ownerEmptyAll', { name: owner.name })
         : tab === 'review'
-          ? 'No tasks to review'
-          : 'No tasks yet';
+          ? t('tasks.emptyReview')
+          : t('tasks.emptyAll');
 
   return (
     <View style={styles.screen}>
@@ -156,18 +160,18 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
             {current.status === 'review' ? (
               <ReviewActions
                 childName={current.assignee.name}
-                onApprove={() => showToast('Task approved')}
-                onReject={() => showToast('Task rejected')}
+                onApprove={() => showToast(t('tasks.approvedToast'))}
+                onReject={() => showToast(t('tasks.rejectedToast'))}
               />
             ) : (
               <>
                 <PillButton
-                  label="Cancel task"
+                  label={t('tasks.cancelTask')}
                   variant="outline"
-                  onPress={() => showToast('Task cancelled')}
+                  onPress={() => showToast(t('tasks.cancelledToast'))}
                 />
                 <PillButton
-                  label="Edit"
+                  label={t('tasks.edit')}
                   variant="dark"
                   onPress={() =>
                     router.push({

@@ -9,6 +9,7 @@ import {
   Text,
   useWindowDimensions,
 } from 'react-native';
+import { useTranslation } from '../i18n';
 import { theme, tracking } from '../theme';
 import { Icon } from './icons';
 
@@ -34,8 +35,10 @@ export type SelectMenuOption<T extends string> = { value: T; label: string };
 
 type SelectMenuProps<T extends string> = {
   visible: boolean;
-  /** Кнопка, под которой раскрывается меню (по правому краю). */
+  /** Кнопка, под которой раскрывается меню. */
   anchor: AnchorRect | null;
+  /** К какому краю кнопки прижато меню: right — справа (по умолчанию), left — слева. */
+  align?: 'left' | 'right';
   options: readonly SelectMenuOption<T>[];
   value: T;
   onSelect: (value: T) => void;
@@ -56,7 +59,9 @@ export function SelectMenu<T extends string>({
   onSelect,
   onClose,
   width = 200,
+  align = 'right',
 }: SelectMenuProps<T>) {
+  const { t } = useTranslation();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [progress] = useState(() => new Animated.Value(0));
   // Меню остаётся смонтированным, пока идёт анимация закрытия.
@@ -82,13 +87,18 @@ export function SelectMenu<T extends string>({
   const menuHeight = options.length * OPTION_HEIGHT + MENU_PADDING * 2;
   const below = anchor.y + anchor.height + GAP;
   const openUp = below + menuHeight > screenHeight - SCREEN_MARGIN;
-  const right = Math.max(
-    SCREEN_MARGIN,
-    screenWidth - (anchor.x + anchor.width),
-  );
+  const horizontal =
+    align === 'left'
+      ? { left: Math.max(SCREEN_MARGIN, anchor.x) }
+      : {
+          right: Math.max(
+            SCREEN_MARGIN,
+            screenWidth - (anchor.x + anchor.width),
+          ),
+        };
   const position = openUp
-    ? { bottom: screenHeight - anchor.y + GAP, right }
-    : { top: below, right };
+    ? { bottom: screenHeight - anchor.y + GAP, ...horizontal }
+    : { top: below, ...horizontal };
 
   return (
     <Modal
@@ -99,7 +109,7 @@ export function SelectMenu<T extends string>({
       onRequestClose={onClose}
     >
       <Pressable
-        accessibilityLabel="Close"
+        accessibilityLabel={t('common.close')}
         style={StyleSheet.absoluteFill}
         onPress={onClose}
       />
@@ -110,7 +120,7 @@ export function SelectMenu<T extends string>({
           position,
           {
             width,
-            transformOrigin: openUp ? 'bottom right' : 'top right',
+            transformOrigin: `${openUp ? 'bottom' : 'top'} ${align}`,
             opacity: progress,
             transform: [
               {

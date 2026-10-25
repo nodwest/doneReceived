@@ -4,7 +4,6 @@ export const parentMock = {
   name: 'Sarah',
   fullName: 'Sarah Miller',
   email: 'sarah.miller@mail.com',
-  greeting: 'Good morning 👋',
   avatar: require('./images/avatar-sarah.jpg'),
 };
 

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 import {
   formatAmount,
@@ -5,41 +6,83 @@ import {
   OPERATION_KIND_COLORS,
   type OperationKind,
 } from '@entities/operation';
+import { useTranslation } from '@shared/i18n';
 import { styles } from './day-summary.styled';
 
-const KIND_LABEL: Record<OperationKind, string> = {
-  earned: 'Earned',
-  missed: 'Missed',
-};
-
 type DaySummaryProps = {
-  /** Дата дня («Oct 15») или период («This week»). */
-  title: string;
+  /** Дата дня строкой («Oct 15») или свой заголовок (выбор периода). */
+  title: ReactNode;
   earned: number;
   missed: number;
+  /** Подписи плашек; по умолчанию «Earned» / «Missed» (у родителя свои). */
+  labels?: Record<OperationKind, string>;
+  /** Заголовок слева в одном ряду с плашками (дата в Wallet), а не над ними. */
+  inline?: boolean;
 };
 
-/** Заголовок периода и итоги: сколько заработано и сколько упущено. */
-export function DaySummary({ title, earned, missed }: DaySummaryProps) {
+/**
+ * Заголовок дня или периода и две плашки итогов: под заголовком на всю
+ * ширину или (inline) в одном ряду с ним.
+ */
+export function DaySummary({
+  title,
+  earned,
+  missed,
+  labels,
+  inline,
+}: DaySummaryProps) {
+  const { t } = useTranslation();
+  const label = (kind: OperationKind) => labels?.[kind] ?? t(`wallet.${kind}`);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.totals}>
-        <Total kind="earned" amount={earned} />
-        <Total kind="missed" amount={missed} />
+    <View style={[styles.container, inline && styles.containerInline]}>
+      {typeof title === 'string' ? (
+        <Text style={styles.title}>{title}</Text>
+      ) : (
+        title
+      )}
+      <View style={[styles.totals, inline && styles.totalsInline]}>
+        <Total
+          kind="earned"
+          label={label('earned')}
+          amount={earned}
+          inline={inline}
+        />
+        <Total
+          kind="missed"
+          label={label('missed')}
+          amount={missed}
+          inline={inline}
+        />
       </View>
     </View>
   );
 }
 
-function Total({ kind, amount }: { kind: OperationKind; amount: number }) {
+type TotalProps = {
+  kind: OperationKind;
+  label: string;
+  amount: number;
+  inline?: boolean;
+};
+
+function Total({ kind, label, amount, inline }: TotalProps) {
   const { ink, soft } = OPERATION_KIND_COLORS[kind];
 
   return (
-    <View style={[styles.total, { backgroundColor: soft }]}>
+    <View
+      style={[
+        styles.total,
+        inline && styles.totalInline,
+        { backgroundColor: soft },
+      ]}
+    >
       <KindCube kind={kind} />
-      <Text style={[styles.label, { color: ink }]} numberOfLines={1}>
-        {KIND_LABEL[kind]}
+      <Text
+        style={[styles.label, inline && styles.labelInline, { color: ink }]}
+        numberOfLines={1}
+      >
+        {label}
       </Text>
       <Text style={[styles.amount, { color: ink }]}>
         {formatAmount(amount)}

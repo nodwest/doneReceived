@@ -1,5 +1,6 @@
 import { Text, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from '@shared/i18n';
 import { Icon } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -14,6 +15,7 @@ type RewardInputProps = {
 };
 
 export function RewardInput({ presets }: RewardInputProps) {
+  const { t } = useTranslation();
   const compact = useIsCompact();
   const reward = useCreateTaskStore((state) => state.reward);
   const rewardPreset = useCreateTaskStore((state) => state.rewardPreset);
@@ -23,7 +25,7 @@ export function RewardInput({ presets }: RewardInputProps) {
   );
 
   return (
-    <FormField label="Reward Amount">
+    <FormField label={t('createTask.reward')}>
       <LinearGradient
         colors={[theme.colors.yellowSoft, theme.colors.white]}
         locations={[0, 0.7071]}

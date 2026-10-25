@@ -1,5 +1,6 @@
 import { Text, View, type ImageSourcePropType } from 'react-native';
 import { PresenceBadge, type Presence } from '@entities/user';
+import { useTranslation } from '@shared/i18n';
 import { HeaderAvatar, RoundButton } from '@shared/ui';
 import { styles } from './profile-header.styled';
 
@@ -20,11 +21,12 @@ export function ProfileHeader({
   presence,
   onBack,
 }: ProfileHeaderProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <RoundButton
         icon="arrow-left"
-        accessibilityLabel="Back"
+        accessibilityLabel={t('common.back')}
         onPress={onBack}
       />
       <View style={styles.title}>

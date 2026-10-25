@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import { BottomSheet, PillButton } from '@shared/ui';
 import { theme } from '@shared/theme';
 import {
@@ -25,6 +26,7 @@ export function RejectReasonSheet({
   onCancel,
   onReject,
 }: RejectReasonSheetProps) {
+  const { t } = useTranslation();
   const [reason, setReason] = useState<RejectReasonKey>(DEFAULT_REASON);
   const [comment, setComment] = useState('');
   // Каждое открытие начинается с чистой формы.
@@ -41,15 +43,14 @@ export function RejectReasonSheet({
     <BottomSheet visible={visible} onClose={onCancel} maxHeightRatio={0.9}>
       <View style={styles.body}>
         <View style={styles.header}>
-          <Text style={styles.title}>Reject task</Text>
+          <Text style={styles.title}>{t('reviewTask.title')}</Text>
           <Text style={styles.subtitle}>
-            Tell {childName} what to fix. {childName} will see your reason and
-            can try again.
+            {t('reviewTask.subtitle', { name: childName })}
           </Text>
         </View>
 
         <View style={styles.reasons} accessibilityRole="radiogroup">
-          {rejectReasons.map(({ key, label }) => {
+          {rejectReasons.map((key) => {
             const selected = key === reason;
             return (
               <Pressable
@@ -68,7 +69,7 @@ export function RejectReasonSheet({
                     selected && styles.reasonLabelSelected,
                   ]}
                 >
-                  {label}
+                  {t(`reviewTask.reasons.${key}`)}
                 </Text>
               </Pressable>
             );
@@ -77,14 +78,14 @@ export function RejectReasonSheet({
 
         <View style={styles.field}>
           <View style={styles.labelRow}>
-            <Text style={styles.label}>Add a comment</Text>
-            <Text style={styles.optional}>(optional)</Text>
+            <Text style={styles.label}>{t('reviewTask.comment')}</Text>
+            <Text style={styles.optional}>{t('common.optional')}</Text>
           </View>
           <TextInput
             value={comment}
             onChangeText={setComment}
             multiline
-            placeholder='Show what needs to be fixed, for example "the bed is not made".'
+            placeholder={t('reviewTask.commentPlaceholder')}
             placeholderTextColor={theme.colors.placeholder}
             style={styles.comment}
           />
@@ -92,13 +93,13 @@ export function RejectReasonSheet({
 
         <View style={styles.actions}>
           <PillButton
-            label="Cancel"
+            label={t('common.cancel')}
             variant="ghost"
             size="md"
             onPress={onCancel}
           />
           <PillButton
-            label="Reject"
+            label={t('reviewTask.reject')}
             variant="danger"
             size="md"
             onPress={() => onReject({ reason, comment: comment.trim() })}

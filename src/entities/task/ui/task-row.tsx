@@ -1,5 +1,6 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from '@shared/i18n';
 import { formatCountdown, formatTimeAgo, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { formatReward, type Task } from '../model';
@@ -12,12 +13,15 @@ type TaskRowProps = {
 
 /** Строка задания в списке: исполнитель, описание, статус и награда. */
 export function TaskRow({ task, onPress }: TaskRowProps) {
+  const { t } = useTranslation();
   const now = useNow();
   const review = task.status === 'review';
 
   let aside: string | null = null;
   if (review && task.doneAt) {
-    aside = `Done ${formatTimeAgo(new Date(task.doneAt), now)}`;
+    aside = t('tasks.doneAgo', {
+      ago: formatTimeAgo(new Date(task.doneAt), now),
+    });
   } else if (!review && task.expiresAt) {
     aside = formatCountdown(new Date(task.expiresAt).getTime() - now.getTime());
   }
@@ -45,7 +49,7 @@ export function TaskRow({ task, onPress }: TaskRowProps) {
         <View style={styles.metaRow}>
           <View style={[styles.chip, review && styles.chipReview]}>
             <Text style={[styles.chipText, review && styles.chipTextReview]}>
-              {review ? 'Review' : 'Active'}
+              {review ? t('tasks.review') : t('tasks.active')}
             </Text>
           </View>
           <Text style={styles.reward}>{formatReward(task.reward)}</Text>

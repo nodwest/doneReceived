@@ -15,6 +15,11 @@ export const styles = StyleSheet.create({
   hidden: {
     opacity: 0,
   },
+  // Последняя колонка обрезается краем экрана.
+  future: {
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
   fade: {
     position: 'absolute',
     top: 0,

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Text, TextInput, useWindowDimensions, View } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { styles } from './create-task-form.styled';
 
@@ -22,6 +23,7 @@ export function DescriptionInput({
   value,
   onChangeText,
 }: DescriptionInputProps) {
+  const { t } = useTranslation();
   const screenHeight = useWindowDimensions().height;
   const [contentHeight, setContentHeight] = useState(0);
 
@@ -47,7 +49,7 @@ export function DescriptionInput({
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder="Make the bed, put toys away, and vacuum the floor."
+        placeholder={t('createTask.descriptionPlaceholder')}
         placeholderTextColor={theme.colors.placeholder}
         multiline
         scrollEnabled={contentHeight > maxHeight}

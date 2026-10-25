@@ -7,9 +7,11 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from '@shared/ui';
+import { useTranslation } from '@shared/i18n';
 import {
   formatClock,
   formatCountdown,
+  formatDayInPhrase,
   formatDayLabel,
   formatTimeAgo,
   useNow,
@@ -33,15 +35,8 @@ export function TaskCard({ task, style }: TaskCardProps) {
   );
 }
 
-// «today» и «yesterday» пишем со строчной буквы внутри фразы, даты — как есть.
-function dayInPhrase(date: Date, now: Date) {
-  const label = formatDayLabel(date, now);
-  return label === 'Today' || label === 'Yesterday'
-    ? label.toLowerCase()
-    : label;
-}
-
 function ActiveTaskCard({ task, style }: TaskCardProps) {
+  const { t } = useTranslation();
   const now = useNow();
   const created = new Date(task.createdAt);
   const expires = task.expiresAt ? new Date(task.expiresAt) : null;
@@ -59,7 +54,7 @@ function ActiveTaskCard({ task, style }: TaskCardProps) {
         aside={
           expires && (
             <View style={styles.timer}>
-              <Text style={styles.timerLabel}>Ends in</Text>
+              <Text style={styles.timerLabel}>{t('taskCard.endsIn')}</Text>
               <Text style={styles.timerValue}>
                 {formatCountdown(expires.getTime() - now.getTime())}
               </Text>
@@ -69,15 +64,18 @@ function ActiveTaskCard({ task, style }: TaskCardProps) {
       />
       <TaskInfo
         task={task}
-        meta={`Created ${dayInPhrase(created, now)} · ${formatClock(created)}`}
+        meta={t('taskCard.created', {
+          day: formatDayInPhrase(created, now),
+          time: formatClock(created),
+        })}
       />
       <View style={styles.statusBlock}>
-        <Text style={styles.caption}>Status</Text>
+        <Text style={styles.caption}>{t('taskCard.status')}</Text>
         <View style={styles.steps}>
           <View style={styles.step}>
             <Icon name="step-dot" size={24} />
             <Text style={[styles.stepLabel, styles.stepLabelCurrent]}>
-              Active
+              {t('tasks.active')}
             </Text>
           </View>
           <View style={styles.connector}>
@@ -85,24 +83,22 @@ function ActiveTaskCard({ task, style }: TaskCardProps) {
           </View>
           <View style={styles.step}>
             <View style={styles.stepDotNext} />
-            <Text style={styles.stepLabel}>Review</Text>
+            <Text style={styles.stepLabel}>{t('tasks.review')}</Text>
           </View>
         </View>
       </View>
       <View style={styles.details}>
         <View style={styles.tile}>
-          <Text style={styles.caption}>Due</Text>
+          <Text style={styles.caption}>{t('taskCard.due')}</Text>
           <Text style={styles.tileValue}>
-            {expires ? formatDayLabel(expires, now) : 'No deadline'}
+            {expires ? formatDayLabel(expires, now) : t('taskCard.noDeadline')}
           </Text>
           {expires && (
             <Text style={styles.tileText}>{formatClock(expires)}</Text>
           )}
         </View>
         <View style={styles.tile}>
-          <Text style={styles.tileText}>
-            Заглушка. Функционал придумаем и добавим потом
-          </Text>
+          <Text style={styles.tileText}>{t('taskCard.stub')}</Text>
         </View>
       </View>
       <RewardHighlight reward={task.reward} />
@@ -111,6 +107,7 @@ function ActiveTaskCard({ task, style }: TaskCardProps) {
 }
 
 function ReviewTaskCard({ task, style }: TaskCardProps) {
+  const { t } = useTranslation();
   const now = useNow();
   const done = task.doneAt ? new Date(task.doneAt) : null;
 
@@ -127,7 +124,9 @@ function ReviewTaskCard({ task, style }: TaskCardProps) {
         review
         task={task}
         meta={
-          done ? `Marked done · ${formatTimeAgo(done, now)}` : 'Marked done'
+          done
+            ? t('taskCard.markedDoneAgo', { ago: formatTimeAgo(done, now) })
+            : t('taskCard.markedDone')
         }
       />
       <View style={styles.photo}>
@@ -147,7 +146,7 @@ function ReviewTaskCard({ task, style }: TaskCardProps) {
         )}
         <View style={styles.photoTag}>
           <Icon name="camera" size={14} color={theme.colors.ink} />
-          <Text style={styles.photoTagText}>Photo report</Text>
+          <Text style={styles.photoTagText}>{t('taskCard.photoReport')}</Text>
         </View>
       </View>
       <RewardHighlight reward={task.reward} />

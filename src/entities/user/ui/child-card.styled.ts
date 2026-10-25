@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   card: {
@@ -28,6 +28,7 @@ export const styles = StyleSheet.create({
   },
   name: {
     fontSize: theme.fontSize.xl,
+    letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
@@ -50,11 +51,13 @@ export const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 15,
+    letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   statLabel: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
     color: theme.colors.ink,
   },

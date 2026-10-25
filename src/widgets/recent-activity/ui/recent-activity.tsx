@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { ActivityItem, type Activity } from '@entities/activity';
+import { useTranslation } from '@shared/i18n';
 import { SectionHeader } from '@shared/ui';
 import { styles } from './recent-activity.styled';
 
@@ -9,11 +10,12 @@ type RecentActivityProps = {
 };
 
 export function RecentActivity({ items, onSeeAll }: RecentActivityProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <SectionHeader
-        title="Recent Activity"
-        actionLabel="See all"
+        title={t('home.recentActivity')}
+        actionLabel={t('common.seeAll')}
         onAction={onSeeAll}
       />
       <View style={styles.list}>

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 import {
   CHART_HEIGHT,
   COLUMN_GAP,
@@ -43,8 +43,17 @@ export const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     boxShadow: '0px 4px 5px rgba(108, 92, 231, 0.28)',
   },
+  // Будущий день: без тени, весь текст серый.
+  chipFuture: {
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+  },
+  textFuture: {
+    color: theme.colors.placeholder,
+  },
   weekday: {
     fontSize: 11,
+    letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -53,6 +62,7 @@ export const styles = StyleSheet.create({
   },
   day: {
     fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.semibold,
     color: theme.colors.ink,
   },
@@ -61,6 +71,7 @@ export const styles = StyleSheet.create({
   },
   month: {
     fontSize: 10,
+    letterSpacing: tracking(10),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },

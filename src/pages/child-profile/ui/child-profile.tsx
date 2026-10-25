@@ -7,17 +7,19 @@ import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
 import {
-  getWeekStart,
   latestRewards,
   OperationRow,
-  operationsSince,
+  operationsInPeriod,
+  PeriodSelect,
   sumTotals,
   useOperations,
   type Operation,
+  type SummaryPeriod,
 } from '@entities/operation';
 import { countTasks, useTasks, type Task } from '@entities/task';
 import type { ChildProfile } from '@entities/user';
 import { childProfilesMock } from '@shared/mocks';
+import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './child-profile.styled';
 
@@ -27,11 +29,14 @@ const RECENT_REWARDS = 3;
 
 /** Профиль ребёнка: статус, баланс, задачи, награды и место на карте. */
 export function ChildProfilePage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: tasks = NO_TASKS } = useTasks();
   const { data: operations = NO_OPERATIONS } = useOperations();
-  const [weekStart] = useState(() => getWeekStart(new Date()));
+  // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
+  const [today] = useState(() => new Date());
+  const [period, setPeriod] = useState<SummaryPeriod>('week');
 
   const child: ChildProfile | undefined = childProfilesMock.find(
     (item) => String(item.id) === id,
@@ -42,7 +47,7 @@ export function ChildProfilePage() {
   const childOperations = operations.filter(
     (operation) => operation.child.id === child.id,
   );
-  const week = sumTotals(operationsSince(childOperations, weekStart));
+  const totals = sumTotals(operationsInPeriod(childOperations, period, today));
   const rewards = latestRewards(childOperations, RECENT_REWARDS);
 
   const openTasks = (tab: 'all' | 'review') =>
@@ -68,16 +73,19 @@ export function ChildProfilePage() {
         />
         <HomeSummary
           amount={child.balance}
-          amountLabel="Balance"
+          amountLabel={t('summary.balance')}
           activeTasks={counts.active}
           tasksToReview={counts.review}
           onActiveTasksPress={() => openTasks('all')}
           onTasksToReviewPress={() => openTasks('review')}
         />
-        <DaySummary title="This week" {...week} />
+        <DaySummary
+          title={<PeriodSelect value={period} onChange={setPeriod} />}
+          {...totals}
+        />
         <ScreenSection
-          title="Recent rewards"
-          actionLabel="See all"
+          title={t('memberProfile.recentRewards')}
+          actionLabel={t('common.seeAll')}
           onAction={() =>
             router.replace({
               pathname: '/wallet',
@@ -86,7 +94,7 @@ export function ChildProfilePage() {
           }
         >
           {rewards.length === 0 ? (
-            <Text style={styles.empty}>No rewards yet</Text>
+            <Text style={styles.empty}>{t('memberProfile.noRewards')}</Text>
           ) : (
             <View style={styles.list}>
               {rewards.map((operation) => (
@@ -96,8 +104,8 @@ export function ChildProfilePage() {
           )}
         </ScreenSection>
         <ScreenSection
-          title="Location"
-          actionLabel="Open map"
+          title={t('memberProfile.location')}
+          actionLabel={t('memberProfile.openMap')}
           onAction={openMap}
         >
           <MapPreview

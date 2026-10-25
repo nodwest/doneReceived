@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from '@shared/i18n';
 import { Icon } from '@shared/ui';
 import { theme } from '@shared/theme';
 import { NAV_ITEMS } from '../config/nav-items';
@@ -12,6 +13,7 @@ type BottomNavProps = {
 };
 
 export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const { bottom } = useSafeAreaInsets();
@@ -23,7 +25,7 @@ export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
         { paddingBottom: Math.max(NAV_PADDING_VERTICAL, bottom) },
       ]}
     >
-      {NAV_ITEMS.map(({ key, label, icon, href }) => {
+      {NAV_ITEMS.map(({ key, icon, href }) => {
         const active = key === activeKey;
         return (
           <Pressable
@@ -44,7 +46,7 @@ export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
               color={active ? theme.colors.violet : theme.colors.grey}
             />
             <Text style={[styles.label, active && styles.labelActive]}>
-              {label}
+              {t(`nav.${key}`)}
             </Text>
           </Pressable>
         );

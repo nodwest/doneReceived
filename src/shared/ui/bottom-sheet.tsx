@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from '../i18n';
 import { theme } from '../theme';
 
 const OPEN_MS = 280;
@@ -32,6 +33,7 @@ export function BottomSheet({
   maxHeightRatio = 0.5,
   children,
 }: BottomSheetProps) {
+  const { t } = useTranslation();
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [progress] = useState(() => new Animated.Value(0));
@@ -74,7 +76,7 @@ export function BottomSheet({
           ]}
         >
           <Pressable
-            accessibilityLabel="Close"
+            accessibilityLabel={t('common.close')}
             style={styles.flex}
             onPress={onClose}
           />

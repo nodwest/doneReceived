@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from '@shared/i18n';
 import { Icon } from '@shared/ui';
 import { theme } from '@shared/theme';
 import type { ChildOverview } from '../model/child-overview';
@@ -31,6 +32,7 @@ export function ChildCard({
   onActiveTasksPress,
   onReviewTasksPress,
 }: ChildCardProps) {
+  const { t } = useTranslation();
   const { name, avatar, activeTasks, reviewTasks, atHome } = child;
 
   return (
@@ -52,17 +54,25 @@ export function ChildCard({
       <View style={styles.stats}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${name}: ${activeTasks} active tasks`}
+          accessibilityLabel={t('childCard.activeTasksA11y', {
+            name,
+            count: activeTasks,
+          })}
           disabled={!onActiveTasksPress}
           onPress={onActiveTasksPress}
           style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
         >
           <Text style={styles.statValue}>{activeTasks}</Text>
-          <Text style={styles.statLabel}>active tasks</Text>
+          <Text style={styles.statLabel}>
+            {t('childCard.activeTasks', { count: activeTasks })}
+          </Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${name}: ${reviewTasks} tasks to review`}
+          accessibilityLabel={t('childCard.tasksToReviewA11y', {
+            name,
+            count: reviewTasks,
+          })}
           disabled={!onReviewTasksPress}
           onPress={onReviewTasksPress}
           style={({ pressed }) => [
@@ -75,7 +85,7 @@ export function ChildCard({
             {reviewTasks}
           </Text>
           <Text style={[styles.statLabel, styles.statReviewText]}>
-            tasks to review
+            {t('childCard.tasksToReview', { count: reviewTasks })}
           </Text>
         </Pressable>
       </View>

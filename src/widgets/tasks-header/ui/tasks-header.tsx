@@ -10,6 +10,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -48,12 +49,13 @@ export function TasksHeader({
   owner,
   tabs = true,
 }: TasksHeaderProps) {
+  const { t } = useTranslation();
   return (
     <View>
       <View style={[styles.container, !tabs && styles.containerInline]}>
         <RoundButton
           icon="arrow-left"
-          accessibilityLabel="Back"
+          accessibilityLabel={t('common.back')}
           onPress={onBack}
         />
 
@@ -70,7 +72,7 @@ export function TasksHeader({
         <RoundButton
           icon={view === 'cards' ? 'list' : 'cards'}
           accessibilityLabel={
-            view === 'cards' ? 'Show as list' : 'Show as cards'
+            view === 'cards' ? t('tasks.showAsList') : t('tasks.showAsCards')
           }
           onPress={onToggleView}
         />
@@ -87,6 +89,7 @@ type SegmentsProps = Pick<
 
 /** Переключатель All / Review с бейджем задач на проверке. */
 function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
+  const { t } = useTranslation();
   const compact = useIsCompact();
   const allActive = tab === 'all';
   const reviewActive = tab === 'review';
@@ -95,7 +98,7 @@ function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
     <View style={styles.segments} accessibilityRole="tablist">
       <Pressable
         accessibilityRole="tab"
-        accessibilityLabel="All tasks"
+        accessibilityLabel={t('tasks.allTasks')}
         accessibilityState={{ selected: allActive }}
         onPress={() => onTabChange('all')}
         style={[
@@ -114,7 +117,7 @@ function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
           />
         )}
         <SegmentLabel
-          label="All tasks"
+          label={t('tasks.allTasks')}
           compact={compact}
           activeStyle={allActive && styles.segmentLabelAll}
         />
@@ -122,7 +125,7 @@ function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
 
       <Pressable
         accessibilityRole="tab"
-        accessibilityLabel="Review Tasks"
+        accessibilityLabel={t('tasks.reviewTasks')}
         accessibilityState={{ selected: reviewActive }}
         onPress={() => onTabChange('review')}
         style={[
@@ -143,7 +146,7 @@ function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
         )}
         {/* На узких экранах полная подпись не помещается рядом с кнопками. */}
         <SegmentLabel
-          label={compact ? 'Review' : 'Review Tasks'}
+          label={compact ? t('tasks.review') : t('tasks.reviewTasks')}
           compact={compact}
           activeStyle={reviewActive && styles.segmentLabelReview}
         />
@@ -169,11 +172,12 @@ function OwnerTitle({
   avatar,
   style,
 }: Owner & { style: StyleProp<ViewStyle> }) {
+  const { t } = useTranslation();
   return (
     <View style={style}>
       <Image source={avatar} style={styles.ownerAvatar} />
       <Text style={styles.ownerName} numberOfLines={1}>
-        {name}&apos;s tasks
+        {t('tasks.ownerTasks', { name })}
       </Text>
     </View>
   );

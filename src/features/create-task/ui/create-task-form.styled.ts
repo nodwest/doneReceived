@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, type TextStyle } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 // Убирает браузерную рамку фокуса и ручку ресайза; в типах RN этих значений нет.
 const webInputReset = Platform.select({
@@ -34,11 +34,13 @@ export const styles = StyleSheet.create({
   },
   label: {
     fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   optional: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -52,6 +54,7 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.line,
     backgroundColor: theme.colors.white,
     fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
     color: theme.colors.ink,
     boxShadow: 'none',
@@ -70,6 +73,7 @@ export const styles = StyleSheet.create({
     minHeight: 56,
     padding: 0,
     fontSize: 15,
+    letterSpacing: tracking(15),
     lineHeight: 20,
     fontFamily: theme.fonts.medium,
     color: theme.colors.ink,
@@ -115,6 +119,7 @@ export const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
     color: theme.colors.grey,
   },
@@ -135,6 +140,7 @@ export const styles = StyleSheet.create({
   },
   rewardSign: {
     fontSize: 32,
+    letterSpacing: tracking(32),
     fontFamily: theme.fonts.bold,
     color: theme.colors.yellow,
   },
@@ -143,16 +149,19 @@ export const styles = StyleSheet.create({
     minWidth: 0,
     paddingVertical: 0,
     fontSize: 44,
+    letterSpacing: tracking(44),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
     ...webInputReset,
   },
   rewardInputCompact: {
     fontSize: 36,
+    letterSpacing: tracking(36),
   },
 
   deadlineHint: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -178,6 +187,7 @@ export const styles = StyleSheet.create({
   },
   dateButtonText: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.bold,
     color: theme.colors.violet,
   },

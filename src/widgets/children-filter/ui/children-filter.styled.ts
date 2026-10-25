@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -32,6 +32,7 @@ export const styles = StyleSheet.create({
   label: {
     flexShrink: 1,
     fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
     color: theme.colors.ink,
   },

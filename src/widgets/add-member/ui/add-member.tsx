@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { InviteCodes } from '@entities/family';
+import { useTranslation } from '@shared/i18n';
 import { GradientButton } from '@shared/ui';
 import { InviteCodesPanel } from './invite-codes-panel';
 
@@ -13,12 +14,13 @@ type AddMemberProps = {
  * кодами для второго родителя и для ребёнка, крестик возвращает кнопку.
  */
 export function AddMember({ codes }: AddMemberProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   if (!open) {
     return (
       <GradientButton
-        label="Family member"
+        label={t('family.addMember')}
         icon="plus"
         onPress={() => setOpen(true)}
       />

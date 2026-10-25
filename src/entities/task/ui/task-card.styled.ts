@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 // Фон активной карточки: полупрозрачный фиолетово-синий градиент.
 export const ACTIVE_CARD_GRADIENT = [
@@ -57,11 +57,13 @@ export const styles = StyleSheet.create({
   },
   name: {
     fontSize: theme.fontSize.h1,
+    letterSpacing: tracking(theme.fontSize.h1),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   nameCompact: {
     fontSize: 22,
+    letterSpacing: tracking(22),
   },
   timer: {
     height: 60,
@@ -74,11 +76,13 @@ export const styles = StyleSheet.create({
   },
   timerLabel: {
     fontSize: 11,
+    letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
     color: theme.colors.inkSoft,
   },
   timerValue: {
     fontSize: 17,
+    letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.violet,
     fontVariant: ['tabular-nums'],
@@ -107,17 +111,20 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
+    letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   description: {
     fontSize: 13,
+    letterSpacing: tracking(13),
     lineHeight: 18,
     fontFamily: theme.fonts.medium,
     color: theme.colors.inkSoft,
   },
   meta: {
     fontSize: 13,
+    letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -129,6 +136,7 @@ export const styles = StyleSheet.create({
   },
   caption: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -143,6 +151,7 @@ export const styles = StyleSheet.create({
   },
   stepLabel: {
     fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
@@ -185,11 +194,13 @@ export const styles = StyleSheet.create({
   },
   tileValue: {
     fontSize: 17,
+    letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
   tileText: {
     fontSize: 13,
+    letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
     color: theme.colors.inkSoft,
   },
@@ -219,6 +230,7 @@ export const styles = StyleSheet.create({
   },
   photoTagText: {
     fontSize: 11,
+    letterSpacing: tracking(11),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
@@ -238,6 +250,7 @@ export const styles = StyleSheet.create({
   },
   rewardValue: {
     fontSize: 36,
+    letterSpacing: tracking(36),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
