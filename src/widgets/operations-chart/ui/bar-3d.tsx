@@ -16,7 +16,7 @@ import { styles } from './bar-3d.styled';
 
 type CubeColors = { front: string; side: string; top: string };
 
-// Будущий день: одинаковый серый кубик минимальной высоты.
+// Будущий или пустой день: одинаковый серый кубик минимальной высоты.
 const FUTURE_COLORS: CubeColors = {
   front: theme.colors.future,
   side: theme.colors.futureDark,
@@ -34,7 +34,7 @@ type Bar3DProps = {
   width: number;
   /** Суммы на гранях — у выбранного дня. */
   showLabels: boolean;
-  /** Будущий день: вместо сумм серый кубик-заглушка. */
+  /** Будущий день или день без наград: вместо сумм серый кубик-заглушка. */
   future?: boolean;
 };
 

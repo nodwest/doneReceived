@@ -52,3 +52,15 @@ export const inviteCodesMock = {
   parent: 'PAR7-390L-2DK8-VQ41-ZMTW',
   child: 'KID4-821X-9Q7M-2LP8-3RTW',
 };
+
+/**
+ * Коды приглашения, которые знает «сервер»: наши (inviteCodesMock — с ними
+ * входят в семью Miller) и коды чужой семьи Johnson, чтобы проверить
+ * вступление в другую семью с вкладки Family.
+ */
+export const familyInvitesMock = [
+  { code: inviteCodesMock.parent, familyName: 'Miller', role: 'parent' },
+  { code: inviteCodesMock.child, familyName: 'Miller', role: 'child' },
+  { code: 'PAR5-7KQ2-JN48-W3XD-61HB', familyName: 'Johnson', role: 'parent' },
+  { code: 'KID9-4FTB-6RZ1-8MCE-27QP', familyName: 'Johnson', role: 'child' },
+] as const;

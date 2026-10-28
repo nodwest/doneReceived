@@ -1,65 +1,28 @@
-import { useMemo, useState } from 'react';
+import { Fragment } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
-import {
-  ChildrenFilter,
-  type ChildFilterValue,
-} from '@widgets/children-filter';
-import { DaySummary } from '@widgets/day-summary';
-import { OperationsChart } from '@widgets/operations-chart';
-import {
-  getDayTotals,
-  getHistoryDays,
-  isSameDay,
-  OperationRow,
-  useOperations,
-  type Operation,
-} from '@entities/operation';
+import { TransactionRow, useWallet } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { formatMonthDay } from '@shared/lib';
-import { childrenMock } from '@shared/mocks';
+import { childProfilesMock } from '@shared/mocks';
+import { SectionHeader } from '@shared/ui';
+import { BalanceCard } from './balance-card';
+import { ChildBalance } from './child-balance';
+import { RewardsHistoryLink } from './rewards-history-link';
 import { styles } from './wallet.styled';
 
-const NO_OPERATIONS: Operation[] = [];
+// Сколько последних транзакций показываем; остальные — по «See all».
+const RECENT_TRANSACTIONS = 4;
 
-/** Вкладка Wallet: история операций по дням. */
+/**
+ * Вкладка Wallet: баланс вошедшего родителя (не всей семьи) с кнопками ввода
+ * и вывода денег, балансы детей, ссылка на историю наград и последние
+ * транзакции. Deposit, Withdraw и «See all» пока ничего не делают.
+ */
 export function WalletPage() {
   const { t } = useTranslation();
-  const { data: operations = NO_OPERATIONS, isPending } = useOperations();
-  // Сегодня фиксируем на время жизни экрана: от него строится лента дней.
-  const [today] = useState(() => new Date());
-  // «See all» в профиле ребёнка открывает историю сразу с его фильтром.
-  const { child: childParam } = useLocalSearchParams<{ child?: string }>();
-  const [filter, setFilter] = useState<ChildFilterValue>(
-    () =>
-      childrenMock.find((child) => String(child.id) === childParam)?.id ??
-      'all',
-  );
-  // null — день не выбран, стоим на сегодняшнем (последнем).
-  const [selected, setSelected] = useState<number | null>(null);
-
-  // Лента дней общая для всех детей, чтобы при смене фильтра не прыгала.
-  const days = useMemo(
-    () => getHistoryDays(operations, today),
-    [operations, today],
-  );
-  const filtered = useMemo(
-    () =>
-      filter === 'all'
-        ? operations
-        : operations.filter((operation) => operation.child.id === filter),
-    [operations, filter],
-  );
-  const totals = useMemo(() => getDayTotals(days, filtered), [days, filtered]);
-
-  const selectedIndex = selected ?? days.length - 1;
-  const day = totals[selectedIndex];
-  // В списке — начисленные награды; упущенные видны в итогах и на графике.
-  const dayOperations = filtered.filter(
-    (operation) =>
-      operation.kind === 'earned' && isSameDay(operation, day.date),
-  );
+  const { data: wallet } = useWallet();
+  const transactions = wallet?.transactions.slice(0, RECENT_TRANSACTIONS) ?? [];
 
   return (
     <TabScreen activeKey="wallet">
@@ -68,38 +31,37 @@ export function WalletPage() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>{t('wallet.title')}</Text>
-        <View style={styles.filter}>
-          <ChildrenFilter
-            items={childrenMock}
-            value={filter}
-            onChange={setFilter}
+        {wallet && <BalanceCard balance={wallet.balance} />}
+        <View style={styles.children}>
+          {childProfilesMock.map((child) => (
+            <ChildBalance
+              key={child.id}
+              name={child.name}
+              avatar={child.avatar}
+              balance={child.balance}
+            />
+          ))}
+        </View>
+        <RewardsHistoryLink onPress={() => router.push('/rewards-history')} />
+        <View style={styles.sectionHeader}>
+          <SectionHeader
+            title={t('wallet.transactions')}
+            actionLabel={t('common.seeAll')}
           />
         </View>
-        {!isPending && (
-          <>
-            <OperationsChart
-              days={totals}
-              selectedIndex={selectedIndex}
-              onSelect={setSelected}
-            />
-            <View style={styles.summary}>
-              <DaySummary
-                inline
-                title={formatMonthDay(day.date)}
-                earned={day.earned}
-                missed={day.missed}
-              />
-            </View>
-            <View style={styles.list}>
-              {dayOperations.length === 0 ? (
-                <Text style={styles.empty}>{t('wallet.noRewardsThisDay')}</Text>
-              ) : (
-                dayOperations.map((operation) => (
-                  <OperationRow key={operation.id} {...operation} />
-                ))
-              )}
-            </View>
-          </>
+        {wallet && (
+          <View style={styles.transactions}>
+            {transactions.length === 0 ? (
+              <Text style={styles.empty}>{t('wallet.noTransactions')}</Text>
+            ) : (
+              transactions.map((transaction, index) => (
+                <Fragment key={transaction.id}>
+                  {index > 0 && <View style={styles.divider} />}
+                  <TransactionRow transaction={transaction} />
+                </Fragment>
+              ))
+            )}
+          </View>
         )}
       </ScrollView>
     </TabScreen>

@@ -9,6 +9,8 @@ type GradientButtonProps = {
   icon?: IconName;
   onPress?: () => void;
   disabled?: boolean;
+  /** Мельче текст и иконка — для двух кнопок в ряд (вкладка Family). */
+  compact?: boolean;
 };
 
 /** Широкая фиолетово-синяя кнопка высотой 56: Create Task, + Family member. */
@@ -17,6 +19,7 @@ export function GradientButton({
   icon,
   onPress,
   disabled,
+  compact,
 }: GradientButtonProps) {
   return (
     <LinearGradient
@@ -35,8 +38,19 @@ export function GradientButton({
         onPress={onPress}
         disabled={disabled}
       >
-        {icon && <Icon name={icon} size={22} color={theme.colors.white} />}
-        <Text style={styles.title}>{label}</Text>
+        {icon && (
+          <Icon
+            name={icon}
+            size={compact ? 18 : 22}
+            color={theme.colors.white}
+          />
+        )}
+        <Text
+          style={[styles.title, compact && styles.titleCompact]}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
       </Button>
     </LinearGradient>
   );
@@ -63,6 +77,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    paddingHorizontal: 8,
   },
   // На вебе наведение не перекрашивает градиент, а нажатие заливает
   // кнопку фиолетовым без затухания — как на нативе.
@@ -78,5 +93,10 @@ const styles = StyleSheet.create({
     letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
+  },
+  titleCompact: {
+    flexShrink: 1,
+    fontSize: 15,
+    letterSpacing: tracking(15),
   },
 });

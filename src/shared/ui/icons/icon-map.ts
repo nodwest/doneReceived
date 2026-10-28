@@ -19,6 +19,7 @@ import { LockIcon } from './lock';
 import { EyeIcon } from './eye';
 import { EyeOffIcon } from './eye-off';
 import { ArrowLeftIcon } from './arrow-left';
+import { ArrowRightIcon } from './arrow-right';
 import { ListIcon } from './list';
 import { CardsIcon } from './cards';
 import { BroomIcon } from './broom';
@@ -57,6 +58,7 @@ export const icons = {
   eye: EyeIcon,
   'eye-off': EyeOffIcon,
   'arrow-left': ArrowLeftIcon,
+  'arrow-right': ArrowRightIcon,
   list: ListIcon,
   cards: CardsIcon,
   broom: BroomIcon,

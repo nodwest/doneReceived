@@ -1,8 +1,7 @@
 import type { ReactNode, Ref } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { Icon, type IconName } from '@shared/ui';
-import { theme } from '@shared/theme';
-import { styles } from './settings-row.styled';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { theme, tracking } from '../theme';
+import { Icon, type IconName } from './icons';
 
 type SettingsRowProps = {
   icon: IconName;
@@ -16,7 +15,10 @@ type SettingsRowProps = {
   ref?: Ref<View>;
 };
 
-/** Пункт меню профиля: иконка в фиолетовой плашке, название и стрелка. */
+/**
+ * Пункт меню настроек: иконка в фиолетовой плашке, название и стрелка —
+ * меню на вкладке Profile и блок Security в Edit profile.
+ */
 export function SettingsRow({
   icon,
   label,
@@ -48,3 +50,37 @@ export function SettingsRow({
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+  },
+  pressed: {
+    opacity: 0.6,
+  },
+  icon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.violetIcon,
+  },
+  label: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: theme.fonts.semibold,
+    letterSpacing: tracking(15),
+    color: theme.colors.ink,
+  },
+  value: {
+    fontSize: theme.fontSize.inputName,
+    fontFamily: theme.fonts.medium,
+    letterSpacing: tracking(theme.fontSize.inputName),
+    color: theme.colors.grey,
+  },
+});

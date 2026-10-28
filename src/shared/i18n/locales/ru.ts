@@ -93,6 +93,27 @@ export const ru: Dictionary = {
     parentsSection: 'Родители',
     childrenSection: 'Дети',
     addMember: 'Участник семьи',
+    joinFamily: 'Присоединиться',
+  },
+  joinFamily: {
+    title: 'Присоединиться к семье',
+    hint: 'Есть код приглашения от другого родителя? Введите его, чтобы присоединиться к их семье как родитель.',
+    codeLabel: 'Код приглашения',
+    parentCodeHint:
+      'Другой родитель найдёт его в «Семья» → «+ Участник семьи».',
+    childCodeHint: 'Родители найдут его в «Семья» → «+ Участник семьи».',
+    notFound: 'Семья с таким кодом не найдена',
+    wrongRole: {
+      parent: 'Это код для ребёнка — попросите код для родителя',
+      child: 'Это код для родителя — попросите код для ребёнка',
+    },
+    familyName: 'Семья {{name}}',
+    joinAs: {
+      parent: 'Вы присоединитесь как родитель',
+      child: 'Вы присоединитесь как ребёнок',
+    },
+    join: 'Присоединиться к семье',
+    joined: 'Вы присоединились: {{family}}',
   },
   inviteCodes: {
     title: 'Добавить в семью',
@@ -126,7 +147,22 @@ export const ru: Dictionary = {
     webOnly: 'Карта доступна в веб-версии',
   },
   wallet: {
-    title: 'История операций',
+    title: 'Кошелёк',
+    balance: 'Баланс',
+    depositAction: 'Пополнить',
+    withdrawAction: 'Вывести',
+    rewardsHistory: 'История вознаграждений',
+    rewardsHistoryHint: 'Получено и упущено по дням',
+    transactions: 'Транзакции',
+    noTransactions: 'Транзакций пока нет',
+    paidTo: 'Выплата: {{name}}',
+    deposit: 'Пополнение',
+    withdrawal: 'Вывод',
+    fromCard: 'С карты •• {{card}}',
+    toCard: 'На карту •• {{card}}',
+  },
+  rewardsHistory: {
+    title: 'История вознаграждений',
     all: 'Все',
     earned: 'Получено',
     missed: 'Упущено',
@@ -212,6 +248,7 @@ export const ru: Dictionary = {
   auth: {
     email: 'Почта',
     password: 'Пароль',
+    confirmPassword: 'Повторите пароль',
     fullName: 'Имя и фамилия',
     loginTitle: 'С возвращением!',
     loginSubtitle:
@@ -225,6 +262,11 @@ export const ru: Dictionary = {
     createAccount: 'Создать аккаунт',
     haveAccount: 'Уже есть аккаунт?',
   },
+  childHome: {
+    title: 'Добро пожаловать: {{family}}!',
+    titleNoFamily: 'Добро пожаловать!',
+    comingSoon: 'Главный экран ребёнка скоро появится.',
+  },
   roleSelect: {
     title: 'Кто вы?',
     subtitle: 'Вы регистрируетесь как родитель или как ребёнок?',
@@ -234,11 +276,19 @@ export const ru: Dictionary = {
     kidDescription: 'Выполняете задания родителей и получаете награды.',
     continue: 'Продолжить',
   },
+  editProfile: {
+    title: 'Редактировать профиль',
+    changePhoto: 'Сменить фото',
+    security: 'Безопасность',
+    changePassword: 'Сменить пароль',
+    save: 'Сохранить изменения',
+  },
   profile: {
     title: 'Профиль',
     editProfile: 'Редактировать профиль',
     notifications: 'Уведомления',
     familyCodes: 'Коды семьи',
+    joinFamily: 'Присоединиться к семье',
     language: 'Язык',
     help: 'Помощь и поддержка',
     logOut: 'Выйти',

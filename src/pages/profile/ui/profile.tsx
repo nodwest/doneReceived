@@ -1,20 +1,22 @@
 import { useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { InviteCodesPanel } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
+import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
 import { useInviteCodes } from '@entities/family';
 import { getLanguageLabel, useLanguage, useTranslation } from '@shared/i18n';
 import { parentMock, profileSettingsMock } from '@shared/mocks';
-import { Toggle, type AnchorRect } from '@shared/ui';
+import { SettingsRow, Toggle, type AnchorRect } from '@shared/ui';
 import { ProfileHero } from './profile-hero';
-import { SettingsRow } from './settings-row';
 import { styles } from './profile.styled';
 
 /**
- * Вкладка Profile: карточка вошедшего родителя и меню настроек. Пункт Family
- * codes показывает вместо меню панель кодов приглашения (как на вкладке
- * Family), крестик возвращает меню. Language раскрывает выпадающий выбор
+ * Вкладка Profile: карточка вошедшего родителя и меню настроек. Пункты Family
+ * codes и Join family показывают вместо меню панель кодов приглашения или
+ * ввода кода (как на вкладке Family), крестик возвращает меню. Edit profile
+ * открывает отдельную страницу. Language раскрывает выпадающий выбор
  * языка прямо у пункта. Остальные пункты пока не работают, тогл уведомлений
  * только переключается.
  */
@@ -22,7 +24,8 @@ export function ProfilePage() {
   const { t } = useTranslation();
   const language = useLanguage();
   const { data: codes } = useInviteCodes();
-  const [showCodes, setShowCodes] = useState(false);
+  const [panel, setPanel] = useState<'codes' | 'join' | null>(null);
+  const closePanel = () => setPanel(null);
   const languageRow = useRef<View>(null);
   const [languageAnchor, setLanguageAnchor] = useState<AnchorRect | null>(null);
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -50,12 +53,18 @@ export function ProfilePage() {
           email={parentMock.email}
           avatar={parentMock.avatar}
         />
-        {showCodes ? (
-          <InviteCodesPanel codes={codes} onClose={() => setShowCodes(false)} />
+        {panel === 'codes' ? (
+          <InviteCodesPanel codes={codes} onClose={closePanel} />
+        ) : panel === 'join' ? (
+          <JoinFamilyPanel onClose={closePanel} />
         ) : (
           <>
             <View style={styles.menu}>
-              <SettingsRow icon="person" label={t('profile.editProfile')} />
+              <SettingsRow
+                icon="person"
+                label={t('profile.editProfile')}
+                onPress={() => router.push('/edit-profile')}
+              />
               <View style={styles.divider} />
               <SettingsRow
                 icon="bell"
@@ -72,7 +81,13 @@ export function ProfilePage() {
               <SettingsRow
                 icon="key"
                 label={t('profile.familyCodes')}
-                onPress={() => setShowCodes(true)}
+                onPress={() => setPanel('codes')}
+              />
+              <View style={styles.divider} />
+              <SettingsRow
+                icon="children"
+                label={t('profile.joinFamily')}
+                onPress={() => setPanel('join')}
               />
               <View style={styles.divider} />
               <SettingsRow

@@ -32,7 +32,8 @@ export function DaySummary({
   inline,
 }: DaySummaryProps) {
   const { t } = useTranslation();
-  const label = (kind: OperationKind) => labels?.[kind] ?? t(`wallet.${kind}`);
+  const label = (kind: OperationKind) =>
+    labels?.[kind] ?? t(`rewardsHistory.${kind}`);
 
   return (
     <View style={[styles.container, inline && styles.containerInline]}>

@@ -91,7 +91,7 @@ export function ParentProfilePage() {
         <ScreenSection
           title={t('memberProfile.recentRewards')}
           actionLabel={t('common.seeAll')}
-          onAction={() => router.replace('/wallet')}
+          onAction={() => router.push('/rewards-history')}
         >
           {rewards.length === 0 ? (
             <Text style={styles.empty}>{t('memberProfile.noRewards')}</Text>
