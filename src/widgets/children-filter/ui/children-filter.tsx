@@ -37,7 +37,7 @@ export function ChildrenFilter({
   return (
     <View style={styles.container} accessibilityRole="tablist">
       <Segment
-        label={t('wallet.all')}
+        label={t('rewardsHistory.all')}
         active={value === 'all'}
         onPress={() => onChange('all')}
       >

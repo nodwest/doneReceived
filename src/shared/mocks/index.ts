@@ -6,3 +6,4 @@ export * from './parent';
 export * from './reward-presets';
 export * from './summary';
 export * from './tasks';
+export * from './wallet';

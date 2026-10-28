@@ -15,3 +15,5 @@ export * from './bottom-sheet';
 export * from './date-time-picker';
 export * from './toggle';
 export * from './select-menu';
+export * from './auth-layout';
+export * from './settings-row';

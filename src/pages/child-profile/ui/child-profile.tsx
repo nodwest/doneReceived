@@ -87,8 +87,8 @@ export function ChildProfilePage() {
           title={t('memberProfile.recentRewards')}
           actionLabel={t('common.seeAll')}
           onAction={() =>
-            router.replace({
-              pathname: '/wallet',
+            router.push({
+              pathname: '/rewards-history',
               params: { child: String(child.id) },
             })
           }

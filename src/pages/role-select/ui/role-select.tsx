@@ -1,64 +1,78 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  InviteCodeField,
+  useInviteCode,
+  useJoinFamily,
+} from '@features/join-family';
+import { RoleIcon, type FamilyRole } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
-import { Button, Icon, type IconName } from '@shared/ui';
-import { theme } from '@shared/theme';
+import { AuthLayout, GradientButton } from '@shared/ui';
 import { styles } from './role-select.styled';
 
 type Role = 'parent' | 'kid';
 
 // Подписи — roleSelect.<key> и roleSelect.<key>Description.
-const ROLES: readonly { key: Role; icon: IconName }[] = [
-  { key: 'parent', icon: 'profile' },
-  { key: 'kid', icon: 'children' },
+const ROLES: readonly { key: Role; icon: FamilyRole }[] = [
+  { key: 'parent', icon: 'parent' },
+  { key: 'kid', icon: 'child' },
 ];
 
+/**
+ * Первый экран после установки: кто входит. Родитель по Continue попадает на
+ * логин. У ребёнка карточка Kid раскрывается полем кода приглашения; когда
+ * код найден, видно, в какую семью он войдёт, и Continue вступает в неё.
+ */
 export function RoleSelectPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<Role>('parent');
+  const invite = useInviteCode('child');
+  const { mutate: join, isPending: joining } = useJoinFamily();
+
+  const onContinue = () => {
+    if (role === 'parent') {
+      router.push('/login');
+      return;
+    }
+    join(invite.code, {
+      onSuccess: ({ familyName }) =>
+        router.replace({
+          pathname: '/child-home',
+          params: { family: familyName },
+        }),
+    });
+  };
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <LinearGradient
-            style={styles.iconWrapper}
-            colors={[theme.colors.violet, theme.colors.blue]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Icon name="star" size={44} color={theme.colors.yellow} />
-          </LinearGradient>
-          <Text style={styles.title}>{t('roleSelect.title')}</Text>
-          <Text style={styles.subtitle}>{t('roleSelect.subtitle')}</Text>
-        </View>
-
-        <View style={styles.options}>
-          {ROLES.map(({ key, icon }) => {
-            const selected = role === key;
-            return (
+    <AuthLayout
+      icon="star"
+      title={t('roleSelect.title')}
+      subtitle={t('roleSelect.subtitle')}
+      action={
+        <GradientButton
+          label={t('roleSelect.continue')}
+          onPress={onContinue}
+          disabled={role === 'kid' && (!invite.invite || joining)}
+        />
+      }
+    >
+      <View style={styles.options}>
+        {ROLES.map(({ key, icon }) => {
+          const selected = role === key;
+          return (
+            <View
+              key={key}
+              style={[styles.card, selected && styles.cardSelected]}
+            >
               <Pressable
-                key={key}
                 accessibilityRole="radio"
                 accessibilityState={{ selected }}
                 onPress={() => setRole(key)}
-                style={[styles.card, selected && styles.cardSelected]}
+                style={styles.cardRow}
               >
-                <LinearGradient
-                  style={styles.cardIcon}
-                  colors={[theme.colors.violet, theme.colors.blue]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Icon name={icon} size={28} color={theme.colors.white} />
-                </LinearGradient>
+                <RoleIcon role={icon} size={56} />
                 <View style={styles.cardText}>
                   <Text style={styles.cardTitle}>{t(`roleSelect.${key}`)}</Text>
                   <Text style={styles.cardDescription}>
@@ -69,21 +83,20 @@ export function RoleSelectPage() {
                   {selected && <View style={styles.radioDot} />}
                 </View>
               </Pressable>
-            );
-          })}
-        </View>
-
-        <LinearGradient
-          colors={[theme.colors.violet, theme.colors.blue]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.button}
-        >
-          <Button onPress={() => router.replace('/')}>
-            <Text style={styles.buttonTitle}>{t('roleSelect.continue')}</Text>
-          </Button>
-        </LinearGradient>
-      </ScrollView>
-    </SafeAreaView>
+              {/* Выбранная карточка Kid снизу продолжается полем кода. */}
+              {key === 'kid' && selected && (
+                <>
+                  <View style={styles.divider} />
+                  <InviteCodeField
+                    state={invite}
+                    hint={t('joinFamily.childCodeHint')}
+                  />
+                </>
+              )}
+            </View>
+          );
+        })}
+      </View>
+    </AuthLayout>
   );
 }

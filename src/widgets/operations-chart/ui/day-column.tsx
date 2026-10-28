@@ -51,6 +51,9 @@ export function DayColumn({ day, scale, selected, onPress }: DayColumnProps) {
           scale={scale}
           width={width}
           showLabels={selected}
+          // День без наград (часто сегодня) — серый кубик, как у будущих дней,
+          // чтобы над датой не было пустоты.
+          future={day.earned + day.missed === 0}
         />
       </View>
       {selected ? (

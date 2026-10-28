@@ -2,83 +2,15 @@ import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: theme.colors.prime,
-  },
-  container: {
-    backgroundColor: theme.colors.prime,
-    display: 'flex',
-    gap: 32,
-    justifyContent: 'center',
-    flexGrow: 1,
-  },
-  scroll: {
-    flexGrow: 1,
-  },
-  body: {
-    paddingHorizontal: 24,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  buttonGradient: {
-    width: '100%',
-    borderRadius: 30,
-    overflow: 'hidden',
-  },
-  header: {
-    width: '100%',
-    maxWidth: 320,
-    alignSelf: 'center',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+  form: {
     gap: 16,
-    margin: 24,
   },
-  iconWrapper: {
-    width: 88,
-    height: 88,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    textAlign: 'center',
-    fontSize: theme.fontSize.h1,
-    letterSpacing: tracking(theme.fontSize.h1),
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    textAlign: 'center',
-    fontSize: theme.fontSize.sm,
-    letterSpacing: tracking(theme.fontSize.sm),
-    color: theme.colors.grey,
-  },
-  buttontitle: {
-    textAlign: 'center',
-    fontSize: theme.fontSize.lg,
-    letterSpacing: tracking(theme.fontSize.lg),
-    color: theme.colors.prime,
-    fontWeight: 'bold',
-  },
-  linktitle: {
-    color: theme.colors.violet,
-    fontWeight: 'bold',
+  field: {
+    gap: 8,
   },
   label: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     color: theme.colors.grey,
-  },
-  content: {
-    width: '100%',
-    gap: 16,
-  },
-  field: {
-    gap: 8,
   },
 });
