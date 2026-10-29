@@ -22,7 +22,6 @@ import { ArrowLeftIcon } from './arrow-left';
 import { ArrowRightIcon } from './arrow-right';
 import { ListIcon } from './list';
 import { CardsIcon } from './cards';
-import { BroomIcon } from './broom';
 import { CameraIcon } from './camera';
 import { StepDotIcon } from './step-dot';
 import { ParentIcon } from './parent';
@@ -35,6 +34,10 @@ import { GlobeIcon } from './globe';
 import { HelpIcon } from './help';
 import { ChevronRightIcon } from './chevron-right';
 import { CheckIcon } from './check';
+import { TaskIcon } from './task';
+import { GiftIcon } from './gift';
+import { CameraOutlineIcon } from './camera-outline';
+import { ImageAddIcon } from './image-add';
 
 export const icons = {
   price: PriceIcon,
@@ -61,7 +64,6 @@ export const icons = {
   'arrow-right': ArrowRightIcon,
   list: ListIcon,
   cards: CardsIcon,
-  broom: BroomIcon,
   camera: CameraIcon,
   'step-dot': StepDotIcon,
   parent: ParentIcon,
@@ -74,4 +76,8 @@ export const icons = {
   help: HelpIcon,
   'chevron-right': ChevronRightIcon,
   check: CheckIcon,
+  task: TaskIcon,
+  gift: GiftIcon,
+  'camera-outline': CameraOutlineIcon,
+  'image-add': ImageAddIcon,
 };

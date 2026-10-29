@@ -1,1 +1,1 @@
-export { WalletPage as default } from '@pages/wallet';
+export { WalletRoute as default } from '@app/index';

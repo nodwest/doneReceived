@@ -1,9 +1,14 @@
 import type { Task } from '../model/task';
-import type { CreateTaskPayload, UpdateTaskPayload } from '../model/types';
+import type {
+  CreateTaskPayload,
+  TaskStatusPayload,
+  UpdateTaskPayload,
+} from '../model/types';
 import { mockServer } from './mock-server';
 
 // Эндпоинты задач. Пока бэкенда нет, тела ходят в mockServer; с API здесь
-// будут запросы (GET /tasks, POST /tasks, PATCH /tasks/:id), сигнатуры и
+// будут запросы (GET /tasks, POST /tasks, PATCH /tasks/:id,
+// PATCH /tasks/:id/status), сигнатуры и
 // весь остальной код не меняются.
 
 export async function fetchTasks(): Promise<Task[]> {
@@ -16,4 +21,8 @@ export async function createTask(payload: CreateTaskPayload): Promise<Task> {
 
 export async function updateTask(payload: UpdateTaskPayload): Promise<Task> {
   return mockServer.update(payload);
+}
+
+export async function setTaskStatus(payload: TaskStatusPayload): Promise<Task> {
+  return mockServer.setStatus(payload);
 }

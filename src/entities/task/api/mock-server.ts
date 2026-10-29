@@ -1,6 +1,10 @@
 import { childrenMock, parentMock, tasksMock } from '@shared/mocks';
 import type { Task } from '../model/task';
-import type { CreateTaskPayload, UpdateTaskPayload } from '../model/types';
+import type {
+  CreateTaskPayload,
+  TaskStatusPayload,
+  UpdateTaskPayload,
+} from '../model/types';
 
 /**
  * Имитация бэкенда, пока его нет: задачи живут в памяти до перезапуска
@@ -51,6 +55,19 @@ export const mockServer = {
       reward: payload.reward,
       expiresAt: payload.expiresAt,
       assignee: findAssignee(payload.assigneeId),
+    };
+    tasks = tasks.map((task) => (task.id === id ? updated : task));
+    return { ...updated };
+  },
+
+  // Ребёнок отправляет задание на проверку (review) или берёт назад (active).
+  setStatus: ({ id, status }: TaskStatusPayload): Task => {
+    const current = tasks.find((task) => task.id === id);
+    if (!current) throw new Error(`Task ${id} not found`);
+    const updated: Task = {
+      ...current,
+      status,
+      doneAt: status === 'review' ? new Date().toISOString() : null,
     };
     tasks = tasks.map((task) => (task.id === id ? updated : task));
     return { ...updated };

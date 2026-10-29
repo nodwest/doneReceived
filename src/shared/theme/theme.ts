@@ -65,8 +65,17 @@ export const theme = {
     parentTo: '#4254AD',
     childFrom: '#4A9EF0',
     childTo: '#A8D9FF',
-    // Конец градиента шапки профиля ребёнка.
+    // Экраны ребёнка: конец голубого градиента (шапка профиля, плитка
+    // баланса, кнопка I did it!) и лёгкая голубая подложка (плитка
+    // вишлиста, новое задание в ленте, чип Active).
     childDeep: '#1E5FB8',
+    childTint: 'rgba(74, 158, 240, 0.16)',
+    childTintLight: 'rgba(168, 217, 255, 0.09)',
+    childTintBorder: 'rgba(74, 158, 240, 0.18)',
+    childChip: 'rgba(74, 158, 240, 0.14)',
+    // Чип «1 ready to buy» на плитке вишлиста.
+    readySoft: '#E3F7EB',
+    readyText: '#1E9A5C',
     // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
     heroSubtle: '#D9E0FF',
     violetIcon: '#EDE8FC',

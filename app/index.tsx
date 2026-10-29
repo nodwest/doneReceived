@@ -1,1 +1,1 @@
-export { ParentHomePage as default } from '@pages/parent-home';
+export { HomeRoute as default } from '@app/index';

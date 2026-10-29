@@ -1,3 +1,5 @@
+import { coParentMock, parentMock } from './parent';
+
 const emma = require('./images/avatar-emma.jpg');
 const liam = require('./images/avatar-liam.jpg');
 
@@ -43,6 +45,50 @@ export const recentActivityMock = [
     action: 'watered the plants',
     at: ago(2 * DAY),
     status: 'approved',
+    reward: 2,
+  },
+] as const;
+
+/**
+ * Лента на главной ребёнка (Emma): что случилось с её заданиями. review —
+ * отправлено на проверку, approved — родитель подтвердил, new — новое
+ * задание. Аватар и имя — родителя, который проверяет или дал задание.
+ */
+export const childActivityMock = [
+  {
+    id: 1,
+    kind: 'review',
+    task: 'Walk the dog',
+    parentName: coParentMock.name,
+    avatar: coParentMock.avatar,
+    at: ago(10 * MINUTE),
+    reward: 3,
+  },
+  {
+    id: 2,
+    kind: 'approved',
+    task: 'Clean your room',
+    parentName: parentMock.name,
+    avatar: parentMock.avatar,
+    at: ago(HOUR),
+    reward: 5,
+  },
+  {
+    id: 3,
+    kind: 'new',
+    task: 'Read a book',
+    parentName: coParentMock.name,
+    avatar: coParentMock.avatar,
+    at: ago(3 * HOUR),
+    reward: 4,
+  },
+  {
+    id: 4,
+    kind: 'approved',
+    task: 'Water the plants',
+    parentName: parentMock.name,
+    avatar: parentMock.avatar,
+    at: ago(2 * DAY),
     reward: 2,
   },
 ] as const;

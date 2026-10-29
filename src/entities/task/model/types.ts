@@ -1,3 +1,5 @@
+import type { TaskState } from './task';
+
 export enum TaskStatus {
   Pending = 'pending',
   Done = 'done',
@@ -26,4 +28,10 @@ export interface CreateTaskPayload {
 
 export interface UpdateTaskPayload extends CreateTaskPayload {
   id: number;
+}
+
+/** Смена статуса ребёнком: I did it! (review) или «Переделать» (active). */
+export interface TaskStatusPayload {
+  id: number;
+  status: TaskState;
 }

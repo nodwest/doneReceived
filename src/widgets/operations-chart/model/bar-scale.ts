@@ -7,16 +7,27 @@ import {
   STACK_OVERLAP,
 } from '../config/sizes';
 
-/** Масштаб из макета: $1 — 9.33pt лицевой грани ($10 — 93.3pt). */
+/** Масштаб из макета, когда наград нет совсем: $1 — 9.33pt лицевой грани. */
 const DESIGN_SCALE = 28 / 3;
-// Над датой остаётся место под столбик; 4pt — запас сверху.
-const MAX_BAR_HEIGHT = CHART_HEIGHT - DATE_CHIP_HEIGHT - COLUMN_GAP - 4;
-// У столбика из двух кубиков две верхние грани минус нахлёст.
-const FACES_HEIGHT = 2 * DEPTH_Y - STACK_OVERLAP;
+// Вся высота над датой отдана столбикам.
+const MAX_BAR_HEIGHT = CHART_HEIGHT - DATE_CHIP_HEIGHT - COLUMN_GAP;
 
-/** pt на $1: как в макете, но самый высокий день всегда помещается. */
+// Верхние грани столбика: у каждого кубика своя, два кубика заходят друг на
+// друга на STACK_OVERLAP.
+function facesHeight({ earned, missed }: DayTotals) {
+  const cubes = Number(earned > 0) + Number(missed > 0);
+  return cubes * DEPTH_Y - (cubes === 2 ? STACK_OVERLAP : 0);
+}
+
+/**
+ * pt на $1, общий для всех дней: самый высокий столбик занимает всю высоту
+ * над датой, остальные — в пропорции к нему.
+ */
 export function getBarScale(days: DayTotals[]) {
-  const max = Math.max(0, ...days.map((day) => day.earned + day.missed));
-  if (max === 0) return DESIGN_SCALE;
-  return Math.min(DESIGN_SCALE, (MAX_BAR_HEIGHT - FACES_HEIGHT) / max);
+  const scales = days
+    .filter((day) => day.earned + day.missed > 0)
+    .map(
+      (day) => (MAX_BAR_HEIGHT - facesHeight(day)) / (day.earned + day.missed),
+    );
+  return scales.length > 0 ? Math.min(...scales) : DESIGN_SCALE;
 }

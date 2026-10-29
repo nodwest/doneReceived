@@ -12,6 +12,7 @@ type OperationsChartProps = {
   days: DayTotals[];
   selectedIndex: number;
   onSelect: (index: number) => void;
+  tone?: 'parent' | 'child';
 };
 
 /**
@@ -22,13 +23,21 @@ export function OperationsChart({
   days,
   selectedIndex,
   onSelect,
+  tone,
 }: OperationsChartProps) {
-  const { scrollRef, sidePadding, ready, onLayout, onScroll, select } =
-    useDayWheel({
-      count: days.length,
-      index: selectedIndex,
-      onIndexChange: onSelect,
-    });
+  const {
+    scrollRef,
+    sidePadding,
+    ready,
+    onLayout,
+    onScroll,
+    onScrollBeginDrag,
+    select,
+  } = useDayWheel({
+    count: days.length,
+    index: selectedIndex,
+    onIndexChange: onSelect,
+  });
   const scale = getBarScale(days);
   // Будущие дни занимают правый отступ ленты: ширина ленты та же, поэтому
   // докрутить до них нельзя — сегодня остаётся последним выбираемым днём.
@@ -51,6 +60,7 @@ export function OperationsChart({
         style={!ready && styles.hidden}
         contentContainerStyle={{ paddingLeft: sidePadding }}
         onScroll={onScroll}
+        onScrollBeginDrag={onScrollBeginDrag}
       >
         {days.map((day, index) => (
           <DayColumn
@@ -59,6 +69,7 @@ export function OperationsChart({
             scale={scale}
             selected={index === selectedIndex}
             onPress={() => select(index)}
+            tone={tone}
           />
         ))}
         <View style={[styles.future, { width: sidePadding }]}>

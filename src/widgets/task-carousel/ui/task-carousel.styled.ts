@@ -48,4 +48,11 @@ export const styles = StyleSheet.create({
     width: 20,
     backgroundColor: theme.colors.violet,
   },
+  dotActiveChild: {
+    backgroundColor: theme.colors.childFrom,
+  },
+  // Карточка заполняет слот ленты по высоте.
+  card: {
+    flexGrow: 1,
+  },
 });

@@ -13,6 +13,12 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.line,
     backgroundColor: theme.colors.white,
   },
+  plain: {
+    paddingHorizontal: 12,
+    borderWidth: 0,
+    borderRadius: 0,
+    backgroundColor: 'transparent',
+  },
   avatar: {
     width: 44,
     height: 44,

@@ -24,6 +24,10 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 12,
   },
+  // Без фильтра по детям график стоит чуть ниже шапки.
+  noFilter: {
+    height: 8,
+  },
   summary: {
     marginTop: 16,
     paddingHorizontal: 24,

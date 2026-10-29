@@ -34,7 +34,16 @@ type TasksHeaderProps = {
    * «George's tasks» стоит по центру шапки, а не строкой под ней.
    */
   tabs?: boolean;
+  /** Цвет выбранного All и бейджа: фиолетовый у родителя, голубой у ребёнка. */
+  tone?: Tone;
 };
+
+type Tone = 'parent' | 'child';
+
+const TONE_GRADIENTS = {
+  parent: [theme.colors.violet, theme.colors.blue],
+  child: [theme.colors.childFrom, theme.colors.childDeep],
+} as const;
 
 type Owner = { name: string; avatar: ImageSourcePropType };
 
@@ -48,6 +57,7 @@ export function TasksHeader({
   onBack,
   owner,
   tabs = true,
+  tone = 'parent',
 }: TasksHeaderProps) {
   const { t } = useTranslation();
   return (
@@ -64,6 +74,7 @@ export function TasksHeader({
             tab={tab}
             onTabChange={onTabChange}
             reviewCount={reviewCount}
+            tone={tone}
           />
         ) : (
           owner && <OwnerTitle {...owner} style={styles.ownerInline} />
@@ -85,10 +96,10 @@ export function TasksHeader({
 type SegmentsProps = Pick<
   TasksHeaderProps,
   'tab' | 'onTabChange' | 'reviewCount'
->;
+> & { tone: Tone };
 
 /** Переключатель All / Review с бейджем задач на проверке. */
-function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
+function Segments({ tab, onTabChange, reviewCount, tone }: SegmentsProps) {
   const { t } = useTranslation();
   const compact = useIsCompact();
   const allActive = tab === 'all';
@@ -109,7 +120,7 @@ function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
       >
         {allActive && (
           <LinearGradient
-            colors={[theme.colors.violet, theme.colors.blue]}
+            colors={TONE_GRADIENTS[tone]}
             start={{ x: 0, y: 0.1 }}
             end={{ x: 1, y: 0.9 }}
             locations={[0, 0.7071]}
@@ -146,13 +157,19 @@ function Segments({ tab, onTabChange, reviewCount }: SegmentsProps) {
         )}
         {/* На узких экранах полная подпись не помещается рядом с кнопками. */}
         <SegmentLabel
-          label={compact ? t('tasks.review') : t('tasks.reviewTasks')}
+          label={
+            compact
+              ? t('tasks.review')
+              : tone === 'child'
+                ? t('tasks.onReview')
+                : t('tasks.reviewTasks')
+          }
           compact={compact}
           activeStyle={reviewActive && styles.segmentLabelReview}
         />
         {reviewCount > 0 && (
           <LinearGradient
-            colors={[theme.colors.violet, theme.colors.blue]}
+            colors={TONE_GRADIENTS[tone]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             locations={[0, 0.7071]}

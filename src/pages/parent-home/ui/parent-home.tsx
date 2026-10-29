@@ -7,6 +7,7 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
+import { ActivityItem } from '@entities/activity';
 import { countTasks, useTasks } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import {
@@ -84,7 +85,11 @@ export function ParentHomePage() {
             }
           />
           <CreateTaskButton onPress={() => router.push('/create-task')} />
-          <RecentActivity items={recentActivityMock} />
+          <RecentActivity>
+            {recentActivityMock.map(({ id, ...item }) => (
+              <ActivityItem key={id} {...item} />
+            ))}
+          </RecentActivity>
         </ScrollView>
         <BottomNav activeKey="home" />
       </SafeAreaView>

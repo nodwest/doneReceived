@@ -8,11 +8,17 @@ type StatCardProps = {
   icon: ReactNode;
   value: string;
   label: string;
-  accent?: boolean;
+  /** Градиентная плитка: фиолетовая (parent) или голубая (child). */
+  accent?: 'parent' | 'child';
   /** Тёплая подсветка: есть задания, ожидающие проверки. */
   highlight?: boolean;
   onPress?: () => void;
 };
+
+const ACCENT_GRADIENTS = {
+  parent: [theme.colors.violet, theme.colors.blue],
+  child: [theme.colors.childFrom, theme.colors.childDeep],
+} as const;
 
 export function StatCard({
   icon,
@@ -25,10 +31,12 @@ export function StatCard({
   const content = (
     <>
       <View style={styles.valueRow}>
-        <Text style={[styles.value, accent && styles.textAccent]}>{value}</Text>
+        <Text style={[styles.value, !!accent && styles.textAccent]}>
+          {value}
+        </Text>
         {icon}
       </View>
-      <Text style={[styles.label, accent && styles.textAccent]}>{label}</Text>
+      <Text style={[styles.label, !!accent && styles.textAccent]}>{label}</Text>
     </>
   );
 
@@ -36,7 +44,7 @@ export function StatCard({
   if (accent) {
     card = (
       <LinearGradient
-        colors={[theme.colors.violet, theme.colors.blue]}
+        colors={ACCENT_GRADIENTS[accent]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         locations={[0, 0.7071]}

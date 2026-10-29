@@ -65,6 +65,16 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
   },
+  nameWithCaption: {
+    fontSize: 24,
+    letterSpacing: tracking(24),
+  },
+  nameCaption: {
+    fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.inkSoft,
+  },
   timer: {
     height: 60,
     gap: 2,
@@ -92,6 +102,10 @@ export const styles = StyleSheet.create({
     ...block,
     paddingVertical: 20,
     paddingHorizontal: 16,
+  },
+  taskBlockGrow: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   // На карточке проверки блок задания занимает свободную высоту, текст по центру.
   taskBlockReview: {
