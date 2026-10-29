@@ -8,7 +8,13 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme, tracking } from '../theme';
 
-type PillButtonVariant = 'primary' | 'danger' | 'dark' | 'outline' | 'ghost';
+type PillButtonVariant =
+  | 'primary'
+  | 'child'
+  | 'danger'
+  | 'dark'
+  | 'outline'
+  | 'ghost';
 
 type PillButtonProps = {
   label: string;
@@ -22,6 +28,8 @@ type PillButtonProps = {
 
 const GRADIENTS = {
   primary: [theme.colors.violet, theme.colors.blue],
+  // Экраны ребёнка: голубая кнопка I did it!.
+  child: [theme.colors.childFrom, theme.colors.childDeep],
   danger: [theme.colors.dangerFrom, theme.colors.danger],
 } as const;
 
@@ -34,7 +42,8 @@ export function PillButton({
   disabled,
   style,
 }: PillButtonProps) {
-  const gradient = variant === 'primary' || variant === 'danger';
+  const gradient =
+    variant === 'primary' || variant === 'child' || variant === 'danger';
 
   return (
     <Pressable
@@ -56,7 +65,7 @@ export function PillButton({
           colors={GRADIENTS[variant]}
           start={{ x: 0, y: 0.2 }}
           end={{ x: 1, y: 0.8 }}
-          locations={variant === 'primary' ? [0, 0.7071] : [0, 1]}
+          locations={variant === 'danger' ? [0, 1] : [0, 0.7071]}
           style={StyleSheet.absoluteFill}
         />
       )}
@@ -89,6 +98,9 @@ const styles = StyleSheet.create({
   },
   primary: {
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.1)',
+  },
+  child: {
+    boxShadow: '0px 8px 9px rgba(30, 95, 184, 0.25)',
   },
   danger: {},
   dark: {

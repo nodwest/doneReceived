@@ -1,1 +1,1 @@
-export { RewardsHistoryPage as default } from '@pages/rewards-history';
+export { RewardsHistoryRoute as default } from '@app/index';

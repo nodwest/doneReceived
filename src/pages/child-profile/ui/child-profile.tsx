@@ -18,16 +18,22 @@ import {
 } from '@entities/operation';
 import { countTasks, useTasks, type Task } from '@entities/task';
 import type { ChildProfile } from '@entities/user';
+import { useWishlistProgress, WishRow } from '@entities/wish';
 import { childProfilesMock } from '@shared/mocks';
 import { useTranslation } from '@shared/i18n';
-import { ScreenSection } from '@shared/ui';
+import { theme } from '@shared/theme';
+import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
 
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
 const RECENT_REWARDS = 3;
 
-/** Профиль ребёнка: статус, баланс, задачи, награды и место на карте. */
+/**
+ * Профиль ребёнка: статус, баланс, задачи, вишлист (сначала готовые, потом
+ * текущее, потом ждущие — так их раскладывает баланс), награды и место на
+ * карте.
+ */
 export function ChildProfilePage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -41,6 +47,7 @@ export function ChildProfilePage() {
   const child: ChildProfile | undefined = childProfilesMock.find(
     (item) => String(item.id) === id,
   );
+  const wishlist = useWishlistProgress(child?.id ?? -1, child?.balance ?? 0);
   if (!child) return <Redirect href="/" />;
 
   const counts = countTasks(tasks, { assigneeId: child.id });
@@ -83,6 +90,43 @@ export function ChildProfilePage() {
           title={<PeriodSelect value={period} onChange={setPeriod} />}
           {...totals}
         />
+        <ScreenSection
+          title={t('wishlist.title')}
+          actionLabel={t('common.seeAll')}
+          onAction={() =>
+            router.push({
+              pathname: '/child/[id]/wishlist',
+              params: { id: String(child.id) },
+            })
+          }
+        >
+          {!wishlist.isPending && wishlist.progress.length === 0 ? (
+            <Text style={styles.empty}>
+              {t('wishCard.noWishes', { name: child.name })}
+            </Text>
+          ) : (
+            <SnapCarousel
+              items={wishlist.progress}
+              keyExtractor={(item) => item.wish.id}
+              dotColor={theme.colors.childFrom}
+              renderItem={(item, style) => (
+                <WishRow
+                  {...item}
+                  style={[style, styles.wish]}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/child/[id]/wishlist/[wishId]',
+                      params: {
+                        id: String(child.id),
+                        wishId: String(item.wish.id),
+                      },
+                    })
+                  }
+                />
+              )}
+            />
+          )}
+        </ScreenSection>
         <ScreenSection
           title={t('memberProfile.recentRewards')}
           actionLabel={t('common.seeAll')}

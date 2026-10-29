@@ -5,6 +5,7 @@ export * from './model/child-profile';
 export * from './model/parent-profile';
 export * from './model/presence';
 export * from './model/role';
+export * from './model/viewer-role';
 export * from './model/location';
 export * from './config/role-colors';
 export * from './ui/child-chip';

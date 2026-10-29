@@ -22,7 +22,6 @@ import { ArrowLeftIcon } from './arrow-left';
 import { ArrowRightIcon } from './arrow-right';
 import { ListIcon } from './list';
 import { CardsIcon } from './cards';
-import { BroomIcon } from './broom';
 import { CameraIcon } from './camera';
 import { StepDotIcon } from './step-dot';
 import { ParentIcon } from './parent';
@@ -35,6 +34,17 @@ import { GlobeIcon } from './globe';
 import { HelpIcon } from './help';
 import { ChevronRightIcon } from './chevron-right';
 import { CheckIcon } from './check';
+import { TaskIcon } from './task';
+import { GiftIcon } from './gift';
+import { CameraOutlineIcon } from './camera-outline';
+import { ImageAddIcon } from './image-add';
+import { BagCheckIcon } from './bag-check';
+import { DragHandleIcon } from './drag-handle';
+import { PencilIcon } from './pencil';
+import { TrashIcon } from './trash';
+import { LinkIcon } from './link';
+import { NoteIcon } from './note';
+import { ExternalIcon } from './external';
 
 export const icons = {
   price: PriceIcon,
@@ -61,7 +71,6 @@ export const icons = {
   'arrow-right': ArrowRightIcon,
   list: ListIcon,
   cards: CardsIcon,
-  broom: BroomIcon,
   camera: CameraIcon,
   'step-dot': StepDotIcon,
   parent: ParentIcon,
@@ -74,4 +83,15 @@ export const icons = {
   help: HelpIcon,
   'chevron-right': ChevronRightIcon,
   check: CheckIcon,
+  task: TaskIcon,
+  gift: GiftIcon,
+  'camera-outline': CameraOutlineIcon,
+  'image-add': ImageAddIcon,
+  'bag-check': BagCheckIcon,
+  'drag-handle': DragHandleIcon,
+  pencil: PencilIcon,
+  trash: TrashIcon,
+  link: LinkIcon,
+  note: NoteIcon,
+  external: ExternalIcon,
 };

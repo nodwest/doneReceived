@@ -1,37 +1,25 @@
 import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { theme } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    minHeight: '100%',
     backgroundColor: theme.colors.prime,
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-    paddingHorizontal: 24,
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
   },
-  icon: {
-    width: 88,
-    height: 88,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
+  scroll: {
+    flex: 1,
   },
-  title: {
-    textAlign: 'center',
-    fontSize: theme.fontSize.h1,
-    letterSpacing: tracking(theme.fontSize.h1),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
-  },
-  subtitle: {
-    textAlign: 'center',
-    fontSize: theme.fontSize.sm,
-    letterSpacing: tracking(theme.fontSize.sm),
-    fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+  body: {
+    gap: 18,
+    paddingTop: 16,
+    paddingBottom: 24,
+    paddingHorizontal: 12,
   },
 });

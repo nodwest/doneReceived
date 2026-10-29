@@ -15,8 +15,9 @@ const now = Date.now();
 const at = (offsetMs: number) => new Date(now + offsetMs).toISOString();
 
 /**
- * Задания родителя: 6 активных и 2 на проверке, как на плитках главной
- * (familySummaryMock). Награды целые: форма редактирования принимает только их.
+ * Задания семьи: 6 активных и 3 на проверке (у Emma — 3 активных и 2 на
+ * проверке, как на её главной). Награды целые: форма редактирования
+ * принимает только их.
  */
 export const tasksMock = [
   {
@@ -125,6 +126,19 @@ export const tasksMock = [
     status: 'review',
     assignee: liam,
     createdAt: at(-6 * HOUR),
+    expiresAt: null,
+    doneAt: at(-2 * HOUR),
+    photo: null,
+  },
+  {
+    id: 9,
+    createdBy: george,
+    title: 'Water the plants',
+    description: 'Water the plants on the balcony.',
+    reward: 2,
+    status: 'review',
+    assignee: emma,
+    createdAt: at(-5 * HOUR),
     expiresAt: null,
     doneAt: at(-2 * HOUR),
     photo: null,

@@ -1,1 +1,1 @@
-export { TasksPage as default } from '@pages/tasks';
+export { TasksRoute as default } from '@app/index';

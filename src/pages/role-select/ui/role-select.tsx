@@ -6,7 +6,7 @@ import {
   useInviteCode,
   useJoinFamily,
 } from '@features/join-family';
-import { RoleIcon, type FamilyRole } from '@entities/user';
+import { RoleIcon, useViewerRoleStore, type FamilyRole } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
 import { AuthLayout, GradientButton } from '@shared/ui';
 import { styles } from './role-select.styled';
@@ -22,7 +22,8 @@ const ROLES: readonly { key: Role; icon: FamilyRole }[] = [
 /**
  * Первый экран после установки: кто входит. Родитель по Continue попадает на
  * логин. У ребёнка карточка Kid раскрывается полем кода приглашения; когда
- * код найден, видно, в какую семью он войдёт, и Continue вступает в неё.
+ * код найден, видно, в какую семью он войдёт, и Continue вступает в неё и
+ * открывает главную ребёнка.
  */
 export function RoleSelectPage() {
   const { t } = useTranslation();
@@ -30,18 +31,19 @@ export function RoleSelectPage() {
   const [role, setRole] = useState<Role>('parent');
   const invite = useInviteCode('child');
   const { mutate: join, isPending: joining } = useJoinFamily();
+  const setViewerRole = useViewerRoleStore((state) => state.setRole);
 
   const onContinue = () => {
     if (role === 'parent') {
       router.push('/login');
       return;
     }
+    // Вступил в семью — дальше смотрим приложение от лица ребёнка.
     join(invite.code, {
-      onSuccess: ({ familyName }) =>
-        router.replace({
-          pathname: '/child-home',
-          params: { family: familyName },
-        }),
+      onSuccess: () => {
+        setViewerRole('child');
+        router.replace('/');
+      },
     });
   };
 

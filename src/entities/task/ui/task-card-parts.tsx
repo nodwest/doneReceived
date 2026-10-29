@@ -8,20 +8,27 @@ import { formatReward, type Task, type TaskAssignee } from '../model';
 import { styles } from './task-card.styled';
 
 type CardHeaderProps = {
-  assignee: TaskAssignee;
+  /** Чьё имя в шапке: исполнитель у родителя, автор задания у ребёнка. */
+  assignee: Pick<TaskAssignee, 'name' | 'avatar'>;
+  /** Подпись над именем («Task from»); с ней имя мельче. */
+  caption?: string;
   /** Блок справа (таймер). */
   aside?: ReactNode;
 };
 
-export function CardHeader({ assignee, aside }: CardHeaderProps) {
+export function CardHeader({ assignee, caption, aside }: CardHeaderProps) {
   const compact = useIsCompact();
 
   return (
     <View style={styles.header}>
       <Image source={assignee.avatar} style={styles.avatar} />
       <View style={styles.nameWrap}>
+        {caption && <Text style={styles.nameCaption}>{caption}</Text>}
         <Text
-          style={[styles.name, compact && styles.nameCompact]}
+          style={[
+            styles.name,
+            caption ? styles.nameWithCaption : compact && styles.nameCompact,
+          ]}
           numberOfLines={1}
           adjustsFontSizeToFit
         >
@@ -37,13 +44,28 @@ type TaskInfoProps = {
   task: Pick<Task, 'title' | 'description'>;
   meta: string;
   review?: boolean;
+  /** Блок забирает свободную высоту карточки, текст по центру. */
+  grow?: boolean;
+  iconColor?: string;
 };
 
-export function TaskInfo({ task, meta, review }: TaskInfoProps) {
+export function TaskInfo({
+  task,
+  meta,
+  review,
+  grow,
+  iconColor = theme.colors.violet,
+}: TaskInfoProps) {
   return (
-    <View style={[styles.taskBlock, review && styles.taskBlockReview]}>
+    <View
+      style={[
+        styles.taskBlock,
+        grow && styles.taskBlockGrow,
+        review && styles.taskBlockReview,
+      ]}
+    >
       <View style={styles.taskRow}>
-        <Icon name="broom" size={24} color={theme.colors.violet} />
+        <Icon name="task" size={24} color={iconColor} />
         <View style={styles.taskText}>
           <Text style={styles.title}>{task.title}</Text>
           {!!task.description && (

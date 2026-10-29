@@ -17,6 +17,14 @@ export const styles = StyleSheet.create({
   approved: {
     borderColor: theme.colors.approvedBorder,
   },
+  new: {
+    overflow: 'hidden',
+    borderColor: theme.colors.childTintBorder,
+    backgroundColor: theme.colors.white,
+  },
+  fill: {
+    ...StyleSheet.absoluteFill,
+  },
   avatar: {
     width: 42,
     height: 42,
@@ -41,6 +49,9 @@ export const styles = StyleSheet.create({
   subtitleApproved: {
     color: theme.colors.success,
   },
+  subtitleNew: {
+    color: theme.colors.childDeep,
+  },
   reward: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
@@ -49,5 +60,8 @@ export const styles = StyleSheet.create({
   },
   rewardPending: {
     color: theme.colors.reviewAccent,
+  },
+  rewardNew: {
+    color: theme.colors.childDeep,
   },
 });

@@ -7,3 +7,4 @@ export * from './reward-presets';
 export * from './summary';
 export * from './tasks';
 export * from './wallet';
+export * from './wishlist';

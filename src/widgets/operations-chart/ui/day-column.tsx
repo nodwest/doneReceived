@@ -17,10 +17,23 @@ type DayColumnProps = {
   scale: number;
   selected: boolean;
   onPress: () => void;
+  /** Цвет выбранной даты: фиолетовый у родителя, голубой у ребёнка. */
+  tone?: 'parent' | 'child';
 };
 
+const SELECTED_GRADIENTS = {
+  parent: [theme.colors.violet, theme.colors.blue],
+  child: [theme.colors.childFrom, theme.colors.childDeep],
+} as const;
+
 /** Колонка барабана: столбик дня и дата под ним. */
-export function DayColumn({ day, scale, selected, onPress }: DayColumnProps) {
+export function DayColumn({
+  day,
+  scale,
+  selected,
+  onPress,
+  tone = 'parent',
+}: DayColumnProps) {
   const width = selected ? COLUMN_WIDTH_SELECTED : COLUMN_WIDTH;
   const lines = (
     <>
@@ -58,7 +71,7 @@ export function DayColumn({ day, scale, selected, onPress }: DayColumnProps) {
       </View>
       {selected ? (
         <LinearGradient
-          colors={[theme.colors.violet, theme.colors.blue]}
+          colors={SELECTED_GRADIENTS[tone]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           locations={[0, 0.7071]}

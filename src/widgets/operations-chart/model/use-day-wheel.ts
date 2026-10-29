@@ -9,6 +9,9 @@ import {
 import { DAY_SLOT_WIDTH } from '../config/sizes';
 
 const SETTLE_DELAY_WEB = 120;
+// Запас на плавную прокрутку после тапа: если лента так и не доехала до дня
+// (например, тап по уже выбранному), выбор снова следует за прокруткой.
+const TAP_SCROLL_TIMEOUT = 800;
 
 type DayWheelOptions = {
   count: number;
@@ -24,6 +27,10 @@ type DayWheelOptions = {
 export function useDayWheel({ count, index, onIndexChange }: DayWheelOptions) {
   const scrollRef = useRef<ScrollView>(null);
   const settleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // День, к которому лента едет после тапа: пока она в пути, промежуточные
+  // позиции выбор не меняют — иначе он метался бы между старым и новым днём.
+  const tapTarget = useRef<number | null>(null);
+  const tapTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [width, setWidth] = useState(0);
   // Лента уже прокручена к стартовому дню.
   const positioned = useRef(false);
@@ -31,7 +38,18 @@ export function useDayWheel({ count, index, onIndexChange }: DayWheelOptions) {
   // Отступы по краям, чтобы первый и последний день тоже вставали по центру.
   const sidePadding = Math.max((width - DAY_SLOT_WIDTH) / 2, 0);
 
-  useEffect(() => () => clearTimeout(settleTimer.current), []);
+  useEffect(
+    () => () => {
+      clearTimeout(settleTimer.current);
+      clearTimeout(tapTimer.current);
+    },
+    [],
+  );
+
+  const releaseTap = () => {
+    tapTarget.current = null;
+    clearTimeout(tapTimer.current);
+  };
 
   const clamp = (value: number) => Math.min(Math.max(value, 0), count - 1);
 
@@ -60,7 +78,12 @@ export function useDayWheel({ count, index, onIndexChange }: DayWheelOptions) {
     if (!positioned.current) return;
     const offsetX = event.nativeEvent.contentOffset.x;
     const next = clamp(Math.round(offsetX / DAY_SLOT_WIDTH));
-    if (next !== index) onIndexChange(next);
+    if (tapTarget.current !== null) {
+      // Лента доехала до дня из тапа — дальше выбор снова следует за ней.
+      if (next === tapTarget.current) releaseTap();
+    } else if (next !== index) {
+      onIndexChange(next);
+    }
     // В вебе нет примагничивания и событий окончания инерции: доводим после паузы.
     if (Platform.OS === 'web') {
       clearTimeout(settleTimer.current);
@@ -68,8 +91,13 @@ export function useDayWheel({ count, index, onIndexChange }: DayWheelOptions) {
     }
   };
 
-  /** Тап по дню: лента плавно доезжает до него. */
+  /** Тап по дню: он сразу выбран, лента плавно доезжает до него. */
   const select = (target: number) => {
+    if (target !== index) {
+      tapTarget.current = target;
+      clearTimeout(tapTimer.current);
+      tapTimer.current = setTimeout(releaseTap, TAP_SCROLL_TIMEOUT);
+    }
     scrollToIndex(target, true);
     onIndexChange(target);
   };
@@ -81,6 +109,8 @@ export function useDayWheel({ count, index, onIndexChange }: DayWheelOptions) {
     ready: width > 0,
     onLayout,
     onScroll,
+    // Пользователь сам взялся за ленту — выбор снова следует за прокруткой.
+    onScrollBeginDrag: releaseTap,
     select,
   };
 }

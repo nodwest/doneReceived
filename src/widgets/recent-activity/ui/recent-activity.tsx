@@ -1,15 +1,16 @@
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { ActivityItem, type Activity } from '@entities/activity';
 import { useTranslation } from '@shared/i18n';
 import { SectionHeader } from '@shared/ui';
 import { styles } from './recent-activity.styled';
 
 type RecentActivityProps = {
-  items: readonly Activity[];
+  /** Пункты ленты: ActivityItem у родителя, ChildActivityItem у ребёнка. */
+  children: ReactNode;
   onSeeAll?: () => void;
 };
 
-export function RecentActivity({ items, onSeeAll }: RecentActivityProps) {
+export function RecentActivity({ children, onSeeAll }: RecentActivityProps) {
   const { t } = useTranslation();
   return (
     <View style={styles.container}>
@@ -18,11 +19,7 @@ export function RecentActivity({ items, onSeeAll }: RecentActivityProps) {
         actionLabel={t('common.seeAll')}
         onAction={onSeeAll}
       />
-      <View style={styles.list}>
-        {items.map(({ id, ...item }) => (
-          <ActivityItem key={id} {...item} />
-        ))}
-      </View>
+      <View style={styles.list}>{children}</View>
     </View>
   );
 }

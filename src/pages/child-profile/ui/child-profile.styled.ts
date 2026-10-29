@@ -7,6 +7,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 24,
   },
+  // Карточки вишлиста в ленте одной высоты: короткая — с содержимым по центру.
+  wish: {
+    justifyContent: 'center',
+  },
   list: {
     gap: 6,
   },
