@@ -5,23 +5,34 @@ import { InviteCodesPanel } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
 import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
+import { ChildModeToggle } from '@features/switch-role';
 import { useInviteCodes } from '@entities/family';
+import { useViewerRole } from '@entities/user';
 import { getLanguageLabel, useLanguage, useTranslation } from '@shared/i18n';
-import { parentMock, profileSettingsMock } from '@shared/mocks';
+import {
+  childAccountMock,
+  parentMock,
+  profileSettingsMock,
+} from '@shared/mocks';
 import { SettingsRow, Toggle, type AnchorRect } from '@shared/ui';
 import { ProfileHero } from './profile-hero';
 import { styles } from './profile.styled';
 
 /**
- * Вкладка Profile: карточка вошедшего родителя и меню настроек. Пункты Family
- * codes и Join family показывают вместо меню панель кодов приглашения или
- * ввода кода (как на вкладке Family), крестик возвращает меню. Edit profile
- * открывает отдельную страницу. Language раскрывает выпадающий выбор
+ * Вкладка Profile: карточка вошедшего пользователя и меню настроек. Пункты
+ * Family codes и Join family показывают вместо меню панель кодов приглашения
+ * или ввода кода (как на вкладке Family), крестик возвращает меню. Edit
+ * profile открывает отдельную страницу. Language раскрывает выпадающий выбор
  * языка прямо у пункта. Остальные пункты пока не работают, тогл уведомлений
- * только переключается.
+ * только переключается. Временный тогл над Log out переключает роль: у
+ * ребёнка (Emma) голубая карточка, нет Family codes, а Join family ждёт
+ * детский код.
  */
 export function ProfilePage() {
   const { t } = useTranslation();
+  const role = useViewerRole();
+  const isChild = role === 'child';
+  const account = isChild ? childAccountMock : parentMock;
   const language = useLanguage();
   const { data: codes } = useInviteCodes();
   const [panel, setPanel] = useState<'codes' | 'join' | null>(null);
@@ -49,14 +60,15 @@ export function ProfilePage() {
       >
         <Text style={styles.title}>{t('profile.title')}</Text>
         <ProfileHero
-          name={parentMock.fullName}
-          email={parentMock.email}
-          avatar={parentMock.avatar}
+          name={account.fullName}
+          email={account.email}
+          avatar={account.avatar}
+          role={role}
         />
         {panel === 'codes' ? (
           <InviteCodesPanel codes={codes} onClose={closePanel} />
         ) : panel === 'join' ? (
-          <JoinFamilyPanel onClose={closePanel} />
+          <JoinFamilyPanel onClose={closePanel} role={role} />
         ) : (
           <>
             <View style={styles.menu}>
@@ -77,12 +89,16 @@ export function ProfilePage() {
                   />
                 }
               />
-              <View style={styles.divider} />
-              <SettingsRow
-                icon="key"
-                label={t('profile.familyCodes')}
-                onPress={() => setPanel('codes')}
-              />
+              {!isChild && (
+                <>
+                  <View style={styles.divider} />
+                  <SettingsRow
+                    icon="key"
+                    label={t('profile.familyCodes')}
+                    onPress={() => setPanel('codes')}
+                  />
+                </>
+              )}
               <View style={styles.divider} />
               <SettingsRow
                 icon="children"
@@ -100,6 +116,7 @@ export function ProfilePage() {
               <View style={styles.divider} />
               <SettingsRow icon="help" label={t('profile.help')} />
             </View>
+            <ChildModeToggle />
             <Pressable style={styles.logOut}>
               <Text style={styles.logOutText}>{t('profile.logOut')}</Text>
             </Pressable>

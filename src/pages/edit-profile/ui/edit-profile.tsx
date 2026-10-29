@@ -3,8 +3,9 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
+import { useViewerRole } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
-import { parentMock } from '@shared/mocks';
+import { childAccountMock, parentMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import {
   GradientButton,
@@ -17,14 +18,16 @@ import {
 import { styles } from './edit-profile.styled';
 
 /**
- * Редактирование профиля вошедшего родителя (из меню Profile): фото, имя,
- * почта, смена пароля и Save changes. Пока только вёрстка: фото, пароль и
- * сохранение ничего не делают, поля правятся только на экране.
+ * Редактирование профиля вошедшего пользователя (из меню Profile): фото, имя,
+ * почта, смена пароля и Save changes. В режиме ребёнка — данные Emma. Пока
+ * только вёрстка: фото, пароль и сохранение ничего не делают, поля правятся
+ * только на экране.
  */
 export function EditProfilePage() {
   const { t } = useTranslation();
-  const [name, setName] = useState(parentMock.fullName);
-  const [email, setEmail] = useState(parentMock.email);
+  const account = useViewerRole() === 'child' ? childAccountMock : parentMock;
+  const [name, setName] = useState(account.fullName);
+  const [email, setEmail] = useState(account.email);
 
   return (
     <TabScreen activeKey="profile">
@@ -51,7 +54,7 @@ export function EditProfilePage() {
             accessibilityLabel={t('editProfile.changePhoto')}
             style={styles.avatarWrap}
           >
-            <Image source={parentMock.avatar} style={styles.avatar} />
+            <Image source={account.avatar} style={styles.avatar} />
             <LinearGradient
               colors={[theme.colors.violet, theme.colors.blue]}
               start={{ x: 0, y: 0 }}

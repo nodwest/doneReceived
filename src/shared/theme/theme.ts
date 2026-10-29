@@ -65,6 +65,8 @@ export const theme = {
     parentTo: '#4254AD',
     childFrom: '#4A9EF0',
     childTo: '#A8D9FF',
+    // Конец градиента шапки профиля ребёнка.
+    childDeep: '#1E5FB8',
     // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
     heroSubtle: '#D9E0FF',
     violetIcon: '#EDE8FC',

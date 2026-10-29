@@ -8,9 +8,11 @@ export const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 24,
+    boxShadow: '0px 4px 6px rgba(26, 26, 46, 0.06)',
+  },
+  heroParent: {
     borderWidth: 1.5,
     borderColor: theme.colors.reviewBorder,
-    boxShadow: '0px 4px 6px rgba(26, 26, 46, 0.06)',
   },
   name: {
     fontSize: 22,

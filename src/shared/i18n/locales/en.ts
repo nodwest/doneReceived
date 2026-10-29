@@ -93,6 +93,8 @@ export const en = {
   joinFamily: {
     title: 'Join a family',
     hint: 'Got an invite code from another parent? Enter it to join their family as a parent.',
+    childHint:
+      'Got an invite code from your parents? Enter it to join their family.',
     codeLabel: 'Invite code',
     parentCodeHint: 'The other parent finds it in Family → + Family member.',
     childCodeHint: 'Parents find it in Family → + Family member.',
@@ -287,6 +289,7 @@ export const en = {
     language: 'Language',
     help: 'Help & support',
     logOut: 'Log out',
+    childMode: 'Child mode (temporary)',
   },
 };
 
