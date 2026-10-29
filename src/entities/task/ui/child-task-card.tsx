@@ -1,6 +1,5 @@
 import {
   Image,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -17,7 +16,7 @@ import {
   useNow,
 } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { Icon, type IconName } from '@shared/ui';
+import { Icon, SourceTile, type IconName } from '@shared/ui';
 import type { Task, TaskAssignee } from '../model';
 import { CardHeader, RewardHighlight, TaskInfo } from './task-card-parts';
 import { styles as cardStyles } from './task-card.styled';
@@ -161,30 +160,18 @@ type PhotoSourceProps = {
 /** Половина зоны фото: пунктирная плитка с иконкой и подпись под ней. */
 function PhotoSource({ icon, label, onPress }: PhotoSourceProps) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={({ pressed }) => [styles.source, pressed && styles.pressed]}
-    >
-      <View style={styles.sourceTile}>
-        <ZoneFill strong />
-        <Icon name={icon} size={26} color={theme.colors.childFrom} />
-      </View>
+    <View style={styles.source}>
+      <SourceTile icon={icon} accessibilityLabel={label} onPress={onPress} />
       <Text style={styles.sourceLabel}>{label}</Text>
-    </Pressable>
+    </View>
   );
 }
 
-/** Лёгкая голубая заливка под пунктирной рамкой (у плиток чуть плотнее). */
-function ZoneFill({ strong }: { strong?: boolean }) {
+/** Лёгкая голубая заливка под пунктирной рамкой зоны фото. */
+function ZoneFill() {
   return (
     <LinearGradient
-      colors={
-        strong
-          ? [theme.colors.childTint, theme.colors.childTintLight]
-          : ['rgba(74, 158, 240, 0.1)', 'rgba(168, 217, 255, 0.08)']
-      }
+      colors={['rgba(74, 158, 240, 0.1)', 'rgba(168, 217, 255, 0.08)']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       locations={[0, 0.7071]}

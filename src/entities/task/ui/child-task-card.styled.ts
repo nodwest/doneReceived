@@ -60,18 +60,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  pressed: {
-    opacity: 0.7,
-  },
-  sourceTile: {
-    ...DASHED,
-    width: 72,
-    height: 72,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 18,
-    borderColor: 'rgba(74, 158, 240, 0.6)',
-  },
   sourceLabel: {
     fontSize: 15,
     letterSpacing: tracking(15),

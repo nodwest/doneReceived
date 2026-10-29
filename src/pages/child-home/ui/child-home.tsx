@@ -8,7 +8,7 @@ import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import { TaskCarousel } from '@widgets/task-carousel';
-import { WishlistStub } from '@widgets/wishlist-preview';
+import { WishlistPreview } from '@widgets/wishlist-preview';
 import { ChildActivityItem } from '@entities/activity';
 import {
   ChildTaskTile,
@@ -17,12 +17,12 @@ import {
   useTasks,
   type Task,
 } from '@entities/task';
+import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import {
   childAccountMock,
   childActivityMock,
   childProfilesMock,
-  wishlistPreviewMock,
 } from '@shared/mocks';
 import { styles } from './child-home.styled';
 
@@ -37,8 +37,8 @@ function greetingKey(hour: number) {
 
 /**
  * Главная ребёнка (Emma, временный режим ребёнка из профиля): баланс и
- * счётчики заданий, карусель активных заданий с I did it!, заглушка
- * вишлиста и лента событий. Тап по заданию открывает его карточку на
+ * счётчики заданий, карусель активных заданий с I did it!, плитка
+ * вишлиста (текущее желание) и лента событий. Тап по заданию открывает его карточку на
  * вкладке Tasks.
  */
 export function ChildHomePage() {
@@ -57,6 +57,7 @@ export function ChildHomePage() {
   const balance =
     childProfilesMock.find((child) => child.id === childAccountMock.id)
       ?.balance ?? 0;
+  const wishlist = useWishlistProgress(childAccountMock.id, balance);
 
   const openTask = (task: Task) =>
     router.push({ pathname: '/tasks', params: { task: String(task.id) } });
@@ -107,7 +108,11 @@ export function ChildHomePage() {
               )}
             />
           )}
-          <WishlistStub {...wishlistPreviewMock} />
+          <WishlistPreview
+            readyCount={wishlist.readyCount}
+            current={wishlist.current}
+            onPress={() => router.push('/wishlist')}
+          />
           <RecentActivity>
             {childActivityMock.map(({ id, ...item }) => (
               <ChildActivityItem key={id} {...item} />

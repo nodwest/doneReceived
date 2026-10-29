@@ -12,7 +12,8 @@ type ViewerRoleState = {
  * ребёнка; живёт до перезапуска.
  */
 export const useViewerRoleStore = create<ViewerRoleState>((set) => ({
-  role: 'parent',
+  // Пока разрабатываем экраны ребёнка, приложение открывается от его лица.
+  role: 'child',
   setRole: (role) => set({ role }),
 }));
 

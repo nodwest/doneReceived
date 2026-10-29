@@ -1,1 +1,1 @@
-export * from './ui/wishlist-stub';
+export * from './ui/wishlist-preview';

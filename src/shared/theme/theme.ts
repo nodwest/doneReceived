@@ -73,9 +73,24 @@ export const theme = {
     childTintLight: 'rgba(168, 217, 255, 0.09)',
     childTintBorder: 'rgba(74, 158, 240, 0.18)',
     childChip: 'rgba(74, 158, 240, 0.14)',
-    // Чип «1 ready to buy» на плитке вишлиста.
+    // Вишлист: желание, которое уже можно купить (зелёное), и ждущее
+    // очереди (серое). readySoft / readyText — и чип «1 ready to buy».
     readySoft: '#E3F7EB',
     readyText: '#1E9A5C',
+    readyBorder: 'rgba(46, 184, 115, 0.35)',
+    readyTint: 'rgba(46, 184, 115, 0.16)',
+    readyTintLight: 'rgba(168, 235, 198, 0.1)',
+    readyIconBg: 'rgba(30, 154, 92, 0.14)',
+    waitingIconBg: 'rgba(138, 143, 163, 0.14)',
+    // Удаление: кнопка Delete у смахнутой строки и Delete wish в шторке.
+    dangerAction: '#FF5A5F',
+    dangerSoft: 'rgba(255, 90, 95, 0.1)',
+    dangerText: '#E5484D',
+    // Формы в шторках: подсказка в пустом поле, фон кнопки закрытия,
+    // ручка перетаскивания строки.
+    placeholderSoft: '#A9ADBD',
+    closeBg: '#F1F2F7',
+    dragHandle: '#B4B8C6',
     // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
     heroSubtle: '#D9E0FF',
     violetIcon: '#EDE8FC',

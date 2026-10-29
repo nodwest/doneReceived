@@ -139,8 +139,34 @@ export function useSnapCarousel({
     scrollRef.current?.scrollTo({ x: page * interval, animated: true });
   };
 
-  const onLayout = (event: LayoutChangeEvent) =>
-    setWidth(event.nativeEvent.layout.width);
+  // Ставит ленту на карточку, где она остановилась, без анимации.
+  const realign = () => {
+    if (pendingIndex.current !== null || cardWidth <= 0) return;
+    scrollRef.current?.scrollTo({
+      x: settledPage.current * interval,
+      animated: false,
+    });
+  };
+
+  // Ширина изменилась (поворот, окно браузера): шаг другой, встаём на ту же карточку.
+  useLayoutEffect(() => {
+    if (pendingIndex.current !== null || interval <= gap) return;
+    scrollRef.current?.scrollTo({
+      x: settledPage.current * interval,
+      animated: false,
+    });
+  }, [interval, gap]);
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    const next = event.nativeEvent.layout.width;
+    // Нулевая ширина — экран ушёл вглубь стека (в вебе он display: none). Если её
+    // принять, карточки сожмутся, браузер обрежет прокрутку, и после «назад»
+    // лента встанет на соседнюю карточку. Оставляем прежнюю ширину.
+    if (next === 0) return;
+    // Экран снова виден: браузер мог сбросить прокрутку скрытой ленты.
+    if (next === width) realign();
+    else setWidth(next);
+  };
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     // До стартовой прокрутки события скролла говорят о нулевой позиции: пропускаем.

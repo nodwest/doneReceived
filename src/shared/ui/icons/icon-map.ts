@@ -38,6 +38,13 @@ import { TaskIcon } from './task';
 import { GiftIcon } from './gift';
 import { CameraOutlineIcon } from './camera-outline';
 import { ImageAddIcon } from './image-add';
+import { BagCheckIcon } from './bag-check';
+import { DragHandleIcon } from './drag-handle';
+import { PencilIcon } from './pencil';
+import { TrashIcon } from './trash';
+import { LinkIcon } from './link';
+import { NoteIcon } from './note';
+import { ExternalIcon } from './external';
 
 export const icons = {
   price: PriceIcon,
@@ -80,4 +87,11 @@ export const icons = {
   gift: GiftIcon,
   'camera-outline': CameraOutlineIcon,
   'image-add': ImageAddIcon,
+  'bag-check': BagCheckIcon,
+  'drag-handle': DragHandleIcon,
+  pencil: PencilIcon,
+  trash: TrashIcon,
+  link: LinkIcon,
+  note: NoteIcon,
+  external: ExternalIcon,
 };

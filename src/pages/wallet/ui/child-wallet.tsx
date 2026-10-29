@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
-import { WishlistStub } from '@widgets/wishlist-preview';
+import { WishlistPreview } from '@widgets/wishlist-preview';
 import {
   OperationRow,
   operationsInPeriod,
@@ -11,12 +11,9 @@ import {
   type Operation,
 } from '@entities/operation';
 import { TaskIconBadge } from '@entities/task';
+import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import {
-  childAccountMock,
-  childProfilesMock,
-  wishlistPreviewMock,
-} from '@shared/mocks';
+import { childAccountMock, childProfilesMock } from '@shared/mocks';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { RewardsHistoryLink } from './rewards-history-link';
@@ -28,7 +25,7 @@ const RECENT_REWARDS = 4;
 
 /**
  * Вкладка Wallet у ребёнка (Emma, временный режим ребёнка): баланс с
- * заработанным за неделю и Withdraw (пока не работает), заглушка вишлиста,
+ * заработанным за неделю и Withdraw (пока не работает), плитка вишлиста,
  * ссылка на историю наград и последние начисленные награды.
  */
 export function ChildWalletPage() {
@@ -53,6 +50,7 @@ export function ChildWalletPage() {
   const balance =
     childProfilesMock.find((child) => child.id === childAccountMock.id)
       ?.balance ?? 0;
+  const wishlist = useWishlistProgress(childAccountMock.id, balance);
   const recent = earned.slice(0, RECENT_REWARDS);
   const openHistory = () => router.push('/rewards-history');
 
@@ -64,7 +62,11 @@ export function ChildWalletPage() {
       >
         <Text style={styles.title}>{t('wallet.title')}</Text>
         <BalanceCard role="child" balance={balance} weekEarned={weekEarned} />
-        <WishlistStub {...wishlistPreviewMock} />
+        <WishlistPreview
+          readyCount={wishlist.readyCount}
+          current={wishlist.current}
+          onPress={() => router.push('/wishlist')}
+        />
         <RewardsHistoryLink onPress={openHistory} />
         <View style={styles.sectionHeader}>
           <SectionHeader
