@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -18,28 +19,42 @@ const SWIPE_SLOP = 8;
 // Быстрый смах открывает или закрывает действия, даже если сдвиг короткий.
 const FLING_VELOCITY = 0.5;
 const ANIMATION_MS = 180;
+// Сопротивление, если тянуть дальше открытых действий: как резинка у
+// прокрутки в iOS — чем дальше, тем туже, но не дальше ширины действий.
+const RUBBER_BAND = 0.55;
+
+const rubberBand = (overshoot: number, limit: number) =>
+  (1 - 1 / ((overshoot * RUBBER_BAND) / limit + 1)) * limit;
 
 type SwipeableRowProps = {
   /** Действия открыты: строка сдвинута влево. */
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Кнопки под строкой у правого края (Edit, Delete). */
-  actions: ReactNode;
+  /** Закрытую строку начали смахивать: родитель сразу закрывает открытую. */
+  onSwipeStart?: () => void;
+  /** Кнопки под строкой у правого края (Edit, Delete), слева направо. */
+  actions: ReactNode[];
   /** На сколько сдвигается строка, открывая действия. */
   actionsWidth: number;
+  /** Промежуток между кнопками. */
+  actionsGap?: number;
   children: ReactNode;
 };
 
 /**
  * Строка, которую смахивают влево: из-под неё выезжают действия. Тап по
  * открытой строке закрывает её. Открытостью управляет родитель — так
- * открытой остаётся только одна строка списка.
+ * открытой остаётся только одна строка списка. Если тянуть дальше
+ * действий, строка идёт туго, как резинка, а промежутки между строкой,
+ * кнопками и правым краем растут поровну; отпустили — встаёт на место.
  */
 export function SwipeableRow({
   open,
   onOpenChange,
+  onSwipeStart,
   actions,
   actionsWidth,
+  actionsGap = 0,
   children,
 }: SwipeableRowProps) {
   const [offset] = useState(() => new Animated.Value(0));
@@ -48,17 +63,19 @@ export function SwipeableRow({
   const [revealed, setRevealed] = useState(open);
   if (open && !revealed) setRevealed(true);
   // Свежие пропсы для обработчиков жеста, которые создаются один раз.
-  const latest = useRef({ open, onOpenChange, actionsWidth });
+  const latest = useRef({ open, onOpenChange, onSwipeStart, actionsWidth });
   useLayoutEffect(() => {
-    latest.current = { open, onOpenChange, actionsWidth };
+    latest.current = { open, onOpenChange, onSwipeStart, actionsWidth };
   });
   // Где была строка, когда палец её взял.
   const startX = useRef(0);
 
+  // После жеста строка доезжает пружиной: из растянутой резинки — мягко.
   const animateTo = (toOpen: boolean) =>
-    Animated.timing(offset, {
+    Animated.spring(offset, {
       toValue: toOpen ? -latest.current.actionsWidth : 0,
-      duration: ANIMATION_MS,
+      speed: 20,
+      bounciness: 0,
       useNativeDriver: false,
     }).start(({ finished }) => {
       if (finished && !toOpen) setRevealed(false);
@@ -82,13 +99,15 @@ export function SwipeableRow({
     onPanResponderTerminationRequest: () => false,
     onPanResponderGrant: () => {
       setRevealed(true);
+      if (!latest.current.open) latest.current.onSwipeStart?.();
       offset.stopAnimation((value) => {
         startX.current = value;
       });
     },
     onPanResponderMove: (_, { dx }) => {
       const width = latest.current.actionsWidth;
-      offset.setValue(Math.min(Math.max(startX.current + dx, -width), 0));
+      const x = Math.min(startX.current + dx, 0);
+      offset.setValue(x < -width ? -width - rubberBand(-width - x, width) : x);
     },
     onPanResponderRelease: (_, { dx, vx }) => {
       const { open: wasOpen, actionsWidth: width } = latest.current;
@@ -111,16 +130,39 @@ export function SwipeableRow({
     extrapolate: 'clamp',
   });
 
+  // Растяжение резинки делится поровну между промежутками: слева от
+  // кнопок (его даёт ширина подложки), между ними и справа.
+  const stretch = (base: number) =>
+    offset.interpolate({
+      inputRange: [-2 * actionsWidth, -actionsWidth],
+      outputRange: [base + actionsWidth / (actions.length + 1), base],
+      extrapolate: 'clamp',
+    });
+  const actionsSpan = offset.interpolate({
+    inputRange: [-2 * actionsWidth, -actionsWidth],
+    outputRange: [2 * actionsWidth, actionsWidth],
+    extrapolate: 'clamp',
+  });
+
   return (
     <View>
       {revealed && (
         <Animated.View
           style={[
             styles.actions,
-            { width: actionsWidth, opacity: actionsOpacity },
+            { width: actionsSpan, opacity: actionsOpacity },
           ]}
         >
-          {actions}
+          {actions.map((action, index) => (
+            <Fragment key={index}>
+              {action}
+              <Animated.View
+                style={{
+                  width: stretch(index < actions.length - 1 ? actionsGap : 0),
+                }}
+              />
+            </Fragment>
+          ))}
         </Animated.View>
       )}
       <Animated.View

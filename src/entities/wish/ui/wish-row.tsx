@@ -1,8 +1,7 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Image,
   Pressable,
-  StyleSheet,
   Text,
   View,
   type StyleProp,
@@ -18,7 +17,7 @@ import { styles } from './wish-row.styled';
 type WishRowProps = WishProgress & {
   /** Справа от строки: ручка перетаскивания. */
   aside?: ReactNode;
-  /** Под строкой: кнопка у готового желания (Ask parent to buy). */
+  /** Вместо чипа статуса: пилюля Ask to buy у готового желания. */
   action?: ReactNode;
   /** Строку сейчас перетаскивают: тень сильнее. */
   lifted?: boolean;
@@ -28,26 +27,23 @@ type WishRowProps = WishProgress & {
   style?: StyleProp<ViewStyle>;
 };
 
-// Подложка строки: зелёная у готового, голубая у наполняемого.
-const TINTS = {
-  ready: [theme.colors.readyTint, theme.colors.readyTintLight],
-  current: [theme.colors.childTint, theme.colors.childTintLight],
-} as const;
-
 const FILLS = {
   ready: [theme.colors.earned, theme.colors.readyText],
   current: [theme.colors.childFrom, theme.colors.childDeep],
 } as const;
 
 /**
- * Желание в вишлисте: фото или иконка, название, цена и сколько накоплено.
- * Готовое — зелёное с «Ready to buy», наполняемое — голубое с «$27 of $45»,
- * ждущее — серое с пустой полосой.
+ * Желание в вишлисте: фото или иконка, название с чипом, полоса и строка
+ * «сколько накоплено — сколько осталось». Все строки одной высоты.
+ * Готовое — зелёное (Ready to buy или Ask to buy), наполняемое — голубое
+ * («60%», «$18 to go»), ждущее — индиго («#3 in queue», «Starts after …»).
  */
 export function WishRow({
   wish,
   status,
   saved,
+  position,
+  after,
   aside,
   action,
   lifted,
@@ -55,29 +51,31 @@ export function WishRow({
   style,
 }: WishRowProps) {
   const { t } = useTranslation();
+  // Ширина кнопки в шапке: столько места не занимает название.
+  const [actionWidth, setActionWidth] = useState(0);
   const waiting = status === 'waiting';
   const progress = wish.price > 0 ? Math.min(saved / wish.price, 1) : 1;
 
+  const chip =
+    status === 'ready'
+      ? t('wishlist.readyChip')
+      : status === 'current'
+        ? `${Math.round(progress * 100)}%`
+        : t('wishCard.inQueue', { position });
+  const left = waiting
+    ? t('wishlist.goal', { price: wish.price })
+    : t('wishlist.savedOf', { saved, price: wish.price });
+  const right =
+    status === 'ready'
+      ? t('wishlist.fullySaved')
+      : status === 'current'
+        ? t('wishlist.toGo', { amount: wish.price - saved })
+        : after && t('wishlist.startsAfter', { title: after });
+
   return (
-    <View
-      style={[
-        styles.card,
-        status === 'ready' && styles.cardReady,
-        status === 'current' && styles.cardCurrent,
-        lifted && styles.cardLifted,
-        style,
-      ]}
-    >
-      {!waiting && (
-        <LinearGradient
-          colors={TINTS[status]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
-      <View style={styles.row}>
-        {/* Нажимается фото и текст: ручка и кнопка — соседние, не вложенные
+    <View style={[styles.card, styles[status], lifted && styles.lifted, style]}>
+      <View style={styles.body}>
+        {/* Нажимается фото и текст: кнопка и ручка — соседние, не вложенные
             (на вебе кнопка внутри кнопки — невалидный HTML). */}
         <Pressable
           accessibilityRole="button"
@@ -90,14 +88,21 @@ export function WishRow({
           <View style={styles.info}>
             <View style={styles.head}>
               <Text
-                style={[styles.title, waiting && styles.textWaiting]}
+                style={[
+                  styles.title,
+                  action ? { marginRight: actionWidth } : null,
+                ]}
                 numberOfLines={1}
               >
                 {wish.title}
               </Text>
-              <Text style={[styles.price, waiting && styles.textWaiting]}>
-                ${wish.price}
-              </Text>
+              {!action && (
+                <View style={[styles.chip, styles[`${status}Chip`]]}>
+                  <Text style={[styles.chipText, styles[`${status}Text`]]}>
+                    {chip}
+                  </Text>
+                </View>
+              )}
             </View>
             <View style={[styles.track, waiting && styles.trackWaiting]}>
               {!waiting && progress > 0 && (
@@ -110,21 +115,48 @@ export function WishRow({
                 />
               )}
             </View>
-            {status === 'ready' && (
-              <View style={styles.chip}>
-                <Text style={styles.chipText}>{t('wishlist.readyChip')}</Text>
-              </View>
-            )}
-            {status === 'current' && (
-              <Text style={styles.saved}>
-                {t('wishlist.savedOf', { saved, price: wish.price })}
+            <View style={styles.meta}>
+              <Text
+                style={[styles.amount, !waiting && styles[`${status}Text`]]}
+              >
+                {left}
               </Text>
-            )}
+              {right && (
+                <View style={styles.note}>
+                  <Text
+                    style={[
+                      styles.noteText,
+                      status === 'ready' && styles.readyText,
+                      waiting && styles.noteWaiting,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {right}
+                  </Text>
+                  {status === 'ready' && (
+                    <Icon
+                      name="check"
+                      size={12}
+                      color={theme.colors.readyText}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
           </View>
         </Pressable>
-        {aside}
+        {action && (
+          <View
+            style={styles.action}
+            onLayout={(event) =>
+              setActionWidth(event.nativeEvent.layout.width + 8)
+            }
+          >
+            {action}
+          </View>
+        )}
       </View>
-      {action}
+      {aside}
     </View>
   );
 }
@@ -145,7 +177,7 @@ export function WishThumb({
         locations={[0, 0.7071]}
         style={styles.icon}
       >
-        <Icon name="gift" size={22} color={theme.colors.white} />
+        <Icon name="gift" size={26} color={theme.colors.white} />
       </LinearGradient>
     );
   }
@@ -158,8 +190,10 @@ export function WishThumb({
     >
       <Icon
         name={status === 'ready' ? 'bag-check' : 'gift'}
-        size={22}
-        color={status === 'ready' ? theme.colors.readyText : theme.colors.grey}
+        size={26}
+        color={
+          status === 'ready' ? theme.colors.readyText : theme.colors.queueText
+        }
       />
     </View>
   );

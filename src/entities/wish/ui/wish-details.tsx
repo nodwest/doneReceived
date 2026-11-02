@@ -27,7 +27,7 @@ type WishDetailsProps = WishProgress & {
 const CHIPS: Record<WishStatus, { bg: string; text: string }> = {
   ready: { bg: theme.colors.readySoft, text: theme.colors.readyText },
   current: { bg: theme.colors.childChip, text: theme.colors.childDeep },
-  waiting: { bg: theme.colors.waitingIconBg, text: theme.colors.inkSoft },
+  waiting: { bg: theme.colors.queueSoft, text: theme.colors.queueText },
 };
 
 const FILLS = {

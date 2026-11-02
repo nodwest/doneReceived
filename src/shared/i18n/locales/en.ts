@@ -291,6 +291,11 @@ export const en = {
     savedOf: '${{saved}} of ${{price}}',
     readyChip: 'Ready to buy',
     askToBuy: 'Ask parent to buy',
+    askToBuyShort: 'Ask to buy',
+    fullySaved: 'Fully saved',
+    toGo: '${{amount}} to go',
+    goal: 'Goal ${{price}}',
+    startsAfter: 'Starts after {{title}}',
     askedToast: 'We asked your parents!',
     balance: 'Your balance ${{balance}}',
     balanceHint:

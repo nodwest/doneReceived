@@ -73,15 +73,20 @@ export const theme = {
     childTintLight: 'rgba(168, 217, 255, 0.09)',
     childTintBorder: 'rgba(74, 158, 240, 0.18)',
     childChip: 'rgba(74, 158, 240, 0.14)',
-    // Вишлист: желание, которое уже можно купить (зелёное), и ждущее
-    // очереди (серое). readySoft / readyText — и чип «1 ready to buy».
+    // Вишлист: желание, которое уже можно купить (зелёное), наполняемое
+    // (голубое) и ждущее очереди (индиго, как parentTo). readySoft /
+    // readyText — и чип «1 ready to buy».
     readySoft: '#E3F7EB',
     readyText: '#1E9A5C',
-    readyBorder: 'rgba(46, 184, 115, 0.35)',
-    readyTint: 'rgba(46, 184, 115, 0.16)',
-    readyTintLight: 'rgba(168, 235, 198, 0.1)',
+    readyBg: '#F1FBF5',
+    readyBorder: 'rgba(46, 184, 115, 0.5)',
     readyIconBg: 'rgba(30, 154, 92, 0.14)',
-    waitingIconBg: 'rgba(138, 143, 163, 0.14)',
+    currentBg: '#F2F8FF',
+    queueBg: '#ECEFF9',
+    queueText: '#4254AD',
+    queueBorder: 'rgba(66, 84, 173, 0.35)',
+    queueSoft: 'rgba(66, 84, 173, 0.12)',
+    queueIconBg: 'rgba(66, 84, 173, 0.14)',
     // Удаление: кнопка Delete у смахнутой строки и Delete wish в шторке.
     dangerAction: '#FF5A5F',
     dangerSoft: 'rgba(255, 90, 95, 0.1)',
