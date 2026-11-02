@@ -59,14 +59,14 @@ export const styles = StyleSheet.create({
     color: theme.colors.readyText,
   },
   track: {
-    height: 10,
-    borderRadius: 5,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: theme.colors.line,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    borderRadius: 5,
+    borderRadius: 3,
   },
   progressText: {
     flexDirection: 'row',
