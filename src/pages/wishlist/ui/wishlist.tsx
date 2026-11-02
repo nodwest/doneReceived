@@ -13,7 +13,7 @@ import { showToast } from '@shared/lib';
 import { childAccountMock, childProfilesMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import { Icon, RoundButton, SortableList, SwipeableRow } from '@shared/ui';
-import { ACTIONS_WIDTH, styles } from './wishlist.styled';
+import { ACTIONS_GAP, ACTIONS_WIDTH, styles } from './wishlist.styled';
 
 /**
  * Вишлист ребёнка (Emma, временный режим ребёнка; открывается с плиток
@@ -98,7 +98,7 @@ export function WishlistPage() {
         )}
         <SortableList
           data={progress}
-          gap={8}
+          gap={10}
           keyExtractor={(item) => item.wish.id}
           onDragActiveChange={(active) => {
             setDragging(active);
@@ -109,37 +109,37 @@ export function WishlistPage() {
             <SwipeableRow
               open={openId === item.wish.id}
               onOpenChange={(open) => setOpenId(open ? item.wish.id : null)}
+              onSwipeStart={() => setOpenId(null)}
               actionsWidth={ACTIONS_WIDTH}
-              actions={
-                <View style={styles.actions}>
-                  <Pressable
-                    accessibilityRole="button"
-                    onPress={() => openSheet(item.wish)}
-                    style={({ pressed }) => [
-                      styles.action,
-                      styles.edit,
-                      pressed && styles.pressed,
-                    ]}
-                  >
-                    <Icon name="pencil" size={20} color={theme.colors.white} />
-                    <Text style={styles.actionLabel}>{t('wishlist.edit')}</Text>
-                  </Pressable>
-                  <Pressable
-                    accessibilityRole="button"
-                    onPress={() => remove(item.wish)}
-                    style={({ pressed }) => [
-                      styles.action,
-                      styles.delete,
-                      pressed && styles.pressed,
-                    ]}
-                  >
-                    <Icon name="trash" size={20} color={theme.colors.white} />
-                    <Text style={styles.actionLabel}>
-                      {t('wishlist.delete')}
-                    </Text>
-                  </Pressable>
-                </View>
-              }
+              actionsGap={ACTIONS_GAP}
+              actions={[
+                <Pressable
+                  key="edit"
+                  accessibilityRole="button"
+                  onPress={() => openSheet(item.wish)}
+                  style={({ pressed }) => [
+                    styles.action,
+                    styles.edit,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <Icon name="pencil" size={20} color={theme.colors.white} />
+                  <Text style={styles.actionLabel}>{t('wishlist.edit')}</Text>
+                </Pressable>,
+                <Pressable
+                  key="delete"
+                  accessibilityRole="button"
+                  onPress={() => remove(item.wish)}
+                  style={({ pressed }) => [
+                    styles.action,
+                    styles.delete,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <Icon name="trash" size={20} color={theme.colors.white} />
+                  <Text style={styles.actionLabel}>{t('wishlist.delete')}</Text>
+                </Pressable>,
+              ]}
             >
               <WishRow
                 {...item}
@@ -163,7 +163,7 @@ export function WishlistPage() {
                     />
                   </View>
                 }
-                action={item.status === 'ready' && <AskToBuyButton />}
+                action={item.status === 'ready' && <AskToBuyButton compact />}
               />
             </SwipeableRow>
           )}

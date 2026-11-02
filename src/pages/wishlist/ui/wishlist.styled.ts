@@ -1,7 +1,9 @@
 import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
-// Ширина открытых действий: две кнопки по 60, промежуток 8 и отступ 12.
+// Действия у смахнутой строки: две кнопки по 60, промежуток 8 и отступ 12
+// от строки.
+export const ACTIONS_GAP = 8;
 export const ACTIONS_WIDTH = 140;
 
 export const styles = StyleSheet.create({
@@ -50,10 +52,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
   action: {
     width: 60,
     height: 60,
@@ -61,6 +59,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 4,
     borderRadius: 18,
+    // Нейтральная тень: широкая мягкая и плотная у края — кнопка приподнята.
+    boxShadow:
+      '0px 8px 16px rgba(26, 26, 46, 0.24), 0px 2px 4px rgba(26, 26, 46, 0.12)',
   },
   edit: {
     backgroundColor: theme.colors.childFrom,

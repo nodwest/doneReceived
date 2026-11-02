@@ -11,6 +11,10 @@ export interface WishProgress {
   status: WishStatus;
   /** Сколько из баланса уже отложено на это желание. */
   saved: number;
+  /** Место в очереди, с 1. */
+  position: number;
+  /** Название желания выше: ждущее начнёт копиться после него. */
+  after: string | null;
 }
 
 /**
@@ -24,18 +28,22 @@ export function allocateBalance(
 ): WishProgress[] {
   let left = balance;
   let currentFound = false;
-  return wishes.map((wish) => {
+  return wishes.map((wish, index) => {
+    const place = {
+      position: index + 1,
+      after: index > 0 ? wishes[index - 1].title : null,
+    };
     if (!currentFound && left >= wish.price) {
       left -= wish.price;
-      return { wish, status: 'ready', saved: wish.price };
+      return { wish, status: 'ready', saved: wish.price, ...place };
     }
     if (!currentFound) {
       currentFound = true;
       const saved = left;
       left = 0;
-      return { wish, status: 'current', saved };
+      return { wish, status: 'current', saved, ...place };
     }
-    return { wish, status: 'waiting', saved: 0 };
+    return { wish, status: 'waiting', saved: 0, ...place };
   });
 }
 

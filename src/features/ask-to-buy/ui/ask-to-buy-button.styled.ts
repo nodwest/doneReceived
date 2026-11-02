@@ -10,6 +10,19 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     boxShadow: '0px 6px 14px rgba(30, 154, 92, 0.22)',
   },
+  compact: {
+    height: 24,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    backgroundColor: theme.colors.readyText,
+  },
+  compactLabel: {
+    fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.white,
+  },
   pressed: {
     opacity: 0.85,
   },

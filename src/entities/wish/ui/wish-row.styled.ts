@@ -3,118 +3,163 @@ import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   card: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
     paddingVertical: 12,
-    paddingLeft: 10,
-    paddingRight: 14,
+    paddingLeft: 12,
+    paddingRight: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
     overflow: 'hidden',
     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.04)',
   },
-  cardReady: {
+  ready: {
     borderColor: theme.colors.readyBorder,
+    backgroundColor: theme.colors.readyBg,
   },
-  cardCurrent: {
+  // Рамка толще на 0.5 — отступы меньше на 0.5, чтобы высота не менялась.
+  current: {
+    paddingVertical: 11.5,
+    paddingLeft: 11.5,
+    paddingRight: 9.5,
     borderWidth: 1.5,
-    borderColor: 'rgba(74, 158, 240, 0.45)',
+    borderColor: theme.colors.childFrom,
+    backgroundColor: theme.colors.currentBg,
+  },
+  waiting: {
+    borderColor: theme.colors.queueBorder,
+    backgroundColor: theme.colors.queueBg,
   },
   // Поднятая строка, пока её перетаскивают.
-  cardLifted: {
+  lifted: {
     boxShadow: '0px 12px 24px rgba(26, 26, 46, 0.16)',
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  body: {
+    flex: 1,
   },
   main: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   pressed: {
     opacity: 0.7,
   },
   icon: {
-    width: 44,
-    height: 44,
+    width: 56,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
+    borderRadius: 16,
   },
   iconReady: {
     backgroundColor: theme.colors.readyIconBg,
   },
   iconWaiting: {
-    backgroundColor: theme.colors.waitingIconBg,
+    backgroundColor: theme.colors.queueIconBg,
   },
   photo: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 56,
+    height: 56,
+    borderRadius: 16,
   },
   info: {
     flex: 1,
-    gap: 6,
+    gap: 8,
   },
+  // Шапка, полоса и нижняя строка фиксированной высоты: карточки всех
+  // статусов одинаковые.
   head: {
+    height: 24,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
   title: {
     flex: 1,
-    fontSize: 15,
-    letterSpacing: tracking(15),
+    fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
-  price: {
-    fontSize: 15,
-    letterSpacing: tracking(15),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+  // Кнопка в шапке: лежит поверх строки, а не внутри нажимаемой области.
+  action: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    height: 24,
+    justifyContent: 'center',
   },
-  textWaiting: {
-    color: theme.colors.inkSoft,
+  chip: {
+    height: 24,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    borderRadius: 12,
+  },
+  readyChip: {
+    backgroundColor: theme.colors.readySoft,
+  },
+  currentChip: {
+    backgroundColor: theme.colors.childChip,
+  },
+  waitingChip: {
+    backgroundColor: theme.colors.queueSoft,
+  },
+  chipText: {
+    fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.bold,
+  },
+  readyText: {
+    color: theme.colors.readyText,
+  },
+  currentText: {
+    color: theme.colors.childDeep,
+  },
+  waitingText: {
+    color: theme.colors.queueText,
   },
   track: {
-    height: 8,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.line,
     overflow: 'hidden',
   },
   trackWaiting: {
-    borderWidth: 0,
-    backgroundColor: theme.colors.line,
+    backgroundColor: theme.colors.queueSoft,
   },
   fill: {
     height: '100%',
-    borderRadius: 4,
+    borderRadius: 3,
   },
-  chip: {
-    alignSelf: 'flex-start',
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: theme.colors.readySoft,
+  meta: {
+    height: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
   },
-  chipText: {
-    fontSize: 11,
-    letterSpacing: tracking(11),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.readyText,
+  amount: {
+    fontSize: 13,
+    letterSpacing: tracking(13),
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.ink,
   },
-  saved: {
+  note: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  noteText: {
+    flexShrink: 1,
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.childDeep,
+    color: theme.colors.grey,
+  },
+  noteWaiting: {
+    color: theme.colors.inkSoft,
   },
 });

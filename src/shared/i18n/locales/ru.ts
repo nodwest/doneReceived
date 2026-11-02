@@ -299,6 +299,11 @@ export const ru: Dictionary = {
     savedOf: '${{saved}} из ${{price}}',
     readyChip: 'Можно купить',
     askToBuy: 'Попросить купить',
+    askToBuyShort: 'Попросить',
+    fullySaved: 'Накоплено',
+    toGo: 'Ещё ${{amount}}',
+    goal: 'Цель ${{price}}',
+    startsAfter: 'После «{{title}}»',
     askedToast: 'Мы попросили родителей!',
     balance: 'Твой баланс ${{balance}}',
     balanceHint:

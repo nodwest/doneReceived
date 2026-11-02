@@ -5,12 +5,30 @@ import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { styles } from './ask-to-buy-button.styled';
 
+type AskToBuyButtonProps = {
+  /** Маленькая пилюля «Ask to buy» в строке вишлиста вместо широкой кнопки. */
+  compact?: boolean;
+};
+
 /**
  * Зелёная кнопка у желания, на которое уже хватает денег. Пока заглушка:
  * показывает тост, родителю ничего не уходит.
  */
-export function AskToBuyButton() {
+export function AskToBuyButton({ compact }: AskToBuyButtonProps) {
   const { t } = useTranslation();
+
+  if (compact) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('wishlist.askToBuy')}
+        onPress={() => showToast(t('wishlist.askedToast'))}
+        style={({ pressed }) => [styles.compact, pressed && styles.pressed]}
+      >
+        <Text style={styles.compactLabel}>{t('wishlist.askToBuyShort')}</Text>
+      </Pressable>
+    );
+  }
 
   return (
     <Pressable
