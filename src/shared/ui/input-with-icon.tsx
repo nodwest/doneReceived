@@ -1,16 +1,26 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from '../i18n';
+import { theme } from '../theme';
 import { Input } from './input';
 import { Icon, type IconName } from './icons';
 
 type InputWithIconProps = React.ComponentProps<typeof Input> & {
   iconName?: IconName;
+  /** Красная рамка: в поле ошибка. */
+  error?: boolean;
 };
 
 function InputWithIcon(prop: InputWithIconProps) {
-  const { iconName, style, value, onChangeText, secureTextEntry, ...props } =
-    prop;
+  const {
+    iconName,
+    error,
+    style,
+    value,
+    onChangeText,
+    secureTextEntry,
+    ...props
+  } = prop;
   const { t } = useTranslation();
   const [innerValue, setInnerValue] = useState('');
   // Для паролей показываем кнопку «глазок», она переключает точки и текст.
@@ -22,7 +32,7 @@ function InputWithIcon(prop: InputWithIconProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, error && styles.containerError]}>
       <View style={styles.icon}>
         {iconName && <Icon name={iconName} size={20} color="#9CA3AF" />}
       </View>
@@ -58,6 +68,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: '#FFFFFF',
     boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.05)',
+  },
+  containerError: {
+    borderColor: theme.colors.danger,
   },
   icon: {
     position: 'absolute',

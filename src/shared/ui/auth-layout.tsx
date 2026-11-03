@@ -10,7 +10,8 @@ type AuthLayoutProps = {
   /** Жёлтая иконка в фиолетовом квадрате над заголовком. */
   icon: IconName;
   title: string;
-  subtitle: string;
+  /** Строка или текст с выделением (вложенные `Text`). */
+  subtitle: ReactNode;
   /** Кнопка внизу экрана. */
   action: ReactNode;
   /** Строка под кнопкой («Нет аккаунта? Зарегистрироваться»). */

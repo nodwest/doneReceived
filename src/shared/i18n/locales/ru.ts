@@ -283,6 +283,51 @@ export const ru: Dictionary = {
     registrationSubtitle:
       'Превращайте домашние дела в приятные награды для всей семьи.',
     createAccount: 'Создать аккаунт',
+    errors: {
+      nameRequired: 'Введите имя',
+      nameTooLong: 'Имя — не длиннее 100 символов',
+      emailRequired: 'Введите почту',
+      emailInvalid: 'Проверьте адрес почты',
+      passwordRequired: 'Придумайте пароль',
+      passwordTooShort: 'Пароль — не короче 8 символов',
+      passwordTooLong: 'Пароль — не длиннее 128 символов',
+      passwordWeak: 'Пароль должен выполнять все требования ниже',
+      passwordsMismatch: 'Пароли не совпадают',
+    },
+    hints: {
+      name: 'Ваше имя, до 100 символов',
+      email: 'Почта вида name@example.com',
+      confirmPassword: 'Совпадает с паролем',
+    },
+    passwordRulesTitle: 'В пароле должно быть:',
+    passwordRules: {
+      length: 'от 8 до 128 символов',
+      upper: 'заглавная буква',
+      lower: 'строчная буква',
+      digit: 'цифра',
+      special: 'спецсимвол, например ! ? # %',
+    },
+    requestErrors: {
+      network: 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.',
+      emailTaken:
+        'Не удалось создать аккаунт. Возможно, эта почта уже зарегистрирована.',
+      wrongCode: 'Неверный код или закончились попытки.',
+      resendFailed:
+        'Не удалось отправить код. Возможно, почта уже подтверждена.',
+      wrongCredentials:
+        'Неверная почта или пароль, либо почта ещё не подтверждена.',
+      unknown: 'Что-то пошло не так. Попробуйте ещё раз.',
+    },
+    verifyTitle: 'Проверьте почту',
+    verifySubtitleStart: 'Мы отправили код из 6 символов на',
+    verifySubtitleEnd: '. Введите его ниже или нажмите ссылку в письме.',
+    codeLabel: 'Код подтверждения',
+    noCode: 'Не пришёл код?',
+    resendIn: 'Отправить ещё раз через',
+    resend: 'Отправить ещё раз',
+    codeResent: 'Мы отправили новый код',
+    confirmedViaLink: 'Почта подтверждена по ссылке',
+    emailConfirmed: 'Почта подтверждена! Войдите, чтобы продолжить.',
     haveAccount: 'Уже есть аккаунт?',
   },
   childHome: {

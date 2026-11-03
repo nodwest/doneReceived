@@ -4,11 +4,13 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from '@expo-google-fonts/inter';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 // Инициализация i18next до первого рендера.
 import '@shared/i18n';
 import './font-rendering';
+import { useSessionStore } from '@entities/session';
 import { ToastHost } from '@shared/ui';
 import { Providers } from './providers';
 
@@ -19,6 +21,11 @@ export function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+
+  // Сохранённая сессия: токен для запросов к API после перезапуска.
+  useEffect(() => {
+    useSessionStore.getState().restore();
+  }, []);
 
   if (!fontsLoaded && !fontsError) return null;
 

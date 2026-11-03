@@ -277,6 +277,51 @@ export const en = {
     registrationSubtitle:
       'Turn everyday chores into fun rewards for the whole family.',
     createAccount: 'Create Account',
+    errors: {
+      nameRequired: 'Enter your name',
+      nameTooLong: 'Name must be 100 characters or less',
+      emailRequired: 'Enter your email',
+      emailInvalid: 'Enter a valid email',
+      passwordRequired: 'Enter a password',
+      passwordTooShort: 'Password must be at least 8 characters',
+      passwordTooLong: 'Password must be 128 characters or less',
+      passwordWeak: 'Password must meet all the requirements below',
+      passwordsMismatch: "Passwords don't match",
+    },
+    hints: {
+      name: 'Your name, up to 100 characters',
+      email: 'An email like name@example.com',
+      confirmPassword: 'Same as the password',
+    },
+    passwordRulesTitle: 'Your password needs:',
+    passwordRules: {
+      length: '8 to 128 characters',
+      upper: 'An uppercase letter',
+      lower: 'A lowercase letter',
+      digit: 'A number',
+      special: 'A special character, like ! ? # %',
+    },
+    requestErrors: {
+      network: "Can't reach the server. Check your connection and try again.",
+      emailTaken:
+        "Couldn't create an account. This email may already be registered.",
+      wrongCode: 'Wrong code or too many attempts.',
+      resendFailed:
+        "Couldn't resend the code. The email may already be confirmed.",
+      wrongCredentials:
+        "Wrong email or password, or the email isn't confirmed yet.",
+      unknown: 'Something went wrong. Please try again.',
+    },
+    verifyTitle: 'Check your email',
+    verifySubtitleStart: 'We sent a 6-character code to',
+    verifySubtitleEnd: '. Enter it below or tap the link in the email.',
+    codeLabel: 'Verification code',
+    noCode: "Didn't get the code?",
+    resendIn: 'Resend code in',
+    resend: 'Resend code',
+    codeResent: 'We sent a new code',
+    confirmedViaLink: 'I confirmed via the link',
+    emailConfirmed: 'Email confirmed! Log in to continue.',
     haveAccount: 'Already have an account?',
   },
   childHome: {

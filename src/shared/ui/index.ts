@@ -23,3 +23,4 @@ export * from './source-tile';
 export * from './photo-carousel';
 export * from './snap-carousel';
 export * from './screen-header';
+export * from './code-input';
