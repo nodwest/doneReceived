@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 import { RoleIcon, RoleTint, type FamilyRole } from '@entities/user';
 import { CopyableCode } from '@shared/ui';
@@ -8,15 +9,24 @@ type InviteCodeCardProps = {
   title: string;
   /** Что сможет новый участник с этой ролью. */
   hint: string;
-  code: string;
+  /** Код с копированием; вместо него можно передать своё (`children`). */
+  code?: string;
+  children?: ReactNode;
+  /** Мелкая подпись внизу блока. */
+  footnote?: string;
 };
 
-/** Блок кода приглашения: иконка роли, подсказка и код с копированием. */
+/**
+ * Блок роли в «Add family member»: иконка, подсказка и код с копированием
+ * или своё действие (Add a child).
+ */
 export function InviteCodeCard({
   role,
   title,
   hint,
   code,
+  children,
+  footnote,
 }: InviteCodeCardProps) {
   return (
     <View style={styles.shadow}>
@@ -28,7 +38,9 @@ export function InviteCodeCard({
             <Text style={styles.hint}>{hint}</Text>
           </View>
         </View>
-        <CopyableCode code={code} />
+        {code !== undefined && <CopyableCode code={code} />}
+        {children}
+        {footnote && <Text style={styles.footnote}>{footnote}</Text>}
       </RoleTint>
     </View>
   );

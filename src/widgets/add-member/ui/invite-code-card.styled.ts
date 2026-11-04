@@ -27,6 +27,12 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.sm),
     color: theme.colors.ink,
   },
+  footnote: {
+    fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.inkSoft,
+  },
   hint: {
     fontSize: theme.fontSize.xs,
     fontFamily: theme.fonts.medium,

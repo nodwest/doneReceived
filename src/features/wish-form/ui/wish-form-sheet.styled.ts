@@ -1,7 +1,6 @@
-import { Platform, StyleSheet, type TextStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
-const FIELD_HEIGHT = 50;
 const TILE = 72;
 
 export const styles = StyleSheet.create({
@@ -38,50 +37,6 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
     color: theme.colors.inkSoft,
-  },
-  input: {
-    minHeight: FIELD_HEIGHT,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.prime,
-  },
-  // Поле в фокусе — белое с голубой рамкой, как в макете.
-  inputFocused: {
-    borderWidth: 2,
-    paddingHorizontal: 15,
-    borderColor: theme.colors.childFrom,
-    backgroundColor: theme.colors.white,
-  },
-  inputMultiline: {
-    minHeight: 76,
-    alignItems: 'flex-start',
-    paddingVertical: 14,
-  },
-  text: {
-    flex: 1,
-    minWidth: 0,
-    alignSelf: 'stretch',
-    fontSize: theme.fontSize.md,
-    letterSpacing: tracking(theme.fontSize.md),
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
-    ...Platform.select<TextStyle>({
-      // Своя рамка фокуса у обёртки поля: браузерную убираем совсем —
-      // даже прозрачная outline: auto закрашивает рамку поверх поля.
-      web: { outlineStyle: 'none' } as unknown as TextStyle,
-    }),
-  },
-  // Три строки описания видны целиком, дальше поле прокручивается.
-  textMultiline: {
-    alignSelf: 'auto',
-    height: 66,
-    lineHeight: 22,
-    textAlignVertical: 'top',
   },
   currency: {
     fontSize: theme.fontSize.md,

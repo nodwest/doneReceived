@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
+import { AddChildSheet } from '@features/add-child';
 import { JoinFamilyPanel } from '@features/join-family';
 import type { InviteCodes } from '@entities/family';
 import { useTranslation } from '@shared/i18n';
@@ -14,18 +15,43 @@ type AddMemberProps = {
 
 /**
  * Кнопки «+ Family member» и Join family в один ряд. По нажатию на их месте
- * открывается панель: коды для второго родителя и ребёнка или ввод кода,
- * чтобы вступить в другую семью. Крестик возвращает кнопки.
+ * открывается панель: код для второго родителя и Add a child или ввод кода,
+ * чтобы вступить в другую семью. Крестик возвращает кнопки. Add a child
+ * открывает шторку New child; профиль создан — шторка и панель закрываются.
  */
 export function AddMember({ codes }: AddMemberProps) {
-  const { t } = useTranslation();
   const [panel, setPanel] = useState<'codes' | 'join' | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const close = () => setPanel(null);
 
-  if (panel === 'codes')
-    return <InviteCodesPanel codes={codes} onClose={close} />;
-  if (panel === 'join') return <JoinFamilyPanel onClose={close} />;
+  return (
+    <>
+      {panel === 'codes' ? (
+        <InviteCodesPanel
+          codes={codes}
+          onClose={close}
+          onAddChild={() => setSheetOpen(true)}
+        />
+      ) : panel === 'join' ? (
+        <JoinFamilyPanel onClose={close} />
+      ) : (
+        <Buttons onOpen={setPanel} />
+      )}
+      <AddChildSheet
+        visible={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        onCreated={() => {
+          setSheetOpen(false);
+          close();
+        }}
+      />
+    </>
+  );
+}
 
+/** Две кнопки в ряд: «+ Family member» и Join family. */
+function Buttons({ onOpen }: { onOpen: (panel: 'codes' | 'join') => void }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.row}>
       <View style={styles.cell}>
@@ -33,7 +59,7 @@ export function AddMember({ codes }: AddMemberProps) {
           compact
           label={t('family.addMember')}
           icon="plus"
-          onPress={() => setPanel('codes')}
+          onPress={() => onOpen('codes')}
         />
       </View>
       <View style={styles.cell}>
@@ -41,7 +67,7 @@ export function AddMember({ codes }: AddMemberProps) {
           compact
           label={t('family.joinFamily')}
           icon="children"
-          onPress={() => setPanel('join')}
+          onPress={() => onOpen('join')}
         />
       </View>
     </View>

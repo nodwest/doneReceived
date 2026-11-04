@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   Image,
   Platform,
@@ -18,85 +19,119 @@ import { styles } from './member-card.styled';
 
 type MemberCardProps = {
   name: string;
-  avatar: ImageSourcePropType;
+  /** Фото; без него — первая буква имени в кружке. */
+  avatar?: ImageSourcePropType;
   role: FamilyRole;
-  presence: Presence;
+  /** Статус «дома»; без него под именем — `subtitle`. */
+  presence?: Presence;
+  /** Строка под именем, если статуса нет: «Added today». */
+  subtitle?: string;
   /** Карточка самого пользователя: рядом с именем метка «You». */
   isYou?: boolean;
-  activeTasks: number;
+  /** Активные задачи; без значения чипов задач нет (новый ребёнок). */
+  activeTasks?: number;
   /** Задачи на проверке — только у детей; без значения чип не показываем. */
   reviewTasks?: number;
   /** Тап по карточке мимо чипов — открыть профиль. */
   onPress?: () => void;
   onActiveTasksPress?: () => void;
   onReviewTasksPress?: () => void;
+  /** Низ карточки под чертой: устройства ребёнка. */
+  footer?: ReactNode;
 };
 
-/** Карточка участника семьи на вкладке Family: родитель или ребёнок. */
+/**
+ * Карточка участника семьи на вкладке Family: родитель или ребёнок. Тап по
+ * верхней части открывает профиль; низ (`footer`) — отдельная часть со
+ * своими кнопками.
+ */
 export function MemberCard({
   name,
   avatar,
   role,
   presence,
+  subtitle,
   isYou,
   activeTasks,
   reviewTasks,
   onPress,
   onActiveTasksPress,
   onReviewTasksPress,
+  footer,
 }: MemberCardProps) {
   const { t } = useTranslation();
   return (
-    <Pressable
-      // В вебе роль button делает из карточки <button>, а внутри неё кнопки-чипы:
-      // вложенные <button> HTML запрещает.
-      accessibilityRole={Platform.OS === 'web' ? undefined : 'button'}
-      accessibilityLabel={name}
-      disabled={!onPress}
-      onPress={onPress}
-      style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}
-    >
+    <View style={styles.shadow}>
       <RoleTint role={role} style={styles.card}>
-        <Image source={avatar} style={styles.avatar} />
-        <View style={styles.info}>
-          <View style={styles.nameRow}>
-            <Text style={styles.name} numberOfLines={1}>
-              {name}
-            </Text>
-            {isYou && (
-              <View style={styles.you}>
-                <Text style={styles.youText}>{t('member.you')}</Text>
-              </View>
+        <Pressable
+          // В вебе роль button делает из карточки <button>, а внутри неё
+          // кнопки-чипы: вложенные <button> HTML запрещает.
+          accessibilityRole={Platform.OS === 'web' ? undefined : 'button'}
+          accessibilityLabel={name}
+          disabled={!onPress}
+          onPress={onPress}
+          style={({ pressed }) => [styles.main, pressed && styles.pressed]}
+        >
+          {avatar ? (
+            <Image source={avatar} style={styles.avatar} />
+          ) : (
+            <View style={[styles.avatar, styles.initial]}>
+              <Text style={styles.initialText}>
+                {name.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
+          <View style={styles.info}>
+            <View style={styles.nameRow}>
+              <Text style={styles.name} numberOfLines={1}>
+                {name}
+              </Text>
+              {isYou && (
+                <View style={styles.you}>
+                  <Text style={styles.youText}>{t('member.you')}</Text>
+                </View>
+              )}
+            </View>
+            {presence ? (
+              <PresenceBadge {...presence} compact />
+            ) : (
+              subtitle && (
+                <Text style={styles.subtitle} numberOfLines={1}>
+                  {subtitle}
+                </Text>
+              )
             )}
           </View>
-          <PresenceBadge {...presence} compact />
-        </View>
-        <View style={styles.stats}>
-          <TaskChip
-            value={activeTasks}
-            label={t('member.active', { count: activeTasks })}
-            accessibilityLabel={t('childCard.activeTasksA11y', {
-              name,
-              count: activeTasks,
-            })}
-            onPress={onActiveTasksPress}
-          />
-          {reviewTasks !== undefined && (
-            <TaskChip
-              value={reviewTasks}
-              label={t('member.toReview')}
-              accessibilityLabel={t('childCard.tasksToReviewA11y', {
-                name,
-                count: reviewTasks,
-              })}
-              onPress={onReviewTasksPress}
-              chipStyle={styles.chipReview}
-              textStyle={styles.chipReviewText}
-            />
+          {activeTasks !== undefined && (
+            <View style={styles.stats}>
+              <TaskChip
+                value={activeTasks}
+                label={t('member.active', { count: activeTasks })}
+                accessibilityLabel={t('childCard.activeTasksA11y', {
+                  name,
+                  count: activeTasks,
+                })}
+                onPress={onActiveTasksPress}
+              />
+              {reviewTasks !== undefined && (
+                <TaskChip
+                  value={reviewTasks}
+                  label={t('member.toReview')}
+                  accessibilityLabel={t('childCard.tasksToReviewA11y', {
+                    name,
+                    count: reviewTasks,
+                  })}
+                  onPress={onReviewTasksPress}
+                  chipStyle={styles.chipReview}
+                  textStyle={styles.chipReviewText}
+                />
+              )}
+            </View>
           )}
-        </View>
+        </Pressable>
+        {footer && <View style={styles.footer}>{footer}</View>}
       </RoleTint>
-    </Pressable>
+    </View>
   );
 }
 

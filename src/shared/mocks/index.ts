@@ -1,5 +1,6 @@
 export * from './activity';
 export * from './children';
+export * from './devices';
 export * from './family';
 export * from './operations';
 export * from './parent';

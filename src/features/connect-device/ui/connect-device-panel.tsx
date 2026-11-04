@@ -1,0 +1,112 @@
+import { Pressable, Text, View } from 'react-native';
+import { CONNECT_CODE_TTL_MS, useConnectCode } from '@entities/device';
+import { useTranslation } from '@shared/i18n';
+import { copyText, showToast, useNow } from '@shared/lib';
+import { theme } from '@shared/theme';
+import { Icon } from '@shared/ui';
+import { useRenewConnectCode } from '../model/use-renew-connect-code';
+import { styles } from './connect-device-panel.styled';
+
+type ConnectDevicePanelProps = {
+  childId: number;
+  childName: string;
+};
+
+const pad = (value: number) => String(value).padStart(2, '0');
+
+/**
+ * «14:59» — сколько ещё действует код. Секунды отбрасываем, а не округляем
+ * вверх: только что выданный код показывает 15:00 или 14:59, а не 15:01
+ * (часы `useNow` тикают раз в секунду и могут отставать от выдачи кода).
+ */
+const formatLeft = (ms: number) => {
+  const seconds = Math.floor(
+    Math.min(Math.max(ms, 0), CONNECT_CODE_TTL_MS) / 1000,
+  );
+  return `${pad(Math.floor(seconds / 60))}:${pad(seconds % 60)}`;
+};
+
+/**
+ * Подключение устройства ребёнка: подсказка, что делать на его телефоне,
+ * одноразовый код (тап копирует), сколько он ещё действует и New code.
+ * Код живёт 15 минут; истёк — вместо таймера «Code expired».
+ */
+export function ConnectDevicePanel({
+  childId,
+  childName,
+}: ConnectDevicePanelProps) {
+  const { t } = useTranslation();
+  const { data, isFetching } = useConnectCode(childId, true);
+  const renew = useRenewConnectCode(childId);
+  const now = useNow(1000);
+  // Меню открыли, а в кэше истёкший код — его уже меняют на новый: старый
+  // не показываем, иначе мелькнёт «Code expired».
+  const stale =
+    !!data && isFetching && new Date(data.expiresAt).getTime() <= now.getTime();
+  const code = stale ? undefined : data;
+
+  const left = code ? new Date(code.expiresAt).getTime() - now.getTime() : 0;
+  const expired = !!code && left <= 0;
+
+  const copy = async () => {
+    if (!code) return;
+    await copyText(code.code);
+    showToast(t('copyableCode.copied'));
+  };
+
+  return (
+    <View style={styles.panel}>
+      <Text style={styles.instruction}>
+        {t('connectDevice.instruction', { name: childName })}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={
+          code ? t('copyableCode.copy', { code: code.code }) : undefined
+        }
+        disabled={!code || expired}
+        onPress={copy}
+        style={({ pressed }) => [
+          styles.codeBox,
+          expired && styles.codeBoxExpired,
+          pressed && styles.pressed,
+        ]}
+      >
+        <Text
+          style={[styles.code, expired && styles.codeExpired]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
+          {code?.code ?? ' '}
+        </Text>
+        <View style={styles.copy}>
+          <Icon name="copy" size={18} color={theme.colors.grey} />
+        </View>
+      </Pressable>
+      <View style={styles.row}>
+        <View style={styles.timer}>
+          {expired ? (
+            <Text style={styles.expired}>{t('connectDevice.expired')}</Text>
+          ) : (
+            <>
+              <Text style={styles.validFor}>{t('connectDevice.validFor')}</Text>
+              <Text style={styles.left}>{code ? formatLeft(left) : ''}</Text>
+            </>
+          )}
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          disabled={renew.isPending}
+          onPress={() => renew.mutate()}
+          style={({ pressed }) => [styles.newCode, pressed && styles.pressed]}
+        >
+          <Icon name="refresh" size={16} color={theme.colors.violet} />
+          <Text style={styles.newCodeLabel}>{t('connectDevice.newCode')}</Text>
+        </Pressable>
+      </View>
+      <Text style={styles.footnote}>
+        {t('connectDevice.footnote', { name: childName })}
+      </Text>
+    </View>
+  );
+}
