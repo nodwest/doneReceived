@@ -83,6 +83,7 @@ export const en = {
     active_one: 'active',
     active_other: 'active',
     toReview: 'to review',
+    added: 'Added {{day}}',
   },
   presence: {
     atHome: 'At home',
@@ -99,6 +100,8 @@ export const en = {
     childrenSection: 'Children',
     addMember: 'Family member',
     joinFamily: 'Join family',
+    deleteChild: 'Delete',
+    childDeleted: '{{name}} is removed from the family',
   },
   joinFamily: {
     title: 'Join a family',
@@ -131,7 +134,53 @@ export const en = {
     child: {
       title: 'For a child',
       hint: 'Sees own tasks, marks them done and earns rewards.',
+      createHint:
+        'Create a profile, then connect the device with a one-time code.',
     },
+    hintWithChild:
+      'A second parent signs up with email and enters the family code. For a child, create a profile first — then connect their device.',
+    addChild: 'Add a child',
+    newDeviceHint:
+      'New device for a child who is already here? Open Devices at the bottom of their card.',
+  },
+  devices: {
+    onlineNow: 'Online now',
+    lastSeen: 'Last seen {{time}}',
+    remove: 'Remove {{name}}',
+    removeSoon: 'Removing devices is coming soon',
+    count_one: '{{count}} device',
+    count_other: '{{count}} devices',
+    none: 'No devices yet',
+    title: 'Devices',
+    connect: 'Connect device',
+    connectNew: 'Connect a new device',
+    show: "Show {{name}}'s devices",
+    hide: "Hide {{name}}'s devices",
+  },
+  connectDevice: {
+    title: 'Connect device',
+    instruction:
+      "On {{name}}'s device open Kids Tasks, choose Kid and enter this code:",
+    validFor: 'Valid for',
+    expired: 'Code expired',
+    newCode: 'New code',
+    footnote:
+      'After {{name}} signs in, the code stops working and the device appears here.',
+  },
+  newChild: {
+    title: 'New child',
+    name: "Child's name",
+    namePlaceholder: 'Name',
+    photo: 'Photo (optional)',
+    photoHint: "Shown on the family screen and on the child's device.",
+    photoSoon: 'Adding a photo is coming soon',
+    nextTitle: 'Next: connect the device',
+    nextHint:
+      "Then you'll get a one-time code. {{name}} enters it on their device — no email or password.",
+    nextHintNoName:
+      "Then you'll get a one-time code. The child enters it on their device — no email or password.",
+    create: 'Create profile',
+    created: "{{name}}'s profile is created",
   },
   memberProfile: {
     paid: 'Paid',
@@ -277,6 +326,53 @@ export const en = {
     registrationSubtitle:
       'Turn everyday chores into fun rewards for the whole family.',
     createAccount: 'Create Account',
+    errors: {
+      nameRequired: 'Enter your name',
+      nameTooLong: 'Name must be 100 characters or less',
+      emailRequired: 'Enter your email',
+      emailInvalid: 'Enter a valid email',
+      passwordRequired: 'Enter a password',
+      passwordTooShort: 'Password must be at least 8 characters',
+      passwordTooLong: 'Password must be 128 characters or less',
+      passwordWeak: 'Password must meet all the requirements below',
+      passwordsMismatch: "Passwords don't match",
+    },
+    hints: {
+      name: 'Your name, up to 100 characters',
+      email: 'An email like name@example.com',
+      confirmPassword: 'Same as the password',
+    },
+    passwordRulesTitle: 'Your password needs:',
+    passwordRules: {
+      length: '8 to 128 characters',
+      upper: 'An uppercase letter',
+      lower: 'A lowercase letter',
+      digit: 'A number',
+      special: 'A special character, like ! ? # %',
+    },
+    requestErrors: {
+      network: "Can't reach the server. Check your connection and try again.",
+      emailTaken:
+        "Couldn't create an account. This email may already be registered.",
+      wrongCode: 'Wrong code or too many attempts.',
+      resendFailed:
+        "Couldn't resend the code. The email may already be confirmed.",
+      wrongCredentials:
+        "Wrong email or password, or the email isn't confirmed yet.",
+      notConfirmed:
+        "The email isn't confirmed yet. Open the link in the email or enter the code.",
+      unknown: 'Something went wrong. Please try again.',
+    },
+    verifyTitle: 'Check your email',
+    verifySubtitleStart: 'We sent a 6-character code to',
+    verifySubtitleEnd: '. Enter it below or tap the link in the email.',
+    codeLabel: 'Verification code',
+    noCode: "Didn't get the code?",
+    resendIn: 'Resend code in',
+    resend: 'Resend code',
+    codeResent: 'We sent a new code',
+    confirmedViaLink: 'I confirmed via the link',
+    emailConfirmed: 'Email confirmed!',
     haveAccount: 'Already have an account?',
   },
   childHome: {
@@ -353,13 +449,22 @@ export const en = {
   },
   roleSelect: {
     title: "Who's joining?",
-    subtitle: 'Are you signing up as a parent or as a child?',
+    subtitle: 'Kids sign in with a code from a parent.',
     parent: 'Parent',
     parentDescription:
       'You can create tasks for your children and set up rewards.',
     kid: 'Kid',
     kidDescription: "You can complete your parents' tasks and earn rewards.",
     continue: 'Continue',
+    continueFound: "That's me — continue",
+  },
+  childCode: {
+    label: 'Code from a parent',
+    hint: 'Ask a parent for a code: Family → your card → Devices.',
+    invalid:
+      'This code has expired or was already used. Ask a parent for a new one.',
+    greeting: 'Hi, {{name}}!',
+    account: '{{family}} family · your account',
   },
   editProfile: {
     title: 'Edit profile',

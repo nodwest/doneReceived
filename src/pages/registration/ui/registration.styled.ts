@@ -13,4 +13,18 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.inputName),
     color: theme.colors.grey,
   },
+  // Ошибка под полем.
+  error: {
+    fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.danger,
+  },
+  action: {
+    gap: 12,
+  },
+  // Ошибка сервера над кнопкой.
+  requestError: {
+    textAlign: 'center',
+  },
 });

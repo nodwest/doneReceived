@@ -34,6 +34,7 @@ export const parentProfilesMock = [
   {
     id: parentMock.id,
     name: parentMock.name,
+    role: parentMock.role,
     avatar: parentMock.avatar,
     rewardsPaid: 128,
     presence: { atHome: true, since: ago(HOUR) },

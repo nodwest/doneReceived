@@ -3,6 +3,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { InviteCodesPanel } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
+import { useLogout } from '@features/auth';
 import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
 import { ChildModeToggle } from '@features/switch-role';
@@ -26,7 +27,7 @@ import { styles } from './profile.styled';
  * языка прямо у пункта. Остальные пункты пока не работают, тогл уведомлений
  * только переключается. Временный тогл над Log out переключает роль: у
  * ребёнка (Emma) голубая карточка, нет Family codes, а Join family ждёт
- * детский код.
+ * детский код. Log out забывает сессию и ведёт на логин.
  */
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -38,6 +39,7 @@ export function ProfilePage() {
   const [panel, setPanel] = useState<'codes' | 'join' | null>(null);
   const closePanel = () => setPanel(null);
   const languageRow = useRef<View>(null);
+  const logout = useLogout();
   const [languageAnchor, setLanguageAnchor] = useState<AnchorRect | null>(null);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [notifications, setNotifications] = useState(
@@ -117,7 +119,14 @@ export function ProfilePage() {
               <SettingsRow icon="help" label={t('profile.help')} />
             </View>
             <ChildModeToggle />
-            <Pressable style={styles.logOut}>
+            <Pressable
+              accessibilityRole="button"
+              style={styles.logOut}
+              onPress={async () => {
+                await logout();
+                router.replace('/login');
+              }}
+            >
               <Text style={styles.logOutText}>{t('profile.logOut')}</Text>
             </Pressable>
           </>

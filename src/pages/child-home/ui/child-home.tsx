@@ -44,7 +44,7 @@ function greetingKey(hour: number) {
 export function ChildHomePage() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { data = NO_TASKS } = useTasks();
+  const { data = NO_TASKS, isPending: tasksPending } = useTasks();
   const myTasks = useMemo(
     () => filterTasks(data, { assigneeId: childAccountMock.id }),
     [data],
@@ -58,6 +58,9 @@ export function ChildHomePage() {
     childProfilesMock.find((child) => child.id === childAccountMock.id)
       ?.balance ?? 0;
   const wishlist = useWishlistProgress(childAccountMock.id, balance);
+  // Пока задания и вишлист не пришли, тело не рисуем: иначе на кадр видны
+  // нули, «Добавь желание» и экран без карусели, а потом всё прыгает вниз.
+  const loading = tasksPending || wishlist.isPending;
 
   const openTask = (task: Task) =>
     router.push({ pathname: '/tasks', params: { task: String(task.id) } });
@@ -75,49 +78,53 @@ export function ChildHomePage() {
             name={childAccountMock.name}
             avatar={childAccountMock.avatar}
           />
-          <HomeSummary
-            tone="child"
-            amount={balance}
-            amountLabel={t('summary.myBalance')}
-            activeTasks={counts.active}
-            tasksToReview={counts.review}
-            reviewLabel={t('summary.onReview')}
-            onActiveTasksPress={() =>
-              router.push({ pathname: '/tasks', params: { tab: 'all' } })
-            }
-            onTasksToReviewPress={() =>
-              router.push({ pathname: '/tasks', params: { tab: 'review' } })
-            }
-          />
-          {activeTasks.length > 0 && (
-            <TaskCarousel
-              tone="child"
-              tasks={activeTasks}
-              renderTask={(task, style) => (
-                <ChildTaskTile
-                  task={task}
-                  label={
-                    task.id === activeTasks[0].id
-                      ? t('childHome.nextUp')
-                      : t('childHome.comingUp')
-                  }
-                  onPress={openTask}
-                  action={<DoneButton task={task} />}
-                  style={style}
+          {!loading && (
+            <>
+              <HomeSummary
+                tone="child"
+                amount={balance}
+                amountLabel={t('summary.myBalance')}
+                activeTasks={counts.active}
+                tasksToReview={counts.review}
+                reviewLabel={t('summary.onReview')}
+                onActiveTasksPress={() =>
+                  router.push({ pathname: '/tasks', params: { tab: 'all' } })
+                }
+                onTasksToReviewPress={() =>
+                  router.push({ pathname: '/tasks', params: { tab: 'review' } })
+                }
+              />
+              {activeTasks.length > 0 && (
+                <TaskCarousel
+                  tone="child"
+                  tasks={activeTasks}
+                  renderTask={(task, style) => (
+                    <ChildTaskTile
+                      task={task}
+                      label={
+                        task.id === activeTasks[0].id
+                          ? t('childHome.nextUp')
+                          : t('childHome.comingUp')
+                      }
+                      onPress={openTask}
+                      action={<DoneButton task={task} />}
+                      style={style}
+                    />
+                  )}
                 />
               )}
-            />
+              <WishlistPreview
+                readyCount={wishlist.readyCount}
+                current={wishlist.current}
+                onPress={() => router.push('/wishlist')}
+              />
+              <RecentActivity>
+                {childActivityMock.map(({ id, ...item }) => (
+                  <ChildActivityItem key={id} {...item} />
+                ))}
+              </RecentActivity>
+            </>
           )}
-          <WishlistPreview
-            readyCount={wishlist.readyCount}
-            current={wishlist.current}
-            onPress={() => router.push('/wishlist')}
-          />
-          <RecentActivity>
-            {childActivityMock.map(({ id, ...item }) => (
-              <ChildActivityItem key={id} {...item} />
-            ))}
-          </RecentActivity>
         </ScrollView>
         <BottomNav activeKey="home" />
       </SafeAreaView>

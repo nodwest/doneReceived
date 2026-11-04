@@ -45,6 +45,9 @@ import { TrashIcon } from './trash';
 import { LinkIcon } from './link';
 import { NoteIcon } from './note';
 import { ExternalIcon } from './external';
+import { PhoneIcon } from './phone';
+import { ChevronDownIcon } from './chevron-down';
+import { RefreshIcon } from './refresh';
 
 export const icons = {
   price: PriceIcon,
@@ -94,4 +97,7 @@ export const icons = {
   link: LinkIcon,
   note: NoteIcon,
   external: ExternalIcon,
+  phone: PhoneIcon,
+  'chevron-down': ChevronDownIcon,
+  refresh: RefreshIcon,
 };

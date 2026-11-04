@@ -11,6 +11,8 @@ type GradientButtonProps = {
   disabled?: boolean;
   /** Мельче текст и иконка — для двух кнопок в ряд (вкладка Family). */
   compact?: boolean;
+  /** Ниже (44) и с меньшим скруглением — кнопка внутри карточки. */
+  small?: boolean;
 };
 
 /** Широкая фиолетово-синяя кнопка высотой 56: Create Task, + Family member. */
@@ -20,6 +22,7 @@ export function GradientButton({
   onPress,
   disabled,
   compact,
+  small,
 }: GradientButtonProps) {
   return (
     <LinearGradient
@@ -27,11 +30,16 @@ export function GradientButton({
       start={{ x: 0, y: 0.2 }}
       end={{ x: 1, y: 0.8 }}
       locations={[0, 0.7071]}
-      style={[styles.gradient, disabled && styles.disabled]}
+      style={[
+        styles.gradient,
+        small && styles.small,
+        disabled && styles.disabled,
+      ]}
     >
       <Button
         style={({ pressed, hovered }) => [
           styles.button,
+          small && styles.small,
           hovered && styles.buttonHovered,
           pressed && styles.buttonPressed,
         ]}
@@ -41,12 +49,16 @@ export function GradientButton({
         {icon && (
           <Icon
             name={icon}
-            size={compact ? 18 : 22}
+            size={small ? 16 : compact ? 18 : 22}
             color={theme.colors.white}
           />
         )}
         <Text
-          style={[styles.title, compact && styles.titleCompact]}
+          style={[
+            styles.title,
+            compact && styles.titleCompact,
+            small && styles.titleSmall,
+          ]}
           numberOfLines={1}
         >
           {label}
@@ -62,6 +74,10 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.1)',
+  },
+  small: {
+    height: 40,
+    borderRadius: 12,
   },
   disabled: {
     opacity: 0.5,
@@ -98,5 +114,9 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontSize: 15,
     letterSpacing: tracking(15),
+  },
+  titleSmall: {
+    fontSize: 13,
+    letterSpacing: tracking(13),
   },
 });

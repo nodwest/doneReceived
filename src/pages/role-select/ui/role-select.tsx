@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import {
-  InviteCodeField,
-  useInviteCode,
-  useJoinFamily,
-} from '@features/join-family';
+import { ChildCodeField, useChildCode } from '@features/sign-in-by-code';
+import { useNewChildren, type NewChild } from '@entities/family';
 import { RoleIcon, useViewerRoleStore, type FamilyRole } from '@entities/user';
+import { childrenMock } from '@shared/mocks';
 import { useTranslation } from '@shared/i18n';
 import { AuthLayout, GradientButton } from '@shared/ui';
 import { styles } from './role-select.styled';
@@ -19,32 +17,36 @@ const ROLES: readonly { key: Role; icon: FamilyRole }[] = [
   { key: 'kid', icon: 'child' },
 ];
 
+const NO_CHILDREN: NewChild[] = [];
+
 /**
- * Первый экран после установки: кто входит. Родитель по Continue попадает на
- * логин. У ребёнка карточка Kid раскрывается полем кода приглашения; когда
- * код найден, видно, в какую семью он войдёт, и Continue вступает в неё и
- * открывает главную ребёнка.
+ * Выбор роли при регистрации (из «Sign up» на логине). Родитель по Continue
+ * попадает на регистрацию. У ребёнка карточка Kid раскрывается полем
+ * одноразового кода, который родитель выдал в Family → Devices; когда код
+ * найден, видно, чей это аккаунт и какая семья, и «That's me — continue»
+ * открывает главную ребёнка. Пока на моках: код не гасится, вход — тот же
+ * временный пропуск ребёнка.
  */
 export function RoleSelectPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<Role>('parent');
-  const invite = useInviteCode('child');
-  const { mutate: join, isPending: joining } = useJoinFamily();
-  const setViewerRole = useViewerRoleStore((state) => state.setRole);
+  // Дети семьи, в чьи аккаунты может вести код: из моков и созданные в
+  // Family. С API имя и фото придут вместе с ответом на код.
+  const { data: newChildren = NO_CHILDREN } = useNewChildren();
+  const childCode = useChildCode([...childrenMock, ...newChildren]);
+  const found = role === 'kid' && !!childCode.account;
+  const enterAsChild = useViewerRoleStore((state) => state.enterAsChild);
 
   const onContinue = () => {
     if (role === 'parent') {
-      router.push('/login');
+      router.push('/registration');
       return;
     }
-    // Вступил в семью — дальше смотрим приложение от лица ребёнка.
-    join(invite.code, {
-      onSuccess: () => {
-        setViewerRole('child');
-        router.replace('/');
-      },
-    });
+    if (!childCode.account) return;
+    // Вошёл в свой аккаунт — дальше смотрим приложение от лица ребёнка.
+    enterAsChild();
+    router.replace('/');
   };
 
   return (
@@ -54,9 +56,11 @@ export function RoleSelectPage() {
       subtitle={t('roleSelect.subtitle')}
       action={
         <GradientButton
-          label={t('roleSelect.continue')}
+          label={
+            found ? t('roleSelect.continueFound') : t('roleSelect.continue')
+          }
           onPress={onContinue}
-          disabled={role === 'kid' && (!invite.invite || joining)}
+          disabled={role === 'kid' && !found}
         />
       }
     >
@@ -89,10 +93,7 @@ export function RoleSelectPage() {
               {key === 'kid' && selected && (
                 <>
                   <View style={styles.divider} />
-                  <InviteCodeField
-                    state={invite}
-                    hint={t('joinFamily.childCodeHint')}
-                  />
+                  <ChildCodeField state={childCode} />
                 </>
               )}
             </View>

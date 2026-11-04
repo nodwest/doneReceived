@@ -5,12 +5,11 @@ import type { Wish } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { BottomSheet, Icon, Toggle } from '@shared/ui';
+import { BottomSheet, Icon, SheetField, Toggle } from '@shared/ui';
 import { useCreateWish } from '../model/use-create-wish';
 import { useUpdateWish } from '../model/use-update-wish';
 import { useWishForm } from '../model/use-wish-form';
 import { PhotoPicker } from './photo-picker';
-import { WishField } from './wish-field';
 import { styles } from './wish-form-sheet.styled';
 
 type WishFormSheetProps = {
@@ -92,14 +91,14 @@ export function WishFormSheet({
             <Icon name="close" size={14} color={theme.colors.ink} />
           </Pressable>
         </View>
-        <WishField
+        <SheetField
           label={t('wishForm.what')}
           value={title}
           onChangeText={form.setTitle}
           placeholder={t('wishForm.whatPlaceholder')}
           returnKeyType="next"
         />
-        <WishField
+        <SheetField
           label={t('wishForm.price')}
           value={price}
           onChangeText={form.setPrice}
@@ -108,14 +107,14 @@ export function WishFormSheet({
           prefix={<Text style={styles.currency}>$</Text>}
         />
         <PhotoPicker photos={photos} onRemove={form.removePhoto} />
-        <WishField
+        <SheetField
           label={t('wishForm.description')}
           value={description}
           onChangeText={form.setDescription}
           placeholder={t('wishForm.descriptionPlaceholder')}
           multiline
         />
-        <WishField
+        <SheetField
           label={t('wishForm.link')}
           value={link}
           onChangeText={form.setLink}

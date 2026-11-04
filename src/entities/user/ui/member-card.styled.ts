@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
-  pressable: {
+  shadow: {
     borderRadius: 20,
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.08)',
   },
@@ -10,16 +10,41 @@ export const styles = StyleSheet.create({
     opacity: 0.85,
   },
   card: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  main: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     padding: 14,
-    borderRadius: 20,
+  },
+  // Низ карточки: устройства ребёнка под тонкой чертой.
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.childTintBorder,
   },
   avatar: {
     width: 56,
     height: 56,
     borderRadius: 28,
+  },
+  initial: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.violetSoft,
+  },
+  initialText: {
+    fontSize: 24,
+    letterSpacing: tracking(24),
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.violet,
+  },
+  subtitle: {
+    fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
   },
   info: {
     flex: 1,

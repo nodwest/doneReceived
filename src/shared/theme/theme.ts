@@ -91,6 +91,8 @@ export const theme = {
     dangerAction: '#FF5A5F',
     dangerSoft: 'rgba(255, 90, 95, 0.1)',
     dangerText: '#E5484D',
+    // Фон поля с ошибкой: код ребёнка истёк или неверен.
+    dangerTint: '#FFF5F5',
     // Формы в шторках: подсказка в пустом поле, фон кнопки закрытия,
     // ручка перетаскивания строки.
     placeholderSoft: '#A9ADBD',
