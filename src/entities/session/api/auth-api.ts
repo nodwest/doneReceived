@@ -59,5 +59,19 @@ export function logout(refreshToken: string) {
   return apiRequest<MessageResponse>('/auth/logout', {
     method: 'POST',
     body: { refreshToken },
+    skipRefresh: true,
+  });
+}
+
+/**
+ * POST /auth/refresh — новая пара токенов (и пользователь) по refresh-токену;
+ * старый refresh-токен больше не годится. 401 — refresh-токен отозван или
+ * истёк: нужно войти заново.
+ */
+export function refreshSession(refreshToken: string) {
+  return apiRequest<Session>('/auth/refresh', {
+    method: 'POST',
+    body: { refreshToken },
+    skipRefresh: true,
   });
 }

@@ -1,5 +1,10 @@
 import { create } from 'zustand';
-import { setAccessTokenGetter } from '@shared/api';
+import {
+  isApiError,
+  setAccessTokenGetter,
+  setTokenRefresher,
+} from '@shared/api';
+import { refreshSession } from '../api/auth-api';
 import type { Session } from './session';
 import { loadSession, removeSession, saveSession } from './session-storage';
 
@@ -18,6 +23,16 @@ type SessionState = {
   signIn: (session: Session) => Promise<void>;
   /** Забыть сессию: выход из аккаунта. */
   signOut: () => Promise<void>;
+  /**
+   * Обновить токены по refresh-токену. true — новая пара сохранена. Сервер
+   * не принял refresh-токен (401 или 400) — сессия стирается, экраны уводят на
+   * логин. Нет сети — сессия остаётся, false.
+   */
+  refresh: () => Promise<boolean>;
+};
+
+const log = (message: string) => {
+  if (__DEV__) console.log(`[auth] ${message}`);
 };
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -37,12 +52,33 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({ session: null, status: 'signed-out' });
     await removeSession();
   },
+  refresh: async () => {
+    const current = get().session;
+    if (!current) return false;
+    try {
+      const next = await refreshSession(current.refreshToken);
+      // Пока обновляли, вышли или вошли заново — эту сессию не воскрешаем.
+      if (get().session !== current) return get().session !== null;
+      await get().signIn(next);
+      log('Токены обновлены');
+      return true;
+    } catch (error) {
+      // 401 — refresh-токен отозван или истёк, 400 — сохранён битым.
+      if (isApiError(error) && (error.status === 401 || error.status === 400)) {
+        if (get().session === current) await get().signOut();
+        log('Сессия истекла, нужно войти заново');
+      }
+      return false;
+    }
+  },
 }));
 
 // Запросы к API берут токен из текущей сессии.
 setAccessTokenGetter(
   () => useSessionStore.getState().session?.accessToken ?? null,
 );
+// Токен устарел — запрос сам обновит его и повторится.
+setTokenRefresher(() => useSessionStore.getState().refresh());
 
 export const useSession = () => useSessionStore((state) => state.session);
 

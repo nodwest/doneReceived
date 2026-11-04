@@ -24,6 +24,11 @@ export const isApiError = (error: unknown): error is ApiError =>
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
+  /**
+   * Не обновлять токены при 401: сам запрос обновления и выход — их 401
+   * значит «сессии нет», повторять нечего.
+   */
+  skipRefresh?: boolean;
 };
 
 // Токен доступа подставляет сессия: shared не знает, где он хранится.
@@ -34,25 +39,58 @@ export function setAccessTokenGetter(getter: () => string | null) {
   getAccessToken = getter;
 }
 
-/** Запрос к API: JSON туда и обратно, ошибки — `ApiError`. */
+// Обновление токенов подставляет сессия: true — новая пара сохранена.
+let refreshTokens: (() => Promise<boolean>) | null = null;
+// Идущее обновление: несколько запросов с протухшим токеном ждут одно.
+let refreshing: Promise<boolean> | null = null;
+
+/**
+ * Как обновить токены, когда сервер ответил 401 на запрос с токеном. Вызов
+ * один на все одновременные 401; после него запрос повторяется один раз.
+ */
+export function setTokenRefresher(refresher: () => Promise<boolean>) {
+  refreshTokens = refresher;
+}
+
+function refreshOnce(refresher: () => Promise<boolean>) {
+  refreshing ??= refresher().finally(() => {
+    refreshing = null;
+  });
+  return refreshing;
+}
+
+/**
+ * Запрос к API: JSON туда и обратно, ошибки — `ApiError`. Токен устарел
+ * (401 на запрос с токеном) — обновляем токены и повторяем запрос один раз;
+ * не вышло — отдаём 401.
+ */
 export async function apiRequest<T>(
   path: string,
-  { method = 'GET', body }: RequestOptions = {},
+  { method = 'GET', body, skipRefresh }: RequestOptions = {},
 ): Promise<T> {
-  const headers: Record<string, string> = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
-  const token = getAccessToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const send = async (token: string | null) => {
+    const headers: Record<string, string> = { Accept: 'application/json' };
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    if (token) headers.Authorization = `Bearer ${token}`;
+    try {
+      return await fetch(`${API_URL}${path}`, {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+    } catch {
+      throw new ApiError(0, []);
+    }
+  };
 
-  let response: Response;
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-  } catch {
-    throw new ApiError(0, []);
+  const token = getAccessToken();
+  let response = await send(token);
+  if (response.status === 401 && token && !skipRefresh && refreshTokens) {
+    // Пока запрос шёл, токены могли уже обновить — тогда сразу повторяем.
+    const fresh =
+      getAccessToken() !== token || (await refreshOnce(refreshTokens));
+    const next = getAccessToken();
+    if (fresh && next) response = await send(next);
   }
 
   const text = await response.text();
