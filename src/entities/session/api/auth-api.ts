@@ -50,3 +50,14 @@ export function verifyEmail(payload: VerifyEmailPayload) {
 export function login(payload: LoginPayload) {
   return apiRequest<Session>('/auth/login', { method: 'POST', body: payload });
 }
+
+/**
+ * POST /auth/logout — сервер отзывает refresh-токен этой сессии. Токены на
+ * устройстве стирает `signOut` сессии.
+ */
+export function logout(refreshToken: string) {
+  return apiRequest<MessageResponse>('/auth/logout', {
+    method: 'POST',
+    body: { refreshToken },
+  });
+}

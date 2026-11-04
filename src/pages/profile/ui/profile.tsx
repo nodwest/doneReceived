@@ -27,7 +27,7 @@ import { styles } from './profile.styled';
  * языка прямо у пункта. Остальные пункты пока не работают, тогл уведомлений
  * только переключается. Временный тогл над Log out переключает роль: у
  * ребёнка (Emma) голубая карточка, нет Family codes, а Join family ждёт
- * детский код. Log out забывает сессию и ведёт на выбор роли.
+ * детский код. Log out забывает сессию и ведёт на логин.
  */
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -124,7 +124,7 @@ export function ProfilePage() {
               style={styles.logOut}
               onPress={async () => {
                 await logout();
-                router.replace('/role-select');
+                router.replace('/login');
               }}
             >
               <Text style={styles.logOutText}>{t('profile.logOut')}</Text>

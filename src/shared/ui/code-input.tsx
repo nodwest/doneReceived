@@ -64,6 +64,9 @@ export function CodeInput({
       })}
       <TextInput
         value={value}
+        // Код — цифры и заглавные латинские буквы: строчные поднимаем,
+        // остальное (кириллицу, пробелы, дефисы) выкидываем. maxLength не
+        // ставим: он обрезал бы вставку «AB-12 3C» до того, как её почистили.
         onChangeText={(text) =>
           onChangeText(
             text
@@ -74,7 +77,6 @@ export function CodeInput({
         }
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        maxLength={length}
         editable={editable}
         autoFocus={autoFocus}
         autoCapitalize="characters"

@@ -19,6 +19,8 @@ function InputWithIcon(prop: InputWithIconProps) {
     value,
     onChangeText,
     secureTextEntry,
+    // Подсказка в пустом поле серая, чтобы не путать её с введённым текстом.
+    placeholderTextColor = theme.colors.placeholderSoft,
     ...props
   } = prop;
   const { t } = useTranslation();
@@ -38,6 +40,7 @@ function InputWithIcon(prop: InputWithIconProps) {
       </View>
       <Input
         {...props}
+        placeholderTextColor={placeholderTextColor}
         secureTextEntry={secureTextEntry && hidden}
         value={value ?? innerValue}
         onChangeText={handleChangeText}

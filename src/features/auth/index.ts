@@ -5,5 +5,6 @@ export * from './model/use-verify-email';
 export * from './model/use-cooldown';
 export * from './model/use-login';
 export * from './model/use-logout';
+export { signUpCredentials } from './model/sign-up-credentials';
 export * from './ui/password-rules';
 export * from './ui/field-hint';

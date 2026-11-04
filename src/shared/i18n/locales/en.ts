@@ -310,6 +310,8 @@ export const en = {
         "Couldn't resend the code. The email may already be confirmed.",
       wrongCredentials:
         "Wrong email or password, or the email isn't confirmed yet.",
+      notConfirmed:
+        "The email isn't confirmed yet. Open the link in the email or enter the code.",
       unknown: 'Something went wrong. Please try again.',
     },
     verifyTitle: 'Check your email',
@@ -321,7 +323,7 @@ export const en = {
     resend: 'Resend code',
     codeResent: 'We sent a new code',
     confirmedViaLink: 'I confirmed via the link',
-    emailConfirmed: 'Email confirmed! Log in to continue.',
+    emailConfirmed: 'Email confirmed!',
     haveAccount: 'Already have an account?',
   },
   childHome: {

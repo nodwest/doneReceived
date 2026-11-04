@@ -4,7 +4,9 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { VERIFICATION_CODE_LENGTH } from '@entities/session';
 import {
   requestError,
+  signUpCredentials,
   useCooldown,
+  useLogin,
   useResendVerification,
   useVerifyEmail,
 } from '@features/auth';
@@ -23,7 +25,9 @@ const formatSeconds = (seconds: number) =>
  * Подтверждение почты после регистрации (`/verify-email?email=…`): код из
  * письма уходит сам, как только введены все символы; повторная отправка с
  * отсчётом. Кнопка внизу — для тех, кто подтвердил почту ссылкой из письма.
- * После подтверждения (любым способом) — логин с подставленной почтой.
+ * После подтверждения входим почтой и паролем из регистрации и открываем
+ * главную. Если их нет (приложение перезапускали) или вход не удался —
+ * логин с подставленной почтой.
  */
 export function VerifyEmail() {
   const { t } = useTranslation();
@@ -32,26 +36,57 @@ export function VerifyEmail() {
   const verify = useVerifyEmail();
   const resend = useResendVerification();
   const cooldown = useCooldown(RESEND_COOLDOWN);
+  const login = useLogin();
 
   // Без почты подтверждать нечего: открыли экран не из регистрации.
   if (!email) return <Redirect href="/registration" />;
 
+  const toLogin = () =>
+    router.replace({ pathname: '/login', params: { email } });
+
+  /**
+   * Почта подтверждена — входим. `viaLink`: подтверждали ссылкой; если вход
+   * не удался (401 — по ссылке ещё не перешли), остаёмся здесь с ошибкой.
+   */
+  const enter = (viaLink: boolean) => {
+    const credentials = signUpCredentials(email);
+    if (!credentials) {
+      toLogin();
+      return;
+    }
+    login.mutate(credentials, {
+      onSuccess: () => {
+        if (viaLink) showToast(t('auth.emailConfirmed'));
+        router.replace('/');
+      },
+      onError: () => {
+        if (!viaLink) toLogin();
+      },
+    });
+  };
+
   const submit = (value: string) => {
-    if (verify.isPending) return;
+    if (verify.isPending || login.isPending) return;
     verify.mutate(
       { email, code: value },
       {
         onSuccess: () => {
           showToast(t('auth.emailConfirmed'));
-          router.replace({ pathname: '/login', params: { email } });
+          enter(false);
         },
       },
     );
   };
 
+  const confirmedViaLink = () => {
+    if (login.isPending) return;
+    enter(true);
+  };
+
   const changeCode = (value: string) => {
     setCode(value);
     if (verify.error) verify.reset();
+    if (login.error) login.reset();
     if (value.length === VERIFICATION_CODE_LENGTH) submit(value);
   };
 
@@ -68,9 +103,11 @@ export function VerifyEmail() {
 
   const error = verify.error
     ? requestError(verify.error, 'wrongCode')
-    : resend.error
-      ? requestError(resend.error, 'resendFailed')
-      : null;
+    : login.error
+      ? requestError(login.error, 'notConfirmed')
+      : resend.error
+        ? requestError(resend.error, 'resendFailed')
+        : null;
   const canResend = cooldown.left === 0 && !resend.isPending;
 
   return (
@@ -87,9 +124,8 @@ export function VerifyEmail() {
       action={
         <GradientButton
           label={t('auth.confirmedViaLink')}
-          onPress={() =>
-            router.replace({ pathname: '/login', params: { email } })
-          }
+          onPress={confirmedViaLink}
+          disabled={login.isPending}
         />
       }
     >
@@ -100,7 +136,7 @@ export function VerifyEmail() {
           onChangeText={changeCode}
           length={VERIFICATION_CODE_LENGTH}
           error={!!verify.error}
-          editable={!verify.isPending}
+          editable={!verify.isPending && !login.isPending}
           autoFocus
           accessibilityLabel={t('auth.codeLabel')}
         />

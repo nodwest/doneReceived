@@ -7,6 +7,7 @@ export type RequestError =
   | 'wrongCode'
   | 'resendFailed'
   | 'wrongCredentials'
+  | 'notConfirmed'
   | 'unknown';
 
 /**

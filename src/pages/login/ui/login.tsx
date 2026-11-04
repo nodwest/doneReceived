@@ -77,7 +77,7 @@ export function Login() {
         <AuthFootnote
           text={t('auth.noAccount')}
           linkLabel={t('auth.signUp')}
-          href="/registration"
+          href="/role-select"
         />
       }
     >
