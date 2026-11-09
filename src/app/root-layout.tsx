@@ -3,6 +3,7 @@ import {
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
+  Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
@@ -53,6 +54,7 @@ export function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    Inter_800ExtraBold,
   });
 
   // Сохранённая сессия: вошли ли раньше и токен для запросов к API.

@@ -30,3 +30,7 @@ export interface Task {
 
 /** Награда в формате карточек: «$5.00». */
 export const formatReward = (reward: number) => `$${reward.toFixed(2)}`;
+
+/** Награда коротко, без копеек: «$5». */
+export const formatRewardShort = (reward: number) =>
+  Number.isInteger(reward) ? `$${reward}` : `$${reward.toFixed(2)}`;

@@ -1,26 +1,27 @@
+import type { ReactNode } from 'react';
 import {
-  Image,
-  StyleSheet,
+  Pressable,
   Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
-import {
-  formatClock,
-  formatCountdown,
-  formatDayInPhrase,
-  formatTimeAgo,
-  useNow,
-} from '@shared/lib';
+import { formatClock, formatDayInPhrase, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { Icon, SourceTile, type IconName } from '@shared/ui';
+import { Icon, type IconName } from '@shared/ui';
 import type { Task, TaskAssignee } from '../model';
-import { CardHeader, RewardHighlight, TaskInfo } from './task-card-parts';
-import { styles as cardStyles } from './task-card.styled';
-import { CHILD_CARD_GRADIENT, styles } from './child-task-card.styled';
+import {
+  InfoTiles,
+  PhotoSection,
+  ReviewPill,
+  SectionLabel,
+  TaskBrief,
+  TaskSheet,
+  TimerPill,
+} from './task-sheet';
+import { styles as sheetStyles } from './task-sheet.styled';
+import { styles } from './child-task-card.styled';
 
 type ChildTaskCardProps = {
   task: Task;
@@ -28,19 +29,22 @@ type ChildTaskCardProps = {
   author: Pick<TaskAssignee, 'name' | 'avatar'>;
   onTakePhoto?: () => void;
   onPickPhoto?: () => void;
+  /** Кнопка внизу карточки: I did it! или Redo task. */
+  footer?: ReactNode;
   style?: StyleProp<ViewStyle>;
 };
 
 /**
- * Крупная карточка задания у ребёнка: от кого задание, сколько осталось,
- * описание, фото-отчёт и награда. Активная — голубая, с выбором фото (камера
- * или галерея); на проверке — жёлтая, с отправленным фото.
+ * Крупная карточка задания у ребёнка. Активная — голубая: от кого задание,
+ * таймер, описание с наградой, срок и когда выдано, фото-отчёт (камера или
+ * галерея). На проверке — оранжевая: отправленное фото и описание.
  */
 export function ChildTaskCard({
   task,
   author,
   onTakePhoto,
   onPickPhoto,
+  footer,
   style,
 }: ChildTaskCardProps) {
   const { t } = useTranslation();
@@ -48,106 +52,94 @@ export function ChildTaskCard({
   const review = task.status === 'review';
   const expires = task.expiresAt ? new Date(task.expiresAt) : null;
   const created = new Date(task.createdAt);
-  const done = task.doneAt ? new Date(task.doneAt) : null;
-
-  let meta = t('taskCard.created', {
-    day: formatDayInPhrase(created, now),
-    time: formatClock(created),
-  });
-  if (review) {
-    meta = done
-      ? t('taskCard.markedDoneAgo', { ago: formatTimeAgo(done, now) })
-      : t('taskCard.markedDone');
-  }
 
   return (
-    <LinearGradient
-      colors={
-        review
-          ? [theme.colors.reviewFrom, theme.colors.reviewTo]
-          : CHILD_CARD_GRADIENT
+    <TaskSheet
+      tone={review ? 'review' : 'child'}
+      avatar={author.avatar}
+      caption={t('taskCard.taskFrom')}
+      name={author.name}
+      aside={
+        review ? (
+          <ReviewPill label={t('tasks.onReview')} />
+        ) : (
+          expires && <TimerPill ms={expires.getTime() - now.getTime()} />
+        )
       }
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      locations={[0, 0.7071]}
-      style={[
-        cardStyles.card,
-        review ? cardStyles.cardReview : cardStyles.cardActive,
-        style,
-      ]}
+      title={task.title}
+      footer={footer}
+      style={style}
     >
-      <CardHeader
-        assignee={author}
-        caption={t('taskCard.taskFrom')}
-        aside={
-          !review &&
-          expires && (
-            <View style={cardStyles.timer}>
-              <Text style={cardStyles.timerLabel}>{t('taskCard.endsIn')}</Text>
-              <Text style={[cardStyles.timerValue, styles.timerValue]}>
-                {formatCountdown(expires.getTime() - now.getTime())}
+      {review && task.photo && (
+        <PhotoSection
+          label={t('taskCard.yourPhoto')}
+          photo={task.photo}
+          counter="1 / 1"
+        />
+      )}
+      <TaskBrief
+        label={t('taskCard.whatToDo')}
+        reward={task.reward}
+        description={task.description}
+      />
+      {!review && (
+        <>
+          <InfoTiles
+            tiles={[
+              {
+                icon: 'calendar',
+                tone: 'warm',
+                label: expires
+                  ? t('taskCard.dueDay', {
+                      day: formatDayInPhrase(expires, now),
+                    })
+                  : t('taskCard.due'),
+                value: expires
+                  ? formatClock(expires)
+                  : t('taskCard.noDeadline'),
+              },
+              {
+                icon: 'sparkle',
+                tone: 'cool',
+                label: t('taskCard.givenDay', {
+                  day: formatDayInPhrase(created, now),
+                }),
+                value: formatClock(created),
+              },
+            ]}
+          />
+          <View style={sheetStyles.section}>
+            <View style={sheetStyles.sectionHead}>
+              <SectionLabel>{t('taskCard.photoReport')}</SectionLabel>
+              <View style={styles.optional}>
+                <Text style={styles.optionalText}>
+                  {t('taskCard.optional')}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.drop}>
+              <View style={styles.sources}>
+                <PhotoSource
+                  icon="camera-outline"
+                  label={t('taskCard.takePhoto')}
+                  onPress={onTakePhoto}
+                  variant="camera"
+                />
+                <PhotoSource
+                  icon="image-add"
+                  label={t('taskCard.gallery')}
+                  onPress={onPickPhoto}
+                  variant="gallery"
+                />
+              </View>
+              <Text style={styles.hint}>
+                {t('taskCard.photoHint', { name: author.name })}
               </Text>
             </View>
-          )
-        }
-      />
-      <TaskInfo
-        task={task}
-        meta={meta}
-        review={review}
-        grow
-        iconColor={review ? theme.colors.reviewAccent : theme.colors.childFrom}
-      />
-      {review ? (
-        <View style={cardStyles.photo}>
-          {task.photo ? (
-            <Image
-              source={task.photo}
-              style={cardStyles.photoImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <LinearGradient
-              colors={[theme.colors.photoFrom, theme.colors.photoTo]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={cardStyles.photoImage}
-            />
-          )}
-          <View style={cardStyles.photoTag}>
-            <Icon name="camera" size={14} color={theme.colors.ink} />
-            <Text style={cardStyles.photoTagText}>
-              {t('taskCard.photoReport')}
-            </Text>
           </View>
-        </View>
-      ) : (
-        <View style={styles.report}>
-          <View style={styles.reportHead}>
-            <Text style={styles.reportTitle}>{t('taskCard.photoReport')}</Text>
-            <View style={styles.chip}>
-              <Text style={styles.chipText}>{t('tasks.active')}</Text>
-            </View>
-          </View>
-          <View style={styles.dropZone}>
-            <ZoneFill />
-            <PhotoSource
-              icon="camera-outline"
-              label={t('taskCard.takePhoto')}
-              onPress={onTakePhoto}
-            />
-            <View style={styles.divider} />
-            <PhotoSource
-              icon="image-add"
-              label={t('taskCard.addFromGallery')}
-              onPress={onPickPhoto}
-            />
-          </View>
-          <Text style={styles.hint}>{t('taskCard.photoHint')}</Text>
-        </View>
+        </>
       )}
-      <RewardHighlight reward={task.reward} />
-    </LinearGradient>
+    </TaskSheet>
   );
 }
 
@@ -155,27 +147,24 @@ type PhotoSourceProps = {
   icon: IconName;
   label: string;
   onPress?: () => void;
+  variant: 'camera' | 'gallery';
 };
 
-/** Половина зоны фото: пунктирная плитка с иконкой и подпись под ней. */
-function PhotoSource({ icon, label, onPress }: PhotoSourceProps) {
+/** Кнопка источника фото: камера (голубая) или галерея (белая). */
+function PhotoSource({ icon, label, onPress, variant }: PhotoSourceProps) {
   return (
-    <View style={styles.source}>
-      <SourceTile icon={icon} accessibilityLabel={label} onPress={onPress} />
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.source,
+        styles[variant],
+        pressed && styles.pressed,
+      ]}
+    >
+      <Icon name={icon} size={20} color={theme.colors.childDeep} />
       <Text style={styles.sourceLabel}>{label}</Text>
-    </View>
-  );
-}
-
-/** Лёгкая голубая заливка под пунктирной рамкой зоны фото. */
-function ZoneFill() {
-  return (
-    <LinearGradient
-      colors={['rgba(74, 158, 240, 0.1)', 'rgba(168, 217, 255, 0.08)']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      locations={[0, 0.7071]}
-      style={StyleSheet.absoluteFill}
-    />
+    </Pressable>
   );
 }

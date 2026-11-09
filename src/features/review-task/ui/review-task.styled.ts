@@ -11,11 +11,11 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  // Кнопки проверки в футере экрана занимают всю его ширину.
+  // Кнопки проверки занимают всю ширину низа карточки.
   reviewActions: {
     flex: 1,
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
 
   body: {

@@ -8,23 +8,31 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { DoneButton, TaskFooterAction } from '@features/complete-task';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
-import { TaskList } from '@widgets/task-list';
 import {
   TasksHeader,
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
 import {
+  ChildReviewRow,
   ChildTaskCard,
-  ChildTaskRow,
+  ChildTaskTile,
   filterTasks,
+  sortTasksByUrgency,
   useTasks,
   type Task,
 } from '@entities/task';
+import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast, useIsCompact } from '@shared/lib';
-import { childAccountMock, parentProfilesMock } from '@shared/mocks';
-import { FOOTER_PADDING_VERTICAL, styles } from './my-tasks.styled';
+import {
+  childAccountMock,
+  childProfilesMock,
+  parentProfilesMock,
+} from '@shared/mocks';
+import { EarnGoalCard } from './earn-goal-card';
+import { SectionHead } from './section-head';
+import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
 
 const NO_TASKS: Task[] = [];
 
@@ -34,25 +42,41 @@ const findAuthor = (id: number) =>
   parentProfilesMock[0];
 
 /**
- * Вкладка Tasks у ребёнка (Emma, временный режим ребёнка): его задания
- * списком или карточками, вкладки All / On review. В списке у активного —
- * I did it!, у задания на проверке — «Waiting for approval…». Тап по строке
- * открывает карточку; в футере карточки I did it! отправляет на проверку,
- * «Переделать» возвращает в активные. `?tab=review` открывает вкладку
- * проверки, `?task=<id>` — сразу карточку задания.
+ * Вкладка Tasks у ребёнка (Emma, временный режим ребёнка). Списком: сверху
+ * «You can earn» — сколько принесут активные задания и насколько приблизят
+ * текущее желание, дальше разделы To do (плитки с I did it!) и On review
+ * (кто проверяет и сколько придёт). Тап открывает карточку: внизу карточки
+ * I did it! отправляет на проверку, Redo task возвращает в активные.
+ * `?tab=review` открывает вкладку проверки, `?task=<id>` — сразу карточку.
  */
 export function MyTasksPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ tab?: string; task?: string }>();
   const { data = NO_TASKS, isPending } = useTasks();
+  // Порядок как в списке: активные по сроку, затем на проверке — карточки
+  // листаются в том же порядке.
   const allTasks = useMemo(
-    () => filterTasks(data, { assigneeId: childAccountMock.id }),
+    () =>
+      sortTasksByUrgency(
+        filterTasks(data, { assigneeId: childAccountMock.id }),
+      ),
     [data],
+  );
+  const activeTasks = useMemo(
+    () => allTasks.filter((task) => task.status === 'active'),
+    [allTasks],
   );
   const reviewTasks = useMemo(
     () => allTasks.filter((task) => task.status === 'review'),
     [allTasks],
+  );
+  const balance =
+    childProfilesMock.find((child) => child.id === childAccountMock.id)
+      ?.balance ?? 0;
+  const { current: currentWish } = useWishlistProgress(
+    childAccountMock.id,
+    balance,
   );
   const { bottom } = useSafeAreaInsets();
   const gutter = useIsCompact() ? 16 : 24;
@@ -77,14 +101,33 @@ export function MyTasksPage() {
     tasks.findIndex((task) => task.id === currentId),
     0,
   );
-  const current: Task | undefined = tasks[currentIndex];
-  const showFooter = view === 'cards' && current;
+  const cards = view === 'cards' && tasks.length > 0;
+  const earn = activeTasks.reduce((sum, task) => sum + task.reward, 0);
 
   const openCard = (task: Task) => {
     setCurrentId(task.id);
     setView('cards');
   };
   const photoStub = () => showToast(t('taskCard.photoSoon'));
+
+  const reviewSection = reviewTasks.length > 0 && (
+    <View style={styles.section}>
+      <SectionHead
+        tone="review"
+        title={t('tasks.onReview')}
+        count={reviewTasks.length}
+        hint={t('myTasks.waitingParent')}
+      />
+      {reviewTasks.map((task) => (
+        <ChildReviewRow
+          key={task.id}
+          task={task}
+          author={findAuthor(task.createdBy)}
+          onPress={openCard}
+        />
+      ))}
+    </View>
+  );
 
   return (
     <View style={styles.screen}>
@@ -104,20 +147,16 @@ export function MyTasksPage() {
             }
           />
         </View>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={[
-            styles.body,
-            view === 'cards' && styles.bodyCards,
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          {isPending ? null : tasks.length === 0 ? (
-            <Text style={styles.empty}>
-              {tab === 'review' ? t('tasks.emptyReview') : t('tasks.emptyAll')}
-            </Text>
-          ) : view === 'cards' ? (
+        {cards ? (
+          // Карточки во всю высоту: кнопка внутри карточки, навбара нет.
+          <View
+            style={[
+              styles.cards,
+              { paddingBottom: Math.max(bottom, CARDS_PADDING_BOTTOM) },
+            ]}
+          >
             <TaskCarousel
+              fullWidth
               tone="child"
               tasks={tasks}
               initialIndex={currentIndex}
@@ -128,37 +167,67 @@ export function MyTasksPage() {
                   author={findAuthor(task.createdBy)}
                   onTakePhoto={photoStub}
                   onPickPhoto={photoStub}
+                  footer={<TaskFooterAction task={task} />}
                   style={style}
                 />
               )}
             />
-          ) : (
-            <TaskList
-              tasks={tasks}
-              renderTask={(task) => (
-                <ChildTaskRow
-                  task={task}
-                  onPress={openCard}
-                  action={<DoneButton task={task} size="sm" />}
-                />
-              )}
-            />
-          )}
-        </ScrollView>
-        {showFooter ? (
-          <View
-            style={[
-              styles.footer,
-              {
-                paddingHorizontal: gutter,
-                paddingBottom: Math.max(bottom, FOOTER_PADDING_VERTICAL),
-              },
-            ]}
-          >
-            <TaskFooterAction task={current} />
           </View>
         ) : (
-          <BottomNav activeKey="tasks" />
+          <>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={styles.body}
+              showsVerticalScrollIndicator={false}
+            >
+              {isPending ? null : tasks.length === 0 ? (
+                <Text style={styles.empty}>
+                  {tab === 'review'
+                    ? t('tasks.emptyReview')
+                    : t('tasks.emptyAll')}
+                </Text>
+              ) : tab === 'review' ? (
+                reviewSection
+              ) : (
+                <>
+                  {earn > 0 && (
+                    <EarnGoalCard
+                      earn={earn}
+                      count={activeTasks.length}
+                      goal={
+                        currentWish && {
+                          title: currentWish.wish.title,
+                          saved: currentWish.saved,
+                          price: currentWish.wish.price,
+                        }
+                      }
+                    />
+                  )}
+                  {activeTasks.length > 0 && (
+                    <View style={styles.section}>
+                      <SectionHead
+                        tone="child"
+                        title={t('myTasks.toDo')}
+                        count={activeTasks.length}
+                        hint={t('myTasks.soonestFirst')}
+                      />
+                      {activeTasks.map((task) => (
+                        <ChildTaskTile
+                          key={task.id}
+                          task={task}
+                          author={findAuthor(task.createdBy)}
+                          onPress={openCard}
+                          action={<DoneButton task={task} />}
+                        />
+                      ))}
+                    </View>
+                  )}
+                  {reviewSection}
+                </>
+              )}
+            </ScrollView>
+            <BottomNav activeKey="tasks" />
+          </>
         )}
       </SafeAreaView>
     </View>

@@ -7,6 +7,9 @@ const GUTTER = 12;
 const GAP = 12;
 // Какая часть следующей карточки выглядывает у правого края (как в макете).
 const PEEK = 16;
+// Без подглядывания карточка во всю ширину: соседняя дальше края на
+// расстояние не меньше отступа, иначе её кромка была бы видна.
+const FULL_GAP = 16;
 // Запас под тень карточки: снаружи он гасится отрицательным отступом.
 const SHADOW_TOP = 12;
 const SHADOW_BOTTOM = 24;
@@ -23,6 +26,13 @@ type SnapCarouselProps<T> = {
   onIndexChange?: (index: number) => void;
   /** Цвет активной точки. */
   dotColor?: string;
+  /**
+   * Сколько следующей карточки видно у правого края; 0 — карточка во всю
+   * ширину, о соседних говорят только точки.
+   */
+  peek?: number;
+  /** Боковой отступ карточки от края экрана. */
+  gutter?: number;
 };
 
 /**
@@ -36,7 +46,10 @@ export function SnapCarousel<T>({
   initialIndex = 0,
   onIndexChange,
   dotColor = theme.colors.violet,
+  peek = PEEK,
+  gutter = GUTTER,
 }: SnapCarouselProps<T>) {
+  const gap = peek === 0 ? Math.max(FULL_GAP, gutter) : GAP;
   const {
     scrollRef,
     index,
@@ -51,9 +64,9 @@ export function SnapCarousel<T>({
     onScrollEndDrag,
   } = useSnapCarousel({
     count: items.length,
-    gutter: GUTTER,
-    peek: PEEK,
-    gap: GAP,
+    gutter,
+    peek,
+    gap,
     initialIndex,
     // Новый набор (смена вкладки) — та же лента, она просто встаёт на место.
     resetKey: items,
@@ -85,9 +98,14 @@ export function SnapCarousel<T>({
         showsHorizontalScrollIndicator={false}
         decelerationRate="fast"
         // Первый кадр до замера ширины рисовал бы карточки не того размера.
-        style={[styles.scroll, !ready && styles.hidden]}
+        style={[
+          styles.scroll,
+          { marginHorizontal: -gutter },
+          !ready && styles.hidden,
+        ]}
         contentContainerStyle={[
           styles.track,
+          { gap, paddingHorizontal: gutter },
           !single && { paddingRight: trackPaddingRight },
           { minHeight },
         ]}
@@ -134,14 +152,11 @@ const styles = StyleSheet.create({
   // Лента выходит за боковые отступы страницы, чтобы следующая карточка была видна у края.
   scroll: {
     flexGrow: 1,
-    marginHorizontal: -GUTTER,
     marginTop: -SHADOW_TOP,
     marginBottom: -SHADOW_BOTTOM,
   },
   track: {
     flexGrow: 1,
-    gap: GAP,
-    paddingHorizontal: GUTTER,
     paddingTop: SHADOW_TOP,
     paddingBottom: SHADOW_BOTTOM,
   },

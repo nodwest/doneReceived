@@ -14,12 +14,12 @@ import {
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
-import { filterTasks, useTasks, type Task } from '@entities/task';
+import { filterTasks, TaskCard, useTasks, type Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
-import { PillButton } from '@shared/ui';
+import { CardButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
 import { childrenMock, parentProfilesMock } from '@shared/mocks';
-import { FOOTER_PADDING_VERTICAL, styles } from './tasks.styled';
+import { CARDS_PADDING_BOTTOM, styles } from './tasks.styled';
 
 const NO_TASKS: Task[] = [];
 
@@ -83,8 +83,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
     tasks.findIndex((task) => task.id === currentId),
     0,
   );
-  const current: Task | undefined = tasks[currentIndex];
-  const showFooter = view === 'cards' && current;
+  const cards = view === 'cards' && tasks.length > 0;
 
   if (scope !== 'all' && !owner) return <Redirect href="/" />;
 
@@ -120,71 +119,76 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
             tabs={scope !== 'parent'}
           />
         </View>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={[
-            styles.body,
-            view === 'cards' && styles.bodyCards,
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          {isPending ? null : tasks.length === 0 ? (
-            <Text style={styles.empty}>{emptyText}</Text>
-          ) : view === 'cards' ? (
+        {cards ? (
+          // Карточки во всю высоту: кнопки внутри карточки, навбара нет.
+          <View
+            style={[
+              styles.cards,
+              { paddingBottom: Math.max(bottom, CARDS_PADDING_BOTTOM) },
+            ]}
+          >
             <TaskCarousel
+              fullWidth
               tasks={tasks}
               initialIndex={currentIndex}
               onIndexChange={(index) => setCurrentId(tasks[index].id)}
-            />
-          ) : (
-            <TaskList
-              tasks={tasks}
-              onSelect={(task) => {
-                setCurrentId(task.id);
-                setView('cards');
-              }}
-            />
-          )}
-        </ScrollView>
-        {showFooter ? (
-          <View
-            style={[
-              styles.footer,
-              {
-                paddingHorizontal: gutter,
-                paddingBottom: Math.max(bottom, FOOTER_PADDING_VERTICAL),
-              },
-            ]}
-          >
-            {/* Кнопки пока заглушки: показывают тост, задачи и бейдж не меняются. */}
-            {current.status === 'review' ? (
-              <ReviewActions
-                childName={current.assignee.name}
-                onApprove={() => showToast(t('tasks.approvedToast'))}
-                onReject={() => showToast(t('tasks.rejectedToast'))}
-              />
-            ) : (
-              <>
-                <PillButton
-                  label={t('tasks.cancelTask')}
-                  variant="outline"
-                  onPress={() => showToast(t('tasks.cancelledToast'))}
-                />
-                <PillButton
-                  label={t('tasks.edit')}
-                  variant="dark"
-                  onPress={() =>
-                    router.push({
-                      pathname: '/edit-task',
-                      params: { id: String(current.id) },
-                    })
+              renderTask={(task, style) => (
+                <TaskCard
+                  task={task}
+                  style={style}
+                  footer={
+                    // Кнопки пока заглушки: показывают тост, задачи и бейдж не меняются.
+                    task.status === 'review' ? (
+                      <ReviewActions
+                        childName={task.assignee.name}
+                        onApprove={() => showToast(t('tasks.approvedToast'))}
+                        onReject={() => showToast(t('tasks.rejectedToast'))}
+                      />
+                    ) : (
+                      <>
+                        <CardButton
+                          label={t('tasks.cancelTask')}
+                          variant="outline"
+                          onPress={() => showToast(t('tasks.cancelledToast'))}
+                        />
+                        <CardButton
+                          label={t('tasks.edit')}
+                          variant="dark"
+                          onPress={() =>
+                            router.push({
+                              pathname: '/edit-task',
+                              params: { id: String(task.id) },
+                            })
+                          }
+                        />
+                      </>
+                    )
                   }
                 />
-              </>
-            )}
+              )}
+            />
           </View>
         ) : (
-          <BottomNav activeKey={owner ? 'family' : 'tasks'} />
+          <>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={styles.body}
+              showsVerticalScrollIndicator={false}
+            >
+              {isPending ? null : tasks.length === 0 ? (
+                <Text style={styles.empty}>{emptyText}</Text>
+              ) : (
+                <TaskList
+                  tasks={tasks}
+                  onSelect={(task) => {
+                    setCurrentId(task.id);
+                    setView('cards');
+                  }}
+                />
+              )}
+            </ScrollView>
+            <BottomNav activeKey={owner ? 'family' : 'tasks'} />
+          </>
         )}
       </SafeAreaView>
     </View>

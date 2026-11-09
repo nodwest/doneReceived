@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from '@shared/i18n';
-import { PillButton } from '@shared/ui';
+import { CardButton } from '@shared/ui';
 import type { RejectDecision } from '../model/reject-reasons';
 import { RejectReasonSheet } from './reject-reason-sheet';
 import { styles } from './review-task.styled';
@@ -12,7 +12,10 @@ type ReviewActionsProps = {
   onReject: (decision: RejectDecision) => void;
 };
 
-/** Кнопки проверки задания: Reject открывает шторку с причиной, Approve подтверждает. */
+/**
+ * Кнопки проверки внизу карточки задания: Reject открывает шторку с причиной,
+ * Approve подтверждает.
+ */
 export function ReviewActions({
   childName,
   onApprove,
@@ -23,12 +26,12 @@ export function ReviewActions({
 
   return (
     <View style={styles.reviewActions}>
-      <PillButton
+      <CardButton
         label={t('reviewTask.reject')}
-        variant="danger"
+        variant="danger-outline"
         onPress={() => setRejecting(true)}
       />
-      <PillButton
+      <CardButton
         label={t('reviewTask.approve')}
         variant="primary"
         onPress={onApprove}

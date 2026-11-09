@@ -1,27 +1,29 @@
 import type { Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
-import { PillButton } from '@shared/ui';
+import { CardButton } from '@shared/ui';
 import { useTaskActions } from '../model/use-task-actions';
 
 /**
- * Кнопка в футере карточки ребёнка: у активного задания — I did it!
- * (на проверку), у задания на проверке — «Переделать» (снова активное).
+ * Кнопка внизу карточки ребёнка: у активного задания — I did it!
+ * (на проверку), у задания на проверке — Redo task (снова активное).
  */
 export function TaskFooterAction({ task }: { task: Task }) {
   const { t } = useTranslation();
   const { markDone, redo, isPending } = useTaskActions();
 
   return task.status === 'review' ? (
-    <PillButton
+    <CardButton
       label={t('completeTask.redo')}
-      variant="outline"
+      variant="review-outline"
+      icon="refresh"
       disabled={isPending}
       onPress={() => redo(task)}
     />
   ) : (
-    <PillButton
+    <CardButton
       label={t('completeTask.done')}
       variant="child"
+      icon="check"
       disabled={isPending}
       onPress={() => markDone(task)}
     />

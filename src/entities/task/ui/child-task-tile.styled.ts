@@ -3,31 +3,36 @@ import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   tile: {
-    gap: 14,
-    padding: 16,
+    gap: 12,
+    padding: 14,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: theme.colors.line,
+    borderColor: theme.colors.cardBorder,
     backgroundColor: theme.colors.white,
-    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0px 6px 16px rgba(26, 26, 51, 0.06)',
   },
   pressed: {
     opacity: 0.85,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+  main: {
     gap: 12,
   },
-  info: {
+  head: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: theme.colors.white,
+    boxShadow: '0px 2px 6px rgba(26, 26, 51, 0.12)',
+  },
+  titleWrap: {
     flex: 1,
     gap: 3,
-  },
-  label: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    fontFamily: theme.fonts.semibold,
-    color: theme.colors.childFrom,
   },
   title: {
     fontSize: 17,
@@ -35,27 +40,47 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
-  aside: {
-    alignItems: 'flex-end',
-    gap: 8,
+  from: {
+    fontSize: 13,
+    letterSpacing: tracking(13),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
+  },
+  fromName: {
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.inkSoft,
   },
   timer: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.childDeep,
+    height: 34,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingLeft: 10,
+    paddingRight: 12,
+    borderRadius: 18,
+  },
+  timerWarm: {
+    backgroundColor: theme.colors.timerWarm,
+  },
+  timerCool: {
+    backgroundColor: theme.colors.timerCool,
+  },
+  timerText: {
+    fontSize: 15,
+    letterSpacing: tracking(15),
+    fontFamily: theme.fonts.bold,
     fontVariant: ['tabular-nums'],
   },
-  reward: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    backgroundColor: theme.colors.reviewFrom,
+  description: {
+    fontSize: theme.fontSize.sm,
+    lineHeight: 20,
+    letterSpacing: tracking(theme.fontSize.sm),
+    fontFamily: theme.fonts.regular,
+    color: theme.colors.inkSoft,
   },
-  rewardText: {
-    fontSize: theme.fontSize.md,
-    letterSpacing: tracking(theme.fontSize.md),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.reviewAccent,
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });
