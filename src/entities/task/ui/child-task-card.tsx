@@ -29,6 +29,8 @@ type ChildTaskCardProps = {
   author: Pick<TaskAssignee, 'name' | 'avatar'>;
   onTakePhoto?: () => void;
   onPickPhoto?: () => void;
+  /** Кто из родителей вернул задание (если его возвращали). */
+  rejectedBy?: Pick<TaskAssignee, 'name'>;
   /** Кнопка внизу карточки: I did it! или Redo task. */
   footer?: ReactNode;
   style?: StyleProp<ViewStyle>;
@@ -44,6 +46,7 @@ export function ChildTaskCard({
   author,
   onTakePhoto,
   onPickPhoto,
+  rejectedBy,
   footer,
   style,
 }: ChildTaskCardProps) {
@@ -71,11 +74,25 @@ export function ChildTaskCard({
       style={style}
     >
       {review && task.photo && (
-        <PhotoSection
-          label={t('taskCard.yourPhoto')}
-          photo={task.photo}
-          counter="1 / 1"
-        />
+        <PhotoSection label={t('taskCard.yourPhoto')} photo={task.photo} />
+      )}
+      {!review && task.rejection && (
+        <View style={styles.rejection}>
+          <View style={styles.rejectionIcon}>
+            <Icon name="refresh" size={16} color={theme.colors.dangerText} />
+          </View>
+          <View style={styles.rejectionText}>
+            <Text style={styles.rejectionTitle}>
+              {t('taskCard.sentBack', {
+                name: rejectedBy?.name ?? author.name,
+              })}
+            </Text>
+            <Text style={styles.rejectionReason}>
+              {t(`reviewTask.reasons.${task.rejection.reason}`)}
+              {task.rejection.comment ? ` · «${task.rejection.comment}»` : ''}
+            </Text>
+          </View>
+        </View>
       )}
       <TaskBrief
         label={t('taskCard.whatToDo')}

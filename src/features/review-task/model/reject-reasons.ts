@@ -1,4 +1,6 @@
-export type RejectReasonKey = 'not-done-properly' | 'not-finished' | 'other';
+import type { RejectReasonKey } from '@entities/task';
+
+export type { RejectReasonKey };
 
 /** Причины отказа по порядку; подписи — reviewTask.reasons.*. */
 export const rejectReasons: readonly RejectReasonKey[] = [

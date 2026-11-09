@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { ScrollView, Text, View, type ViewStyle } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import {
   ChildTransactionCard,
@@ -26,7 +26,7 @@ import {
   formatWeekdayShort,
   startOfDay,
 } from '@shared/lib';
-import { childAccountMock, childProfilesMock } from '@shared/mocks';
+import { childAccountMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import { RoundButton, SegmentedFilter, SnapCarousel } from '@shared/ui';
 import { styles } from './transactions.styled';
@@ -45,6 +45,10 @@ type ScreenProps<T extends { id: number; at: string }, F extends string> = {
   renderCard: (item: T, style: ViewStyle) => ReactNode;
 };
 
+// В русском день недели приходит строчным: «сб» → «Сб».
+const capitalize = (text: string) =>
+  text.charAt(0).toUpperCase() + text.slice(1);
+
 /** «Today, Nov 13», «Yesterday, Nov 12», «Mon, Nov 11». */
 function useDayTitle() {
   const { t } = useTranslation();
@@ -54,7 +58,7 @@ function useDayTitle() {
       date.getTime() >= addDays(today, -1).getTime() &&
       date.getTime() <= today.getTime();
     return t('transactions.dayHeader', {
-      day: recent ? formatDayLabel(date) : formatWeekdayShort(date),
+      day: recent ? formatDayLabel(date) : capitalize(formatWeekdayShort(date)),
       date: formatMonthDay(date),
     });
   };
@@ -65,7 +69,8 @@ function useDayTitle() {
  * транзакции по дням с итогами дня (пришло зелёным, ушло — оранжевым у
  * родителя, синим у ребёнка). Тап по строке открывает транзакции этого дня
  * карточками (листаются, навбара нет), кнопка списка или «назад» — обратно к
- * списку. Кнопка карточек в шапке открывает самый свежий день.
+ * списку. Кнопка карточек в шапке открывает самый свежий день,
+ * `?transaction=<id>` — сразу карточку этой транзакции.
  */
 function TransactionsScreen<
   T extends { id: number; at: string },
@@ -84,6 +89,29 @@ function TransactionsScreen<
   const dayTitle = useDayTitle();
   // Открытые карточки: день и номер транзакции в нём; null — список.
   const [open, setOpen] = useState<{ day: number; index: number } | null>(null);
+  // ?transaction=<id> (тап по строке в Wallet) — сразу карточка этой
+  // транзакции; «назад» из неё уводит обратно в Wallet.
+  const { transaction: linkParam } = useLocalSearchParams<{
+    transaction?: string;
+  }>();
+  const [linked, setLinked] = useState(linkParam !== undefined);
+  const [linkPending, setLinkPending] = useState(linkParam !== undefined);
+  if (linkPending && !isPending) {
+    setLinkPending(false);
+    const dayIndex = days.findIndex((day) =>
+      day.items.some((item) => String(item.id) === linkParam),
+    );
+    if (dayIndex >= 0) {
+      setOpen({
+        day: dayIndex,
+        index: days[dayIndex].items.findIndex(
+          (item) => String(item.id) === linkParam,
+        ),
+      });
+    } else {
+      setLinked(false);
+    }
+  }
   const cardsDay = open ? days[open.day] : undefined;
   const cards = open !== null && cardsDay !== undefined;
   const leave = () =>
@@ -95,7 +123,7 @@ function TransactionsScreen<
         <RoundButton
           icon="arrow-left"
           accessibilityLabel={t('common.back')}
-          onPress={cards ? () => setOpen(null) : leave}
+          onPress={cards && !linked ? () => setOpen(null) : leave}
         />
         <Text style={styles.title} numberOfLines={1}>
           {t('transactions.title')}
@@ -104,7 +132,10 @@ function TransactionsScreen<
           <RoundButton
             icon="list"
             accessibilityLabel={t('tasks.showAsList')}
-            onPress={() => setOpen(null)}
+            onPress={() => {
+              setLinked(false);
+              setOpen(null);
+            }}
           />
         ) : days.length > 0 ? (
           <RoundButton
@@ -244,13 +275,6 @@ export function TransactionsPage() {
             wallet
               ? balanceAfter(wallet.transactions, wallet.balance, transaction)
               : 0
-          }
-          childBalance={
-            transaction.kind === 'payout'
-              ? childProfilesMock.find(
-                  (child) => child.id === transaction.child.id,
-                )?.balance
-              : undefined
           }
           onOpenTask={
             transaction.kind === 'payout'

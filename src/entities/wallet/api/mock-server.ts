@@ -9,6 +9,7 @@ import {
 import type {
   ChildTransaction,
   ChildWallet,
+  PayoutPayload,
   PayoutTransaction,
   Transaction,
   Wallet,
@@ -67,7 +68,8 @@ const payouts: PayoutTransaction[] = rewards
     taskDoneAt: reward.doneAt,
   }));
 
-const parentTransactions: Transaction[] = byNewest([
+let parentBalance: number = walletMock.balance;
+let parentTransactions: Transaction[] = byNewest([
   ...payouts,
   ...walletMock.cardTransactions.map(({ daysAgo, time, ...transaction }) => ({
     ...transaction,
@@ -106,17 +108,72 @@ function childTransactions(childId: number): ChildTransaction[] {
   ]);
 }
 
+// Кошельки детей: собираются при первом запросе и дальше живут в памяти.
+const childWallets = new Map<number, ChildWallet>();
+function childWallet(childId: number): ChildWallet {
+  let wallet = childWallets.get(childId);
+  if (!wallet) {
+    wallet = {
+      balance:
+        childProfilesMock.find((child) => child.id === childId)?.balance ?? 0,
+      transactions: childTransactions(childId),
+    };
+    childWallets.set(childId, wallet);
+  }
+  return wallet;
+}
+
 export const mockServer = {
   // Копия, как после сериализации ответа: снаружи данные «сервера» не изменить.
   wallet: (): Wallet => ({
-    balance: walletMock.balance,
+    balance: parentBalance,
     transactions: parentTransactions.map((transaction) => ({
       ...transaction,
     })),
   }),
-  childWallet: (childId: number): ChildWallet => ({
-    balance:
-      childProfilesMock.find((child) => child.id === childId)?.balance ?? 0,
-    transactions: childTransactions(childId),
-  }),
+  childWallet: (childId: number): ChildWallet => {
+    const wallet = childWallet(childId);
+    return {
+      balance: wallet.balance,
+      transactions: wallet.transactions.map((item) => ({ ...item })),
+    };
+  },
+
+  // Награда за подтверждённое задание: уходит из кошелька вошедшего родителя
+  // и приходит на баланс ребёнка.
+  payout: (payload: PayoutPayload) => {
+    const parent =
+      parentProfilesMock.find((item) => item.id === parentMock.id) ??
+      parentProfilesMock[0];
+    const task = {
+      task: payload.task,
+      operationId: payload.operationId,
+      taskDoneAt: payload.taskDoneAt,
+    };
+    parentBalance -= payload.amount;
+    parentTransactions = [
+      {
+        id: payload.operationId,
+        kind: 'payout',
+        amount: payload.amount,
+        at: payload.at,
+        child: payload.child,
+        ...task,
+      },
+      ...parentTransactions,
+    ];
+    const wallet = childWallet(payload.child.id);
+    wallet.balance += payload.amount;
+    wallet.transactions = [
+      {
+        id: payload.operationId,
+        kind: 'reward',
+        amount: payload.amount,
+        at: payload.at,
+        from: { id: parent.id, name: parent.name, avatar: parent.avatar },
+        ...task,
+      },
+      ...wallet.transactions,
+    ];
+  },
 };

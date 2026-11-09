@@ -25,6 +25,7 @@ import { formatMonthDay } from '@shared/lib';
 import {
   childAccountMock,
   childrenMock,
+  parentMock,
   parentProfilesMock,
 } from '@shared/mocks';
 import { theme } from '@shared/theme';
@@ -41,6 +42,7 @@ const findApprover = (id: number) =>
 /**
  * История наград по дням (открывается из Wallet и «See all» в профилях):
  * заработанные и упущенные награды на графике, итоги и награды выбранного дня.
+ * У родителя — только награды по его заданиям (выплаченные из его кошелька).
  * Тап по награде или кнопка карточек справа в шапке открывают карточки
  * выплаченных заданий этого дня (листаются), кнопка списка или «назад» —
  * обратно к графику на тот же день. С childId — история одного ребёнка от
@@ -49,7 +51,18 @@ const findApprover = (id: number) =>
  */
 export function RewardsHistoryPage({ childId }: { childId?: number }) {
   const { t } = useTranslation();
-  const { data: operations = NO_OPERATIONS, isPending } = useOperations();
+  const { data: allOperations = NO_OPERATIONS, isPending } = useOperations();
+  // Родитель видит награды только по своим заданиям — те, что выплатил из
+  // своего кошелька; ребёнок — все свои награды, от любого родителя.
+  const operations = useMemo(
+    () =>
+      childId === undefined
+        ? allOperations.filter(
+            (operation) => operation.parentId === parentMock.id,
+          )
+        : allOperations,
+    [allOperations, childId],
+  );
   const { data: wishes } = useWishes(childId ?? childAccountMock.id);
   const { data: childWallet } = useChildWallet(childId ?? childAccountMock.id);
   // Сегодня фиксируем на время жизни экрана: от него строится лента дней.

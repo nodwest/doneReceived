@@ -1,4 +1,4 @@
-import type { TaskState } from './task';
+import type { RejectReasonKey, TaskState } from './task';
 
 export enum TaskStatus {
   Pending = 'pending',
@@ -33,5 +33,12 @@ export interface UpdateTaskPayload extends CreateTaskPayload {
 /** Смена статуса ребёнком: I did it! (review) или «Переделать» (active). */
 export interface TaskStatusPayload {
   id: number;
-  status: TaskState;
+  status: Exclude<TaskState, 'done'>;
+}
+
+/** Отказ родителя на проверке: задание снова активно, с причиной. */
+export interface RejectTaskPayload {
+  id: number;
+  reason: RejectReasonKey;
+  comment: string;
 }

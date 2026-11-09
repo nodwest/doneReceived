@@ -26,3 +26,9 @@ export function useWallet() {
 export function useChildWallet(childId: number) {
   return useQuery(childWalletQueryOptions(childId));
 }
+
+/** Баланс ребёнка; пока кошелёк грузится — isPending. */
+export function useChildBalance(childId: number) {
+  const { data, isPending } = useChildWallet(childId);
+  return { balance: data?.balance ?? 0, isPending };
+}

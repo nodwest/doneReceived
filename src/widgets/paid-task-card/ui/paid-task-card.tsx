@@ -128,7 +128,6 @@ export function PaidTaskCard({
               : t('taskCard.yourPhoto')
           }
           photo={operation.photo}
-          counter="1 / 1"
           height={140}
         />
       )}

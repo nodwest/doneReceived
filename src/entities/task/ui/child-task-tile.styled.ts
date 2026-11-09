@@ -46,6 +46,10 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
+  sentBack: {
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.dangerText,
+  },
   fromName: {
     fontFamily: theme.fonts.semibold,
     color: theme.colors.inkSoft,

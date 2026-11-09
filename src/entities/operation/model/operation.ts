@@ -27,6 +27,12 @@ export interface Operation {
   photo: ImageSourcePropType | null;
 }
 
+/** Что сервер записывает в историю, когда родитель подтвердил задание. */
+export type RewardPayload = Pick<
+  Operation,
+  'title' | 'description' | 'amount' | 'child' | 'doneAt' | 'photo'
+>;
+
 /** Сумма в формате истории: «$10». */
 export const formatAmount = (amount: number) => `$${amount}`;
 

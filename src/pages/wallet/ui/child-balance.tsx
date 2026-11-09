@@ -1,15 +1,16 @@
 import { Image, Text, View, type ImageSourcePropType } from 'react-native';
-import { formatBalance } from '@entities/wallet';
+import { formatBalance, useChildBalance } from '@entities/wallet';
 import { styles } from './child-balance.styled';
 
 type ChildBalanceProps = {
+  childId: number;
   name: string;
   avatar: ImageSourcePropType;
-  balance: number;
 };
 
-/** Плитка баланса ребёнка: аватар, имя и сумма. */
-export function ChildBalance({ name, avatar, balance }: ChildBalanceProps) {
+/** Плитка баланса ребёнка: аватар, имя и сумма из его кошелька. */
+export function ChildBalance({ childId, name, avatar }: ChildBalanceProps) {
+  const { balance } = useChildBalance(childId);
   return (
     <View style={styles.card}>
       <Image source={avatar} style={styles.avatar} />

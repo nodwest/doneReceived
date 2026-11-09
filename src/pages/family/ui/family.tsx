@@ -11,7 +11,12 @@ import {
   useNewChildren,
   type NewChild,
 } from '@entities/family';
-import { countTasks, useTasks, type Task } from '@entities/task';
+import {
+  countChildTasks,
+  countTasks,
+  useTasks,
+  type Task,
+} from '@entities/task';
 import { MemberCard, useViewerRole } from '@entities/user';
 import {
   childProfilesMock,
@@ -126,7 +131,7 @@ export function FamilyPage() {
                   // Владелец аккаунта: те же цифры, что на главной. Карточка
                   // переключает на главную (как вкладка Home), чипы открывают
                   // Tasks поверх Family — «назад» вернёт сюда.
-                  const total = countTasks(tasks);
+                  const total = countTasks(tasks, { createdBy: parentMock.id });
                   const openTasks = (tab: 'all' | 'review') =>
                     router.push({ pathname: '/tasks', params: { tab } });
                   return (
@@ -175,7 +180,8 @@ export function FamilyPage() {
             <View style={styles.list}>
               {children.map((child) => {
                 const id = String(child.id);
-                const counts = countTasks(tasks, { assigneeId: child.id });
+                // Активные — все задания ребёнка, на проверке — только свои.
+                const counts = countChildTasks(tasks, child.id, parentMock.id);
                 const openTasks = (tab: 'all' | 'review') =>
                   router.push({
                     pathname: '/child/[id]/tasks',

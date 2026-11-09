@@ -13,13 +13,20 @@ import { TaskIconBadge } from '@entities/task';
 import { ChildTransactionRow, useChildWallet } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { childAccountMock, childProfilesMock } from '@shared/mocks';
+import { childAccountMock } from '@shared/mocks';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { RewardsHistoryLink } from './rewards-history-link';
 import { styles } from './wallet.styled';
 
 const NO_OPERATIONS: Operation[] = [];
+// Тап по транзакции — её карточка в истории транзакций.
+const openTransaction = (id: number) =>
+  router.push({
+    pathname: '/transactions',
+    params: { transaction: String(id) },
+  });
+
 // Сколько последних транзакций показываем; остальные — по «See all».
 const RECENT_TRANSACTIONS = 4;
 
@@ -48,11 +55,10 @@ export function ChildWalletPage() {
     (sum, operation) => sum + operation.amount,
     0,
   );
-  const balance =
-    childProfilesMock.find((child) => child.id === childAccountMock.id)
-      ?.balance ?? 0;
-  const wishlist = useWishlistProgress(childAccountMock.id, balance);
+  // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
   const { data: wallet } = useChildWallet(childAccountMock.id);
+  const balance = wallet?.balance ?? 0;
+  const wishlist = useWishlistProgress(childAccountMock.id, balance);
   const recent = wallet?.transactions.slice(0, RECENT_TRANSACTIONS) ?? [];
 
   return (
@@ -87,6 +93,7 @@ export function ChildWalletPage() {
                   <ChildTransactionRow
                     transaction={transaction}
                     rewardIcon={<TaskIconBadge size={40} />}
+                    onPress={() => openTransaction(transaction.id)}
                   />
                 </Fragment>
               ))

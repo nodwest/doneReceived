@@ -18,12 +18,12 @@ import {
   useTasks,
   type Task,
 } from '@entities/task';
+import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import {
   childAccountMock,
   childActivityMock,
-  childProfilesMock,
   parentProfilesMock,
 } from '@shared/mocks';
 import { styles } from './child-home.styled';
@@ -63,13 +63,14 @@ export function ChildHomePage() {
     [myTasks],
   );
   const counts = countTasks(myTasks);
-  const balance =
-    childProfilesMock.find((child) => child.id === childAccountMock.id)
-      ?.balance ?? 0;
+  // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
+  const { balance, isPending: balancePending } = useChildBalance(
+    childAccountMock.id,
+  );
   const wishlist = useWishlistProgress(childAccountMock.id, balance);
   // Пока задания и вишлист не пришли, тело не рисуем: иначе на кадр видны
   // нули, «Добавь желание» и экран без карусели, а потом всё прыгает вниз.
-  const loading = tasksPending || wishlist.isPending;
+  const loading = tasksPending || wishlist.isPending || balancePending;
 
   const openTask = (task: Task) =>
     router.push({ pathname: '/tasks', params: { task: String(task.id) } });

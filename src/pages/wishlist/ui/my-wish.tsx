@@ -5,10 +5,11 @@ import { AskToBuyButton } from '@features/ask-to-buy';
 import { useDeleteWish } from '@features/delete-wish';
 import { WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
+import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress, WishDetails } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { childAccountMock, childProfilesMock } from '@shared/mocks';
+import { childAccountMock } from '@shared/mocks';
 import { RoundButton, ScreenHeader, SourceTile } from '@shared/ui';
 import { styles } from './my-wish.styled';
 
@@ -20,9 +21,8 @@ import { styles } from './my-wish.styled';
 export function MyWishPage() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const balance =
-    childProfilesMock.find((child) => child.id === childAccountMock.id)
-      ?.balance ?? 0;
+  // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
+  const { balance } = useChildBalance(childAccountMock.id);
   const { progress, isPending } = useWishlistProgress(
     childAccountMock.id,
     balance,

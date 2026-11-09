@@ -11,6 +11,7 @@ import {
   formatBalance,
   formatTransactionTotal,
   transactionCode,
+  useChildBalance,
   type ChildTransaction,
   type Transaction,
 } from '@entities/wallet';
@@ -131,12 +132,34 @@ function BalanceNote({
   );
 }
 
+/** Низ карточки выплаты: баланс после неё и сколько у ребёнка сейчас. */
+function PayoutNote({
+  title,
+  childId,
+  name,
+}: {
+  title: string;
+  childId: number;
+  name: string;
+}) {
+  const { t } = useTranslation();
+  const { balance } = useChildBalance(childId);
+  return (
+    <BalanceNote
+      tone="parent"
+      title={title}
+      caption={t('transactions.childBalanceNow', {
+        name,
+        amount: formatBalance(balance),
+      })}
+    />
+  );
+}
+
 type TransactionCardProps = {
   transaction: Transaction;
   /** Баланс кошелька сразу после транзакции. */
   balanceAfter: number;
-  /** Баланс ребёнка сейчас (у выплаты). */
-  childBalance?: number;
   /** Открыть карточку задания, за которое выплата. */
   onOpenTask?: () => void;
   style?: StyleProp<ViewStyle>;
@@ -150,7 +173,6 @@ type TransactionCardProps = {
 export function TransactionCard({
   transaction,
   balanceAfter,
-  childBalance,
   onOpenTask,
   style,
 }: TransactionCardProps) {
@@ -183,18 +205,7 @@ export function TransactionCard({
         caption={t('transactions.paidTo')}
         name={child.name}
         footer={
-          <BalanceNote
-            tone="parent"
-            title={balance}
-            caption={
-              childBalance === undefined
-                ? ''
-                : t('transactions.childBalanceNow', {
-                    name: child.name,
-                    amount: formatBalance(childBalance),
-                  })
-            }
-          />
+          <PayoutNote title={balance} childId={child.id} name={child.name} />
         }
       >
         <TaskLink

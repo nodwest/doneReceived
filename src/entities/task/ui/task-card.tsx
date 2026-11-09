@@ -57,7 +57,6 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
           <PhotoSection
             label={t('taskCard.childPhoto', { name: task.assignee.name })}
             photo={task.photo}
-            counter="1 / 1"
           />
         )}
         <TaskBrief

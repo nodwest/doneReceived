@@ -11,6 +11,13 @@ import { ChildBalance } from './child-balance';
 import { RewardsHistoryLink } from './rewards-history-link';
 import { styles } from './wallet.styled';
 
+// Тап по транзакции — её карточка в истории транзакций.
+const openTransaction = (id: number) =>
+  router.push({
+    pathname: '/transactions',
+    params: { transaction: String(id) },
+  });
+
 // Сколько последних транзакций показываем; остальные — по «See all».
 const RECENT_TRANSACTIONS = 4;
 
@@ -37,9 +44,9 @@ export function WalletPage() {
           {childProfilesMock.map((child) => (
             <ChildBalance
               key={child.id}
+              childId={child.id}
               name={child.name}
               avatar={child.avatar}
-              balance={child.balance}
             />
           ))}
         </View>
@@ -59,7 +66,10 @@ export function WalletPage() {
               transactions.map((transaction, index) => (
                 <Fragment key={transaction.id}>
                   {index > 0 && <View style={styles.divider} />}
-                  <TransactionRow transaction={transaction} />
+                  <TransactionRow
+                    transaction={transaction}
+                    onPress={() => openTransaction(transaction.id)}
+                  />
                 </Fragment>
               ))
             )}

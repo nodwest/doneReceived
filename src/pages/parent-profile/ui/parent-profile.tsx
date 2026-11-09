@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import {
+  Redirect,
+  router as appRouter,
+  useLocalSearchParams,
+  useRouter,
+} from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
@@ -18,7 +23,7 @@ import {
 } from '@entities/operation';
 import { countTasks, useTasks, type Task } from '@entities/task';
 import type { ParentProfile } from '@entities/user';
-import { parentProfilesMock } from '@shared/mocks';
+import { parentMock, parentProfilesMock } from '@shared/mocks';
 import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './parent-profile.styled';
@@ -26,6 +31,14 @@ import { styles } from './parent-profile.styled';
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
 const RECENT_REWARDS = 3;
+
+// Тап по награде — карточка задания в истории наград. В истории родителя
+// только его награды, поэтому открываются они.
+const openReward = (operation: Operation) =>
+  appRouter.push({
+    pathname: '/rewards-history',
+    params: { operation: String(operation.id) },
+  });
 
 /**
  * Профиль родителя: как у ребёнка, но вместо баланса — выплаченные награды,
@@ -70,7 +83,8 @@ export function ParentProfilePage() {
           }
         />
         <HomeSummary
-          amount={parent.rewardsPaid}
+          // Выплачено за всё время: награды по его заданиям из истории.
+          amount={sumTotals(parentOperations).earned}
           activeTasks={counts.active}
           onActiveTasksPress={() =>
             router.push({
@@ -103,6 +117,11 @@ export function ParentProfilePage() {
                   key={operation.id}
                   {...operation}
                   caption="child-day"
+                  onPress={
+                    parent.id === parentMock.id
+                      ? () => openReward(operation)
+                      : undefined
+                  }
                 />
               ))}
             </View>

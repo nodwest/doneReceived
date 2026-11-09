@@ -63,12 +63,19 @@ export function ChildTaskTile({
             <Text style={styles.title} numberOfLines={1}>
               {task.title}
             </Text>
-            <Text style={styles.from} numberOfLines={1}>
-              {t('taskCard.from')}{' '}
-              <Text style={styles.fromName}>{author.name}</Text>
-              {' · '}
-              {formatTimeAgo(new Date(task.createdAt), now)}
-            </Text>
+            {task.rejection ? (
+              // Задание вернули: ребёнок сразу видит, что его нужно переделать.
+              <Text style={[styles.from, styles.sentBack]} numberOfLines={1}>
+                {t('taskCard.sentBackShort')}
+              </Text>
+            ) : (
+              <Text style={styles.from} numberOfLines={1}>
+                {t('taskCard.from')}{' '}
+                <Text style={styles.fromName}>{author.name}</Text>
+                {' · '}
+                {formatTimeAgo(new Date(task.createdAt), now)}
+              </Text>
+            )}
           </View>
           {left !== null && (
             <View

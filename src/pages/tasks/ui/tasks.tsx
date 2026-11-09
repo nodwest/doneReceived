@@ -5,6 +5,7 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import { CancelTaskButton } from '@features/cancel-task';
 import { ReviewActions } from '@features/review-task';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
@@ -17,11 +18,15 @@ import {
 import { filterTasks, TaskCard, useTasks, type Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
-import { showToast, useIsCompact } from '@shared/lib';
-import { childrenMock, parentProfilesMock } from '@shared/mocks';
+import { useIsCompact } from '@shared/lib';
+import { childrenMock, parentMock, parentProfilesMock } from '@shared/mocks';
 import { CARDS_PADDING_BOTTOM, styles } from './tasks.styled';
+import { ViewOnlyNote } from './view-only-note';
 
 const NO_TASKS: Task[] = [];
+
+const findParentName = (id: number) =>
+  parentProfilesMock.find((parent) => parent.id === id)?.name ?? '';
 
 /**
  * Чей список: all — вкладка Tasks, задачи всех детей; child — задачи ребёнка
@@ -51,16 +56,25 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
         : undefined;
   // Список из кэша React Query: после создания или правки он перечитывается сам.
   const { data = NO_TASKS, isPending } = useTasks();
+  // Вкладка Tasks — только задания вошедшего родителя: их он проверяет,
+  // выплачивает и правит. Задания второго родителя видны из его профиля
+  // (scope parent), а в профиле ребёнка (scope child) — все его задания от
+  // обоих родителей; чужие — без кнопок, чтобы знать, что уже задано, и не
+  // повторять.
   const allTasks = useMemo(() => {
-    if (!owner) return data;
+    if (!owner) return filterTasks(data, { createdBy: parentMock.id });
     return scope === 'parent'
       ? filterTasks(data, { createdBy: owner.id }).filter(
           (task) => task.status === 'active',
         )
       : filterTasks(data, { assigneeId: owner.id });
   }, [data, scope, owner]);
+  // На проверке — только то, что может проверить вошедший родитель.
   const reviewTasks = useMemo(
-    () => allTasks.filter((task) => task.status === 'review'),
+    () =>
+      allTasks.filter(
+        (task) => task.status === 'review' && task.createdBy === parentMock.id,
+      ),
     [allTasks],
   );
   const { bottom } = useSafeAreaInsets();
@@ -106,10 +120,10 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
             tab={tab}
             onTabChange={setTab}
             reviewCount={reviewTasks.length}
-            view={view}
-            onToggleView={() =>
-              setView((prev) => (prev === 'cards' ? 'list' : 'cards'))
-            }
+            // Иконка — по тому, что на экране: без заданий карточек нет,
+            // даже если до этого смотрели карточками.
+            view={cards ? 'cards' : 'list'}
+            onToggleView={() => setView(cards ? 'list' : 'cards')}
             // Назад — туда, откуда пришли (главная, Family, профиль); без
             // истории (открыли по ссылке) — на главную.
             onBack={() =>
@@ -137,20 +151,20 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                   task={task}
                   style={style}
                   footer={
-                    // Кнопки пока заглушки: показывают тост, задачи и бейдж не меняются.
-                    task.status === 'review' ? (
-                      <ReviewActions
-                        childName={task.assignee.name}
-                        onApprove={() => showToast(t('tasks.approvedToast'))}
-                        onReject={() => showToast(t('tasks.rejectedToast'))}
+                    // Approve выплачивает награду и уводит задание в историю,
+                    // Reject возвращает его ребёнку, Cancel task — отменяет.
+                    // Всё это — только у автора задания; второй родитель
+                    // чужое задание только видит.
+                    task.createdBy !== parentMock.id ? (
+                      <ViewOnlyNote
+                        author={findParentName(task.createdBy)}
+                        review={task.status === 'review'}
                       />
+                    ) : task.status === 'review' ? (
+                      <ReviewActions task={task} />
                     ) : (
                       <>
-                        <CardButton
-                          label={t('tasks.cancelTask')}
-                          variant="outline"
-                          onPress={() => showToast(t('tasks.cancelledToast'))}
-                        />
+                        <CancelTaskButton task={task} />
                         <CardButton
                           label={t('tasks.edit')}
                           variant="dark"

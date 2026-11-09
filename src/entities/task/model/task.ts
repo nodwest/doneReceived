@@ -1,7 +1,23 @@
 import type { ImageSourcePropType } from 'react-native';
 
-/** active — ребёнок выполняет; review — отмечено выполненным, ждёт проверки родителя. */
-export type TaskState = 'active' | 'review';
+/**
+ * active — ребёнок выполняет; review — отмечено выполненным, ждёт проверки
+ * родителя; done — родитель подтвердил, награда выплачена, задание ушло в
+ * историю (в списке заданий его больше нет).
+ */
+export type TaskState = 'active' | 'review' | 'done';
+
+/** Почему родитель вернул задание; подписи — reviewTask.reasons.*. */
+export type RejectReasonKey = 'not-done-properly' | 'not-finished' | 'other';
+
+/** Отказ родителя: задание снова активно, ребёнок видит, что переделать. */
+export interface TaskRejection {
+  reason: RejectReasonKey;
+  /** Комментарий родителя; пустая строка — без комментария. */
+  comment: string;
+  /** id родителя, который вернул задание. */
+  by: number;
+}
 
 export interface TaskAssignee {
   id: number;
@@ -26,6 +42,8 @@ export interface Task {
   doneAt: string | null;
   /** Фото-отчёт ребёнка; null — снимка нет. */
   photo: ImageSourcePropType | null;
+  /** Последний отказ родителя; null — задание не возвращали. */
+  rejection: TaskRejection | null;
 }
 
 /** Награда в формате карточек: «$5.00». */

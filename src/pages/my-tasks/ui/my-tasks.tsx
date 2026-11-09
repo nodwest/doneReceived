@@ -22,14 +22,11 @@ import {
   useTasks,
   type Task,
 } from '@entities/task';
+import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast, useIsCompact } from '@shared/lib';
-import {
-  childAccountMock,
-  childProfilesMock,
-  parentProfilesMock,
-} from '@shared/mocks';
+import { childAccountMock, parentProfilesMock } from '@shared/mocks';
 import { EarnGoalCard } from './earn-goal-card';
 import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
@@ -71,9 +68,8 @@ export function MyTasksPage() {
     () => allTasks.filter((task) => task.status === 'review'),
     [allTasks],
   );
-  const balance =
-    childProfilesMock.find((child) => child.id === childAccountMock.id)
-      ?.balance ?? 0;
+  // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
+  const { balance } = useChildBalance(childAccountMock.id);
   const { current: currentWish } = useWishlistProgress(
     childAccountMock.id,
     balance,
@@ -138,10 +134,10 @@ export function MyTasksPage() {
             tab={tab}
             onTabChange={setTab}
             reviewCount={reviewTasks.length}
-            view={view}
-            onToggleView={() =>
-              setView((prev) => (prev === 'cards' ? 'list' : 'cards'))
-            }
+            // Иконка — по тому, что на экране: без заданий карточек нет,
+            // даже если до этого смотрели карточками.
+            view={cards ? 'cards' : 'list'}
+            onToggleView={() => setView(cards ? 'list' : 'cards')}
             onBack={() =>
               router.canGoBack() ? router.back() : router.replace('/')
             }
@@ -165,6 +161,9 @@ export function MyTasksPage() {
                 <ChildTaskCard
                   task={task}
                   author={findAuthor(task.createdBy)}
+                  rejectedBy={
+                    task.rejection ? findAuthor(task.rejection.by) : undefined
+                  }
                   onTakePhoto={photoStub}
                   onPickPhoto={photoStub}
                   footer={<TaskFooterAction task={task} />}

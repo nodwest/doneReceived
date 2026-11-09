@@ -31,6 +31,9 @@ export interface PayoutTransaction extends TransactionBase, TaskPayment {
   child: TransactionPerson;
 }
 
+/** Выплата за подтверждённое задание: из кошелька родителя ребёнку. */
+export type PayoutPayload = Omit<PayoutTransaction, 'id' | 'kind'>;
+
 /** Пополнение с карты или вывод на карту. */
 export interface CardTransaction extends TransactionBase {
   kind: 'deposit' | 'withdrawal';
