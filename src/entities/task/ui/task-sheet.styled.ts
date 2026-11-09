@@ -21,6 +21,9 @@ export const styles = StyleSheet.create({
   shadowReview: {
     boxShadow: '0px 10px 28px rgba(230, 126, 0, 0.12)',
   },
+  shadowWallet: {
+    boxShadow: '0px 10px 28px rgba(23, 33, 96, 0.14)',
+  },
   shadowPaid: {
     boxShadow: '0px 10px 28px rgba(26, 133, 79, 0.12)',
   },
@@ -40,6 +43,14 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.9)',
+  },
+  heroIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.16)',
   },
   who: {
     flex: 1,
@@ -66,6 +77,12 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(30),
     fontFamily: theme.fonts.extrabold,
     color: theme.colors.white,
+  },
+  titleAmount: {
+    fontSize: 36,
+    lineHeight: 42,
+    letterSpacing: tracking(36),
+    fontVariant: ['tabular-nums'],
   },
   textDark: {
     color: theme.colors.ink,

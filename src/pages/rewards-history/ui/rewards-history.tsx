@@ -18,12 +18,12 @@ import {
   type Operation,
 } from '@entities/operation';
 import { TaskIconBadge } from '@entities/task';
+import { balanceAfter, useChildWallet } from '@entities/wallet';
 import { getRewardGoal, useWishes } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { formatMonthDay } from '@shared/lib';
 import {
   childAccountMock,
-  childProfilesMock,
   childrenMock,
   parentProfilesMock,
 } from '@shared/mocks';
@@ -51,10 +51,13 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
   const { t } = useTranslation();
   const { data: operations = NO_OPERATIONS, isPending } = useOperations();
   const { data: wishes } = useWishes(childId ?? childAccountMock.id);
+  const { data: childWallet } = useChildWallet(childId ?? childAccountMock.id);
   // Сегодня фиксируем на время жизни экрана: от него строится лента дней.
   const [today] = useState(() => new Date());
-  // «See all» в профиле ребёнка открывает историю сразу с его фильтром.
-  const { child: childParam } = useLocalSearchParams<{ child?: string }>();
+  // «See all» в профиле ребёнка открывает историю сразу с его фильтром;
+  // operation — сразу карточку этой награды (из карточки транзакции).
+  const { child: childParam, operation: operationParam } =
+    useLocalSearchParams<{ child?: string; operation?: string }>();
   const [selectedChild, setFilter] = useState<ChildFilterValue>(
     () =>
       childrenMock.find((child) => String(child.id) === childParam)?.id ??
@@ -65,6 +68,10 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
   const [selected, setSelected] = useState<number | null>(null);
   // Номер открытой карточки среди наград дня; null — показан график.
   const [card, setCard] = useState<number | null>(null);
+  // Открыли по ссылке на награду: «назад» из карточки уводит туда, откуда
+  // пришли, а не к графику.
+  const [linked, setLinked] = useState<string | undefined>(operationParam);
+  const [linkPending, setLinkPending] = useState(operationParam !== undefined);
 
   // Лента дней общая для всех детей, чтобы при смене фильтра не прыгала.
   const days = useMemo(
@@ -80,6 +87,28 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
   );
   const totals = useMemo(() => getDayTotals(days, filtered), [days, filtered]);
 
+  // Ссылка на награду: как только история пришла, встаём на её день и
+  // открываем её карточку (один раз).
+  if (linkPending && operations.length > 0) {
+    setLinkPending(false);
+    const target = filtered.find(
+      (operation) => String(operation.id) === operationParam,
+    );
+    const dayIndex = target
+      ? days.findIndex((date) => isSameDay(target, date))
+      : -1;
+    if (target && dayIndex >= 0) {
+      const sameDay = filtered.filter(
+        (operation) =>
+          operation.kind === 'earned' && isSameDay(operation, days[dayIndex]),
+      );
+      setSelected(dayIndex);
+      setCard(Math.max(sameDay.indexOf(target), 0));
+    } else {
+      setLinked(undefined);
+    }
+  }
+
   const selectedIndex = selected ?? days.length - 1;
   const day = totals[selectedIndex];
   // В списке — начисленные награды; упущенные видны в итогах и на графике.
@@ -93,21 +122,19 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
   );
   const cards = card !== null && dayOperations.length > 0;
 
-  // Копилка ребёнка после каждой награды: нынешний баланс без наград,
-  // пришедших позже неё (других движений денег пока нет).
+  // Копилка ребёнка после награды: баланс сразу после неё по его
+  // транзакциям (награды и выводы на карту).
   const goalFor = (operation: Operation) => {
-    if (childId === undefined || !wishes) return null;
-    const balance =
-      childProfilesMock.find((child) => child.id === childId)?.balance ?? 0;
-    const later = operations
-      .filter(
-        (other) =>
-          other.child.id === childId &&
-          other.kind === 'earned' &&
-          other.at > operation.at,
-      )
-      .reduce((sum, other) => sum + other.amount, 0);
-    const after = balance - later;
+    if (childId === undefined || !wishes || !childWallet) return null;
+    const reward = childWallet.transactions.find(
+      (item) => item.kind === 'reward' && item.operationId === operation.id,
+    );
+    if (!reward) return null;
+    const after = balanceAfter(
+      childWallet.transactions,
+      childWallet.balance,
+      reward,
+    );
     return getRewardGoal(wishes, after - operation.amount, after);
   };
 
@@ -128,7 +155,7 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
         <RoundButton
           icon="arrow-left"
           accessibilityLabel={t('common.back')}
-          onPress={cards ? () => setCard(null) : leave}
+          onPress={cards && !linked ? () => setCard(null) : leave}
         />
         <Text style={styles.title} numberOfLines={1}>
           {title}
@@ -137,7 +164,10 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
           <RoundButton
             icon="list"
             accessibilityLabel={t('tasks.showAsList')}
-            onPress={() => setCard(null)}
+            onPress={() => {
+              setLinked(undefined);
+              setCard(null);
+            }}
           />
         ) : dayOperations.length > 0 ? (
           <RoundButton

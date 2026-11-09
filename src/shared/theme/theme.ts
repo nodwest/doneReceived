@@ -109,6 +109,9 @@ export const theme = {
     heroParentTo: '#5443D6',
     heroChildFrom: '#5AAEF5',
     heroPaidFrom: '#3FCF86',
+    heroWalletFrom: '#4F62BF',
+    // Блок подробностей в карточке транзакции.
+    detailsBg: '#F7F8FB',
     heroReviewFrom: '#FFD98C',
     heroReviewTo: '#FFB24A',
     heroReviewCaption: '#9A5200',

@@ -6,6 +6,7 @@ import {
   RewardsHistoryPage,
 } from '@pages/rewards-history';
 import { TasksPage } from '@pages/tasks';
+import { ChildTransactionsPage, TransactionsPage } from '@pages/transactions';
 import { ChildWalletPage, WalletPage } from '@pages/wallet';
 import { useViewerRole } from '@entities/user';
 
@@ -31,5 +32,13 @@ export function RewardsHistoryRoute() {
     <ChildRewardsHistoryPage />
   ) : (
     <RewardsHistoryPage />
+  );
+}
+
+export function TransactionsRoute() {
+  return useViewerRole() === 'child' ? (
+    <ChildTransactionsPage />
+  ) : (
+    <TransactionsPage />
   );
 }

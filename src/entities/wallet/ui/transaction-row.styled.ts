@@ -9,10 +9,27 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
+  // Отдельная плашка в полном списке транзакций.
+  card: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.line,
+    backgroundColor: theme.colors.white,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
+  },
+  avatarLarge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   icon: {
     width: 40,
@@ -21,6 +38,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.colors.violetIcon,
+  },
+  iconLarge: {
+    width: 44,
+    height: 44,
+  },
+  iconWithdrawal: {
+    backgroundColor: theme.colors.queueBg,
   },
   middle: {
     flex: 1,
@@ -54,16 +78,16 @@ export const styles = StyleSheet.create({
   amountTextPayout: {
     color: theme.colors.homeBrown,
   },
-  amountDeposit: {
+  amountIncome: {
     backgroundColor: theme.colors.rewardSoft,
   },
-  amountTextDeposit: {
+  amountTextIncome: {
     color: theme.colors.earnedLabel,
   },
   amountWithdrawal: {
-    backgroundColor: theme.colors.prime,
+    backgroundColor: theme.colors.queueBg,
   },
   amountTextWithdrawal: {
-    color: theme.colors.ink,
+    color: theme.colors.queueText,
   },
 });

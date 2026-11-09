@@ -30,6 +30,7 @@ const APP_SCREENS = [
   'edit-profile',
   'map',
   'rewards-history',
+  'transactions',
   'child/[id]/index',
   'child/[id]/tasks',
   'child/[id]/wishlist/index',

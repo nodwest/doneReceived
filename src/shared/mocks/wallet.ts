@@ -3,24 +3,16 @@ import { childrenMock } from './children';
 const [emma, liam] = childrenMock;
 
 /**
- * Кошелёк вошедшего родителя: баланс и транзакции (сначала новые; даты —
- * «дней назад» от сегодня). payout — выплата награды ребёнку за задачу,
- * deposit и withdrawal — пополнение с карты и вывод на карту.
+ * Кошелёк вошедшего родителя (Sarah): баланс и операции с картой — пополнение
+ * (deposit) и вывод (withdrawal); даты — «дней назад» от сегодня. Выплаты
+ * детям за задания (payout) mock-server берёт из истории наград
+ * (operationsMock): задания, которые дала и подтвердила Sarah.
  */
 export const walletMock = {
   balance: 240,
-  transactions: [
+  cardTransactions: [
     {
-      id: 1,
-      kind: 'payout',
-      daysAgo: 0,
-      time: '18:12',
-      amount: 4,
-      child: emma,
-      task: 'Clean your room',
-    },
-    {
-      id: 2,
+      id: 1001,
       kind: 'deposit',
       daysAgo: 0,
       time: '09:00',
@@ -28,25 +20,23 @@ export const walletMock = {
       card: '4242',
     },
     {
-      id: 3,
-      kind: 'payout',
+      id: 1002,
+      kind: 'withdrawal',
       daysAgo: 1,
-      time: '16:40',
-      amount: 3,
-      child: liam,
-      task: 'Walk the dog',
+      time: '13:30',
+      amount: 20,
+      card: '4242',
     },
     {
-      id: 4,
-      kind: 'payout',
-      daysAgo: 8,
-      time: '11:05',
-      amount: 2,
-      child: emma,
-      task: 'Water the plants',
+      id: 1003,
+      kind: 'deposit',
+      daysAgo: 5,
+      time: '10:00',
+      amount: 100,
+      card: '4242',
     },
     {
-      id: 5,
+      id: 1004,
       kind: 'withdrawal',
       daysAgo: 9,
       time: '13:30',
@@ -54,13 +44,36 @@ export const walletMock = {
       card: '4242',
     },
     {
-      id: 6,
-      kind: 'payout',
-      daysAgo: 10,
-      time: '20:30',
-      amount: 3,
-      child: liam,
-      task: 'Wash the dishes',
+      id: 1005,
+      kind: 'deposit',
+      daysAgo: 12,
+      time: '08:45',
+      amount: 50,
+      card: '4242',
     },
   ],
 } as const;
+
+/**
+ * Выводы детей на свою карту; награды (reward) mock-server берёт из истории
+ * наград. Баланс ребёнка — в childProfilesMock.
+ */
+export const childWithdrawalsMock = [
+  {
+    id: 2001,
+    child: emma,
+    daysAgo: 1,
+    time: '19:30',
+    amount: 10,
+    card: '5678',
+  },
+  {
+    id: 2002,
+    child: emma,
+    daysAgo: 6,
+    time: '12:10',
+    amount: 15,
+    card: '5678',
+  },
+  { id: 2003, child: liam, daysAgo: 3, time: '18:00', amount: 8, card: '9012' },
+] as const;

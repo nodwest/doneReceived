@@ -17,7 +17,8 @@ const RECENT_TRANSACTIONS = 4;
 /**
  * Вкладка Wallet: баланс вошедшего родителя (не всей семьи) с кнопками ввода
  * и вывода денег, балансы детей, ссылка на историю наград и последние
- * транзакции. Deposit, Withdraw и «See all» пока ничего не делают.
+ * транзакции; «See all» — вся история транзакций. Deposit и Withdraw пока
+ * ничего не делают.
  */
 export function WalletPage() {
   const { t } = useTranslation();
@@ -47,6 +48,7 @@ export function WalletPage() {
           <SectionHeader
             title={t('wallet.transactions')}
             actionLabel={t('common.seeAll')}
+            onAction={() => router.push('/transactions')}
           />
         </View>
         {wallet && (

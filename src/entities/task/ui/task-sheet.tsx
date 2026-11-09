@@ -17,15 +17,17 @@ import { styles } from './task-sheet.styled';
 
 /**
  * parent — фиолетовая шапка, child — голубая, review — оранжевая «на
- * проверке», paid — зелёная: награда выплачена.
+ * проверке», paid — зелёная: награда выплачена, wallet — тёмно-синяя, как
+ * карточка баланса: транзакция кошелька.
  */
-export type TaskSheetTone = 'parent' | 'child' | 'review' | 'paid';
+export type TaskSheetTone = 'parent' | 'child' | 'review' | 'paid' | 'wallet';
 
 const HERO_GRADIENTS = {
   parent: [theme.colors.heroParentFrom, theme.colors.heroParentTo],
   child: [theme.colors.heroChildFrom, theme.colors.childDeep],
   review: [theme.colors.heroReviewFrom, theme.colors.heroReviewTo],
   paid: [theme.colors.heroPaidFrom, theme.colors.earnedDark],
+  wallet: [theme.colors.heroWalletFrom, theme.colors.parentFrom],
 } as const;
 
 const SHADOWS = {
@@ -33,18 +35,23 @@ const SHADOWS = {
   child: styles.shadowChild,
   review: styles.shadowReview,
   paid: styles.shadowPaid,
+  wallet: styles.shadowWallet,
 };
 
 type TaskSheetProps = {
   tone: TaskSheetTone;
   /** Аватар в шапке: ребёнок у родителя, автор задания у ребёнка. */
-  avatar: ImageSourcePropType;
+  avatar?: ImageSourcePropType;
+  /** Значок вместо аватара (операция с картой). */
+  icon?: IconName;
   /** Подпись над именем: «Task for», «Task from», «Done 5 min ago». */
   caption: string;
   name: string;
   /** Плашка справа в шапке: таймер или «On review». */
   aside?: ReactNode;
   title: string;
+  /** Вместо названия — крупная сумма: «−$4.00». */
+  amount?: boolean;
   /** Секции тела: прокручиваются, если не влезают. */
   children: ReactNode;
   /** Кнопки внизу карточки: всегда видны. */
@@ -60,10 +67,12 @@ type TaskSheetProps = {
 export function TaskSheet({
   tone,
   avatar,
+  icon,
   caption,
   name,
   aside,
   title,
+  amount,
   children,
   footer,
   style,
@@ -79,7 +88,13 @@ export function TaskSheet({
         style={styles.hero}
       >
         <View style={styles.from}>
-          <Image source={avatar} style={styles.avatar} />
+          {icon ? (
+            <View style={styles.heroIcon}>
+              <Icon name={icon} size={20} color={theme.colors.white} />
+            </View>
+          ) : (
+            avatar && <Image source={avatar} style={styles.avatar} />
+          )}
           <View style={styles.who}>
             <Text
               style={[styles.caption, dark && styles.captionDark]}
@@ -96,7 +111,14 @@ export function TaskSheet({
           </View>
           {aside}
         </View>
-        <Text style={[styles.title, dark && styles.textDark]} numberOfLines={2}>
+        <Text
+          style={[
+            styles.title,
+            amount && styles.titleAmount,
+            dark && styles.textDark,
+          ]}
+          numberOfLines={2}
+        >
           {title}
         </Text>
       </LinearGradient>
