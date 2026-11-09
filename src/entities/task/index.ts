@@ -1,10 +1,18 @@
 export * from './model';
-export { createTask, setTaskStatus, updateTask } from './api/tasks-api';
+export {
+  approveTask,
+  cancelTask,
+  createTask,
+  rejectTask,
+  setTaskStatus,
+  updateTask,
+} from './api/tasks-api';
 export * from './api/tasks-query';
 export * from './ui/reward-button';
 export * from './ui/task-card';
 export * from './ui/task-row';
 export * from './ui/task-icon-badge';
 export * from './ui/child-task-tile';
-export * from './ui/child-task-row';
+export * from './ui/child-review-row';
 export * from './ui/child-task-card';
+export * from './ui/task-sheet';

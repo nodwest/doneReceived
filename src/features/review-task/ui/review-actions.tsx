@@ -1,45 +1,42 @@
 import { useState } from 'react';
 import { View } from 'react-native';
+import type { Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
-import { PillButton } from '@shared/ui';
-import type { RejectDecision } from '../model/reject-reasons';
+import { CardButton } from '@shared/ui';
+import { useReviewTask } from '../model/use-review-task';
 import { RejectReasonSheet } from './reject-reason-sheet';
 import { styles } from './review-task.styled';
 
-type ReviewActionsProps = {
-  childName: string;
-  onApprove: () => void;
-  onReject: (decision: RejectDecision) => void;
-};
-
-/** Кнопки проверки задания: Reject открывает шторку с причиной, Approve подтверждает. */
-export function ReviewActions({
-  childName,
-  onApprove,
-  onReject,
-}: ReviewActionsProps) {
+/**
+ * Кнопки проверки внизу карточки задания: Reject открывает шторку с причиной
+ * и возвращает задание ребёнку, Approve подтверждает и выплачивает награду.
+ */
+export function ReviewActions({ task }: { task: Task }) {
   const { t } = useTranslation();
   const [rejecting, setRejecting] = useState(false);
+  const { approve, reject, isPending } = useReviewTask();
 
   return (
     <View style={styles.reviewActions}>
-      <PillButton
+      <CardButton
         label={t('reviewTask.reject')}
-        variant="danger"
+        variant="danger-outline"
+        disabled={isPending}
         onPress={() => setRejecting(true)}
       />
-      <PillButton
+      <CardButton
         label={t('reviewTask.approve')}
         variant="primary"
-        onPress={onApprove}
+        disabled={isPending}
+        onPress={() => approve(task)}
       />
       <RejectReasonSheet
         visible={rejecting}
-        childName={childName}
+        childName={task.assignee.name}
         onCancel={() => setRejecting(false)}
         onReject={(decision) => {
           setRejecting(false);
-          onReject(decision);
+          reject(task, decision);
         }}
       />
     </View>

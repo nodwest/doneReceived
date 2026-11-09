@@ -8,7 +8,8 @@ import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import { ActivityItem } from '@entities/activity';
-import { countTasks, useTasks } from '@entities/task';
+import { sumTotals, useOperations } from '@entities/operation';
+import { countChildTasks, countTasks, useTasks } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import {
   childProfilesMock,
@@ -32,9 +33,18 @@ export function ParentHomePage() {
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
   // Пока список грузится, показываем значения из сводки.
   const { data: tasks } = useTasks();
-  const total = tasks && countTasks(tasks);
+  // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
+  const total = tasks && countTasks(tasks, { createdBy: parentMock.id });
+  // Выплачено вошедшим родителем за всё время — из истории наград: после
+  // подтверждения задания сумма растёт.
+  const { data: operations } = useOperations();
+  const rewardsPaid =
+    operations &&
+    sumTotals(
+      operations.filter((operation) => operation.parentId === parentMock.id),
+    ).earned;
   const children = childProfilesMock.map((child) => {
-    const counts = countTasks(tasks ?? [], { assigneeId: child.id });
+    const counts = countChildTasks(tasks ?? [], child.id, parentMock.id);
     return {
       id: child.id,
       name: child.name,
@@ -59,7 +69,7 @@ export function ParentHomePage() {
             avatar={parentMock.avatar}
           />
           <HomeSummary
-            amount={familySummaryMock.rewardsPaid}
+            amount={rewardsPaid ?? familySummaryMock.rewardsPaid}
             activeTasks={total?.active ?? familySummaryMock.activeTasks}
             tasksToReview={total?.review ?? familySummaryMock.tasksToReview}
             onActiveTasksPress={() =>

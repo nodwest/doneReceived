@@ -14,19 +14,26 @@ import {
   ChildTaskTile,
   countTasks,
   filterTasks,
+  sortTasksByUrgency,
   useTasks,
   type Task,
 } from '@entities/task';
+import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import {
   childAccountMock,
   childActivityMock,
-  childProfilesMock,
+  parentProfilesMock,
 } from '@shared/mocks';
 import { styles } from './child-home.styled';
 
 const NO_TASKS: Task[] = [];
+
+// Автор задания для «from Sarah»; неизвестный — первый родитель.
+const findAuthor = (id: number) =>
+  parentProfilesMock.find((parent) => parent.id === id) ??
+  parentProfilesMock[0];
 
 /** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
 function greetingKey(hour: number) {
@@ -49,18 +56,21 @@ export function ChildHomePage() {
     () => filterTasks(data, { assigneeId: childAccountMock.id }),
     [data],
   );
+  // Ближайшие по сроку — первыми, как в списке «To do».
   const activeTasks = useMemo(
-    () => myTasks.filter((task) => task.status === 'active'),
+    () =>
+      sortTasksByUrgency(myTasks.filter((task) => task.status === 'active')),
     [myTasks],
   );
   const counts = countTasks(myTasks);
-  const balance =
-    childProfilesMock.find((child) => child.id === childAccountMock.id)
-      ?.balance ?? 0;
+  // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
+  const { balance, isPending: balancePending } = useChildBalance(
+    childAccountMock.id,
+  );
   const wishlist = useWishlistProgress(childAccountMock.id, balance);
   // Пока задания и вишлист не пришли, тело не рисуем: иначе на кадр видны
   // нули, «Добавь желание» и экран без карусели, а потом всё прыгает вниз.
-  const loading = tasksPending || wishlist.isPending;
+  const loading = tasksPending || wishlist.isPending || balancePending;
 
   const openTask = (task: Task) =>
     router.push({ pathname: '/tasks', params: { task: String(task.id) } });
@@ -101,11 +111,7 @@ export function ChildHomePage() {
                   renderTask={(task, style) => (
                     <ChildTaskTile
                       task={task}
-                      label={
-                        task.id === activeTasks[0].id
-                          ? t('childHome.nextUp')
-                          : t('childHome.comingUp')
-                      }
+                      author={findAuthor(task.createdBy)}
                       onPress={openTask}
                       action={<DoneButton task={task} />}
                       style={style}

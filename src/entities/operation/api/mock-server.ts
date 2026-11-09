@@ -1,5 +1,5 @@
-import { operationsMock } from '@shared/mocks';
-import type { Operation } from '../model/operation';
+import { operationsMock, parentMock } from '@shared/mocks';
+import type { Operation, RewardPayload } from '../model/operation';
 
 /**
  * Имитация бэкенда, пока его нет: история собирается из моков при загрузке,
@@ -8,8 +8,10 @@ import type { Operation } from '../model/operation';
  */
 const today = new Date();
 
-const operations: Operation[] = operationsMock.map(
-  ({ daysAgo, time, ...operation }) => {
+const MINUTE = 60_000;
+
+let operations: Operation[] = operationsMock.map(
+  ({ daysAgo, time, doneMinutesBefore, ...operation }) => {
     const [hours, minutes] = time.split(':').map(Number);
     const at = new Date(
       today.getFullYear(),
@@ -18,11 +20,36 @@ const operations: Operation[] = operationsMock.map(
       hours,
       minutes,
     );
-    return { ...operation, at: at.toISOString() };
+    const doneAt =
+      doneMinutesBefore === null
+        ? null
+        : new Date(at.getTime() - doneMinutesBefore * MINUTE).toISOString();
+    return { ...operation, at: at.toISOString(), doneAt };
   },
 );
+
+let nextId = Math.max(...operations.map((operation) => operation.id)) + 1;
 
 export const mockServer = {
   // Копия, как после сериализации ответа: снаружи данные «сервера» не изменить.
   list: (): Operation[] => operations.map((operation) => ({ ...operation })),
+
+  // Родитель подтвердил задание: награда начислена сейчас, от его имени.
+  addReward: (payload: RewardPayload): Operation => {
+    const operation: Operation = {
+      id: nextId++,
+      kind: 'earned',
+      title: payload.title,
+      description: payload.description,
+      amount: payload.amount,
+      child: payload.child,
+      // С API сервер берёт родителя из сессии.
+      parentId: parentMock.id,
+      at: new Date().toISOString(),
+      doneAt: payload.doneAt,
+      photo: payload.photo,
+    };
+    operations = [operation, ...operations];
+    return { ...operation };
+  },
 };

@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
-export const FOOTER_PADDING_VERTICAL = 12;
+// Отступ под точками карусели, когда снизу нет навбара.
+export const CARDS_PADDING_BOTTOM = 16;
 
 export const styles = StyleSheet.create({
   screen: {
@@ -11,6 +12,7 @@ export const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    minHeight: 0,
     width: '100%',
     maxWidth: 480,
     alignSelf: 'center',
@@ -19,14 +21,20 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   body: {
+    gap: 16,
     paddingTop: 12,
     paddingBottom: 24,
     paddingHorizontal: 12,
   },
-  // Карусель занимает всю высоту между шапкой и футером.
-  bodyCards: {
-    flexGrow: 1,
-    paddingBottom: 16,
+  section: {
+    gap: 10,
+  },
+  // Карусель занимает всю высоту под шапкой; карточки — 16pt от краёв.
+  cards: {
+    flex: 1,
+    minHeight: 0,
+    paddingTop: 12,
+    paddingHorizontal: 16,
   },
   empty: {
     marginTop: 48,
@@ -35,11 +43,5 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
-  },
-  footer: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingTop: FOOTER_PADDING_VERTICAL,
-    backgroundColor: theme.colors.white,
   },
 });

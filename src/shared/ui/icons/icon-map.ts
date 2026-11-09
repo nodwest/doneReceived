@@ -48,6 +48,9 @@ import { ExternalIcon } from './external';
 import { PhoneIcon } from './phone';
 import { ChevronDownIcon } from './chevron-down';
 import { RefreshIcon } from './refresh';
+import { ClockIcon } from './clock';
+import { CalendarIcon } from './calendar';
+import { SparkleIcon } from './sparkle';
 
 export const icons = {
   price: PriceIcon,
@@ -100,4 +103,7 @@ export const icons = {
   phone: PhoneIcon,
   'chevron-down': ChevronDownIcon,
   refresh: RefreshIcon,
+  clock: ClockIcon,
+  calendar: CalendarIcon,
+  sparkle: SparkleIcon,
 };

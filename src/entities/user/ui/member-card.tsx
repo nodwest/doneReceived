@@ -113,7 +113,8 @@ export function MemberCard({
                 })}
                 onPress={onActiveTasksPress}
               />
-              {reviewTasks !== undefined && (
+              {/* Нечего проверять — чип не показываем. */}
+              {reviewTasks !== undefined && reviewTasks > 0 && (
                 <TaskChip
                   value={reviewTasks}
                   label={t('member.toReview')}

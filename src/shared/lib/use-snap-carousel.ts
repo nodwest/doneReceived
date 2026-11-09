@@ -70,8 +70,10 @@ export function useSnapCarousel({
   // Одна карточка занимает всю ширину между отступами: соседней нет. Ширина
   // всегда явная — '100%' внутри горизонтальной ленты считался бы от её
   // содержимого, и карточка с длинным текстом вылезала бы за экран.
+  // Без подглядывания (peek 0) карточка тоже во всю ширину, а соседняя
+  // начинается за краем экрана.
   const cardWidth = Math.max(
-    single ? width - 2 * gutter : width - gutter - peek - gap,
+    single || peek === 0 ? width - 2 * gutter : width - gutter - peek - gap,
     0,
   );
   const interval = cardWidth + gap;

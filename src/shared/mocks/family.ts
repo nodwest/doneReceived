@@ -29,20 +29,18 @@ export const childProfilesMock = [
   },
 ];
 
-/** Родители: сколько выплатили наград, статус «дома» и место на карте. */
+/** Родители: статус «дома» и место на карте (выплаченное считается по истории). */
 export const parentProfilesMock = [
   {
     id: parentMock.id,
     name: parentMock.name,
     role: parentMock.role,
     avatar: parentMock.avatar,
-    rewardsPaid: 128,
     presence: { atHome: true, since: ago(HOUR) },
     position: { lat: 47.2225, lng: 39.7188 },
   },
   {
     ...coParentMock,
-    rewardsPaid: 86,
     presence: { atHome: false, since: ago(25 * MINUTE) },
     position: { lat: 47.2268, lng: 39.7452 },
   },

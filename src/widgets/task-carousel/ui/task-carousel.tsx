@@ -13,6 +13,11 @@ type TaskCarouselProps = {
   renderTask?: (task: Task, style: ViewStyle) => ReactNode;
   /** Цвет активной точки: фиолетовый у родителя, голубой у ребёнка. */
   tone?: 'parent' | 'child';
+  /**
+   * Карточка во всю ширину без выглядывающей соседней (экраны заданий);
+   * без него справа видна кромка следующей (главная ребёнка).
+   */
+  fullWidth?: boolean;
 };
 
 /** Крупные карточки заданий, которые листаются свайпом; под лентой точки страниц. */
@@ -22,6 +27,7 @@ export function TaskCarousel({
   onIndexChange,
   renderTask = (task, style) => <TaskCard task={task} style={style} />,
   tone = 'parent',
+  fullWidth,
 }: TaskCarouselProps) {
   return (
     <SnapCarousel
@@ -31,6 +37,9 @@ export function TaskCarousel({
       initialIndex={initialIndex}
       onIndexChange={onIndexChange}
       dotColor={tone === 'child' ? theme.colors.childFrom : theme.colors.violet}
+      peek={fullWidth ? 0 : undefined}
+      fill={fullWidth}
+      gutter={fullWidth ? 16 : undefined}
     />
   );
 }

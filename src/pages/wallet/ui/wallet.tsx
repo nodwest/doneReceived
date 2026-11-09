@@ -11,13 +11,21 @@ import { ChildBalance } from './child-balance';
 import { RewardsHistoryLink } from './rewards-history-link';
 import { styles } from './wallet.styled';
 
+// Тап по транзакции — её карточка в истории транзакций.
+const openTransaction = (id: number) =>
+  router.push({
+    pathname: '/transactions',
+    params: { transaction: String(id) },
+  });
+
 // Сколько последних транзакций показываем; остальные — по «See all».
 const RECENT_TRANSACTIONS = 4;
 
 /**
  * Вкладка Wallet: баланс вошедшего родителя (не всей семьи) с кнопками ввода
  * и вывода денег, балансы детей, ссылка на историю наград и последние
- * транзакции. Deposit, Withdraw и «See all» пока ничего не делают.
+ * транзакции; «See all» — вся история транзакций. Deposit и Withdraw пока
+ * ничего не делают.
  */
 export function WalletPage() {
   const { t } = useTranslation();
@@ -36,9 +44,9 @@ export function WalletPage() {
           {childProfilesMock.map((child) => (
             <ChildBalance
               key={child.id}
+              childId={child.id}
               name={child.name}
               avatar={child.avatar}
-              balance={child.balance}
             />
           ))}
         </View>
@@ -47,6 +55,7 @@ export function WalletPage() {
           <SectionHeader
             title={t('wallet.transactions')}
             actionLabel={t('common.seeAll')}
+            onAction={() => router.push('/transactions')}
           />
         </View>
         {wallet && (
@@ -57,7 +66,10 @@ export function WalletPage() {
               transactions.map((transaction, index) => (
                 <Fragment key={transaction.id}>
                   {index > 0 && <View style={styles.divider} />}
-                  <TransactionRow transaction={transaction} />
+                  <TransactionRow
+                    transaction={transaction}
+                    onPress={() => openTransaction(transaction.id)}
+                  />
                 </Fragment>
               ))
             )}

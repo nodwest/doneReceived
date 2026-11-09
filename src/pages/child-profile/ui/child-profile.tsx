@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import {
+  Redirect,
+  router as appRouter,
+  useLocalSearchParams,
+  useRouter,
+} from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
@@ -16,10 +21,11 @@ import {
   type Operation,
   type SummaryPeriod,
 } from '@entities/operation';
-import { countTasks, useTasks, type Task } from '@entities/task';
+import { countChildTasks, useTasks, type Task } from '@entities/task';
 import type { ChildProfile } from '@entities/user';
+import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress, WishRow } from '@entities/wish';
-import { childProfilesMock } from '@shared/mocks';
+import { childProfilesMock, parentMock } from '@shared/mocks';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { ScreenSection, SnapCarousel } from '@shared/ui';
@@ -28,6 +34,14 @@ import { styles } from './child-profile.styled';
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
 const RECENT_REWARDS = 3;
+
+// Тап по награде — карточка задания в истории наград. В истории родителя
+// только его награды, поэтому открываются они.
+const openReward = (operation: Operation) =>
+  appRouter.push({
+    pathname: '/rewards-history',
+    params: { operation: String(operation.id) },
+  });
 
 /**
  * Профиль ребёнка: статус, баланс, задачи, вишлист (сначала готовые, потом
@@ -47,10 +61,13 @@ export function ChildProfilePage() {
   const child: ChildProfile | undefined = childProfilesMock.find(
     (item) => String(item.id) === id,
   );
-  const wishlist = useWishlistProgress(child?.id ?? -1, child?.balance ?? 0);
+  // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
+  const { balance } = useChildBalance(child?.id ?? -1);
+  const wishlist = useWishlistProgress(child?.id ?? -1, balance);
   if (!child) return <Redirect href="/" />;
 
-  const counts = countTasks(tasks, { assigneeId: child.id });
+  // Активные — все задания ребёнка, на проверке — только свои.
+  const counts = countChildTasks(tasks, child.id, parentMock.id);
   const childOperations = operations.filter(
     (operation) => operation.child.id === child.id,
   );
@@ -79,7 +96,7 @@ export function ChildProfilePage() {
           }
         />
         <HomeSummary
-          amount={child.balance}
+          amount={balance}
           amountLabel={t('summary.balance')}
           activeTasks={counts.active}
           tasksToReview={counts.review}
@@ -142,7 +159,16 @@ export function ChildProfilePage() {
           ) : (
             <View style={styles.list}>
               {rewards.map((operation) => (
-                <OperationRow key={operation.id} {...operation} caption="day" />
+                <OperationRow
+                  key={operation.id}
+                  {...operation}
+                  caption="day"
+                  onPress={
+                    operation.parentId === parentMock.id
+                      ? () => openReward(operation)
+                      : undefined
+                  }
+                />
               ))}
             </View>
           )}

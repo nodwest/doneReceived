@@ -5,6 +5,7 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import { CancelTaskButton } from '@features/cancel-task';
 import { ReviewActions } from '@features/review-task';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
@@ -14,14 +15,18 @@ import {
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
-import { filterTasks, useTasks, type Task } from '@entities/task';
+import { filterTasks, TaskCard, useTasks, type Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
-import { PillButton } from '@shared/ui';
-import { showToast, useIsCompact } from '@shared/lib';
-import { childrenMock, parentProfilesMock } from '@shared/mocks';
-import { FOOTER_PADDING_VERTICAL, styles } from './tasks.styled';
+import { CardButton } from '@shared/ui';
+import { useIsCompact } from '@shared/lib';
+import { childrenMock, parentMock, parentProfilesMock } from '@shared/mocks';
+import { CARDS_PADDING_BOTTOM, styles } from './tasks.styled';
+import { ViewOnlyNote } from './view-only-note';
 
 const NO_TASKS: Task[] = [];
+
+const findParentName = (id: number) =>
+  parentProfilesMock.find((parent) => parent.id === id)?.name ?? '';
 
 /**
  * Чей список: all — вкладка Tasks, задачи всех детей; child — задачи ребёнка
@@ -51,16 +56,25 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
         : undefined;
   // Список из кэша React Query: после создания или правки он перечитывается сам.
   const { data = NO_TASKS, isPending } = useTasks();
+  // Вкладка Tasks — только задания вошедшего родителя: их он проверяет,
+  // выплачивает и правит. Задания второго родителя видны из его профиля
+  // (scope parent), а в профиле ребёнка (scope child) — все его задания от
+  // обоих родителей; чужие — без кнопок, чтобы знать, что уже задано, и не
+  // повторять.
   const allTasks = useMemo(() => {
-    if (!owner) return data;
+    if (!owner) return filterTasks(data, { createdBy: parentMock.id });
     return scope === 'parent'
       ? filterTasks(data, { createdBy: owner.id }).filter(
           (task) => task.status === 'active',
         )
       : filterTasks(data, { assigneeId: owner.id });
   }, [data, scope, owner]);
+  // На проверке — только то, что может проверить вошедший родитель.
   const reviewTasks = useMemo(
-    () => allTasks.filter((task) => task.status === 'review'),
+    () =>
+      allTasks.filter(
+        (task) => task.status === 'review' && task.createdBy === parentMock.id,
+      ),
     [allTasks],
   );
   const { bottom } = useSafeAreaInsets();
@@ -83,8 +97,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
     tasks.findIndex((task) => task.id === currentId),
     0,
   );
-  const current: Task | undefined = tasks[currentIndex];
-  const showFooter = view === 'cards' && current;
+  const cards = view === 'cards' && tasks.length > 0;
 
   if (scope !== 'all' && !owner) return <Redirect href="/" />;
 
@@ -107,10 +120,10 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
             tab={tab}
             onTabChange={setTab}
             reviewCount={reviewTasks.length}
-            view={view}
-            onToggleView={() =>
-              setView((prev) => (prev === 'cards' ? 'list' : 'cards'))
-            }
+            // Иконка — по тому, что на экране: без заданий карточек нет,
+            // даже если до этого смотрели карточками.
+            view={cards ? 'cards' : 'list'}
+            onToggleView={() => setView(cards ? 'list' : 'cards')}
             // Назад — туда, откуда пришли (главная, Family, профиль); без
             // истории (открыли по ссылке) — на главную.
             onBack={() =>
@@ -120,71 +133,76 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
             tabs={scope !== 'parent'}
           />
         </View>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={[
-            styles.body,
-            view === 'cards' && styles.bodyCards,
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          {isPending ? null : tasks.length === 0 ? (
-            <Text style={styles.empty}>{emptyText}</Text>
-          ) : view === 'cards' ? (
+        {cards ? (
+          // Карточки во всю высоту: кнопки внутри карточки, навбара нет.
+          <View
+            style={[
+              styles.cards,
+              { paddingBottom: Math.max(bottom, CARDS_PADDING_BOTTOM) },
+            ]}
+          >
             <TaskCarousel
+              fullWidth
               tasks={tasks}
               initialIndex={currentIndex}
               onIndexChange={(index) => setCurrentId(tasks[index].id)}
-            />
-          ) : (
-            <TaskList
-              tasks={tasks}
-              onSelect={(task) => {
-                setCurrentId(task.id);
-                setView('cards');
-              }}
-            />
-          )}
-        </ScrollView>
-        {showFooter ? (
-          <View
-            style={[
-              styles.footer,
-              {
-                paddingHorizontal: gutter,
-                paddingBottom: Math.max(bottom, FOOTER_PADDING_VERTICAL),
-              },
-            ]}
-          >
-            {/* Кнопки пока заглушки: показывают тост, задачи и бейдж не меняются. */}
-            {current.status === 'review' ? (
-              <ReviewActions
-                childName={current.assignee.name}
-                onApprove={() => showToast(t('tasks.approvedToast'))}
-                onReject={() => showToast(t('tasks.rejectedToast'))}
-              />
-            ) : (
-              <>
-                <PillButton
-                  label={t('tasks.cancelTask')}
-                  variant="outline"
-                  onPress={() => showToast(t('tasks.cancelledToast'))}
-                />
-                <PillButton
-                  label={t('tasks.edit')}
-                  variant="dark"
-                  onPress={() =>
-                    router.push({
-                      pathname: '/edit-task',
-                      params: { id: String(current.id) },
-                    })
+              renderTask={(task, style) => (
+                <TaskCard
+                  task={task}
+                  style={style}
+                  footer={
+                    // Approve выплачивает награду и уводит задание в историю,
+                    // Reject возвращает его ребёнку, Cancel task — отменяет.
+                    // Всё это — только у автора задания; второй родитель
+                    // чужое задание только видит.
+                    task.createdBy !== parentMock.id ? (
+                      <ViewOnlyNote
+                        author={findParentName(task.createdBy)}
+                        review={task.status === 'review'}
+                      />
+                    ) : task.status === 'review' ? (
+                      <ReviewActions task={task} />
+                    ) : (
+                      <>
+                        <CancelTaskButton task={task} />
+                        <CardButton
+                          label={t('tasks.edit')}
+                          variant="dark"
+                          onPress={() =>
+                            router.push({
+                              pathname: '/edit-task',
+                              params: { id: String(task.id) },
+                            })
+                          }
+                        />
+                      </>
+                    )
                   }
                 />
-              </>
-            )}
+              )}
+            />
           </View>
         ) : (
-          <BottomNav activeKey={owner ? 'family' : 'tasks'} />
+          <>
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={styles.body}
+              showsVerticalScrollIndicator={false}
+            >
+              {isPending ? null : tasks.length === 0 ? (
+                <Text style={styles.empty}>{emptyText}</Text>
+              ) : (
+                <TaskList
+                  tasks={tasks}
+                  onSelect={(task) => {
+                    setCurrentId(task.id);
+                    setView('cards');
+                  }}
+                />
+              )}
+            </ScrollView>
+            <BottomNav activeKey={owner ? 'family' : 'tasks'} />
+          </>
         )}
       </SafeAreaView>
     </View>

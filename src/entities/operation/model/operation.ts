@@ -15,11 +15,23 @@ export interface Operation {
   kind: OperationKind;
   amount: number;
   child: OperationChild;
-  /** id родителя, создавшего задачу. */
+  /** id родителя, создавшего задачу; он же её подтвердил. */
   parentId: number;
-  /** ISO-время операции. */
+  /** ISO-время операции: награда начислена или упущена. */
   at: string;
+  /** Что нужно было сделать: описание задания. */
+  description: string;
+  /** ISO-время, когда ребёнок отметил задание выполненным; у упущенных — null. */
+  doneAt: string | null;
+  /** Фото-отчёт ребёнка; null — снимка нет. */
+  photo: ImageSourcePropType | null;
 }
+
+/** Что сервер записывает в историю, когда родитель подтвердил задание. */
+export type RewardPayload = Pick<
+  Operation,
+  'title' | 'description' | 'amount' | 'child' | 'doneAt' | 'photo'
+>;
 
 /** Сумма в формате истории: «$10». */
 export const formatAmount = (amount: number) => `$${amount}`;

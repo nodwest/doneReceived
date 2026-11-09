@@ -67,27 +67,30 @@ export function ChildCard({
             {t('childCard.activeTasks', { count: activeTasks })}
           </Text>
         </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('childCard.tasksToReviewA11y', {
-            name,
-            count: reviewTasks,
-          })}
-          disabled={!onReviewTasksPress}
-          onPress={onReviewTasksPress}
-          style={({ pressed }) => [
-            styles.stat,
-            styles.statReview,
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={[styles.statValue, styles.statReviewText]}>
-            {reviewTasks}
-          </Text>
-          <Text style={[styles.statLabel, styles.statReviewText]}>
-            {t('childCard.tasksToReview', { count: reviewTasks })}
-          </Text>
-        </Pressable>
+        {/* Нечего проверять — чип не показываем. */}
+        {reviewTasks > 0 && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('childCard.tasksToReviewA11y', {
+              name,
+              count: reviewTasks,
+            })}
+            disabled={!onReviewTasksPress}
+            onPress={onReviewTasksPress}
+            style={({ pressed }) => [
+              styles.stat,
+              styles.statReview,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={[styles.statValue, styles.statReviewText]}>
+              {reviewTasks}
+            </Text>
+            <Text style={[styles.statLabel, styles.statReviewText]}>
+              {t('childCard.tasksToReview', { count: reviewTasks })}
+            </Text>
+          </Pressable>
+        )}
       </View>
       {atHome && (
         <LinearGradient
