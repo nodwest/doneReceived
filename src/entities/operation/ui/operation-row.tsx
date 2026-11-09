@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { formatClock, formatDayLabel } from '@shared/lib';
 import { formatAmount, type Operation } from '../model/operation';
 import { styles } from './operation-row.styled';
@@ -16,6 +16,8 @@ type OperationRowProps = Operation & {
   leading?: ReactNode;
   /** plain — строка без своей рамки, внутри общей карточки со списком. */
   variant?: 'card' | 'plain';
+  /** Тап по строке (Rewards history открывает карточку задания). */
+  onPress?: () => void;
 };
 
 const CAPTION = {
@@ -36,11 +38,22 @@ export function OperationRow({
   caption = 'child',
   leading,
   variant = 'card',
+  onPress,
 }: OperationRowProps) {
   const date = new Date(at);
 
   return (
-    <View style={[styles.container, variant === 'plain' && styles.plain]}>
+    <Pressable
+      accessibilityRole={onPress ? 'button' : undefined}
+      accessibilityLabel={title}
+      disabled={!onPress}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.container,
+        variant === 'plain' && styles.plain,
+        pressed && styles.pressed,
+      ]}
+    >
       {leading ?? <Image source={child.avatar} style={styles.avatar} />}
       <View style={styles.middle}>
         <Text style={styles.title} numberOfLines={1}>
@@ -53,6 +66,6 @@ export function OperationRow({
       <View style={styles.reward}>
         <Text style={styles.rewardText}>+{formatAmount(amount)}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }

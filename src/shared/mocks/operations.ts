@@ -65,9 +65,38 @@ const rows = [
   [13, '21:00', liam, 'missed', 3, 'Take out the trash'],
 ] as const;
 
+// Описания заданий из истории: карточка выплаченного задания показывает, что
+// нужно было сделать.
+const descriptions: Record<string, string> = {
+  'Clean your room':
+    'Make the bed, put toys away, and vacuum the floor. Wipe the desk and sort the books by size.',
+  'Walk the dog':
+    'Take Max for a 20 minute walk around the block and do not forget a bag.',
+  'Water the plants': 'Water the plants on the balcony and in the kitchen.',
+  'Take out the trash':
+    'Empty all the bins in the house and take the bags to the container in the yard.',
+  'Finish homework':
+    'Finish the math workbook, pages 12 to 14, and check every answer twice.',
+  'Feed the cat': 'Fill the bowl with dry food and change the water.',
+  'Make the bed':
+    'Straighten the sheets and fold the blanket, then arrange the pillows neatly.',
+  'Practice piano': 'Play the new piece three times from start to finish.',
+  'Wash the dishes': 'Wash, dry, and put away the dishes after dinner.',
+  'Read a book': 'Read one chapter of your book and tell me what it was about.',
+  'Tidy the toys': 'Put all the toys back in their boxes and on the shelves.',
+  'Help with groceries':
+    'Carry the bags from the car and put the food in the fridge.',
+};
+
+// С фото-отчётом приходят уборки: родитель видит, как стало.
+const WITH_PHOTO = new Set(['Clean your room', 'Tidy the toys']);
+const roomPhoto = require('./images/photo-report-room.jpg');
+
 /**
  * История операций за две недели; даты считаются от сегодняшнего дня.
- * parentId — кто из родителей создал задачу: каждая третья — George.
+ * parentId — кто из родителей создал задачу и подтвердил её: каждая третья —
+ * George. doneMinutesBefore — за сколько минут до начисления ребёнок отметил
+ * задание выполненным (у упущенных — null).
  */
 export const operationsMock = rows.map(
   ([daysAgo, time, child, kind, amount, title], index) => ({
@@ -79,5 +108,8 @@ export const operationsMock = rows.map(
     kind,
     amount,
     title,
+    description: descriptions[title] ?? '',
+    doneMinutesBefore: kind === 'earned' ? 12 + ((index * 7) % 40) : null,
+    photo: kind === 'earned' && WITH_PHOTO.has(title) ? roomPhoto : null,
   }),
 );

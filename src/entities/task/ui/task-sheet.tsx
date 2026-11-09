@@ -15,19 +15,24 @@ import { theme } from '@shared/theme';
 import { formatRewardShort } from '../model';
 import { styles } from './task-sheet.styled';
 
-/** parent — фиолетовая шапка, child — голубая, review — оранжевая «на проверке». */
-export type TaskSheetTone = 'parent' | 'child' | 'review';
+/**
+ * parent — фиолетовая шапка, child — голубая, review — оранжевая «на
+ * проверке», paid — зелёная: награда выплачена.
+ */
+export type TaskSheetTone = 'parent' | 'child' | 'review' | 'paid';
 
 const HERO_GRADIENTS = {
   parent: [theme.colors.heroParentFrom, theme.colors.heroParentTo],
   child: [theme.colors.heroChildFrom, theme.colors.childDeep],
   review: [theme.colors.heroReviewFrom, theme.colors.heroReviewTo],
+  paid: [theme.colors.heroPaidFrom, theme.colors.earnedDark],
 } as const;
 
 const SHADOWS = {
   parent: styles.shadowParent,
   child: styles.shadowChild,
   review: styles.shadowReview,
+  paid: styles.shadowPaid,
 };
 
 type TaskSheetProps = {
@@ -112,15 +117,20 @@ export function TaskSheet({
   );
 }
 
-/** Сколько осталось до конца задания — полупрозрачная плашка в шапке. */
-export function TimerPill({ ms }: { ms: number }) {
+/** Полупрозрачная плашка в цветной шапке: иконка и короткая подпись. */
+export function HeroPill({ icon, label }: { icon: IconName; label: string }) {
   return (
     <View style={styles.pill}>
-      <Icon name="clock" size={16} color={theme.colors.white} />
-      <Text style={styles.pillText}>{formatCountdown(ms)}</Text>
+      <Icon name={icon} size={16} color={theme.colors.white} />
+      <Text style={styles.pillText}>{label}</Text>
     </View>
   );
 }
+
+/** Сколько осталось до конца задания. */
+export const TimerPill = ({ ms }: { ms: number }) => (
+  <HeroPill icon="clock" label={formatCountdown(ms)} />
+);
 
 /** «On review» с оранжевой точкой — светлая плашка в оранжевой шапке. */
 export function ReviewPill({ label }: { label: string }) {
@@ -139,8 +149,25 @@ export function SectionLabel({ children }: { children: string }) {
   return <Text style={styles.sectionLabel}>{children}</Text>;
 }
 
-/** Золотая плашка награды с монетой: «$5». */
-export function RewardChip({ reward }: { reward: number }) {
+type RewardChipProps = {
+  reward: number;
+  /** Награда уже выплачена: зелёная плашка «+$4». */
+  paid?: boolean;
+};
+
+/** Плашка награды с монетой: золотая «$5» или зелёная выплаченная «+$4». */
+export function RewardChip({ reward, paid }: RewardChipProps) {
+  const value = formatRewardShort(reward);
+  if (paid) {
+    return (
+      <View style={[styles.rewardChip, styles.rewardChipPaid]}>
+        <Icon name="coin" size={24} color={theme.colors.yellow} />
+        <Text style={[styles.rewardChipValue, styles.rewardChipValuePaid]}>
+          +{value}
+        </Text>
+      </View>
+    );
+  }
   return (
     <LinearGradient
       colors={[theme.colors.rewardChipFrom, theme.colors.rewardChipTo]}
@@ -149,24 +176,28 @@ export function RewardChip({ reward }: { reward: number }) {
       style={styles.rewardChip}
     >
       <Icon name="coin" size={24} color={theme.colors.yellow} />
-      <Text style={styles.rewardChipValue}>{formatRewardShort(reward)}</Text>
+      <Text style={styles.rewardChipValue}>{value}</Text>
     </LinearGradient>
   );
 }
 
-type TaskBriefProps = {
+type TaskBriefProps = RewardChipProps & {
   label: string;
-  reward: number;
   description: string;
 };
 
 /** «What to do»: заголовок с наградой справа и описание задания. */
-export function TaskBrief({ label, reward, description }: TaskBriefProps) {
+export function TaskBrief({
+  label,
+  reward,
+  paid,
+  description,
+}: TaskBriefProps) {
   return (
     <View style={styles.brief}>
       <View style={styles.briefHead}>
         <SectionLabel>{label}</SectionLabel>
-        <RewardChip reward={reward} />
+        <RewardChip reward={reward} paid={paid} />
       </View>
       {!!description && <Text style={styles.description}>{description}</Text>}
     </View>
@@ -176,7 +207,7 @@ export function TaskBrief({ label, reward, description }: TaskBriefProps) {
 export type InfoTileProps = {
   icon: IconName;
   /** Цвет иконки; фон плитки — тот же цвет, но бледный. */
-  tone: 'warm' | 'cool';
+  tone: 'warm' | 'cool' | 'green';
   label: string;
   value: string;
 };
@@ -184,6 +215,7 @@ export type InfoTileProps = {
 const TILE_TONES = {
   warm: { bg: theme.colors.dueTile, ink: theme.colors.dueInk },
   cool: { bg: theme.colors.givenTile, ink: theme.colors.childDeep },
+  green: { bg: theme.colors.readySoft, ink: theme.colors.readyText },
 };
 
 /** Пара плиток «когда»: срок и когда выдано / создано. */
@@ -217,17 +249,28 @@ type PhotoSectionProps = {
   photo: ImageSourcePropType;
   /** «1 / 1» справа от заголовка. */
   counter?: string;
+  /** Высота снимка; меньше — когда в карточке много других секций. */
+  height?: number;
 };
 
 /** Фото-отчёт: заголовок и снимок на всю ширину. */
-export function PhotoSection({ label, photo, counter }: PhotoSectionProps) {
+export function PhotoSection({
+  label,
+  photo,
+  counter,
+  height,
+}: PhotoSectionProps) {
   return (
     <View style={styles.section}>
       <View style={styles.photoHead}>
         <SectionLabel>{label}</SectionLabel>
         {counter && <Text style={styles.photoCounter}>{counter}</Text>}
       </View>
-      <Image source={photo} style={styles.photo} resizeMode="cover" />
+      <Image
+        source={photo}
+        style={[styles.photo, height !== undefined && { height }]}
+        resizeMode="cover"
+      />
     </View>
   );
 }

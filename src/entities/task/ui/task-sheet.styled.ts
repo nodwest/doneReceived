@@ -21,6 +21,9 @@ export const styles = StyleSheet.create({
   shadowReview: {
     boxShadow: '0px 10px 28px rgba(230, 126, 0, 0.12)',
   },
+  shadowPaid: {
+    boxShadow: '0px 10px 28px rgba(26, 133, 79, 0.12)',
+  },
 
   hero: {
     gap: 18,
@@ -187,6 +190,13 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.rewardChipBorder,
     overflow: 'hidden',
+  },
+  rewardChipPaid: {
+    borderColor: theme.colors.readyBorder,
+    backgroundColor: theme.colors.readySoft,
+  },
+  rewardChipValuePaid: {
+    color: theme.colors.readyText,
   },
   rewardChipValue: {
     fontSize: 18,

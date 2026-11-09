@@ -108,6 +108,7 @@ export const theme = {
     heroParentFrom: '#8B7CF6',
     heroParentTo: '#5443D6',
     heroChildFrom: '#5AAEF5',
+    heroPaidFrom: '#3FCF86',
     heroReviewFrom: '#FFD98C',
     heroReviewTo: '#FFB24A',
     heroReviewCaption: '#9A5200',

@@ -54,3 +54,39 @@ export function summarizeWishlist(progress: readonly WishProgress[]) {
     current: progress.find((item) => item.status === 'current') ?? null,
   };
 }
+
+/** Как одна награда сдвинула копилку: желание, которое копилось после неё. */
+export interface RewardGoal {
+  title: string;
+  price: number;
+  /** Сколько было отложено на это желание до награды. */
+  before: number;
+  /** И сколько стало после. */
+  after: number;
+}
+
+/**
+ * Какое желание наполнялось сразу после награды и на сколько она его
+ * сдвинула. Баланс до и после награды раскладывается по вишлисту так же, как
+ * сейчас; null — копить было не на что (вишлист пуст или всё готово).
+ */
+export function getRewardGoal(
+  wishes: readonly Wish[],
+  balanceBefore: number,
+  balanceAfter: number,
+): RewardGoal | null {
+  const current = summarizeWishlist(
+    allocateBalance(wishes, balanceAfter),
+  ).current;
+  if (!current) return null;
+  const before =
+    allocateBalance(wishes, Math.max(balanceBefore, 0)).find(
+      (item) => item.wish.id === current.wish.id,
+    )?.saved ?? 0;
+  return {
+    title: current.wish.title,
+    price: current.wish.price,
+    before,
+    after: current.saved,
+  };
+}

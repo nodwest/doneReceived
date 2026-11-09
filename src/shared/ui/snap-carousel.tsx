@@ -13,6 +13,8 @@ const FULL_GAP = 16;
 // Запас под тень карточки: снаружи он гасится отрицательным отступом.
 const SHADOW_TOP = 12;
 const SHADOW_BOTTOM = 24;
+// Высота точек под лентой вместе с отступом над ними.
+const DOTS_HEIGHT = 6 + 13;
 // Сколько карточек по обе стороны от текущей держим отрисованными.
 const RENDER_RADIUS = 1;
 
@@ -33,6 +35,11 @@ type SnapCarouselProps<T> = {
   peek?: number;
   /** Боковой отступ карточки от края экрана. */
   gutter?: number;
+  /**
+   * Карточка ровно по высоте свободного места, а не по содержимому: то, что
+   * не влезло, прокручивается внутри карточки (экраны карточек заданий).
+   */
+  fill?: boolean;
 };
 
 /**
@@ -48,7 +55,10 @@ export function SnapCarousel<T>({
   dotColor = theme.colors.violet,
   peek = PEEK,
   gutter = GUTTER,
+  fill,
 }: SnapCarouselProps<T>) {
+  // Свободная высота под карточки и точки (только с fill).
+  const [rootHeight, setRootHeight] = useState(0);
   const gap = peek === 0 ? Math.max(FULL_GAP, gutter) : GAP;
   const {
     scrollRef,
@@ -78,13 +88,29 @@ export function SnapCarousel<T>({
   const minHeight = tallest.items === items ? tallest.height : 0;
   const onTrackSizeChange = (contentWidth: number, contentHeight: number) => {
     onContentSizeChange(contentWidth);
-    if (contentHeight > minHeight) {
+    if (!fill && contentHeight > minHeight) {
       setTallest({ items, height: contentHeight });
     }
   };
+  const slotHeight = Math.max(
+    rootHeight - (items.length < 2 ? 0 : DOTS_HEIGHT),
+    0,
+  );
+  const measured = !fill || rootHeight > 0;
 
   return (
-    <View style={styles.root}>
+    <View
+      style={fill ? styles.rootFill : styles.root}
+      onLayout={
+        fill
+          ? (event) => {
+              const next = event.nativeEvent.layout.height;
+              // Нулевая высота — экран ушёл вглубь стека: оставляем прежнюю.
+              if (next > 0) setRootHeight(next);
+            }
+          : undefined
+      }
+    >
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -101,7 +127,11 @@ export function SnapCarousel<T>({
         style={[
           styles.scroll,
           { marginHorizontal: -gutter },
-          !ready && styles.hidden,
+          fill && {
+            flexGrow: 0,
+            height: slotHeight + SHADOW_TOP + SHADOW_BOTTOM,
+          },
+          !(ready && measured) && styles.hidden,
         ]}
         contentContainerStyle={[
           styles.track,
@@ -112,7 +142,10 @@ export function SnapCarousel<T>({
       >
         {items.map((item, i) => {
           const key = keyExtractor(item);
-          const style: ViewStyle = { width: cardWidth || undefined };
+          const style: ViewStyle = {
+            width: cardWidth || undefined,
+            height: fill ? slotHeight : undefined,
+          };
           // Рисуем только видимую карточку и соседние: остальные — пустые места
           // той же ширины. Вход на экран и смена вкладки не ждут всех карточек.
           return Math.abs(i - index) <= RENDER_RADIUS ? (
@@ -148,6 +181,11 @@ const styles = StyleSheet.create({
   // Лента растягивается на всю свободную высоту, карточки — вслед за ней.
   root: {
     flexGrow: 1,
+  },
+  // Высота — ровно свободное место, а не содержимое карточек.
+  rootFill: {
+    flex: 1,
+    minHeight: 0,
   },
   // Лента выходит за боковые отступы страницы, чтобы следующая карточка была видна у края.
   scroll: {

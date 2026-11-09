@@ -3,17 +3,22 @@ import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   body: {
-    paddingTop: 12,
     paddingBottom: 24,
   },
+  // Назад слева, кнопка вида справа, заголовок по центру между ними.
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    paddingTop: 12,
     paddingHorizontal: 16,
+  },
+  headerSpacer: {
+    width: 44,
   },
   title: {
     flex: 1,
+    textAlign: 'center',
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
@@ -36,6 +41,14 @@ export const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 12,
     gap: 6,
+  },
+  // Карточки наград дня во всю высоту под шапкой.
+  cards: {
+    flex: 1,
+    minHeight: 0,
+    paddingTop: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   empty: {
     marginTop: 24,

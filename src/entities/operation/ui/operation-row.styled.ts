@@ -13,6 +13,9 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.line,
     backgroundColor: theme.colors.white,
   },
+  pressed: {
+    opacity: 0.85,
+  },
   plain: {
     paddingHorizontal: 12,
     borderWidth: 0,

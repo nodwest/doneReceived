@@ -8,3 +8,4 @@ export * from './ui/task-icon-badge';
 export * from './ui/child-task-tile';
 export * from './ui/child-review-row';
 export * from './ui/child-task-card';
+export * from './ui/task-sheet';

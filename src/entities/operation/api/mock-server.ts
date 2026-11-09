@@ -8,8 +8,10 @@ import type { Operation } from '../model/operation';
  */
 const today = new Date();
 
+const MINUTE = 60_000;
+
 const operations: Operation[] = operationsMock.map(
-  ({ daysAgo, time, ...operation }) => {
+  ({ daysAgo, time, doneMinutesBefore, ...operation }) => {
     const [hours, minutes] = time.split(':').map(Number);
     const at = new Date(
       today.getFullYear(),
@@ -18,7 +20,11 @@ const operations: Operation[] = operationsMock.map(
       hours,
       minutes,
     );
-    return { ...operation, at: at.toISOString() };
+    const doneAt =
+      doneMinutesBefore === null
+        ? null
+        : new Date(at.getTime() - doneMinutesBefore * MINUTE).toISOString();
+    return { ...operation, at: at.toISOString(), doneAt };
   },
 );
 

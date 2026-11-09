@@ -38,6 +38,7 @@ export function TaskCarousel({
       onIndexChange={onIndexChange}
       dotColor={tone === 'child' ? theme.colors.childFrom : theme.colors.violet}
       peek={fullWidth ? 0 : undefined}
+      fill={fullWidth}
       gutter={fullWidth ? 16 : undefined}
     />
   );

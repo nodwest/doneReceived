@@ -15,10 +15,16 @@ export interface Operation {
   kind: OperationKind;
   amount: number;
   child: OperationChild;
-  /** id родителя, создавшего задачу. */
+  /** id родителя, создавшего задачу; он же её подтвердил. */
   parentId: number;
-  /** ISO-время операции. */
+  /** ISO-время операции: награда начислена или упущена. */
   at: string;
+  /** Что нужно было сделать: описание задания. */
+  description: string;
+  /** ISO-время, когда ребёнок отметил задание выполненным; у упущенных — null. */
+  doneAt: string | null;
+  /** Фото-отчёт ребёнка; null — снимка нет. */
+  photo: ImageSourcePropType | null;
 }
 
 /** Сумма в формате истории: «$10». */

@@ -7,18 +7,25 @@ import { styles } from './tab-screen.styled';
 type TabScreenProps = {
   activeKey: string;
   wide?: boolean;
+  /** Без навбара (экран карточек): отступ снизу — под жесты системы. */
+  navHidden?: boolean;
   children?: ReactNode;
 };
 
-export function TabScreen({ activeKey, wide, children }: TabScreenProps) {
+export function TabScreen({
+  activeKey,
+  wide,
+  navHidden,
+  children,
+}: TabScreenProps) {
   return (
     <View style={styles.screen}>
       <SafeAreaView
         style={[styles.container, wide && styles.containerWide]}
-        edges={wide ? [] : ['top']}
+        edges={wide ? [] : navHidden ? ['top', 'bottom'] : ['top']}
       >
         <View style={styles.content}>{children}</View>
-        <BottomNav activeKey={activeKey} />
+        {!navHidden && <BottomNav activeKey={activeKey} />}
       </SafeAreaView>
     </View>
   );

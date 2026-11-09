@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    minHeight: 0,
     width: '100%',
     maxWidth: 480,
     alignSelf: 'center',
@@ -16,7 +17,10 @@ export const styles = StyleSheet.create({
   containerWide: {
     maxWidth: '100%',
   },
+  // minHeight 0: в вебе иначе блок растёт под содержимое, и экраны с
+  // карточками во всю высоту уезжали бы за край.
   content: {
     flex: 1,
+    minHeight: 0,
   },
 });
