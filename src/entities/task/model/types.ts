@@ -23,22 +23,24 @@ export interface CreateTaskPayload {
   description: string;
   /** ISO-время, когда задача перестаёт быть активной; null — без срока. */
   expiresAt: string | null;
-  assigneeId: number;
+  assigneeId: string;
 }
 
 export interface UpdateTaskPayload extends CreateTaskPayload {
-  id: number;
+  id: string;
+  /** Задание с сервера: правится через PATCH, у моковых — нет. */
+  serverTaskId?: string;
 }
 
 /** Смена статуса ребёнком: I did it! (review) или «Переделать» (active). */
 export interface TaskStatusPayload {
-  id: number;
+  id: string;
   status: Exclude<TaskState, 'done'>;
 }
 
 /** Отказ родителя на проверке: задание снова активно, с причиной. */
 export interface RejectTaskPayload {
-  id: number;
+  id: string;
   reason: RejectReasonKey;
   comment: string;
 }

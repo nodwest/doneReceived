@@ -59,7 +59,7 @@ export function ChildTaskCard({
   return (
     <TaskSheet
       tone={review ? 'review' : 'child'}
-      avatar={author.avatar}
+      avatar={author.avatar ?? undefined}
       caption={t('taskCard.taskFrom')}
       name={author.name}
       aside={

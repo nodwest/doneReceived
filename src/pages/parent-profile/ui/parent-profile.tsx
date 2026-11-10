@@ -11,6 +11,7 @@ import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
+import { useFamilyTasks } from '@features/family-tasks';
 import {
   latestRewards,
   OperationRow,
@@ -21,7 +22,7 @@ import {
   type Operation,
   type SummaryPeriod,
 } from '@entities/operation';
-import { countTasks, useTasks, type Task } from '@entities/task';
+import { countTasks, type Task } from '@entities/task';
 import type { ParentProfile } from '@entities/user';
 import { parentMock, parentProfilesMock } from '@shared/mocks';
 import { useTranslation } from '@shared/i18n';
@@ -48,7 +49,7 @@ export function ParentProfilePage() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: tasks = NO_TASKS } = useTasks();
+  const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: operations = NO_OPERATIONS } = useOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
   const [today] = useState(() => new Date());
@@ -59,7 +60,7 @@ export function ParentProfilePage() {
   );
   if (!parent) return <Redirect href="/" />;
 
-  const counts = countTasks(tasks, { createdBy: parent.id });
+  const counts = countTasks(tasks, { createdBy: String(parent.id) });
   const parentOperations = operations.filter(
     (operation) => operation.parentId === parent.id,
   );

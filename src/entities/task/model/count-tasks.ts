@@ -2,9 +2,9 @@ import type { Task } from './task';
 
 type TaskFilter = {
   /** Задачи одного ребёнка. */
-  assigneeId?: number;
+  assigneeId?: string;
   /** Задачи, созданные одним родителем. */
-  createdBy?: number;
+  createdBy?: string;
 };
 
 /** Задачи по фильтру; без фильтра — все. */
@@ -38,8 +38,8 @@ export function countTasks(tasks: readonly Task[], filter?: TaskFilter) {
  */
 export function countChildTasks(
   tasks: readonly Task[],
-  childId: number,
-  parentId: number,
+  childId: string,
+  parentId: string,
 ) {
   return {
     active: countTasks(tasks, { assigneeId: childId }).active,

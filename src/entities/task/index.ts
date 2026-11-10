@@ -3,10 +3,12 @@ export {
   approveTask,
   cancelTask,
   createTask,
+  isServerChild,
   rejectTask,
   setTaskStatus,
   updateTask,
 } from './api/tasks-api';
+export type { TaskViewer } from './api/server-tasks-api';
 export * from './api/tasks-query';
 export * from './ui/reward-button';
 export * from './ui/task-card';

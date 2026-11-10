@@ -16,24 +16,40 @@ export interface TaskRejection {
   /** Комментарий родителя; пустая строка — без комментария. */
   comment: string;
   /** id родителя, который вернул задание. */
-  by: number;
+  by: string;
 }
 
 export interface TaskAssignee {
-  id: number;
+  /** id ребёнка: у моков — число строкой, с сервера — UUID профиля. */
+  id: string;
   name: string;
-  avatar: ImageSourcePropType;
+  /** Фото; null — у ребёнка с сервера фото пока нет (буква имени). */
+  avatar: ImageSourcePropType | null;
 }
 
 export interface Task {
-  id: number;
+  /**
+   * id задачи в приложении: у моков — число строкой, с сервера — UUID
+   * назначения (задание на одного ребёнка).
+   */
+  id: string;
+  /**
+   * Задание с сервера: id задания (для правки и отмены). У моковых — нет.
+   * Один `serverTaskId` может быть у нескольких назначений, но пока задание
+   * назначается одному ребёнку.
+   */
+  serverTaskId?: string;
   title: string;
   description: string;
   reward: number;
   status: TaskState;
   assignee: TaskAssignee;
-  /** id родителя, создавшего задачу. */
-  createdBy: number;
+  /**
+   * id родителя, создавшего задачу. Задания с сервера, созданные вошедшим
+   * родителем, помечены тем же id, что моковые задания Sarah (`OWN_TASK_AUTHOR`
+   * в запросе списка): экраны считают их «моими».
+   */
+  createdBy: string;
   /** ISO-время создания. */
   createdAt: string;
   /** ISO-время, когда задача перестаёт быть активной; null — без срока. */

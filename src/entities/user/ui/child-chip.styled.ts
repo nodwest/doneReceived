@@ -22,6 +22,17 @@ export const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
   },
+  initial: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.childChip,
+  },
+  letter: {
+    fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.childDeep,
+  },
   name: {
     fontSize: 15,
     letterSpacing: tracking(15),

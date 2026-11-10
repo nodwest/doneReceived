@@ -9,13 +9,13 @@ import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import { TaskCarousel } from '@widgets/task-carousel';
 import { WishlistPreview } from '@widgets/wishlist-preview';
+import { useFamilyTasks } from '@features/family-tasks';
 import { ChildActivityItem } from '@entities/activity';
 import {
   ChildTaskTile,
   countTasks,
   filterTasks,
   sortTasksByUrgency,
-  useTasks,
   type Task,
 } from '@entities/task';
 import { useChildBalance } from '@entities/wallet';
@@ -31,8 +31,8 @@ import { styles } from './child-home.styled';
 const NO_TASKS: Task[] = [];
 
 // Автор задания для «from Sarah»; неизвестный — первый родитель.
-const findAuthor = (id: number) =>
-  parentProfilesMock.find((parent) => parent.id === id) ??
+const findAuthor = (id: string) =>
+  parentProfilesMock.find((parent) => String(parent.id) === id) ??
   parentProfilesMock[0];
 
 /** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
@@ -51,9 +51,9 @@ function greetingKey(hour: number) {
 export function ChildHomePage() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { data = NO_TASKS, isPending: tasksPending } = useTasks();
+  const { data = NO_TASKS, isPending: tasksPending } = useFamilyTasks();
   const myTasks = useMemo(
-    () => filterTasks(data, { assigneeId: childAccountMock.id }),
+    () => filterTasks(data, { assigneeId: String(childAccountMock.id) }),
     [data],
   );
   // Ближайшие по сроку — первыми, как в списке «To do».

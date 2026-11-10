@@ -1,5 +1,5 @@
 import { childrenMock, parentMock, tasksMock } from '@shared/mocks';
-import type { Task } from '../model/task';
+import type { Task, TaskAssignee } from '../model/task';
 import type {
   CreateTaskPayload,
   RejectTaskPayload,
@@ -8,27 +8,37 @@ import type {
 } from '../model/types';
 
 /**
- * Имитация бэкенда, пока его нет: задачи живут в памяти до перезапуска
- * приложения, стартовые данные — из моков. Эндпоинты в ./tasks-api ходят сюда.
- * С настоящим API этот файл удаляется целиком.
+ * Имитация бэкенда для моковых детей (Emma, Liam): задачи живут в памяти до
+ * перезапуска приложения, стартовые данные — из моков. id в приложении —
+ * строки: у моков это число строкой. Задания настоящих детей ходят в API
+ * (./server-tasks-api).
  */
-let tasks: Task[] = tasksMock.map((task) => ({ ...task, rejection: null }));
-let nextId = Math.max(...tasks.map((task) => task.id)) + 1;
+const toAssignee = (child: (typeof childrenMock)[number]): TaskAssignee => ({
+  id: String(child.id),
+  name: child.name,
+  avatar: child.avatar,
+});
 
-// Сервер сам подставляет исполнителя по id: в payload приходит только assigneeId.
-function findAssignee(id: number) {
-  const assignee = childrenMock.find((child) => child.id === id);
+let tasks: Task[] = tasksMock.map((task) => ({
+  ...task,
+  id: String(task.id),
+  createdBy: String(task.createdBy),
+  assignee: toAssignee(task.assignee),
+  rejection: null,
+}));
+let nextId = Math.max(...tasksMock.map((task) => task.id)) + 1;
+
+function findAssignee(id: string) {
+  const assignee = childrenMock.find((child) => String(child.id) === id);
   if (!assignee) throw new Error(`Assignee ${id} not found`);
-  return assignee;
+  return toAssignee(assignee);
 }
 
 export const mockServer = {
-  // Копия, как после сериализации ответа: снаружи данные «сервера» не изменить.
-  // Подтверждённые задания ушли в историю: в списке их нет.
   list: (): Task[] =>
     tasks.filter((task) => task.status !== 'done').map((task) => ({ ...task })),
 
-  find: (id: number): Task => {
+  find: (id: string): Task => {
     const task = tasks.find((item) => item.id === id);
     if (!task) throw new Error(`Task ${id} not found`);
     return { ...task };
@@ -36,21 +46,19 @@ export const mockServer = {
 
   create: (payload: CreateTaskPayload): Task => {
     const task: Task = {
-      id: nextId++,
+      id: String(nextId++),
       title: payload.title,
       description: payload.description,
       reward: payload.reward,
       status: 'active',
       assignee: findAssignee(payload.assigneeId),
-      // Автора сервер берёт из сессии: задачу создаёт вошедший родитель.
-      createdBy: parentMock.id,
+      createdBy: String(parentMock.id),
       createdAt: new Date().toISOString(),
       expiresAt: payload.expiresAt,
       doneAt: null,
       photo: null,
       rejection: null,
     };
-    // Порядок хранения не важен: клиент сортирует список сам (sortTasksByUrgency).
     tasks = [task, ...tasks];
     return { ...task };
   },
@@ -70,7 +78,6 @@ export const mockServer = {
     return { ...updated };
   },
 
-  // Ребёнок отправляет задание на проверку (review) или берёт назад (active).
   setStatus: ({ id, status }: TaskStatusPayload): Task => {
     const current = tasks.find((task) => task.id === id);
     if (!current) throw new Error(`Task ${id} not found`);
@@ -83,15 +90,13 @@ export const mockServer = {
     return { ...updated };
   },
 
-  // Родитель подтвердил: задание выполнено и уходит в историю.
-  approve: (id: number): Task => {
+  approve: (id: string): Task => {
     const current = mockServer.find(id);
     const updated: Task = { ...current, status: 'done', rejection: null };
     tasks = tasks.map((task) => (task.id === id ? updated : task));
     return { ...updated };
   },
 
-  // Родитель вернул задание: снова активно, с причиной; фото-отчёт сброшен.
   reject: ({ id, reason, comment }: RejectTaskPayload): Task => {
     const current = mockServer.find(id);
     const updated: Task = {
@@ -99,15 +104,13 @@ export const mockServer = {
       status: 'active',
       doneAt: null,
       photo: null,
-      // Кто вернул — вошедший родитель (с API сервер берёт его из сессии).
-      rejection: { reason, comment, by: parentMock.id },
+      rejection: { reason, comment, by: String(parentMock.id) },
     };
     tasks = tasks.map((task) => (task.id === id ? updated : task));
     return { ...updated };
   },
 
-  // Родитель отменил задание: оно пропадает без награды.
-  cancel: (id: number) => {
+  cancel: (id: string) => {
     tasks = tasks.filter((task) => task.id !== id);
   },
 };

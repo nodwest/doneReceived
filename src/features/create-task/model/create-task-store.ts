@@ -16,7 +16,7 @@ type FormState = {
   reward: string;
   rewardPreset: number | null;
   description: string;
-  assigneeId: number | null;
+  assigneeId: string | null;
   deadline: DeadlineChoice;
 };
 
@@ -25,7 +25,7 @@ type FormActions = {
   setReward: (reward: string) => void;
   pickRewardPreset: (preset: number) => void;
   setDescription: (description: string) => void;
-  setAssignee: (id: number) => void;
+  setAssignee: (id: string) => void;
   selectDeadline: (preset: DeadlinePreset) => void;
   setCustomDeadline: (date: Date) => void;
   /** Предзаполняет форму данными существующей задачи (режим редактирования). */

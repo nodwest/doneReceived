@@ -6,39 +6,84 @@ import type {
   UpdateTaskPayload,
 } from '../model/types';
 import { mockServer } from './mock-server';
+import {
+  cancelServerTask,
+  createServerTask,
+  fetchServerTasks,
+  updateServerTask,
+  type TaskViewer,
+} from './server-tasks-api';
 
-// Эндпоинты задач. Пока бэкенда нет, тела ходят в mockServer; с API здесь
-// будут запросы (GET /tasks, POST /tasks, PATCH /tasks/:id,
-// PATCH /tasks/:id/status, POST /tasks/:id/approve, POST /tasks/:id/reject,
-// DELETE /tasks/:id), сигнатуры и весь остальной код не меняются.
+// Эндпоинты задач. Задания настоящих детей (их id — UUID) ходят в API,
+// моковых Emma и Liam — в mockServer, пока их профили и кошельки на моках.
 
-export async function fetchTasks(): Promise<Task[]> {
-  return mockServer.list();
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Ребёнок с сервера (UUID), а не моковый. */
+export const isServerChild = (childId: string) => UUID.test(childId);
+
+/**
+ * Все задачи: моковые и, если есть семья, с сервера. Сервер не ответил —
+ * показываем моковые, чтобы экраны не пустели.
+ */
+export async function fetchTasks(viewer: TaskViewer | null): Promise<Task[]> {
+  const mocks = mockServer.list();
+  if (!viewer) return mocks;
+  const server = await fetchServerTasks(viewer).catch(() => [] as Task[]);
+  return [...server, ...mocks];
 }
 
-export async function createTask(payload: CreateTaskPayload): Promise<Task> {
-  return mockServer.create(payload);
+/** Создать задание: настоящему ребёнку — на сервере, моковому — в моках. */
+export async function createTask(
+  payload: CreateTaskPayload,
+  familyId: string | null,
+): Promise<void> {
+  if (isServerChild(payload.assigneeId)) {
+    if (!familyId) throw new Error('No family');
+    await createServerTask(familyId, payload);
+    return;
+  }
+  mockServer.create(payload);
 }
 
-export async function updateTask(payload: UpdateTaskPayload): Promise<Task> {
-  return mockServer.update(payload);
+/** Править задание: с сервера — PATCH, моковое — в моках. */
+export async function updateTask(
+  payload: UpdateTaskPayload,
+  familyId: string | null,
+): Promise<void> {
+  if (payload.serverTaskId) {
+    if (!familyId) throw new Error('No family');
+    await updateServerTask(familyId, payload);
+    return;
+  }
+  mockServer.update(payload);
 }
+
+/** Родитель отменил задание: с сервера — резерв вернётся в кошелёк. */
+export async function cancelTask(
+  task: Task,
+  familyId: string | null,
+): Promise<void> {
+  if (task.serverTaskId) {
+    if (!familyId) throw new Error('No family');
+    await cancelServerTask(familyId, task.serverTaskId);
+    return;
+  }
+  mockServer.cancel(task.id);
+}
+
+// Отметка выполнения и проверка — пока только у моковых заданий (шаги 3–4).
 
 export async function setTaskStatus(payload: TaskStatusPayload): Promise<Task> {
   return mockServer.setStatus(payload);
 }
 
 /** Родитель подтвердил задание на проверке: оно выполнено (done). */
-export async function approveTask(id: number): Promise<Task> {
+export async function approveTask(id: string): Promise<Task> {
   return mockServer.approve(id);
 }
 
 /** Родитель вернул задание с причиной: оно снова активно. */
 export async function rejectTask(payload: RejectTaskPayload): Promise<Task> {
   return mockServer.reject(payload);
-}
-
-/** Родитель отменил задание. */
-export async function cancelTask(id: number): Promise<void> {
-  mockServer.cancel(id);
 }

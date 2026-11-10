@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskForm } from '@features/create-task';
 import { DepositSheet } from '@features/deposit-funds';
-import { useCurrentFamily } from '@entities/family';
+import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import type { UpdateTaskPayload } from '@entities/task';
+import type { ChipChild } from '@entities/user';
 import { useParentFunds } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
@@ -33,6 +34,23 @@ export function TaskFormScreen({
   const familyId = useCurrentFamily()?.id ?? null;
   const { data: funds } = useParentFunds(familyId);
   const [depositOpen, setDepositOpen] = useState(false);
+  // Кому назначить: моковые Emma и Liam и дети семьи с сервера.
+  const { data: serverChildren } = useFamilyChildren(familyId);
+  const assignees = useMemo<ChipChild[]>(
+    () => [
+      ...childrenMock.map((child) => ({
+        id: String(child.id),
+        name: child.name,
+        avatar: child.avatar,
+      })),
+      ...(serverChildren ?? []).map((child) => ({
+        id: child.id,
+        name: child.displayName,
+        avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+      })),
+    ],
+    [serverChildren],
+  );
 
   // При открытии экрана напрямую (перезагрузка, deep link) истории нет.
   const close = () =>
@@ -57,7 +75,7 @@ export function TaskFormScreen({
           />
         </View>
         <CreateTaskForm
-          assignees={childrenMock}
+          assignees={assignees}
           rewardPresets={rewardPresetsMock}
           task={task}
           funds={funds}

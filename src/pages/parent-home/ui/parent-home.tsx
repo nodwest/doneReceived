@@ -7,9 +7,10 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
+import { useFamilyTasks } from '@features/family-tasks';
 import { ActivityItem } from '@entities/activity';
 import { sumTotals, useOperations } from '@entities/operation';
-import { countChildTasks, countTasks, useTasks } from '@entities/task';
+import { countChildTasks, countTasks } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import {
   childProfilesMock,
@@ -32,9 +33,10 @@ export function ParentHomePage() {
   // Счётчики заданий — из того же запроса, что и экран Tasks и профиль
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
   // Пока список грузится, показываем значения из сводки.
-  const { data: tasks } = useTasks();
+  const { data: tasks } = useFamilyTasks();
   // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
-  const total = tasks && countTasks(tasks, { createdBy: parentMock.id });
+  const total =
+    tasks && countTasks(tasks, { createdBy: String(parentMock.id) });
   // Выплачено вошедшим родителем за всё время — из истории наград: после
   // подтверждения задания сумма растёт.
   const { data: operations } = useOperations();
@@ -44,7 +46,11 @@ export function ParentHomePage() {
       operations.filter((operation) => operation.parentId === parentMock.id),
     ).earned;
   const children = childProfilesMock.map((child) => {
-    const counts = countChildTasks(tasks ?? [], child.id, parentMock.id);
+    const counts = countChildTasks(
+      tasks ?? [],
+      String(child.id),
+      String(parentMock.id),
+    );
     return {
       id: child.id,
       name: child.name,

@@ -1,10 +1,16 @@
 import { useLayoutEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ChildChip, type Child } from '@entities/user';
+import { ChildChip, type ChipChild } from '@entities/user';
 import type { UpdateTaskPayload } from '@entities/task';
-import { formatMoney, type ParentFunds } from '@entities/wallet';
+import {
+  formatMoney,
+  getParentFunds,
+  type ParentFunds,
+} from '@entities/wallet';
+import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
+import { showToast } from '@shared/lib';
 import { Input } from '@shared/ui';
 import { theme } from '@shared/theme';
 import {
@@ -23,7 +29,8 @@ import { RewardInput } from './reward-input';
 import { styles } from './create-task-form.styled';
 
 type CreateTaskFormProps = {
-  assignees: readonly Child[];
+  /** Кому можно назначить: моковые дети и дети семьи с сервера. */
+  assignees: readonly ChipChild[];
   rewardPresets: readonly number[];
   /** Задача для редактирования; без неё форма создаёт новую. Берётся при открытии. */
   task?: UpdateTaskPayload;
@@ -70,10 +77,12 @@ export function CreateTaskForm({
     return reset;
   }, [initialTask, fill, reset]);
 
-  // Задания пока на моках и на сервере ничего не резервируют, поэтому при
-  // правке награда задачи из резерва не вычитается. С настоящими заданиями
-  // при правке на новую сумму будет доступно свободное плюс она.
-  const budget = funds ?? null;
+  // Награда задания с сервера уже в резерве: при правке на новую сумму
+  // доступно свободное плюс она. Моковые задания ничего не резервируют.
+  const ownReserve = initialTask?.serverTaskId ? initialTask.reward : 0;
+  const budget = funds
+    ? getParentFunds(funds.total, funds.reserved - ownReserve)
+    : null;
   const amount = Number(reward) || 0;
   const short = budget ? amount - budget.available : 0;
   const notEnough = short > 0;
@@ -89,13 +98,26 @@ export function CreateTaskForm({
   const submit = async () => {
     const payload = buildCreateTaskPayload(useCreateTaskStore.getState());
     if (!payload || isPending) return;
-    if (initialTask) {
-      await updateTask.mutateAsync({ ...payload, id: initialTask.id });
-    } else {
-      await createTask.mutateAsync(payload);
+    try {
+      if (initialTask) {
+        await updateTask.mutateAsync({
+          ...payload,
+          id: initialTask.id,
+          serverTaskId: initialTask.serverTaskId,
+        });
+      } else {
+        await createTask.mutateAsync(payload);
+      }
+      onSubmitted();
+    } catch (error) {
+      showToast(t(`createTask.errors.${submitError(error)}`));
     }
-    onSubmitted();
   };
+
+  // У задания с сервера ребёнка не поменять: показываем только его.
+  const shownAssignees = initialTask?.serverTaskId
+    ? assignees.filter((child) => child.id === initialTask.assigneeId)
+    : assignees;
 
   return (
     <KeyboardAvoidingView
@@ -145,7 +167,7 @@ export function CreateTaskForm({
 
         <FormField label={t('createTask.assignTo')}>
           <View style={styles.chips}>
-            {assignees.map((child) => (
+            {shownAssignees.map((child) => (
               <ChildChip
                 key={child.id}
                 child={child}
@@ -173,4 +195,21 @@ export function CreateTaskForm({
       </ScrollView>
     </KeyboardAvoidingView>
   );
+}
+
+/** Ключ ошибки создания или правки: `createTask.errors.*`. */
+function submitError(
+  error: unknown,
+): 'insufficientFunds' | 'onReview' | 'network' | 'failed' {
+  if (!isApiError(error)) return 'failed';
+  if (error.status === 0) return 'network';
+  const code =
+    error.data && typeof error.data === 'object'
+      ? (error.data as { code?: unknown }).code
+      : null;
+  if (code === 'INSUFFICIENT_FUNDS') return 'insufficientFunds';
+  if (code === 'TASK_ON_REVIEW') return 'onReview';
+  // Создание при нехватке денег отвечает 409 без кода.
+  if (error.status === 409) return 'insufficientFunds';
+  return 'failed';
 }

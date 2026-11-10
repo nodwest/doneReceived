@@ -6,6 +6,7 @@ import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
 import { formatRewardShort, type Task, type TaskAssignee } from '../model';
 import { styles } from './child-review-row.styled';
+import { AssigneeAvatar } from './assignee-avatar';
 
 type ChildReviewRowProps = {
   task: Task;
@@ -66,7 +67,11 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
         </View>
       </View>
       <View style={styles.status}>
-        <Image source={author.avatar} style={styles.checker} />
+        <AssigneeAvatar
+          source={author.avatar}
+          name={author.name}
+          style={styles.checker}
+        />
         <Text style={styles.checking} numberOfLines={1}>
           {t('tasks.checking', { name: author.name })}
         </Text>

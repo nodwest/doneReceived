@@ -324,6 +324,7 @@ export const en = {
     approvedToast: 'Approved · {{amount}} sent to {{name}}',
     rejectedToast: 'Sent back to {{name}} to redo',
     cancelledToast: 'Task cancelled',
+    cancelFailed: "Couldn't cancel the task. Please try again.",
     onlyAuthorApproves: 'Only {{name}} can approve and pay for this task',
     onlyAuthorEdits: 'Only {{name}} can edit or cancel this task',
     doneAgo: 'Done {{ago}}',
@@ -370,6 +371,14 @@ export const en = {
     create: 'Create Task',
     save: 'Save changes',
     shortBy: 'Short by {{amount}}',
+    errors: {
+      insufficientFunds:
+        'Not enough money in your wallet for this reward. Top up or lower it.',
+      onReview:
+        'The child has already sent this task for review — check it first.',
+      network: "Can't reach the server. Check your connection and try again.",
+      failed: "Couldn't save the task. Please try again.",
+    },
     budget: {
       title: 'Available for rewards',
       notEnough: 'Not enough for this reward',

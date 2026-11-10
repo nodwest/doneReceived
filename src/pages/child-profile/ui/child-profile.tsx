@@ -11,6 +11,7 @@ import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
+import { useFamilyTasks } from '@features/family-tasks';
 import {
   latestRewards,
   OperationRow,
@@ -21,7 +22,7 @@ import {
   type Operation,
   type SummaryPeriod,
 } from '@entities/operation';
-import { countChildTasks, useTasks, type Task } from '@entities/task';
+import { countChildTasks, type Task } from '@entities/task';
 import type { ChildProfile } from '@entities/user';
 import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress, WishRow } from '@entities/wish';
@@ -52,7 +53,7 @@ export function ChildProfilePage() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: tasks = NO_TASKS } = useTasks();
+  const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: operations = NO_OPERATIONS } = useOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
   const [today] = useState(() => new Date());
@@ -67,7 +68,11 @@ export function ChildProfilePage() {
   if (!child) return <Redirect href="/" />;
 
   // Активные — все задания ребёнка, на проверке — только свои.
-  const counts = countChildTasks(tasks, child.id, parentMock.id);
+  const counts = countChildTasks(
+    tasks,
+    String(child.id),
+    String(parentMock.id),
+  );
   const childOperations = operations.filter(
     (operation) => operation.child.id === child.id,
   );

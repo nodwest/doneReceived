@@ -13,13 +13,13 @@ import {
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
+import { useFamilyTasks } from '@features/family-tasks';
 import {
   ChildReviewRow,
   ChildTaskCard,
   ChildTaskTile,
   filterTasks,
   sortTasksByUrgency,
-  useTasks,
   type Task,
 } from '@entities/task';
 import { useChildBalance } from '@entities/wallet';
@@ -34,8 +34,8 @@ import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
 const NO_TASKS: Task[] = [];
 
 // Автор задания для «Task from Sarah»; неизвестный — первый родитель.
-const findAuthor = (id: number) =>
-  parentProfilesMock.find((parent) => parent.id === id) ??
+const findAuthor = (id: string) =>
+  parentProfilesMock.find((parent) => String(parent.id) === id) ??
   parentProfilesMock[0];
 
 /**
@@ -50,13 +50,13 @@ export function MyTasksPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ tab?: string; task?: string }>();
-  const { data = NO_TASKS, isPending } = useTasks();
+  const { data = NO_TASKS, isPending } = useFamilyTasks();
   // Порядок как в списке: активные по сроку, затем на проверке — карточки
   // листаются в том же порядке.
   const allTasks = useMemo(
     () =>
       sortTasksByUrgency(
-        filterTasks(data, { assigneeId: childAccountMock.id }),
+        filterTasks(data, { assigneeId: String(childAccountMock.id) }),
       ),
     [data],
   );
@@ -76,7 +76,7 @@ export function MyTasksPage() {
   );
   const { bottom } = useSafeAreaInsets();
   const gutter = useIsCompact() ? 16 : 24;
-  const initialTaskId = params.task ? Number(params.task) : null;
+  const initialTaskId = params.task ?? null;
   const [tab, setTab] = useState<TasksTab>(
     params.tab === 'review' ? 'review' : 'all',
   );
@@ -85,13 +85,13 @@ export function MyTasksPage() {
     initialTaskId === null ? 'list' : 'cards',
   );
   // У каждой вкладки своя карточка: возвращаясь тоглом, видим ту, с которой ушли.
-  const [currentIds, setCurrentIds] = useState<Record<TasksTab, number | null>>(
+  const [currentIds, setCurrentIds] = useState<Record<TasksTab, string | null>>(
     { all: initialTaskId, review: null },
   );
 
   const tasks = tab === 'review' ? reviewTasks : allTasks;
   const currentId = currentIds[tab];
-  const setCurrentId = (id: number) =>
+  const setCurrentId = (id: string) =>
     setCurrentIds((prev) => ({ ...prev, [tab]: id }));
   const currentIndex = Math.max(
     tasks.findIndex((task) => task.id === currentId),

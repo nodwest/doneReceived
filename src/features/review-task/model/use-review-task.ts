@@ -25,12 +25,19 @@ export function useReviewTask() {
 
   const approve = useMutation({
     mutationFn: async (task: Task) => {
+      // Проверка пока только у моковых заданий: у их детей есть фото.
+      const { assignee } = task;
+      if (!assignee.avatar) throw new Error('Approve is mock-only for now');
       await approveTask(task.id);
       const reward = await addReward({
         title: task.title,
         description: task.description,
         amount: task.reward,
-        child: task.assignee,
+        child: {
+          id: Number(assignee.id),
+          name: assignee.name,
+          avatar: assignee.avatar,
+        },
         doneAt: task.doneAt,
         photo: task.photo,
       });

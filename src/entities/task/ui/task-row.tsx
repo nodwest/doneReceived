@@ -1,10 +1,11 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { formatCountdown, formatTimeAgo, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { formatReward, type Task } from '../model';
 import { styles } from './task-row.styled';
+import { AssigneeAvatar } from './assignee-avatar';
 
 type TaskRowProps = {
   task: Task;
@@ -29,7 +30,11 @@ export function TaskRow({ task, onPress }: TaskRowProps) {
   const content = (
     <>
       <View style={styles.assignee}>
-        <Image source={task.assignee.avatar} style={styles.avatar} />
+        <AssigneeAvatar
+          source={task.assignee.avatar}
+          name={task.assignee.name}
+          style={styles.avatar}
+        />
         <Text style={styles.name}>{task.assignee.name}</Text>
       </View>
       <View style={styles.info}>
