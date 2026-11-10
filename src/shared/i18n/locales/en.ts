@@ -126,10 +126,11 @@ export const en = {
   },
   inviteCodes: {
     title: 'Add family member',
-    hint: 'Share a code with the new member. They enter it when signing up — and join your family right away.',
+    hint: 'Share a code with the new member. They enter it after signing up — and join your family right away.',
     parent: {
       title: 'For a parent',
       hint: 'Can create tasks, approve them and pay rewards.',
+      failed: "Couldn't get a code",
     },
     child: {
       title: 'For a child',
@@ -138,7 +139,7 @@ export const en = {
         'Create a profile, then connect the device with a one-time code.',
     },
     hintWithChild:
-      'A second parent signs up with email and enters the family code. For a child, create a profile first — then connect their device.',
+      'A second parent signs up with email and enters this code. For a child, create a profile first — then connect their device.',
     addChild: 'Add a child',
     newDeviceHint:
       'New device for a child who is already here? Open Devices at the bottom of their card.',
@@ -539,6 +540,44 @@ export const en = {
     kidDescription: "You can complete your parents' tasks and earn rewards.",
     continue: 'Continue',
     continueFound: "That's me — continue",
+  },
+  familySetup: {
+    title: 'Your family',
+    subtitle: 'Create a family or join the one you were invited to.',
+    create: 'Create a family',
+    createDescription:
+      'Start fresh: add your children and invite a second parent later.',
+    nameLabel: 'Family name',
+    namePlaceholder: 'Miller',
+    nameHint: "Everyone in the family sees this name. You'll be the owner.",
+    createAction: 'Create family',
+    join: 'Join a family',
+    joinDescription:
+      'Your partner already has a family? Enter their parent code.',
+    codeLabel: 'Parent code',
+    codePlaceholder: 'XXXX-XXXX',
+    codeHint: 'Ask your partner to open Family → + Family member.',
+    joinAction: 'Join family',
+    created: 'The {{name}} family is ready',
+    joined: 'You joined the family',
+    attemptsLeft_one: '{{count}} attempt left.',
+    attemptsLeft_other: '{{count}} attempts left.',
+    noAttemptsLeft: 'That was the last attempt.',
+    tooManyAttempts_one: 'Too many wrong codes. Try again in {{count}} minute.',
+    tooManyAttempts_other:
+      'Too many wrong codes. Try again in {{count}} minutes.',
+    wrongAccount: 'Wrong account?',
+    logOut: 'Log out',
+    errors: {
+      network: "Can't reach the server. Check your connection and try again.",
+      invalidName: 'Enter a family name up to 100 characters.',
+      alreadyInFamily: 'This account is already in a family.',
+      invalidCode:
+        'This code has expired or was already used. Ask your partner to open + Family member again.',
+      cannotJoin:
+        "Can't join: this account is already in a family or the family is full.",
+      unknown: 'Something went wrong. Please try again.',
+    },
   },
   childCode: {
     label: 'Code from a parent',

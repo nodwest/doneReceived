@@ -10,10 +10,13 @@ export interface FamilyInvite {
 
 // Код — пять групп по четыре символа: KID4-821X-9Q7M-2LP8-3RTW.
 const GROUP_SIZE = 4;
-const CODE_LENGTH = 5 * GROUP_SIZE;
+const CODE_LENGTH = 2 * GROUP_SIZE;
 
-/** Шаблон кода для плейсхолдера поля. */
-export const INVITE_CODE_TEMPLATE = 'XXXX-XXXX-XXXX-XXXX-XXXX';
+/**
+ * Шаблон кода для плейсхолдера поля: 8 символов, как у кода устройства
+ * ребёнка. Код второго родителя на сервере такой же.
+ */
+export const INVITE_CODE_TEMPLATE = 'XXXX-XXXX';
 
 /**
  * Приводит ввод к виду кода: заглавные буквы и цифры, дефисы между группами.

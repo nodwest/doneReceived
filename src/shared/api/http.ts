@@ -4,17 +4,28 @@ import { API_URL } from '../config';
  * Ошибка запроса к API. `status` — HTTP-код, 0 — до сервера не достучались
  * (нет сети, сервер недоступен, на вебе — запрос заблокирован CORS).
  * `messages` — тексты ошибок от сервера: NestJS отдаёт `message` строкой
- * или массивом (ошибки валидации полей).
+ * или массивом (ошибки валидации полей). `data` — всё тело ответа (там
+ * бывают свои поля, например `attemptsLeft`). `retryAfter` — через сколько
+ * секунд можно повторить (заголовок `Retry-After` у 429), иначе null.
  */
 export class ApiError extends Error {
   readonly status: number;
   readonly messages: string[];
+  readonly data: unknown;
+  readonly retryAfter: number | null;
 
-  constructor(status: number, messages: string[]) {
+  constructor(
+    status: number,
+    messages: string[],
+    data: unknown = null,
+    retryAfter: number | null = null,
+  ) {
     super(messages[0] ?? `Request failed with status ${status}`);
     this.name = 'ApiError';
     this.status = status;
     this.messages = messages;
+    this.data = data;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -95,8 +106,24 @@ export async function apiRequest<T>(
 
   const text = await response.text();
   const data: unknown = text ? safeParse(text) : null;
-  if (!response.ok) throw new ApiError(response.status, errorMessages(data));
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      errorMessages(data),
+      data,
+      parseRetryAfter(response.headers.get('Retry-After')),
+    );
+  }
   return data as T;
+}
+
+/** `Retry-After`: секунды или дата HTTP; в секундах, иначе null. */
+function parseRetryAfter(value: string | null): number | null {
+  if (!value) return null;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds)) return Math.max(seconds, 0);
+  const date = Date.parse(value);
+  return Number.isNaN(date) ? null : Math.max((date - Date.now()) / 1000, 0);
 }
 
 function safeParse(text: string): unknown {

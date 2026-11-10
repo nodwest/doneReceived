@@ -3,10 +3,15 @@ import type { InviteCodes } from '@entities/family';
 import { useTranslation } from '@shared/i18n';
 import { GradientButton, RoundButton } from '@shared/ui';
 import { InviteCodeCard } from './invite-code-card';
+import { ParentInviteCode } from './parent-invite-code';
 import { styles } from './invite-codes-panel.styled';
 
 type InviteCodesPanelProps = {
-  /** Коды приглашения; пока грузятся — панель без карточек кодов. */
+  /**
+   * Моковые коды: для ребёнка в профиле и для родителя без семьи на
+   * сервере. Код второго родителя при семье выдаёт сервер, когда панель
+   * открыли.
+   */
   codes?: InviteCodes;
   onClose: () => void;
   /**
@@ -42,23 +47,20 @@ export function InviteCodesPanel({
       <Text style={styles.hint}>
         {onAddChild ? t('inviteCodes.hintWithChild') : t('inviteCodes.hint')}
       </Text>
-      {codes && (
-        <>
-          <InviteCodeCard
-            role="parent"
-            title={t('inviteCodes.parent.title')}
-            hint={t('inviteCodes.parent.hint')}
-            code={codes.parent}
-          />
-          {!onAddChild && (
-            <InviteCodeCard
-              role="child"
-              title={t('inviteCodes.child.title')}
-              hint={t('inviteCodes.child.hint')}
-              code={codes.child}
-            />
-          )}
-        </>
+      <InviteCodeCard
+        role="parent"
+        title={t('inviteCodes.parent.title')}
+        hint={t('inviteCodes.parent.hint')}
+      >
+        <ParentInviteCode fallbackCode={codes?.parent} />
+      </InviteCodeCard>
+      {codes && !onAddChild && (
+        <InviteCodeCard
+          role="child"
+          title={t('inviteCodes.child.title')}
+          hint={t('inviteCodes.child.hint')}
+          code={codes.child}
+        />
       )}
       {onAddChild && (
         <InviteCodeCard
