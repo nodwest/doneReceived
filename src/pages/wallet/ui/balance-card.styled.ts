@@ -51,6 +51,26 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },
+  // Полоса «в резерве / доступно» под суммой у родителя.
+  meter: {
+    gap: 10,
+    paddingTop: 6,
+    paddingBottom: 4,
+  },
+  legend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    columnGap: 16,
+    rowGap: 6,
+  },
+  total: {
+    marginLeft: 'auto',
+    fontSize: theme.fontSize.xs,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.heroSubtle,
+  },
   actions: {
     flexDirection: 'row',
     gap: 8,

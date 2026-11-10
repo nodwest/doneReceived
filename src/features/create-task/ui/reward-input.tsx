@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Text, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
@@ -12,9 +13,13 @@ import { styles } from './create-task-form.styled';
 
 type RewardInputProps = {
   presets: readonly number[];
+  /** Награда не по карману: красная рамка и знак доллара. */
+  error?: boolean;
+  /** Под быстрыми суммами: карточка бюджета. */
+  footer?: ReactNode;
 };
 
-export function RewardInput({ presets }: RewardInputProps) {
+export function RewardInput({ presets, error, footer }: RewardInputProps) {
   const { t } = useTranslation();
   const compact = useIsCompact();
   const reward = useCreateTaskStore((state) => state.reward);
@@ -27,13 +32,18 @@ export function RewardInput({ presets }: RewardInputProps) {
   return (
     <FormField label={t('createTask.reward')}>
       <LinearGradient
-        colors={[theme.colors.yellowSoft, theme.colors.white]}
+        colors={[
+          error ? theme.colors.dangerTint : theme.colors.yellowSoft,
+          theme.colors.white,
+        ]}
         locations={[0, 0.7071]}
         start={{ x: 0.46, y: 0 }}
         end={{ x: 0.54, y: 1 }}
-        style={styles.reward}
+        style={[styles.reward, error && styles.rewardError]}
       >
-        <Text style={styles.rewardSign}>$</Text>
+        <Text style={[styles.rewardSign, error && styles.rewardSignError]}>
+          $
+        </Text>
         <TextInput
           value={reward}
           onChangeText={setReward}
@@ -57,6 +67,7 @@ export function RewardInput({ presets }: RewardInputProps) {
           />
         ))}
       </ChipRow>
+      {footer}
     </FormField>
   );
 }

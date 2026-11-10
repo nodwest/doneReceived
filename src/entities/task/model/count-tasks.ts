@@ -47,3 +47,14 @@ export function countChildTasks(
       .review,
   };
 }
+
+/**
+ * Сколько денег родителя в резерве: награды его заданий, которые ещё не
+ * выплачены — активные и на проверке. Подтверждённое выплачено, из резерва
+ * ушло.
+ */
+export function reservedRewards(tasks: readonly Task[], createdBy: number) {
+  return filterTasks(tasks, { createdBy })
+    .filter((task) => task.status === 'active' || task.status === 'review')
+    .reduce((sum, task) => sum + task.reward, 0);
+}

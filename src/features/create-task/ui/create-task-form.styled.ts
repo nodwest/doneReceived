@@ -138,11 +138,17 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.yellow,
     overflow: 'hidden',
   },
+  rewardError: {
+    borderColor: theme.colors.dangerText,
+  },
   rewardSign: {
     fontSize: 32,
     letterSpacing: tracking(32),
     fontFamily: theme.fonts.bold,
     color: theme.colors.yellow,
+  },
+  rewardSignError: {
+    color: theme.colors.dangerText,
   },
   rewardInput: {
     flex: 1,

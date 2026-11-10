@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChildChip, type Child } from '@entities/user';
 import type { UpdateTaskPayload } from '@entities/task';
+import { formatMoney, getParentFunds } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { Input } from '@shared/ui';
 import { theme } from '@shared/theme';
@@ -17,6 +18,7 @@ import { CreateTaskButton } from './create-task-button';
 import { DeadlineField } from './deadline-field';
 import { DescriptionInput } from './description-input';
 import { FormField } from './form-field';
+import { RewardBudget } from './reward-budget';
 import { RewardInput } from './reward-input';
 import { styles } from './create-task-form.styled';
 
@@ -27,6 +29,11 @@ type CreateTaskFormProps = {
   task?: UpdateTaskPayload;
   /** Задача создана или обновлена. */
   onSubmitted: () => void;
+  /**
+   * Деньги родителя: весь кошелёк и резерв за его невыплаченные задания (при
+   * правке в нём и награда этой задачи). Без них — форма без бюджета.
+   */
+  funds?: { total: number; reserved: number };
 };
 
 export function CreateTaskForm({
@@ -34,6 +41,7 @@ export function CreateTaskForm({
   rewardPresets,
   task,
   onSubmitted,
+  funds,
 }: CreateTaskFormProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -62,8 +70,18 @@ export function CreateTaskForm({
     return reset;
   }, [initialTask, fill, reset]);
 
+  // Награда этой задачи уже в резерве, если её правим: на новую сумму
+  // доступно свободное плюс она.
+  const budget = funds
+    ? getParentFunds(funds.total, funds.reserved - (initialTask?.reward ?? 0))
+    : null;
+  const amount = Number(reward) || 0;
+  const short = budget ? amount - budget.available : 0;
+  const notEnough = short > 0;
+
   const canSubmit =
     !isPending &&
+    !notEnough &&
     Number(reward) > 0 &&
     title.trim().length > 0 &&
     assigneeId !== null &&
@@ -108,7 +126,11 @@ export function CreateTaskForm({
 
         <DeadlineField />
 
-        <RewardInput presets={rewardPresets} />
+        <RewardInput
+          presets={rewardPresets}
+          error={notEnough}
+          footer={budget && <RewardBudget funds={budget} amount={amount} />}
+        />
 
         <FormField label={t('createTask.description')} optional>
           <DescriptionInput value={description} onChangeText={setDescription} />
@@ -129,7 +151,13 @@ export function CreateTaskForm({
 
         <View style={styles.footer}>
           <CreateTaskButton
-            label={initialTask ? t('createTask.save') : t('createTask.create')}
+            label={
+              notEnough
+                ? t('createTask.shortBy', { amount: formatMoney(short) })
+                : initialTask
+                  ? t('createTask.save')
+                  : t('createTask.create')
+            }
             withIcon={false}
             disabled={!canSubmit}
             onPress={submit}
