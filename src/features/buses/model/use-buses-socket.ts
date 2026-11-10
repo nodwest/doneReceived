@@ -21,15 +21,16 @@ export const useBusesSocket = (onVehicles: (vehicles: Bus[]) => void) => {
       onVehicles(message.data);
     };
 
-    socket.onclose = () => {
-      console.log('BUSES WebSocket disconnected');
-    };
-
-    socket.onerror = (error) => {
-      console.error('BUSES WebSocket error:', error);
+    socket.onclose = ({ code }) => {
+      if (code !== 1000) {
+        console.warn('BUSES WebSocket disconnected:', WS_URL, code);
+      }
     };
 
     return () => {
+      socket.onopen = null;
+      socket.onmessage = null;
+      socket.onclose = null;
       socket.close();
     };
   }, [onVehicles]);

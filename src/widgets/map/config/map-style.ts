@@ -1,58 +1,22 @@
+import { layers, namedFlavor } from '@protomaps/basemaps';
 import type { StyleSpecification } from 'maplibre-gl';
 
 import { OSM_SOURCE } from './map-source';
-
-import {
-  backgroundLayer,
-  landcoverLayer,
-  landuseLayer,
-  parkLayer,
-  waterLayer,
-  waterLabelsLayer,
-  buildingLayer,
-  houseNumbersLayer,
-  roadsCasingLayer,
-  roadsLayer,
-  roadLabelsLayer,
-  citiesMajorLayer,
-  citiesMediumLayer,
-  settlementsSmallLayer,
-  poiLayer,
-  buildings3dLayer,
-  waterwayLayer,
-} from '../layers';
-
 import { userLayer } from '../layers/dynamic/user-layer';
 import { userSource } from '../layers/dynamic/user-source';
 
 export const MAP_STYLE: StyleSpecification = {
   version: 8,
 
-  name: 'Rostov OSM',
+  name: 'DoneReceived',
+  glyphs:
+    'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
+  sprite: 'https://protomaps.github.io/basemaps-assets/sprites/v4/light',
 
   sources: {
     osm: OSM_SOURCE,
     users: userSource,
   },
 
-  layers: [
-    backgroundLayer,
-    landcoverLayer,
-    landuseLayer,
-    parkLayer,
-    waterLayer,
-    waterwayLayer,
-    waterLabelsLayer,
-    roadsCasingLayer,
-    roadsLayer,
-    buildingLayer,
-    buildings3dLayer,
-    houseNumbersLayer,
-    poiLayer,
-    citiesMajorLayer,
-    roadLabelsLayer,
-    citiesMediumLayer,
-    settlementsSmallLayer,
-    userLayer,
-  ],
+  layers: [...layers('osm', namedFlavor('light'), { lang: 'ru' }), userLayer],
 };

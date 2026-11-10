@@ -20,6 +20,7 @@ export function useMap(containerRef: React.RefObject<HTMLDivElement | null>) {
 
     const deckOverlay = new MapboxOverlay({
       layers: [],
+      deviceProps: { debug: false, debugWebGL: false },
     });
 
     map.addControl(deckOverlay);

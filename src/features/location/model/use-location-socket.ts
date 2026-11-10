@@ -1,38 +1,39 @@
 import { useEffect } from 'react';
 
-import { WS_URL } from '@shared/config';
+import { useSessionStore } from '@entities/session';
+import { LOCATION_WS_URL } from '@shared/config';
 import { startLocationTracking } from '@shared/lib';
 import type { Location } from '@entities/user';
 
 export const useLocationSocket = (onLocation: (location: Location) => void) => {
-  useEffect(() => {
-    const socket = new WebSocket(WS_URL);
+  const accessToken = useSessionStore((state) => state.session?.accessToken);
 
-    let stopLocationTracking = () => {};
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const socket = new WebSocket(LOCATION_WS_URL);
+
+    let stopLocationTracking: (() => void) | undefined;
 
     socket.onopen = () => {
-      console.log('WebSocket connected');
-
-      stopLocationTracking = startLocationTracking((lat, lng) => {
-        if (socket.readyState !== WebSocket.OPEN) {
-          return;
-        }
-
-        socket.send(
-          JSON.stringify({
-            event: 'location',
-            data: {
-              userId: 'user-1',
-              lat,
-              lng,
-            },
-          }),
-        );
-      });
+      socket.send(
+        JSON.stringify({ event: 'authenticate', data: { accessToken } }),
+      );
     };
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+
+      if (message.event === 'authenticated' && message.data === true) {
+        stopLocationTracking ??= startLocationTracking((lat, lng) => {
+          if (socket.readyState !== WebSocket.OPEN) return;
+
+          socket.send(
+            JSON.stringify({ event: 'location', data: { lat, lng } }),
+          );
+        });
+        return;
+      }
 
       if (message.event !== 'location') return;
 
@@ -45,17 +46,20 @@ export const useLocationSocket = (onLocation: (location: Location) => void) => {
       });
     };
 
-    socket.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+    socket.onclose = ({ code }) => {
+      stopLocationTracking?.();
+      stopLocationTracking = undefined;
+      if (code === 1006) {
+        console.warn('Location WebSocket connection lost:', LOCATION_WS_URL);
+      }
     };
 
     return () => {
-      stopLocationTracking();
+      socket.onopen = null;
+      socket.onmessage = null;
+      socket.onclose = null;
+      stopLocationTracking?.();
       socket.close();
     };
-  }, [onLocation]);
+  }, [accessToken, onLocation]);
 };
