@@ -35,6 +35,11 @@ export interface UpdateTaskPayload extends CreateTaskPayload {
 /** Смена статуса ребёнком: I did it! (review) или «Переделать» (active). */
 export interface TaskStatusPayload {
   id: string;
+  /**
+   * Задание с сервера: на проверку — отчёт по назначению (`id`), обратно —
+   * отзыв отчёта (Redo). У моковых — нет.
+   */
+  serverTaskId?: string;
   status: Exclude<TaskState, 'done'>;
 }
 

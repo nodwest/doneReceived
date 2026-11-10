@@ -79,8 +79,9 @@ function toTask(
 
 /**
  * GET /families/:id/tasks — назначения семьи (ребёнку — только свои), до 100
- * последних, и имена детей (GET /families/:id/children; ребёнку он закрыт).
- * Отменённые и подтверждённые в список не идут.
+ * последних, и имена детей (GET /families/:id/children). Ребёнку список
+ * детей закрыт (403), его не спрашиваем: имя — из сессии. Отменённые и
+ * подтверждённые в список не идут.
  */
 export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
   const { familyId } = viewer;
@@ -88,9 +89,11 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
     apiRequest<{ task: TaskDto; assignment: AssignmentDto }[]>(
       `/families/${familyId}/tasks`,
     ),
-    apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
-      () => [] as ChildDto[],
-    ),
+    viewer.childName !== undefined
+      ? ([] as ChildDto[])
+      : apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
+          () => [] as ChildDto[],
+        ),
   ]);
   return items
     .filter(
@@ -150,4 +153,46 @@ export function cancelServerTask(familyId: string, serverTaskId: string) {
   return apiRequest<null>(`/families/${familyId}/tasks/${serverTaskId}`, {
     method: 'DELETE',
   });
+}
+
+/**
+ * POST /families/:id/task-assignments/:assignmentId/submissions — ребёнок
+ * отправляет отчёт («I did it!»), назначение уходит на проверку. Без фото и
+ * заметки — пустое тело. 409 — уже на проверке, принято или срок истёк.
+ */
+export function submitServerTask(familyId: string, assignmentId: string) {
+  return apiRequest<unknown>(
+    `/families/${familyId}/task-assignments/${assignmentId}/submissions`,
+    { method: 'POST', body: {} },
+  );
+}
+
+type SubmissionDto = {
+  submission: { id: string; withdrawnAt?: string | null };
+  review: unknown | null;
+};
+
+/**
+ * Redo: ребёнок забирает непроверенный отчёт — назначение снова активно,
+ * резерв не трогается. Сначала находим отчёт, который ждёт проверки (GET
+ * …/submissions, отозванные сервер скрывает), потом DELETE
+ * /families/:id/task-submissions/:submissionId. 409 — уже проверен
+ * (`SUBMISSION_ALREADY_REVIEWED`), срок прошёл (`TASK_DEADLINE_PASSED`),
+ * задание отменено.
+ */
+export async function withdrawServerSubmission(
+  familyId: string,
+  assignmentId: string,
+) {
+  const submissions = await apiRequest<SubmissionDto[]>(
+    `/families/${familyId}/task-assignments/${assignmentId}/submissions`,
+  );
+  const pending = submissions.find(
+    ({ submission, review }) => review === null && !submission.withdrawnAt,
+  );
+  if (!pending) throw new Error('No pending submission');
+  await apiRequest<null>(
+    `/families/${familyId}/task-submissions/${pending.submission.id}`,
+    { method: 'DELETE' },
+  );
 }

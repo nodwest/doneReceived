@@ -106,6 +106,10 @@ export async function apiRequest<T>(
 
   const text = await response.text();
   const data: unknown = text ? safeParse(text) : null;
+  // В разработке — каждый запрос в консоль: видно, что ушло и что ответили.
+  if (__DEV__) {
+    console.log(`[api] ${method} ${path} → ${response.status}`, data);
+  }
   if (!response.ok) {
     throw new ApiError(
       response.status,

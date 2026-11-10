@@ -13,12 +13,11 @@ import {
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
-import { useFamilyTasks } from '@features/family-tasks';
+import { useChildTasks } from '@features/family-tasks';
 import {
   ChildReviewRow,
   ChildTaskCard,
   ChildTaskTile,
-  filterTasks,
   sortTasksByUrgency,
   type Task,
 } from '@entities/task';
@@ -50,16 +49,10 @@ export function MyTasksPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ tab?: string; task?: string }>();
-  const { data = NO_TASKS, isPending } = useFamilyTasks();
+  const { data = NO_TASKS, isPending } = useChildTasks();
   // Порядок как в списке: активные по сроку, затем на проверке — карточки
   // листаются в том же порядке.
-  const allTasks = useMemo(
-    () =>
-      sortTasksByUrgency(
-        filterTasks(data, { assigneeId: String(childAccountMock.id) }),
-      ),
-    [data],
-  );
+  const allTasks = useMemo(() => sortTasksByUrgency(data), [data]);
   const activeTasks = useMemo(
     () => allTasks.filter((task) => task.status === 'active'),
     [allTasks],

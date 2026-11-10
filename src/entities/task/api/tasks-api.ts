@@ -10,7 +10,9 @@ import {
   cancelServerTask,
   createServerTask,
   fetchServerTasks,
+  submitServerTask,
   updateServerTask,
+  withdrawServerSubmission,
   type TaskViewer,
 } from './server-tasks-api';
 
@@ -72,11 +74,27 @@ export async function cancelTask(
   mockServer.cancel(task.id);
 }
 
-// Отметка выполнения и проверка — пока только у моковых заданий (шаги 3–4).
-
-export async function setTaskStatus(payload: TaskStatusPayload): Promise<Task> {
-  return mockServer.setStatus(payload);
+/**
+ * Ребёнок: «I did it!» (review) — отчёт на проверку, Redo (active) — отзыв
+ * непроверенного отчёта. С сервера — по назначению, моковое — в моках.
+ */
+export async function setTaskStatus(
+  payload: TaskStatusPayload,
+  familyId: string | null,
+): Promise<void> {
+  if (payload.serverTaskId) {
+    if (!familyId) throw new Error('No family');
+    if (payload.status === 'review') {
+      await submitServerTask(familyId, payload.id);
+    } else {
+      await withdrawServerSubmission(familyId, payload.id);
+    }
+    return;
+  }
+  mockServer.setStatus(payload);
 }
+
+// Проверка родителем — пока только у моковых заданий (шаг 4).
 
 /** Родитель подтвердил задание на проверке: оно выполнено (done). */
 export async function approveTask(id: string): Promise<Task> {

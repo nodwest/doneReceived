@@ -39,7 +39,11 @@ export function ConnectDevicePanel({
   childName,
 }: ConnectDevicePanelProps) {
   const { t } = useTranslation();
-  const { data, isFetching, refetch } = useConnectCode(familyId, childId, true);
+  const { data, isFetching, isError, refetch } = useConnectCode(
+    familyId,
+    childId,
+    true,
+  );
   const now = useNow(1000);
   // Меню открыли, а в кэше истёкший код — его уже меняют на новый: старый
   // не показываем, иначе мелькнёт «Code expired».
@@ -49,6 +53,10 @@ export function ConnectDevicePanel({
 
   const left = code ? new Date(code.expiresAt).getTime() - now.getTime() : 0;
   const expired = !!code && left <= 0;
+  // Кода нет: либо ещё просим у сервера, либо сервер не ответил — тогда
+  // ошибка и «Try again», а не пустое окно без кнопок.
+  const failed = !code && isError && !isFetching;
+  const loading = !code && !failed;
 
   const copy = async () => {
     if (!code) return;
@@ -87,7 +95,11 @@ export function ConnectDevicePanel({
       </Pressable>
       <View style={styles.row}>
         <View style={styles.timer}>
-          {expired ? (
+          {failed ? (
+            <Text style={styles.expired}>{t('connectDevice.failed')}</Text>
+          ) : loading ? (
+            <Text style={styles.validFor}>{t('connectDevice.loading')}</Text>
+          ) : expired ? (
             <Text style={styles.expired}>{t('connectDevice.expired')}</Text>
           ) : (
             <>
@@ -97,7 +109,7 @@ export function ConnectDevicePanel({
           )}
         </View>
         {/* Пока код жив, сервер всё равно отдаст его же: новый — после срока. */}
-        {expired && (
+        {(expired || failed) && (
           <Pressable
             accessibilityRole="button"
             disabled={isFetching}
@@ -106,7 +118,7 @@ export function ConnectDevicePanel({
           >
             <Icon name="refresh" size={16} color={theme.colors.violet} />
             <Text style={styles.newCodeLabel}>
-              {t('connectDevice.newCode')}
+              {failed ? t('connectDevice.retry') : t('connectDevice.newCode')}
             </Text>
           </Pressable>
         )}

@@ -173,6 +173,9 @@ export const en = {
     validFor: 'Valid for',
     expired: 'Code expired',
     newCode: 'New code',
+    loading: 'Getting a code…',
+    failed: "Couldn't get a code",
+    retry: 'Try again',
     footnote:
       'After {{name}} signs in, the code stops working and the device appears here.',
   },
@@ -572,6 +575,13 @@ export const en = {
     redo: 'Redo task',
     sentToast: 'Great job! Sent for review',
     redoToast: 'The task is active again',
+    errors: {
+      alreadyReviewed: 'A parent has already checked this task.',
+      deadlinePassed: 'The deadline has passed, the task can no longer change.',
+      cancelled: 'This task was cancelled.',
+      network: "Can't reach the server. Check your connection and try again.",
+      failed: 'Something went wrong. Please try again.',
+    },
   },
   roleSelect: {
     title: "Who's joining?",

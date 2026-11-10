@@ -9,12 +9,11 @@ import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import { TaskCarousel } from '@widgets/task-carousel';
 import { WishlistPreview } from '@widgets/wishlist-preview';
-import { useFamilyTasks } from '@features/family-tasks';
+import { useChildTasks } from '@features/family-tasks';
 import { ChildActivityItem } from '@entities/activity';
 import {
   ChildTaskTile,
   countTasks,
-  filterTasks,
   sortTasksByUrgency,
   type Task,
 } from '@entities/task';
@@ -51,11 +50,7 @@ function greetingKey(hour: number) {
 export function ChildHomePage() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { data = NO_TASKS, isPending: tasksPending } = useFamilyTasks();
-  const myTasks = useMemo(
-    () => filterTasks(data, { assigneeId: String(childAccountMock.id) }),
-    [data],
-  );
+  const { data: myTasks = NO_TASKS, isPending: tasksPending } = useChildTasks();
   // Ближайшие по сроку — первыми, как в списке «To do».
   const activeTasks = useMemo(
     () =>
