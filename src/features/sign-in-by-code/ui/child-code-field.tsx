@@ -16,13 +16,15 @@ type ChildCodeFieldProps = {
 /**
  * Поле одноразового кода от родителя на выборе роли: подпись, ввод с
  * шаблоном XXXX-XXXX, подсказка, где родитель берёт код, или красная ошибка
- * («код истёк или уже использован») и зелёная плашка найденного аккаунта.
+ * («код истёк или уже использован», «нет связи») и зелёная плашка
+ * найденного аккаунта.
  */
 export function ChildCodeField({ state }: ChildCodeFieldProps) {
   const { t } = useTranslation();
   const [focused, setFocused] = useState(false);
   const { code, setCode, status, account } = state;
-  const invalid = status === 'invalid';
+  const failed = status === 'failed';
+  const invalid = status === 'invalid' || failed;
 
   return (
     <View style={styles.container}>
@@ -57,7 +59,11 @@ export function ChildCodeField({ state }: ChildCodeFieldProps) {
           />
         </View>
         <Text style={[styles.hint, invalid && styles.error]}>
-          {invalid ? t('childCode.invalid') : t('childCode.hint')}
+          {failed
+            ? t('childCode.failed')
+            : invalid
+              ? t('childCode.invalid')
+              : t('childCode.hint')}
         </Text>
       </View>
       {account && <ChildAccountFound {...account} />}

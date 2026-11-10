@@ -2,6 +2,8 @@ import { apiRequest } from '@shared/api';
 import type {
   LoginPayload,
   MessageResponse,
+  PairDevicePayload,
+  PairedDevice,
   RegisterPayload,
   Session,
   VerifyEmailPayload,
@@ -73,5 +75,17 @@ export function refreshSession(refreshToken: string) {
     method: 'POST',
     body: { refreshToken },
     skipRefresh: true,
+  });
+}
+
+/**
+ * POST /child-devices/pair — ребёнок подключает устройство одноразовым кодом
+ * от родителя и получает свою сессию (`user.kind === 'child'`). 400 — код
+ * неверен, истёк или уже использован.
+ */
+export function pairChildDevice(payload: PairDevicePayload) {
+  return apiRequest<PairedDevice>('/child-devices/pair', {
+    method: 'POST',
+    body: payload,
   });
 }

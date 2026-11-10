@@ -2,11 +2,16 @@ import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskForm } from '@features/create-task';
-import type { UpdateTaskPayload } from '@entities/task';
+import {
+  reservedRewards,
+  useTasks,
+  type UpdateTaskPayload,
+} from '@entities/task';
+import { useWallet } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
-import { childrenMock, rewardPresetsMock } from '@shared/mocks';
+import { childrenMock, parentMock, rewardPresetsMock } from '@shared/mocks';
 import { styles } from './create-task.styled';
 
 type TaskFormScreenProps = {
@@ -25,6 +30,17 @@ export function TaskFormScreen({
   const { t } = useTranslation();
   const router = useRouter();
   const gutter = useIsCompact() ? 16 : 24;
+  // Деньги родителя: кошелёк и резерв за его невыплаченные задания. Пока
+  // на моках ($1000); с API — GET /families/:id/wallet.
+  const { data: wallet } = useWallet();
+  const { data: tasks } = useTasks();
+  const funds =
+    wallet && tasks
+      ? {
+          total: wallet.balance,
+          reserved: reservedRewards(tasks, parentMock.id),
+        }
+      : undefined;
 
   // При открытии экрана напрямую (перезагрузка, deep link) истории нет.
   const close = () =>
@@ -52,6 +68,7 @@ export function TaskFormScreen({
           assignees={childrenMock}
           rewardPresets={rewardPresetsMock}
           task={task}
+          funds={funds}
           onSubmitted={handleSubmitted}
         />
       </SafeAreaView>

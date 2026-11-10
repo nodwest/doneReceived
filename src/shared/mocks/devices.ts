@@ -45,14 +45,6 @@ export const devicesMock = [
 ];
 
 /**
- * Профили детей, которые родитель создал, но устройство ещё не подключил:
- * Mia добавлена сегодня. Подключить устройство — одноразовым кодом.
- */
-export const newChildrenMock = [
-  { id: 3, name: 'Mia', role: 'child' as const, createdAt: ago(0) },
-];
-
-/**
  * Одноразовые коды подключения устройства ребёнка: «сервер» выдаёт их по
  * кругу, New code берёт следующий. Код живёт 15 минут.
  */
@@ -62,18 +54,4 @@ export const connectCodesMock = [
   'P8WD-3KZ6',
   'H2JC-7VMQ',
   'R9FL-5XT4',
-];
-
-/** Семья вошедшего родителя — её называет «сервер» по коду подключения. */
-export const ourFamilyNameMock = 'Miller';
-
-/**
- * Коды подключения, которые «сервер» узнаёт без выдачи из Family: чтобы на
- * выборе роли можно было войти ребёнком, не открывая меню кода у родителя.
- * Код, выданный в Family, важнее: он ведёт к тому ребёнку, кому его выдали.
- */
-export const connectCodeOwnersMock = [
-  { code: 'K7QM-2LP8', childId: emma.id, familyName: ourFamilyNameMock },
-  { code: 'X4TR-9BN2', childId: liam.id, familyName: ourFamilyNameMock },
-  { code: 'P8WD-3KZ6', childId: 3, familyName: ourFamilyNameMock },
 ];

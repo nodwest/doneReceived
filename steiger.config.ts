@@ -11,6 +11,14 @@ export default defineConfig([
     },
   },
   {
+    // Страница — это экран приложения, их больше 20, и группировать их
+    // в папки пока не нужно
+    files: ['./src/pages/**'],
+    rules: {
+      'fsd/excessive-slicing': 'off',
+    },
+  },
+  {
     // Общепринятые сегменты слоя app
     files: ['./src/app/providers/**', './src/app/styles/**'],
     rules: {

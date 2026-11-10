@@ -85,3 +85,9 @@ export const useSession = () => useSessionStore((state) => state.session);
 /** Вошедший пользователь или null. */
 export const useSessionUser = () =>
   useSessionStore((state) => state.session?.user ?? null);
+
+/** Родитель или ребёнок вошёл; без поля в сессии (старая) — родитель. */
+export const useSessionKind = () =>
+  useSessionStore((state) =>
+    state.session ? (state.session.user.kind ?? 'parent') : null,
+  );

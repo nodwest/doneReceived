@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CHILD_NAME_MAX_LENGTH, type NewChild } from '@entities/family';
+import { CHILD_NAME_MAX_LENGTH } from '@entities/family';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -13,13 +13,13 @@ type AddChildSheetProps = {
   visible: boolean;
   onClose: () => void;
   /** Профиль создан — шторку закрывает страница или виджет. */
-  onCreated: (child: NewChild) => void;
+  onCreated: () => void;
 };
 
 /**
  * Шторка New child: имя ребёнка и фото (пока только плитки-заглушки) —
- * Create profile создаёт профиль без устройства. Устройство подключают
- * потом кодом из карточки ребёнка.
+ * Create profile создаёт профиль в семье на сервере, без устройства.
+ * Устройство подключают потом кодом из карточки ребёнка.
  */
 export function AddChildSheet({
   visible,
@@ -43,16 +43,14 @@ export function AddChildSheet({
 
   const submit = () => {
     if (disabled) return;
-    createChild.mutate(
-      { name: trimmed },
-      {
-        onSuccess: (child) => {
-          showToast(t('newChild.created', { name: child.name }));
-          setName('');
-          onCreated(child);
-        },
+    createChild.mutate(trimmed, {
+      onSuccess: (child) => {
+        showToast(t('newChild.created', { name: child.displayName }));
+        setName('');
+        onCreated();
       },
-    );
+      onError: () => showToast(t('newChild.failed')),
+    });
   };
 
   return (

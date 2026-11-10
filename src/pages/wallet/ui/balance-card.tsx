@@ -1,7 +1,13 @@
 import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { FamilyRole } from '@entities/user';
-import { formatBalance } from '@entities/wallet';
+import {
+  formatBalance,
+  formatMoney,
+  FundsBar,
+  FundsLegendItem,
+  getParentFunds,
+} from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
@@ -13,6 +19,12 @@ type BalanceCardProps = {
   role?: FamilyRole;
   /** Сколько ребёнок заработал за неделю: плашка «+$28 this week». */
   weekEarned?: number;
+  /**
+   * Родитель: сколько из баланса в резерве за ещё не выплаченные задания.
+   * Тогда крупно — доступное на новые задания, под ним полоса резерв /
+   * доступно от всего кошелька.
+   */
+  reserved?: number;
 };
 
 const GRADIENTS = {
@@ -21,17 +33,21 @@ const GRADIENTS = {
 } as const;
 
 /**
- * Карточка баланса на вкладке Wallet: у родителя — кнопки Deposit и Withdraw
- * (ввод и вывод денег), у ребёнка — Withdraw и заработанное за неделю.
- * Кнопки пока ничего не делают.
+ * Карточка баланса на вкладке Wallet: у родителя — доступное на задания,
+ * полоса «в резерве / доступно» от всего кошелька и кнопки Deposit и
+ * Withdraw, у ребёнка — баланс, Withdraw и заработанное за неделю. Кнопки
+ * пока ничего не делают.
  */
 export function BalanceCard({
   balance,
   role = 'parent',
   weekEarned,
+  reserved,
 }: BalanceCardProps) {
   const { t } = useTranslation();
   const child = role === 'child';
+  const funds =
+    !child && reserved !== undefined ? getParentFunds(balance, reserved) : null;
 
   return (
     <LinearGradient
@@ -43,9 +59,55 @@ export function BalanceCard({
       style={[styles.card, !child && styles.cardParent]}
     >
       <Text style={[styles.caption, child && styles.captionChild]}>
-        {child ? t('wallet.yourBalance') : t('wallet.balance')}
+        {child
+          ? t('wallet.yourBalance')
+          : funds
+            ? t('wallet.availableForTasks')
+            : t('wallet.balance')}
       </Text>
-      <Text style={styles.balance}>{formatBalance(balance)}</Text>
+      <Text style={styles.balance}>
+        {funds ? formatMoney(funds.available) : formatBalance(balance)}
+      </Text>
+      {funds && (
+        <View style={styles.meter}>
+          <FundsBar
+            height={10}
+            scale={funds.total}
+            trackColor={theme.colors.fundsTrackDark}
+            segments={[
+              {
+                key: 'reserved',
+                value: funds.reserved,
+                color: theme.colors.fundsReservedDark,
+              },
+              {
+                key: 'available',
+                value: funds.available,
+                color: theme.colors.fundsFreeDark,
+              },
+            ]}
+          />
+          <View style={styles.legend}>
+            <FundsLegendItem
+              color={theme.colors.fundsReservedDark}
+              label={t('wallet.reserved')}
+              value={formatMoney(funds.reserved)}
+              labelColor={theme.colors.heroSubtle}
+              valueColor={theme.colors.white}
+            />
+            <FundsLegendItem
+              color={theme.colors.fundsFreeDark}
+              label={t('wallet.available')}
+              value={formatMoney(funds.available)}
+              labelColor={theme.colors.heroSubtle}
+              valueColor={theme.colors.white}
+            />
+            <Text style={styles.total}>
+              {t('wallet.ofTotal', { amount: formatMoney(funds.total) })}
+            </Text>
+          </View>
+        </View>
+      )}
       {child && weekEarned !== undefined && (
         <View style={styles.week}>
           <Text style={styles.weekValue}>+${weekEarned}</Text>

@@ -1,12 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createChild, familyKeys } from '@entities/family';
+import { createChild, familiesKeys, useCurrentFamily } from '@entities/family';
 
-/** Создать профиль ребёнка: он сразу появляется на вкладке Family. */
+/**
+ * Создать профиль ребёнка в семье вошедшего родителя (POST
+ * /families/:id/children): он сразу появляется на вкладке Family.
+ */
 export function useCreateChild() {
   const queryClient = useQueryClient();
+  const familyId = useCurrentFamily()?.id ?? null;
   return useMutation({
-    mutationFn: createChild,
+    mutationFn: (name: string) => {
+      if (!familyId) throw new Error('No family');
+      return createChild(familyId, name);
+    },
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: familyKeys.newChildren() }),
+      queryClient.invalidateQueries({
+        queryKey: familiesKeys.children(familyId),
+      }),
   });
 }

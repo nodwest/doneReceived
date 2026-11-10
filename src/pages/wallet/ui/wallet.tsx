@@ -2,9 +2,10 @@ import { Fragment } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
+import { reservedRewards, useTasks } from '@entities/task';
 import { TransactionRow, useWallet } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { childProfilesMock } from '@shared/mocks';
+import { childProfilesMock, parentMock } from '@shared/mocks';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { ChildBalance } from './child-balance';
@@ -22,14 +23,17 @@ const openTransaction = (id: number) =>
 const RECENT_TRANSACTIONS = 4;
 
 /**
- * Вкладка Wallet: баланс вошедшего родителя (не всей семьи) с кнопками ввода
- * и вывода денег, балансы детей, ссылка на историю наград и последние
+ * Вкладка Wallet: деньги вошедшего родителя (не всей семьи) — доступное на
+ * задания и резерв за невыплаченные — с кнопками ввода и вывода денег, балансы детей, ссылка на историю наград и последние
  * транзакции; «See all» — вся история транзакций. Deposit и Withdraw пока
  * ничего не делают.
  */
 export function WalletPage() {
   const { t } = useTranslation();
   const { data: wallet } = useWallet();
+  // Резерв — награды моих ещё не выплаченных заданий. С API придёт с сервера
+  // (GET /families/:id/wallet: balancePoints и reservedPoints).
+  const { data: tasks } = useTasks();
   const transactions = wallet?.transactions.slice(0, RECENT_TRANSACTIONS) ?? [];
 
   return (
@@ -39,7 +43,12 @@ export function WalletPage() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>{t('wallet.title')}</Text>
-        {wallet && <BalanceCard balance={wallet.balance} />}
+        {wallet && (
+          <BalanceCard
+            balance={wallet.balance}
+            reserved={tasks ? reservedRewards(tasks, parentMock.id) : undefined}
+          />
+        )}
         <View style={styles.children}>
           {childProfilesMock.map((child) => (
             <ChildBalance

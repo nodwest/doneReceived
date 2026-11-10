@@ -6,20 +6,30 @@ import {
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 // Инициализация i18next до первого рендера.
 import '@shared/i18n';
 import './font-rendering';
-import { useSessionStore } from '@entities/session';
+import { useMyFamilies } from '@entities/family';
+import {
+  useSessionKind,
+  useSessionStore,
+  type AccountKind,
+} from '@entities/session';
 import { useViewerRoleStore } from '@entities/user';
+import { theme } from '@shared/theme';
 import { ToastHost } from '@shared/ui';
 import { Providers } from './providers';
 
 // Экраны входа: пока не вошли. Первый из них — куда попадаем без входа.
 const AUTH_SCREENS = ['login', 'role-select', 'registration', 'verify-email'];
 
-// Экраны приложения: после входа родителя или ребёнка по коду. Новый роут
+// Родитель вошёл, но семьи у аккаунта нет: только создать или вступить.
+const FAMILY_SETUP_SCREEN = 'family-setup';
+
+// Экраны приложения: после входа родителя или ребёнка по коду подключения. Новый роут
 // добавляйте сюда, иначе он откроется и без входа.
 const APP_SCREENS = [
   'index',
@@ -43,9 +53,10 @@ const APP_SCREENS = [
 
 const restoreSession = async () => {
   await useSessionStore.getState().restore();
-  // Вошедший раньше родитель смотрит приложение от своего лица.
-  if (useSessionStore.getState().status === 'signed-in') {
-    useViewerRoleStore.getState().setRole('parent');
+  // Вошедший раньше смотрит приложение от своего лица: родитель или ребёнок.
+  const { session } = useSessionStore.getState();
+  if (session) {
+    useViewerRoleStore.getState().setRole(session.user.kind ?? 'parent');
   }
 };
 
@@ -64,8 +75,7 @@ export function RootLayout() {
   }, []);
 
   const sessionStatus = useSessionStore((state) => state.status);
-  const childEntered = useViewerRoleStore((state) => state.childEntered);
-  const entered = sessionStatus === 'signed-in' || childEntered;
+  const kind = useSessionKind();
 
   if (!fontsLoaded && !fontsError) return null;
   // Пока читаем сессию, не знаем, куда пускать: ничего не показываем.
@@ -73,15 +83,46 @@ export function RootLayout() {
 
   return (
     <Providers>
-      {/* Без входа открыты только экраны входа, после входа — только
-          приложение: закрытый экран уводит на первый открытый. */}
+      <Screens signedIn={sessionStatus === 'signed-in'} kind={kind} />
+      <ToastHost />
+    </Providers>
+  );
+}
+
+type ScreensProps = {
+  signedIn: boolean;
+  /** Кто вошёл: семью проверяем только у родителя, ребёнок всегда в семье. */
+  kind: AccountKind | null;
+};
+
+/**
+ * Какие экраны открыты. Без входа — только экраны входа. Ребёнок (вошёл
+ * кодом подключения) — сразу приложение. После входа родителя сначала
+ * узнаём его семьи (GET /families): семьи нет — открыт только Family setup,
+ * есть — приложение. Закрытый экран уводит на первый
+ * открытый, поэтому после создания семьи приложение само уходит на главную.
+ */
+function Screens({ signedIn, kind }: ScreensProps) {
+  const parent = signedIn && kind === 'parent';
+  const families = useMyFamilies(parent);
+  const entered = signedIn;
+  const needsFamily = parent && families.data?.length === 0;
+  // Список семей ещё грузится: стек не снимаем (идёт навигация после
+  // логина), а закрываем экраном фона, чтобы главная не мигнула.
+  const checkingFamily = parent && families.isPending;
+
+  return (
+    <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={!entered}>
           {AUTH_SCREENS.map((name) => (
             <Stack.Screen key={name} name={name} />
           ))}
         </Stack.Protected>
-        <Stack.Protected guard={entered}>
+        <Stack.Protected guard={needsFamily}>
+          <Stack.Screen name={FAMILY_SETUP_SCREEN} />
+        </Stack.Protected>
+        <Stack.Protected guard={entered && !needsFamily}>
           {APP_SCREENS.map((name) => (
             <Stack.Screen key={name} name={name} />
           ))}
@@ -95,7 +136,18 @@ export function RootLayout() {
           />
         </Stack.Protected>
       </Stack>
-      <ToastHost />
-    </Providers>
+      {checkingFamily && <View style={screensStyles.cover} />}
+    </>
   );
 }
+
+const screensStyles = StyleSheet.create({
+  cover: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: theme.colors.prime,
+  },
+});

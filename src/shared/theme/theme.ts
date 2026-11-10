@@ -76,6 +76,13 @@ export const theme = {
     // Вишлист: желание, которое уже можно купить (зелёное), наполняемое
     // (голубое) и ждущее очереди (индиго, как parentTo). readySoft /
     // readyText — и чип «1 ready to buy».
+    // Деньги родителя: резерв за задания и свободные — шкала в форме задания
+    // (на светлом) и в карточке баланса Wallet (на тёмном).
+    fundsReserved: '#B9BDD3',
+    fundsFree: '#22A06B',
+    fundsReservedDark: 'rgba(255, 255, 255, 0.45)',
+    fundsFreeDark: '#4ADE9A',
+    fundsTrackDark: 'rgba(255, 255, 255, 0.14)',
     readySoft: '#E3F7EB',
     readyText: '#1E9A5C',
     readyBg: '#F1FBF5',

@@ -1,5 +1,5 @@
 import { Image, Text, View, type ImageSourcePropType } from 'react-native';
-import { formatBalance, useChildBalance } from '@entities/wallet';
+import { formatMoney, useChildBalance } from '@entities/wallet';
 import { styles } from './child-balance.styled';
 
 type ChildBalanceProps = {
@@ -18,7 +18,7 @@ export function ChildBalance({ childId, name, avatar }: ChildBalanceProps) {
         <Text style={styles.name} numberOfLines={1}>
           {name}
         </Text>
-        <Text style={styles.balance}>{formatBalance(balance)}</Text>
+        <Text style={styles.balance}>{formatMoney(balance)}</Text>
       </View>
     </View>
   );

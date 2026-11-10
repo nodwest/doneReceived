@@ -83,7 +83,7 @@ export const en = {
     active_one: 'active',
     active_other: 'active',
     toReview: 'to review',
-    added: 'Added {{day}}',
+    childProfile: 'Child profile',
   },
   presence: {
     atHome: 'At home',
@@ -102,6 +102,11 @@ export const en = {
     joinFamily: 'Join family',
     deleteChild: 'Delete',
     childDeleted: '{{name}} is removed from the family',
+    deleteHasBalance:
+      "Can't remove {{name}}: there is money on the balance. Withdraw it first.",
+    deleteHasTasks:
+      "Can't remove {{name}}: there are open tasks. Cancel them first.",
+    deleteFailed: "Couldn't remove the profile. Please try again.",
   },
   joinFamily: {
     title: 'Join a family',
@@ -126,10 +131,11 @@ export const en = {
   },
   inviteCodes: {
     title: 'Add family member',
-    hint: 'Share a code with the new member. They enter it when signing up — and join your family right away.',
+    hint: 'Share a code with the new member. They enter it after signing up — and join your family right away.',
     parent: {
       title: 'For a parent',
       hint: 'Can create tasks, approve them and pay rewards.',
+      failed: "Couldn't get a code",
     },
     child: {
       title: 'For a child',
@@ -138,7 +144,7 @@ export const en = {
         'Create a profile, then connect the device with a one-time code.',
     },
     hintWithChild:
-      'A second parent signs up with email and enters the family code. For a child, create a profile first — then connect their device.',
+      'A second parent signs up with email and enters this code. For a child, create a profile first — then connect their device.',
     addChild: 'Add a child',
     newDeviceHint:
       'New device for a child who is already here? Open Devices at the bottom of their card.',
@@ -146,6 +152,9 @@ export const en = {
   devices: {
     onlineNow: 'Online now',
     lastSeen: 'Last seen {{time}}',
+    connected: 'Connected {{time}}',
+    removed: '{{name}} is disconnected',
+    removeFailed: "Couldn't disconnect the device. Please try again.",
     remove: 'Remove {{name}}',
     removeSoon: 'Removing devices is coming soon',
     count_one: '{{count}} device',
@@ -181,6 +190,7 @@ export const en = {
       "Then you'll get a one-time code. The child enters it on their device — no email or password.",
     create: 'Create profile',
     created: "{{name}}'s profile is created",
+    failed: "Couldn't create the profile. Please try again.",
   },
   memberProfile: {
     paid: 'Paid',
@@ -204,6 +214,10 @@ export const en = {
   wallet: {
     title: 'Wallet',
     balance: 'Balance',
+    availableForTasks: 'Available for tasks',
+    reserved: 'Reserved',
+    available: 'Available',
+    ofTotal: 'of {{amount}}',
     depositAction: 'Deposit',
     withdrawAction: 'Withdraw',
     rewardsHistory: 'Rewards history',
@@ -344,6 +358,20 @@ export const en = {
     updatedToast: 'Task updated',
     create: 'Create Task',
     save: 'Save changes',
+    shortBy: 'Short by {{amount}}',
+    budget: {
+      title: 'Available for rewards',
+      notEnough: 'Not enough for this reward',
+      left: 'left',
+      free: 'free',
+      reserved: 'Reserved',
+      thisTask: 'This task',
+      leftLabel: 'Left',
+      short: 'Short',
+      walletLimit: 'Wallet {{amount}} ↑',
+      noteOver: 'Lower the reward to {{amount}} or top up your wallet.',
+      depositSoon: 'Top-ups are coming soon',
+    },
     taskTitle: 'Task Title',
     taskTitlePlaceholder: 'Clean your room',
     description: 'Description',
@@ -468,13 +496,10 @@ export const en = {
     readyToBuy_other: '{{count}} ready to buy',
     savedOf: '${{saved}} of ${{price}}',
     readyChip: 'Ready to buy',
-    askToBuy: 'Ask parent to buy',
-    askToBuyShort: 'Ask to buy',
     fullySaved: 'Fully saved',
     toGo: '${{amount}} to go',
     goal: 'Goal ${{price}}',
     startsAfter: 'Starts after {{title}}',
-    askedToast: 'We asked your parents!',
     balance: 'Your balance ${{balance}}',
     balanceHint:
       'Rewards fill wishes from top to bottom. Drag to change the order.',
@@ -540,11 +565,52 @@ export const en = {
     continue: 'Continue',
     continueFound: "That's me — continue",
   },
+  familySetup: {
+    title: 'Your family',
+    subtitle: 'Create a family or join the one you were invited to.',
+    create: 'Create a family',
+    createDescription:
+      'Start fresh: add your children and invite a second parent later.',
+    nameLabel: 'Family name',
+    namePlaceholder: 'Miller',
+    nameHint: "Everyone in the family sees this name. You'll be the owner.",
+    createAction: 'Create family',
+    join: 'Join a family',
+    joinDescription:
+      'Your partner already has a family? Enter their parent code.',
+    codeLabel: 'Parent code',
+    codePlaceholder: 'XXXX-XXXX',
+    codeHint: 'Ask your partner to open Family → + Family member.',
+    joinAction: 'Join family',
+    joinNamed: 'Join the {{name}} family',
+    created: 'The {{name}} family is ready',
+    joined: 'You joined the family',
+    attemptsLeft_one: '{{count}} attempt left.',
+    attemptsLeft_other: '{{count}} attempts left.',
+    noAttemptsLeft: 'That was the last attempt.',
+    tooManyAttempts_one: 'Too many wrong codes. Try again in {{count}} minute.',
+    tooManyAttempts_other:
+      'Too many wrong codes. Try again in {{count}} minutes.',
+    wrongAccount: 'Wrong account?',
+    logOut: 'Log out',
+    errors: {
+      network: "Can't reach the server. Check your connection and try again.",
+      invalidName: 'Enter a family name up to 100 characters.',
+      alreadyInFamily: 'This account is already in a family.',
+      invalidCode:
+        'This code has expired or was already used. Ask your partner to open + Family member again.',
+      cannotJoin:
+        "Can't join: this account is already in a family or the family is full.",
+      unknown: 'Something went wrong. Please try again.',
+    },
+  },
   childCode: {
     label: 'Code from a parent',
     hint: 'Ask a parent for a code: Family → your card → Devices.',
     invalid:
       'This code has expired or was already used. Ask a parent for a new one.',
+    failed: "Couldn't check the code. Check your connection and try again.",
+    pairFailed: "Couldn't sign in. Ask a parent for a new code.",
     greeting: 'Hi, {{name}}!',
     account: '{{family}} family · your account',
   },

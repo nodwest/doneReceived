@@ -48,8 +48,8 @@ export const parentProfilesMock = [
 
 /** Коды приглашения в семью: для второго родителя и для ребёнка. */
 export const inviteCodesMock = {
-  parent: 'PAR7-390L-2DK8-VQ41-ZMTW',
-  child: 'KID4-821X-9Q7M-2LP8-3RTW',
+  parent: 'PR7Q-2KD8',
+  child: 'KD4X-9Q7M',
 };
 
 /**
@@ -60,6 +60,6 @@ export const inviteCodesMock = {
 export const familyInvitesMock = [
   { code: inviteCodesMock.parent, familyName: 'Miller', role: 'parent' },
   { code: inviteCodesMock.child, familyName: 'Miller', role: 'child' },
-  { code: 'PAR5-7KQ2-JN48-W3XD-61HB', familyName: 'Johnson', role: 'parent' },
-  { code: 'KID9-4FTB-6RZ1-8MCE-27QP', familyName: 'Johnson', role: 'child' },
+  { code: 'PJ5K-7QW3', familyName: 'Johnson', role: 'parent' },
+  { code: 'KJ9F-6RZ1', familyName: 'Johnson', role: 'child' },
 ] as const;

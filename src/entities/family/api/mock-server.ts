@@ -1,20 +1,6 @@
-import {
-  childrenMock,
-  familyInvitesMock,
-  inviteCodesMock,
-  newChildrenMock,
-} from '@shared/mocks';
+import { familyInvitesMock, inviteCodesMock } from '@shared/mocks';
 import type { FamilyInvite } from '../model/family-invite';
 import type { InviteCodes } from '../model/invite-codes';
-import type { NewChild, NewChildPayload } from '../model/new-child';
-
-// Новые профили детей живут в памяти до перезапуска приложения.
-let newChildren: NewChild[] = newChildrenMock.map((child) => ({ ...child }));
-let nextChildId =
-  Math.max(
-    ...childrenMock.map((child) => child.id),
-    ...newChildren.map((child) => child.id),
-  ) + 1;
 
 const findInvite = (code: string): FamilyInvite | null => {
   const invite = familyInvitesMock.find((item) => item.code === code);
@@ -35,26 +21,5 @@ export const mockServer = {
     const invite = findInvite(code);
     if (!invite) throw new Error('Invite code not found');
     return invite;
-  },
-
-  newChildren: (): NewChild[] => newChildren.map((child) => ({ ...child })),
-
-  createChild: ({ name }: NewChildPayload): NewChild => {
-    const child: NewChild = {
-      id: nextChildId++,
-      name,
-      role: 'child',
-      createdAt: new Date().toISOString(),
-    };
-    newChildren = [...newChildren, child];
-    return { ...child };
-  },
-
-  // Удалить можно только профиль без устройства — такие и лежат здесь.
-  deleteChild: (id: number): void => {
-    if (!newChildren.some((child) => child.id === id)) {
-      throw new Error(`Child ${id} not found`);
-    }
-    newChildren = newChildren.filter((child) => child.id !== id);
   },
 };
