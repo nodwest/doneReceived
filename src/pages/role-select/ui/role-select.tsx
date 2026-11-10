@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChildCodeField, useChildCode } from '@features/sign-in-by-code';
-import { useNewChildren, type NewChild } from '@entities/family';
-import { RoleIcon, useViewerRoleStore, type FamilyRole } from '@entities/user';
-import { childrenMock } from '@shared/mocks';
+import {
+  ChildCodeField,
+  useChildCode,
+  usePairDevice,
+} from '@features/sign-in-by-code';
+import { RoleIcon, type FamilyRole } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
+import { showToast } from '@shared/lib';
 import { AuthLayout, GradientButton } from '@shared/ui';
 import { styles } from './role-select.styled';
 
@@ -17,36 +20,33 @@ const ROLES: readonly { key: Role; icon: FamilyRole }[] = [
   { key: 'kid', icon: 'child' },
 ];
 
-const NO_CHILDREN: NewChild[] = [];
-
 /**
  * Выбор роли при регистрации (из «Sign up» на логине). Родитель по Continue
  * попадает на регистрацию. У ребёнка карточка Kid раскрывается полем
- * одноразового кода, который родитель выдал в Family → Devices; когда код
- * найден, видно, чей это аккаунт и какая семья, и «That's me — continue»
- * открывает главную ребёнка. Пока на моках: код не гасится, вход — тот же
- * временный пропуск ребёнка.
+ * одноразового кода, который родитель выдал в Family → Devices; сервер
+ * отвечает, чей это профиль и какая семья (код не гасится), и «That's me —
+ * continue» подключает устройство: сессия ребёнка, его главная.
  */
 export function RoleSelectPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<Role>('parent');
-  // Дети семьи, в чьи аккаунты может вести код: из моков и созданные в
-  // Family. С API имя и фото придут вместе с ответом на код.
-  const { data: newChildren = NO_CHILDREN } = useNewChildren();
-  const childCode = useChildCode([...childrenMock, ...newChildren]);
+  const childCode = useChildCode();
   const found = role === 'kid' && !!childCode.account;
-  const enterAsChild = useViewerRoleStore((state) => state.enterAsChild);
+  const pair = usePairDevice();
 
   const onContinue = () => {
     if (role === 'parent') {
       router.push('/registration');
       return;
     }
-    if (!childCode.account) return;
-    // Вошёл в свой аккаунт — дальше смотрим приложение от лица ребёнка.
-    enterAsChild();
-    router.replace('/');
+    if (!childCode.account || pair.isPending) return;
+    // Сессия ребёнка сохранена — экраны входа закрываются, открывается его
+    // главная.
+    pair.mutate(childCode.code, {
+      onSuccess: () => router.replace('/'),
+      onError: () => showToast(t('childCode.pairFailed')),
+    });
   };
 
   return (
@@ -60,7 +60,7 @@ export function RoleSelectPage() {
             found ? t('roleSelect.continueFound') : t('roleSelect.continue')
           }
           onPress={onContinue}
-          disabled={role === 'kid' && !found}
+          disabled={role === 'kid' && (!found || pair.isPending)}
         />
       }
     >

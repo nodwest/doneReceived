@@ -14,12 +14,14 @@ type DeviceRowProps = {
 
 /**
  * Устройство ребёнка в списке: значок телефона (фиолетовый, если на связи),
- * модель и «Online now» или «Last seen …», справа — корзина.
+ * модель и «Online now», «Last seen …» или «Connected …», справа — корзина.
  */
 export function DeviceRow({ device, onRemove }: DeviceRowProps) {
   const { t } = useTranslation();
-  const lastSeen = useTimeAgo(device.lastSeenAt);
-  const { online } = device;
+  // С сервера приходит только время подключения, у моков — последний выход
+  // на связь.
+  const lastSeen = useTimeAgo(device.lastSeenAt ?? device.connectedAt ?? '');
+  const online = !!device.online;
 
   return (
     <View style={styles.row}>
@@ -37,7 +39,9 @@ export function DeviceRow({ device, onRemove }: DeviceRowProps) {
         <Text style={styles.status} numberOfLines={1}>
           {online
             ? t('devices.onlineNow')
-            : t('devices.lastSeen', { time: lastSeen })}
+            : device.lastSeenAt
+              ? t('devices.lastSeen', { time: lastSeen })
+              : t('devices.connected', { time: lastSeen })}
         </Text>
       </View>
       {onRemove && (

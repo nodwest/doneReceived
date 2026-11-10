@@ -13,7 +13,11 @@ import { useFonts } from 'expo-font';
 import '@shared/i18n';
 import './font-rendering';
 import { useMyFamilies } from '@entities/family';
-import { useSessionStore } from '@entities/session';
+import {
+  useSessionKind,
+  useSessionStore,
+  type AccountKind,
+} from '@entities/session';
 import { useViewerRoleStore } from '@entities/user';
 import { theme } from '@shared/theme';
 import { ToastHost } from '@shared/ui';
@@ -25,7 +29,7 @@ const AUTH_SCREENS = ['login', 'role-select', 'registration', 'verify-email'];
 // Родитель вошёл, но семьи у аккаунта нет: только создать или вступить.
 const FAMILY_SETUP_SCREEN = 'family-setup';
 
-// Экраны приложения: после входа родителя или ребёнка по коду. Новый роут
+// Экраны приложения: после входа родителя или ребёнка по коду подключения. Новый роут
 // добавляйте сюда, иначе он откроется и без входа.
 const APP_SCREENS = [
   'index',
@@ -49,9 +53,10 @@ const APP_SCREENS = [
 
 const restoreSession = async () => {
   await useSessionStore.getState().restore();
-  // Вошедший раньше родитель смотрит приложение от своего лица.
-  if (useSessionStore.getState().status === 'signed-in') {
-    useViewerRoleStore.getState().setRole('parent');
+  // Вошедший раньше смотрит приложение от своего лица: родитель или ребёнок.
+  const { session } = useSessionStore.getState();
+  if (session) {
+    useViewerRoleStore.getState().setRole(session.user.kind ?? 'parent');
   }
 };
 
@@ -70,7 +75,7 @@ export function RootLayout() {
   }, []);
 
   const sessionStatus = useSessionStore((state) => state.status);
-  const childEntered = useViewerRoleStore((state) => state.childEntered);
+  const kind = useSessionKind();
 
   if (!fontsLoaded && !fontsError) return null;
   // Пока читаем сессию, не знаем, куда пускать: ничего не показываем.
@@ -78,10 +83,7 @@ export function RootLayout() {
 
   return (
     <Providers>
-      <Screens
-        signedIn={sessionStatus === 'signed-in'}
-        childEntered={childEntered}
-      />
+      <Screens signedIn={sessionStatus === 'signed-in'} kind={kind} />
       <ToastHost />
     </Providers>
   );
@@ -89,23 +91,25 @@ export function RootLayout() {
 
 type ScreensProps = {
   signedIn: boolean;
-  /** Временный пропуск ребёнка без аккаунта: семью не проверяем. */
-  childEntered: boolean;
+  /** Кто вошёл: семью проверяем только у родителя, ребёнок всегда в семье. */
+  kind: AccountKind | null;
 };
 
 /**
- * Какие экраны открыты. Без входа — только экраны входа. После входа
- * родителя сначала узнаём его семьи (GET /families): семьи нет — открыт
- * только Family setup, есть — приложение. Закрытый экран уводит на первый
+ * Какие экраны открыты. Без входа — только экраны входа. Ребёнок (вошёл
+ * кодом подключения) — сразу приложение. После входа родителя сначала
+ * узнаём его семьи (GET /families): семьи нет — открыт только Family setup,
+ * есть — приложение. Закрытый экран уводит на первый
  * открытый, поэтому после создания семьи приложение само уходит на главную.
  */
-function Screens({ signedIn, childEntered }: ScreensProps) {
-  const families = useMyFamilies(signedIn);
-  const entered = signedIn || childEntered;
-  const needsFamily = signedIn && families.data?.length === 0;
+function Screens({ signedIn, kind }: ScreensProps) {
+  const parent = signedIn && kind === 'parent';
+  const families = useMyFamilies(parent);
+  const entered = signedIn;
+  const needsFamily = parent && families.data?.length === 0;
   // Список семей ещё грузится: стек не снимаем (идёт навигация после
   // логина), а закрываем экраном фона, чтобы главная не мигнула.
-  const checkingFamily = signedIn && families.isPending;
+  const checkingFamily = parent && families.isPending;
 
   return (
     <>

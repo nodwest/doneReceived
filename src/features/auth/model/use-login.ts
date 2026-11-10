@@ -15,7 +15,7 @@ export function useLogin() {
     mutationFn: login,
     onSuccess: async (session) => {
       forgetSignUp();
-      setRole('parent');
+      setRole(session.user.kind ?? 'parent');
       await signIn(session);
       authLog('Вы вошли', { id: session.user.id, email: session.user.email });
     },

@@ -3,25 +3,29 @@ import type { ImageSourcePropType } from 'react-native';
 import {
   formatConnectCode,
   isCompleteConnectCode,
-  useConnectCodeOwner,
+  usePairingPreview,
 } from '@entities/device';
-
-/** Ребёнок семьи, в чей аккаунт может вести код. */
-export type CodeChild = {
-  id: number;
-  name: string;
-  avatar?: ImageSourcePropType;
-};
+import { isApiError } from '@shared/api';
 
 /** Аккаунт, в который войдёт ребёнок по введённому коду. */
-export type ChildAccount = CodeChild & { familyName: string };
+export type ChildAccount = {
+  id: string;
+  name: string;
+  avatar?: ImageSourcePropType;
+  familyName: string;
+};
 
 /**
- * typing — код ещё не введён целиком; checking — спрашиваем «сервер»;
- * found — код ведёт в аккаунт ребёнка; invalid — код истёк, использован или
- * неизвестен.
+ * typing — код ещё не введён целиком; checking — спрашиваем сервер;
+ * found — код ведёт в профиль ребёнка; invalid — код истёк, использован
+ * или неизвестен; failed — сервер не ответил (сеть, лимит попыток).
  */
-export type ChildCodeStatus = 'typing' | 'checking' | 'found' | 'invalid';
+export type ChildCodeStatus =
+  | 'typing'
+  | 'checking'
+  | 'found'
+  | 'invalid'
+  | 'failed';
 
 export type ChildCodeState = {
   code: string;
@@ -33,28 +37,34 @@ export type ChildCodeState = {
 
 /**
  * Ввод одноразового кода подключения на выборе роли: приводит ввод к виду
- * кода и, когда введены все символы, узнаёт, чей это аккаунт. `children` —
- * дети семьи, из них берём имя и фото (пока «сервер» отдаёт только id).
+ * `XXXX-XXXX` и, когда введены все символы, спрашивает сервер, чей это
+ * профиль (POST /child-devices/pair/preview). Код при этом не гасится.
  */
-export function useChildCode(children: readonly CodeChild[]): ChildCodeState {
+export function useChildCode(): ChildCodeState {
   const [code, setCodeState] = useState('');
   const complete = isCompleteConnectCode(code);
-  const { data, isPending } = useConnectCodeOwner(complete ? code : null);
-  const child = data && children.find((item) => item.id === data.childId);
+  const { data, error, isPending } = usePairingPreview(complete ? code : null);
 
   let status: ChildCodeStatus;
   if (!complete) status = 'typing';
+  else if (data) status = 'found';
   else if (isPending) status = 'checking';
-  else if (!data || !child) status = 'invalid';
-  else status = 'found';
+  else if (isApiError(error) && (error.status === 404 || error.status === 400))
+    status = 'invalid';
+  else status = 'failed';
 
   return {
     code,
     setCode: (input) => setCodeState(formatConnectCode(input)),
     status,
     account:
-      status === 'found' && data && child
-        ? { ...child, familyName: data.familyName }
+      status === 'found' && data
+        ? {
+            id: data.childId,
+            name: data.name,
+            avatar: data.avatarUrl ? { uri: data.avatarUrl } : undefined,
+            familyName: data.familyName,
+          }
         : null,
   };
 }

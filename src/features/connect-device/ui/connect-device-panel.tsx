@@ -4,11 +4,12 @@ import { useTranslation } from '@shared/i18n';
 import { copyText, showToast, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
-import { useRenewConnectCode } from '../model/use-renew-connect-code';
 import { styles } from './connect-device-panel.styled';
 
 type ConnectDevicePanelProps = {
-  childId: number;
+  /** Семья на сервере; null — моковый ребёнок (Emma, Liam). */
+  familyId: string | null;
+  childId: string;
   childName: string;
 };
 
@@ -28,16 +29,17 @@ const formatLeft = (ms: number) => {
 
 /**
  * Подключение устройства ребёнка: подсказка, что делать на его телефоне,
- * одноразовый код (тап копирует), сколько он ещё действует и New code.
- * Код живёт 15 минут; истёк — вместо таймера «Code expired».
+ * одноразовый код (тап копирует) и сколько он ещё действует. Код живёт
+ * 15 минут, пока жив — сервер отдаёт его же; истёк — вместо таймера
+ * «Code expired» и New code, который просит у сервера новый.
  */
 export function ConnectDevicePanel({
+  familyId,
   childId,
   childName,
 }: ConnectDevicePanelProps) {
   const { t } = useTranslation();
-  const { data, isFetching } = useConnectCode(childId, true);
-  const renew = useRenewConnectCode(childId);
+  const { data, isFetching, refetch } = useConnectCode(familyId, childId, true);
   const now = useNow(1000);
   // Меню открыли, а в кэше истёкший код — его уже меняют на новый: старый
   // не показываем, иначе мелькнёт «Code expired».
@@ -94,15 +96,20 @@ export function ConnectDevicePanel({
             </>
           )}
         </View>
-        <Pressable
-          accessibilityRole="button"
-          disabled={renew.isPending}
-          onPress={() => renew.mutate()}
-          style={({ pressed }) => [styles.newCode, pressed && styles.pressed]}
-        >
-          <Icon name="refresh" size={16} color={theme.colors.violet} />
-          <Text style={styles.newCodeLabel}>{t('connectDevice.newCode')}</Text>
-        </Pressable>
+        {/* Пока код жив, сервер всё равно отдаст его же: новый — после срока. */}
+        {expired && (
+          <Pressable
+            accessibilityRole="button"
+            disabled={isFetching}
+            onPress={() => refetch()}
+            style={({ pressed }) => [styles.newCode, pressed && styles.pressed]}
+          >
+            <Icon name="refresh" size={16} color={theme.colors.violet} />
+            <Text style={styles.newCodeLabel}>
+              {t('connectDevice.newCode')}
+            </Text>
+          </Pressable>
+        )}
       </View>
       <Text style={styles.footnote}>
         {t('connectDevice.footnote', { name: childName })}

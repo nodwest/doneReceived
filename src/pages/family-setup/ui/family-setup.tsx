@@ -9,11 +9,13 @@ import {
   type SetupErrorInfo,
 } from '@features/setup-family';
 import { useLogout } from '@features/auth';
+import { FamilyFound } from '@features/join-family';
 import {
   FAMILY_NAME_MAX_LENGTH,
   formatInviteCode,
   INVITE_CODE_TEMPLATE,
   isCompleteInviteCode,
+  useFamilyInvitePreview,
 } from '@entities/family';
 import { ROLE_COLORS } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
@@ -29,7 +31,8 @@ type Mode = 'create' | 'join';
  * `root-layout.tsx`). Карточка Create a family раскрывается полем названия —
  * POST /families, родитель становится owner. Join a family — полем кода,
  * `XXXX-XXXX`, который второй родитель видит в Family → + Family member
- * (живёт 15 минут): POST /families/join. Как только семья появилась в
+ * (живёт 15 минут): введён целиком — зелёная плашка с семьёй (POST
+ * /families/invites/preview), потом POST /families/join. Как только семья появилась в
  * GET /families, приложение само уходит на главную.
  */
 export function FamilySetupPage() {
@@ -43,11 +46,21 @@ export function FamilySetupPage() {
 
   const trimmedName = name.trim();
   const canCreate = trimmedName.length > 0 && !createFamily.isPending;
-  const canJoin = isCompleteInviteCode(code) && !joinFamily.isPending;
+  // Код введён целиком — сервер говорит, в какую семью он ведёт (код не
+  // гасится, но неверный тратит попытку). Вступить — только в найденную.
+  const complete = isCompleteInviteCode(code);
+  const preview = useFamilyInvitePreview(
+    mode === 'join' && complete ? code : null,
+  );
+  const foundFamily = complete ? preview.data : undefined;
+  const canJoin = !!foundFamily && !joinFamily.isPending;
 
   let errorInfo: SetupErrorInfo | null = null;
   if (mode === 'create' && createFamily.isError) {
     errorInfo = createFamilyError(createFamily.error);
+  }
+  if (mode === 'join' && complete && preview.isError) {
+    errorInfo = joinFamilyError(preview.error);
   }
   if (mode === 'join' && joinFamily.isError) {
     errorInfo = joinFamilyError(joinFamily.error);
@@ -103,7 +116,9 @@ export function FamilySetupPage() {
           label={
             mode === 'create'
               ? t('familySetup.createAction')
-              : t('familySetup.joinAction')
+              : foundFamily
+                ? t('familySetup.joinNamed', { name: foundFamily.familyName })
+                : t('familySetup.joinAction')
           }
           onPress={onSubmit}
           disabled={mode === 'create' ? !canCreate : !canJoin}
@@ -163,6 +178,9 @@ export function FamilySetupPage() {
             error={error}
             onSubmit={onSubmit}
           />
+          {foundFamily && !error && (
+            <FamilyFound familyName={foundFamily.familyName} role="parent" />
+          )}
         </ChoiceCard>
       </View>
     </AuthLayout>

@@ -84,7 +84,7 @@ export const ru: Dictionary = {
     active_many: 'активных',
     active_other: 'активного',
     toReview: 'на проверке',
-    added: 'Профиль создан {{day}}',
+    childProfile: 'Профиль ребёнка',
   },
   presence: {
     atHome: 'Дома',
@@ -107,6 +107,11 @@ export const ru: Dictionary = {
     joinFamily: 'Присоединиться',
     deleteChild: 'Удалить',
     childDeleted: 'Профиль удалён: {{name}}',
+    deleteHasBalance:
+      'Нельзя удалить {{name}}: на счету есть деньги. Сначала выведите их.',
+    deleteHasTasks:
+      'Нельзя удалить {{name}}: есть открытые задания. Сначала отмените их.',
+    deleteFailed: 'Не получилось удалить профиль. Попробуйте ещё раз.',
   },
   joinFamily: {
     title: 'Присоединиться к семье',
@@ -153,6 +158,9 @@ export const ru: Dictionary = {
   devices: {
     onlineNow: 'В сети',
     lastSeen: 'Последний раз в сети {{time}}',
+    connected: 'Подключено {{time}}',
+    removed: '{{name}} отключено',
+    removeFailed: 'Не получилось отключить устройство. Попробуйте ещё раз.',
     remove: 'Удалить {{name}}',
     removeSoon: 'Удаление устройств скоро появится',
     count_one: '{{count}} устройство',
@@ -190,6 +198,7 @@ export const ru: Dictionary = {
       'Потом вы получите одноразовый код. Ребёнок введёт его на своём устройстве — без почты и пароля.',
     create: 'Создать профиль',
     created: 'Профиль создан: {{name}}',
+    failed: 'Не получилось создать профиль. Попробуйте ещё раз.',
   },
   memberProfile: {
     paid: 'Выплачено',
@@ -567,6 +576,7 @@ export const ru: Dictionary = {
     codePlaceholder: 'XXXX-XXXX',
     codeHint: 'Попросите партнёра открыть Семья → + Участник семьи.',
     joinAction: 'Вступить',
+    joinNamed: 'Вступить в семью {{name}}',
     created: 'Семья «{{name}}» создана',
     joined: 'Вы вступили в семью',
     attemptsLeft_one: 'Осталась {{count}} попытка.',
@@ -599,6 +609,9 @@ export const ru: Dictionary = {
     label: 'Код от родителя',
     hint: 'Попросите код у родителя: Семья → ваша карточка → Устройства.',
     invalid: 'Код истёк или уже использован. Попросите у родителя новый.',
+    failed:
+      'Не получилось проверить код. Проверьте интернет и попробуйте ещё раз.',
+    pairFailed: 'Не получилось войти. Попросите у родителя новый код.',
     greeting: 'Привет, {{name}}!',
     account: 'Семья {{family}} · ваш аккаунт',
   },

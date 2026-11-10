@@ -1,17 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { ConnectDevicePanel } from '@features/connect-device';
-import { DeviceRow, type Device } from '@entities/device';
+import { useRevokeDevice } from '@features/revoke-device';
+import { DeviceRow, useChildDevices, type Device } from '@entities/device';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
 import { styles } from './child-devices.styled';
 
+const NO_DEVICES: Device[] = [];
+
 type ChildDevicesProps = {
-  childId: number;
+  /**
+   * Семья на сервере: устройства, код и отключение — настоящие. null —
+   * моковый ребёнок (Emma, Liam), устройства передаёт страница.
+   */
+  familyId: string | null;
+  childId: string;
   childName: string;
-  devices: Device[];
+  /** Устройства мокового ребёнка; у ребёнка с сервера не нужны. */
+  mockDevices?: Device[];
   /**
    * Раскрыт ли блок. Открытостью управляет страница: раскрыли у одного
    * ребёнка — у другого он сворачивается.
@@ -35,9 +44,10 @@ type Panel = 'list' | 'connect';
  * Connect device сразу к коду. Заголовок раскрытого блока сворачивает его.
  */
 export function ChildDevices({
+  familyId,
   childId,
   childName,
-  devices,
+  mockDevices = NO_DEVICES,
   expanded,
   onExpandedChange,
   onReveal,
@@ -45,7 +55,26 @@ export function ChildDevices({
   const { t } = useTranslation();
   const [panel, setPanel] = useState<Panel>('list');
   const blockRef = useRef<View>(null);
+  const { data: serverDevices = NO_DEVICES } = useChildDevices(
+    familyId,
+    childId,
+  );
+  const devices = familyId ? serverDevices : mockDevices;
   const hasDevices = devices.length > 0;
+  const revoke = useRevokeDevice(familyId ?? '', childId);
+
+  // Корзина: устройство с сервера отключается (на нём ребёнок выйдет), у
+  // моковых — только тост.
+  const remove = (device: Device) => {
+    if (!familyId) {
+      showToast(t('devices.removeSoon'));
+      return;
+    }
+    revoke.mutate(device.id, {
+      onSuccess: () => showToast(t('devices.removed', { name: device.name })),
+      onError: () => showToast(t('devices.removeFailed')),
+    });
+  };
 
   // Каждое открытие явно выбирает, что показать: блок мог свернуться
   // извне (раскрыли другого ребёнка) с открытым кодом.
@@ -127,15 +156,18 @@ export function ChildDevices({
       </Pressable>
       <View style={[styles.panel, connecting && styles.panelConnect]}>
         {connecting ? (
-          <ConnectDevicePanel childId={childId} childName={childName} />
+          <ConnectDevicePanel
+            familyId={familyId}
+            childId={childId}
+            childName={childName}
+          />
         ) : (
           <>
             {devices.map((device) => (
               <DeviceRow
                 key={device.id}
                 device={device}
-                // Удаление устройств пока не работает: только тост.
-                onRemove={() => showToast(t('devices.removeSoon'))}
+                onRemove={() => remove(device)}
               />
             ))}
             <Pressable

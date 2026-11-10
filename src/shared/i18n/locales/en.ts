@@ -83,7 +83,7 @@ export const en = {
     active_one: 'active',
     active_other: 'active',
     toReview: 'to review',
-    added: 'Added {{day}}',
+    childProfile: 'Child profile',
   },
   presence: {
     atHome: 'At home',
@@ -102,6 +102,11 @@ export const en = {
     joinFamily: 'Join family',
     deleteChild: 'Delete',
     childDeleted: '{{name}} is removed from the family',
+    deleteHasBalance:
+      "Can't remove {{name}}: there is money on the balance. Withdraw it first.",
+    deleteHasTasks:
+      "Can't remove {{name}}: there are open tasks. Cancel them first.",
+    deleteFailed: "Couldn't remove the profile. Please try again.",
   },
   joinFamily: {
     title: 'Join a family',
@@ -147,6 +152,9 @@ export const en = {
   devices: {
     onlineNow: 'Online now',
     lastSeen: 'Last seen {{time}}',
+    connected: 'Connected {{time}}',
+    removed: '{{name}} is disconnected',
+    removeFailed: "Couldn't disconnect the device. Please try again.",
     remove: 'Remove {{name}}',
     removeSoon: 'Removing devices is coming soon',
     count_one: '{{count}} device',
@@ -182,6 +190,7 @@ export const en = {
       "Then you'll get a one-time code. The child enters it on their device — no email or password.",
     create: 'Create profile',
     created: "{{name}}'s profile is created",
+    failed: "Couldn't create the profile. Please try again.",
   },
   memberProfile: {
     paid: 'Paid',
@@ -555,6 +564,7 @@ export const en = {
     codePlaceholder: 'XXXX-XXXX',
     codeHint: 'Ask your partner to open Family → + Family member.',
     joinAction: 'Join family',
+    joinNamed: 'Join the {{name}} family',
     created: 'The {{name}} family is ready',
     joined: 'You joined the family',
     attemptsLeft_one: '{{count}} attempt left.',
@@ -581,6 +591,8 @@ export const en = {
     hint: 'Ask a parent for a code: Family → your card → Devices.',
     invalid:
       'This code has expired or was already used. Ask a parent for a new one.',
+    failed: "Couldn't check the code. Check your connection and try again.",
+    pairFailed: "Couldn't sign in. Ask a parent for a new code.",
     greeting: 'Hi, {{name}}!',
     account: '{{family}} family · your account',
   },

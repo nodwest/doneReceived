@@ -8,6 +8,7 @@ import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
 import { ChildModeToggle } from '@features/switch-role';
 import { useInviteCodes } from '@entities/family';
+import { useSessionKind } from '@entities/session';
 import { useViewerRole } from '@entities/user';
 import { getLanguageLabel, useLanguage, useTranslation } from '@shared/i18n';
 import {
@@ -33,6 +34,8 @@ export function ProfilePage() {
   const { t } = useTranslation();
   const role = useViewerRole();
   const isChild = role === 'child';
+  // Вошёл сам ребёнок: тогл «посмотреть как ребёнок» ему не нужен.
+  const childSession = useSessionKind() === 'child';
   const account = isChild ? childAccountMock : parentMock;
   const language = useLanguage();
   const { data: codes } = useInviteCodes();
@@ -118,7 +121,7 @@ export function ProfilePage() {
               <View style={styles.divider} />
               <SettingsRow icon="help" label={t('profile.help')} />
             </View>
-            <ChildModeToggle />
+            {!childSession && <ChildModeToggle />}
             <Pressable
               accessibilityRole="button"
               style={styles.logOut}

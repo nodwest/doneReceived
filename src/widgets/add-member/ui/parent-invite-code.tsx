@@ -1,5 +1,9 @@
 import { Text, View } from 'react-native';
-import { useCurrentFamily, useParentInvite } from '@entities/family';
+import {
+  formatInviteCode,
+  useCurrentFamily,
+  useParentInvite,
+} from '@entities/family';
 import { useTranslation } from '@shared/i18n';
 import { useNow } from '@shared/lib';
 import { CopyableCode } from '@shared/ui';
@@ -29,7 +33,7 @@ export function ParentInviteCode({ fallbackCode }: ParentInviteCodeProps) {
 
   // Истёкший код (новый ещё в пути) не показываем: его уже не примут.
   const alive = !!data && new Date(data.expiresAt).getTime() > now.getTime();
-  if (alive) return <CopyableCode code={data.code} />;
+  if (alive) return <CopyableCode code={formatInviteCode(data.parentCode)} />;
 
   // Та же высота, что у CopyableCode: пока код грузится, блок не прыгает.
   return (

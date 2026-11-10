@@ -7,3 +7,4 @@ export * from './use-time-ago';
 export * from './use-snap-carousel';
 export * from './clipboard';
 export * from './color';
+export * from './device-label';

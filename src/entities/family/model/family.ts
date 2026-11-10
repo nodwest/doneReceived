@@ -20,11 +20,40 @@ export interface FamilyMembership extends Family {
   role: MemberRole;
 }
 
-/** Код приглашения второго родителя: POST /families/:id/invites. */
+/**
+ * Коды «Add family member»: POST /families/:id/invites. Сервер выдаёт пару —
+ * для второго родителя и общий код, по которому ребёнок сам создаёт себе
+ * профиль. Общий детский код мы не показываем: ребёнка добавляет родитель
+ * (Add a child), а устройство подключается кодом профиля.
+ */
 export interface ParentInvite {
-  code: string;
+  /** 8 символов без дефиса; показываем через `formatInviteCode`. */
+  parentCode: string;
+  childCode: string;
+  /** Общий срок пары: 15 минут с первого запроса. */
+  expiresAt: string;
+  parentUsed: boolean;
+  childUsed: boolean;
+}
+
+/** Семья по коду приглашения до вступления: POST /families/invites/preview. */
+export interface FamilyInvitePreview {
+  familyId: string;
+  familyName: string;
+  role: 'admin';
   expiresAt: string;
 }
+
+/** Профиль ребёнка в семье: GET /families/:id/children. */
+export interface FamilyChild {
+  /** UUID профиля (childId в ручках). */
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+}
+
+/** Сколько символов можно в имени ребёнка (на сервере до 100). */
+export const CHILD_NAME_MAX_LENGTH = 40;
 
 /** Название семьи: 1–100 символов без пробелов по краям (правило API). */
 export const FAMILY_NAME_MAX_LENGTH = 100;

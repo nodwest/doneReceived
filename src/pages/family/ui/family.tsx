@@ -5,12 +5,14 @@ import { AddMember } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
 import { ChildDevices } from '@widgets/child-devices';
 import { useDeleteChild } from '@features/delete-child';
-import { useDevices, type Device } from '@entities/device';
+import { useMockDevices, type Device } from '@entities/device';
 import {
+  useCurrentFamily,
+  useFamilyChildren,
   useInviteCodes,
-  useNewChildren,
-  type NewChild,
+  type FamilyChild,
 } from '@entities/family';
+import { isApiError } from '@shared/api';
 import {
   countChildTasks,
   countTasks,
@@ -24,22 +26,23 @@ import {
   parentProfilesMock,
 } from '@shared/mocks';
 import { useTranslation } from '@shared/i18n';
-import { formatDayInPhrase, showToast } from '@shared/lib';
+import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { Icon, ScreenSection, SwipeableRow } from '@shared/ui';
 import { DELETE_ACTION_WIDTH, REVEAL_GAP, styles } from './family.styled';
 
 const NO_TASKS: Task[] = [];
 const NO_DEVICES: Device[] = [];
-const NO_CHILDREN: NewChild[] = [];
+const NO_CHILDREN: FamilyChild[] = [];
 
 /**
  * Вкладка Family: кнопка приглашения и карточки родителей и детей. Тап по
  * карточке открывает профиль, по чипу задач — его задачи. Карточка «You»
  * (владелец аккаунта) ведёт на главную и вкладку Tasks. Родитель внизу
- * карточек детей видит их устройства и подключает новые кодом. Новые
- * профили детей (созданные Add a child, без устройства) идут в конце
- * списка; родитель удаляет их, смахнув карточку влево.
+ * карточек детей видит их устройства и подключает новые кодом. Emma и Liam
+ * пока моки; за ними — дети семьи с сервера (Add a child): их устройства,
+ * код подключения и отключение настоящие, родитель удаляет профиль,
+ * смахнув карточку влево.
  */
 export function FamilyPage() {
   const { t } = useTranslation();
@@ -47,14 +50,15 @@ export function FamilyPage() {
   // Счётчики — из того же списка задач, что на главной и в профилях.
   const { data: tasks = NO_TASKS } = useTasks();
   const { data: codes } = useInviteCodes();
-  const { data: devices = NO_DEVICES } = useDevices();
-  const { data: newChildren = NO_CHILDREN } = useNewChildren();
+  const { data: devices = NO_DEVICES } = useMockDevices();
+  const familyId = useCurrentFamily()?.id ?? null;
+  const { data: newChildren = NO_CHILDREN } = useFamilyChildren(familyId);
   const deleteChild = useDeleteChild();
   const isParent = useViewerRole() === 'parent';
   // Открытая смахиванием карточка: одновременно — только одна.
-  const [swipedId, setSwipedId] = useState<number | null>(null);
+  const [swipedId, setSwipedId] = useState<string | null>(null);
   // Раскрытые устройства: одновременно — только у одного ребёнка.
-  const [devicesOpenId, setDevicesOpenId] = useState<number | null>(null);
+  const [devicesOpenId, setDevicesOpenId] = useState<string | null>(null);
   const viewportRef = useRef<View>(null);
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
@@ -62,7 +66,7 @@ export function FamilyPage() {
   const children = childProfilesMock;
   const childrenCount = children.length + newChildren.length;
 
-  const devicesOf = (childId: number) =>
+  const devicesOf = (childId: string) =>
     devices.filter((device) => device.childId === childId);
 
   // Раскрытый блок устройств уходит под низ экрана — докручиваем, чтобы он
@@ -83,23 +87,44 @@ export function FamilyPage() {
     });
   };
 
-  const devicesFooter = (childId: number, childName: string) =>
+  // familyId — у ребёнка с сервера, null — у мокового (его устройства
+  // передаём сами).
+  const devicesFooter = (
+    childFamilyId: string | null,
+    childId: string,
+    childName: string,
+  ) =>
     isParent && (
       <ChildDevices
+        familyId={childFamilyId}
         childId={childId}
         childName={childName}
-        devices={devicesOf(childId)}
+        mockDevices={childFamilyId ? undefined : devicesOf(childId)}
         expanded={devicesOpenId === childId}
         onExpandedChange={(open) => setDevicesOpenId(open ? childId : null)}
         onReveal={revealDevices}
       />
     );
 
-  const removeChild = (child: NewChild) => {
+  // Сервер не удалит ребёнка с деньгами на счету или открытыми заданиями.
+  const removeChild = (child: FamilyChild) => {
     setSwipedId(null);
     deleteChild.mutate(child.id, {
       onSuccess: () =>
-        showToast(t('family.childDeleted', { name: child.name })),
+        showToast(t('family.childDeleted', { name: child.displayName })),
+      onError: (error) => {
+        const code =
+          isApiError(error) && error.data && typeof error.data === 'object'
+            ? (error.data as { code?: unknown }).code
+            : null;
+        showToast(
+          code === 'CHILD_BALANCE_NOT_ZERO'
+            ? t('family.deleteHasBalance', { name: child.displayName })
+            : code === 'CHILD_HAS_TASKS'
+              ? t('family.deleteHasTasks', { name: child.displayName })
+              : t('family.deleteFailed'),
+        );
+      },
     });
   };
 
@@ -201,19 +226,24 @@ export function FamilyPage() {
                     }
                     onActiveTasksPress={() => openTasks('all')}
                     onReviewTasksPress={() => openTasks('review')}
-                    footer={devicesFooter(child.id, child.name)}
+                    footer={devicesFooter(null, id, child.name)}
                   />
                 );
               })}
               {newChildren.map((child) => {
                 const card = (
                   <MemberCard
-                    name={child.name}
+                    name={child.displayName}
+                    avatar={
+                      child.avatarUrl ? { uri: child.avatarUrl } : undefined
+                    }
                     role="child"
-                    subtitle={t('member.added', {
-                      day: formatDayInPhrase(new Date(child.createdAt)),
-                    })}
-                    footer={devicesFooter(child.id, child.name)}
+                    subtitle={t('member.childProfile')}
+                    footer={devicesFooter(
+                      familyId,
+                      child.id,
+                      child.displayName,
+                    )}
                   />
                 );
                 if (!isParent) return <View key={child.id}>{card}</View>;
@@ -229,7 +259,7 @@ export function FamilyPage() {
                         key="delete"
                         accessibilityRole="button"
                         accessibilityLabel={t('devices.remove', {
-                          name: child.name,
+                          name: child.displayName,
                         })}
                         onPress={() => removeChild(child)}
                         style={({ pressed }) => [
