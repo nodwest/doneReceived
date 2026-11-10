@@ -232,6 +232,17 @@ export const en = {
     fromCard: 'From card •• {{card}}',
     toCard: 'To card •• {{card}}',
   },
+  deposit: {
+    title: 'Deposit',
+    amount: 'Amount',
+    testHint:
+      'Test money for now: it goes to your wallet right away. Real payments will come later.',
+    action: 'Deposit {{amount}}',
+    actionEmpty: 'Enter an amount',
+    done: '{{amount}} added to your wallet',
+    disabled: 'Test deposits are turned off on the server',
+    failed: "Couldn't top up. Please try again.",
+  },
   transactions: {
     title: 'Transactions',
     all: 'All',
@@ -370,7 +381,6 @@ export const en = {
       short: 'Short',
       walletLimit: 'Wallet {{amount}} ↑',
       noteOver: 'Lower the reward to {{amount}} or top up your wallet.',
-      depositSoon: 'Top-ups are coming soon',
     },
     taskTitle: 'Task Title',
     taskTitlePlaceholder: 'Clean your room',

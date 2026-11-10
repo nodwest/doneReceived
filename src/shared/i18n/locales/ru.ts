@@ -240,6 +240,17 @@ export const ru: Dictionary = {
     fromCard: 'С карты •• {{card}}',
     toCard: 'На карту •• {{card}}',
   },
+  deposit: {
+    title: 'Пополнить кошелёк',
+    amount: 'Сумма',
+    testHint:
+      'Пока это тестовые деньги: они сразу появятся в кошельке. Настоящие платежи будут позже.',
+    action: 'Пополнить на {{amount}}',
+    actionEmpty: 'Введите сумму',
+    done: 'Кошелёк пополнен на {{amount}}',
+    disabled: 'Тестовое пополнение выключено на сервере',
+    failed: 'Не получилось пополнить. Попробуйте ещё раз.',
+  },
   transactions: {
     title: 'Транзакции',
     all: 'Все',
@@ -380,7 +391,6 @@ export const ru: Dictionary = {
       short: 'Не хватает',
       walletLimit: 'Кошелёк {{amount}} ↑',
       noteOver: 'Уменьшите награду до {{amount}} или пополните кошелёк.',
-      depositSoon: 'Пополнение скоро появится',
     },
     taskTitle: 'Название',
     taskTitlePlaceholder: 'Убрать в комнате',

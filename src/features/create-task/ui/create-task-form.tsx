@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChildChip, type Child } from '@entities/user';
 import type { UpdateTaskPayload } from '@entities/task';
-import { formatMoney, getParentFunds } from '@entities/wallet';
+import { formatMoney, type ParentFunds } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { Input } from '@shared/ui';
 import { theme } from '@shared/theme';
@@ -29,11 +29,10 @@ type CreateTaskFormProps = {
   task?: UpdateTaskPayload;
   /** Задача создана или обновлена. */
   onSubmitted: () => void;
-  /**
-   * Деньги родителя: весь кошелёк и резерв за его невыплаченные задания (при
-   * правке в нём и награда этой задачи). Без них — форма без бюджета.
-   */
-  funds?: { total: number; reserved: number };
+  /** Деньги родителя с сервера; пока грузятся — форма без бюджета. */
+  funds?: ParentFunds;
+  /** Deposit в карточке бюджета: открыть шторку пополнения. */
+  onDeposit?: () => void;
 };
 
 export function CreateTaskForm({
@@ -42,6 +41,7 @@ export function CreateTaskForm({
   task,
   onSubmitted,
   funds,
+  onDeposit,
 }: CreateTaskFormProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -70,11 +70,10 @@ export function CreateTaskForm({
     return reset;
   }, [initialTask, fill, reset]);
 
-  // Награда этой задачи уже в резерве, если её правим: на новую сумму
-  // доступно свободное плюс она.
-  const budget = funds
-    ? getParentFunds(funds.total, funds.reserved - (initialTask?.reward ?? 0))
-    : null;
+  // Задания пока на моках и на сервере ничего не резервируют, поэтому при
+  // правке награда задачи из резерва не вычитается. С настоящими заданиями
+  // при правке на новую сумму будет доступно свободное плюс она.
+  const budget = funds ?? null;
   const amount = Number(reward) || 0;
   const short = budget ? amount - budget.available : 0;
   const notEnough = short > 0;
@@ -129,7 +128,15 @@ export function CreateTaskForm({
         <RewardInput
           presets={rewardPresets}
           error={notEnough}
-          footer={budget && <RewardBudget funds={budget} amount={amount} />}
+          footer={
+            budget && (
+              <RewardBudget
+                funds={budget}
+                amount={amount}
+                onDeposit={onDeposit}
+              />
+            )
+          }
         />
 
         <FormField label={t('createTask.description')} optional>

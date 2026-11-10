@@ -1,11 +1,12 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
-import { reservedRewards, useTasks } from '@entities/task';
-import { TransactionRow, useWallet } from '@entities/wallet';
+import { DepositSheet } from '@features/deposit-funds';
+import { useCurrentFamily } from '@entities/family';
+import { TransactionRow, useParentFunds, useWallet } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { childProfilesMock, parentMock } from '@shared/mocks';
+import { childProfilesMock } from '@shared/mocks';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { ChildBalance } from './child-balance';
@@ -24,16 +25,18 @@ const RECENT_TRANSACTIONS = 4;
 
 /**
  * Вкладка Wallet: деньги вошедшего родителя (не всей семьи) — доступное на
- * задания и резерв за невыплаченные — с кнопками ввода и вывода денег, балансы детей, ссылка на историю наград и последние
+ * задания и резерв за невыплаченные (с сервера) — с кнопками ввода и вывода
+ * денег (Deposit — шторка тестового пополнения), балансы детей, ссылка на историю наград и последние
  * транзакции; «See all» — вся история транзакций. Deposit и Withdraw пока
  * ничего не делают.
  */
 export function WalletPage() {
   const { t } = useTranslation();
+  // Транзакции пока на моках, деньги родителя — с сервера.
   const { data: wallet } = useWallet();
-  // Резерв — награды моих ещё не выплаченных заданий. С API придёт с сервера
-  // (GET /families/:id/wallet: balancePoints и reservedPoints).
-  const { data: tasks } = useTasks();
+  const familyId = useCurrentFamily()?.id ?? null;
+  const { data: funds } = useParentFunds(familyId);
+  const [depositOpen, setDepositOpen] = useState(false);
   const transactions = wallet?.transactions.slice(0, RECENT_TRANSACTIONS) ?? [];
 
   return (
@@ -43,12 +46,7 @@ export function WalletPage() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>{t('wallet.title')}</Text>
-        {wallet && (
-          <BalanceCard
-            balance={wallet.balance}
-            reserved={tasks ? reservedRewards(tasks, parentMock.id) : undefined}
-          />
-        )}
+        <BalanceCard funds={funds} onDeposit={() => setDepositOpen(true)} />
         <View style={styles.children}>
           {childProfilesMock.map((child) => (
             <ChildBalance
@@ -85,6 +83,11 @@ export function WalletPage() {
           </View>
         )}
       </ScrollView>
+      <DepositSheet
+        visible={depositOpen}
+        onClose={() => setDepositOpen(false)}
+        familyId={familyId}
+      />
     </TabScreen>
   );
 }
