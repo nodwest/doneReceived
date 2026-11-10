@@ -483,13 +483,10 @@ export const ru: Dictionary = {
     readyToBuy_other: 'Можно купить: {{count}}',
     savedOf: '${{saved}} из ${{price}}',
     readyChip: 'Можно купить',
-    askToBuy: 'Попросить купить',
-    askToBuyShort: 'Попросить',
     fullySaved: 'Накоплено',
     toGo: 'Ещё ${{amount}}',
     goal: 'Цель ${{price}}',
     startsAfter: 'После «{{title}}»',
-    askedToast: 'Мы попросили родителей!',
     balance: 'Твой баланс ${{balance}}',
     balanceHint:
       'Награды наполняют желания сверху вниз. Перетащи, чтобы поменять порядок.',

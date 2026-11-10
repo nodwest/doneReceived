@@ -469,13 +469,10 @@ export const en = {
     readyToBuy_other: '{{count}} ready to buy',
     savedOf: '${{saved}} of ${{price}}',
     readyChip: 'Ready to buy',
-    askToBuy: 'Ask parent to buy',
-    askToBuyShort: 'Ask to buy',
     fullySaved: 'Fully saved',
     toGo: '${{amount}} to go',
     goal: 'Goal ${{price}}',
     startsAfter: 'Starts after {{title}}',
-    askedToast: 'We asked your parents!',
     balance: 'Your balance ${{balance}}',
     balanceHint:
       'Rewards fill wishes from top to bottom. Drag to change the order.',

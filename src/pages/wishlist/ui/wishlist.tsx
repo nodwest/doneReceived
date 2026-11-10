@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { AskToBuyButton } from '@features/ask-to-buy';
 import { useDeleteWish } from '@features/delete-wish';
 import { useReorderWishes } from '@features/reorder-wishes';
 import { WishFormSheet } from '@features/wish-form';
@@ -163,7 +162,6 @@ export function WishlistPage() {
                     />
                   </View>
                 }
-                action={item.status === 'ready' && <AskToBuyButton compact />}
               />
             </SwipeableRow>
           )}

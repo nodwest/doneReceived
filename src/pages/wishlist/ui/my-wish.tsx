@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { AskToBuyButton } from '@features/ask-to-buy';
 import { useDeleteWish } from '@features/delete-wish';
 import { WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
@@ -75,7 +74,6 @@ export function MyWishPage() {
             </>
           }
           noPhotosHint={t('wishForm.photoHint')}
-          footer={item.status === 'ready' && <AskToBuyButton />}
         />
       </ScrollView>
       <WishFormSheet
