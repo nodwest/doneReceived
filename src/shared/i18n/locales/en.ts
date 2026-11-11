@@ -262,6 +262,7 @@ export const en = {
     withdrawalTo: 'Withdrawal to',
     rewardFrom: 'Reward from',
     rewardFromName: 'Reward from {{name}}',
+    reward: 'Reward for a task',
     card: 'Card •• {{card}}',
     forTask: 'For task',
     details: 'Details',

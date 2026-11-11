@@ -52,10 +52,18 @@ export interface Wallet {
 }
 
 /** Награда ребёнку за задание: деньги приходят на его баланс. */
-export interface RewardTransaction extends TransactionBase, TaskPayment {
+export interface RewardTransaction
+  extends TransactionBase, Omit<TaskPayment, 'operationId'> {
   kind: 'reward';
-  /** Родитель, который дал и подтвердил задание. */
-  from: TransactionPerson;
+  /** id награды в истории; null — у наград с сервера истории пока нет. */
+  operationId: number | null;
+  /**
+   * Родитель, который дал и подтвердил задание. С сервера имени пока нет
+   * (пустое) и фото нет (null).
+   */
+  from: Omit<TransactionPerson, 'avatar'> & {
+    avatar: ImageSourcePropType | null;
+  };
 }
 
 /** Вывод ребёнком денег на карту. */

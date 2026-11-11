@@ -16,9 +16,9 @@ export function usePairDevice() {
   return useMutation({
     mutationFn: (code: string) =>
       pairChildDevice({ code: connectCodeForApi(code), label: deviceLabel() }),
-    onSuccess: async ({ accessToken, refreshToken, user }) => {
+    onSuccess: async ({ accessToken, refreshToken, user, childId }) => {
       setRole('child');
-      await signIn({ accessToken, refreshToken, user });
+      await signIn({ accessToken, refreshToken, user, childId });
     },
   });
 }

@@ -180,9 +180,11 @@ export function ChildTransactionRow({
         {...look}
         leading={rewardIcon}
         title={transaction.task}
-        subtitle={`${t('transactions.rewardFromName', {
-          name: transaction.from.name,
-        })} · ${when}`}
+        subtitle={`${
+          transaction.from.name
+            ? t('transactions.rewardFromName', { name: transaction.from.name })
+            : t('transactions.reward')
+        } · ${when}`}
         amount={formatTransactionAmount(transaction)}
         tone="income"
       />

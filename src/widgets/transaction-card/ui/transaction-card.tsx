@@ -143,7 +143,7 @@ function PayoutNote({
   name: string;
 }) {
   const { t } = useTranslation();
-  const { balance } = useChildBalance(childId);
+  const { balance } = useChildBalance(String(childId));
   return (
     <BalanceNote
       tone="parent"
@@ -318,7 +318,7 @@ export function ChildTransactionCard({
     return (
       <TaskSheet
         {...common}
-        avatar={from.avatar}
+        avatar={from.avatar ?? undefined}
         caption={t('transactions.rewardFrom')}
         name={from.name}
         footer={

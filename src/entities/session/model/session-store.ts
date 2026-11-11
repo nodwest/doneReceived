@@ -59,7 +59,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       const next = await refreshSession(current.refreshToken);
       // Пока обновляли, вышли или вошли заново — эту сессию не воскрешаем.
       if (get().session !== current) return get().session !== null;
-      await get().signIn(next);
+      // Ответ refresh не знает id детского профиля — берём из прежней сессии.
+      await get().signIn({ ...next, childId: current.childId });
       log('Токены обновлены');
       return true;
     } catch (error) {

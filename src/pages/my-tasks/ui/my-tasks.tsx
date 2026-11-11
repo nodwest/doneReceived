@@ -13,7 +13,7 @@ import {
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
-import { useChildTasks } from '@features/family-tasks';
+import { useChildTasks, useMyChildBalance } from '@features/family-tasks';
 import {
   ChildReviewRow,
   ChildTaskCard,
@@ -21,7 +21,6 @@ import {
   sortTasksByUrgency,
   type Task,
 } from '@entities/task';
-import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast, useIsCompact } from '@shared/lib';
@@ -62,7 +61,7 @@ export function MyTasksPage() {
     [allTasks],
   );
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(childAccountMock.id);
+  const { balance } = useMyChildBalance();
   const { current: currentWish } = useWishlistProgress(
     childAccountMock.id,
     balance,

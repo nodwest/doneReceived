@@ -20,7 +20,7 @@ export function ChildWishlistPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const child = childProfilesMock.find((item) => String(item.id) === id);
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(child?.id ?? -1);
+  const { balance } = useChildBalance(child ? String(child.id) : null);
   const { progress, isPending } = useWishlistProgress(child?.id ?? -1, balance);
   if (!child) return <Redirect href="/" />;
 

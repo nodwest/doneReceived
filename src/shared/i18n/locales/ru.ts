@@ -270,6 +270,7 @@ export const ru: Dictionary = {
     withdrawalTo: 'Вывод на',
     rewardFrom: 'Награда от',
     rewardFromName: 'Награда от {{name}}',
+    reward: 'Награда за задание',
     card: 'Карта •• {{card}}',
     forTask: 'За задание',
     details: 'Подробности',

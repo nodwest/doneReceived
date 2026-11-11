@@ -10,7 +10,7 @@ type ChildBalanceProps = {
 
 /** Плитка баланса ребёнка: аватар, имя и сумма из его кошелька. */
 export function ChildBalance({ childId, name, avatar }: ChildBalanceProps) {
-  const { balance } = useChildBalance(childId);
+  const { balance } = useChildBalance(String(childId));
   return (
     <View style={styles.card}>
       <Image source={avatar} style={styles.avatar} />

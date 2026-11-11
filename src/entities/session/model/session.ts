@@ -31,6 +31,11 @@ export type Session = {
   accessToken: string;
   refreshToken: string;
   user: SessionUser;
+  /**
+   * У ребёнка — id его детского профиля (`childId` в ручках), из ответа
+   * подключения устройства. Сессии, сохранённые раньше, его не содержат.
+   */
+  childId?: string;
 };
 
 export type RegisterPayload = {

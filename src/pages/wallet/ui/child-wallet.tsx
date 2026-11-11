@@ -10,7 +10,8 @@ import {
   type Operation,
 } from '@entities/operation';
 import { TaskIconBadge } from '@entities/task';
-import { ChildTransactionRow, useChildWallet } from '@entities/wallet';
+import { useMyChildWallet } from '@features/family-tasks';
+import { ChildTransactionRow } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { childAccountMock } from '@shared/mocks';
@@ -56,7 +57,7 @@ export function ChildWalletPage() {
     0,
   );
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { data: wallet } = useChildWallet(childAccountMock.id);
+  const { data: wallet } = useMyChildWallet();
   const balance = wallet?.balance ?? 0;
   const wishlist = useWishlistProgress(childAccountMock.id, balance);
   const recent = wallet?.transactions.slice(0, RECENT_TRANSACTIONS) ?? [];

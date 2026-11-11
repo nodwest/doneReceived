@@ -64,7 +64,9 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
     [allOperations, childId],
   );
   const { data: wishes } = useWishes(childId ?? childAccountMock.id);
-  const { data: childWallet } = useChildWallet(childId ?? childAccountMock.id);
+  const { data: childWallet } = useChildWallet(
+    String(childId ?? childAccountMock.id),
+  );
   // Сегодня фиксируем на время жизни экрана: от него строится лента дней.
   const [today] = useState(() => new Date());
   // «See all» в профиле ребёнка открывает историю сразу с его фильтром;

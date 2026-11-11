@@ -4,7 +4,7 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useDeleteWish } from '@features/delete-wish';
 import { WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
-import { useChildBalance } from '@entities/wallet';
+import { useMyChildBalance } from '@features/family-tasks';
 import { useWishlistProgress, WishDetails } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
@@ -21,7 +21,7 @@ export function MyWishPage() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(childAccountMock.id);
+  const { balance } = useMyChildBalance();
   const { progress, isPending } = useWishlistProgress(
     childAccountMock.id,
     balance,
