@@ -79,7 +79,6 @@ export function ParentHomePage() {
         activeTasks: active,
         reviewTasks: review,
         atHome: false,
-        server: true,
       };
     }),
   ];
@@ -110,24 +109,17 @@ export function ParentHomePage() {
           />
           <ChildrenCarousel
             items={children}
-            // Профиля и страницы заданий у ребёнка с сервера пока нет: карточка
-            // ведёт на Family (там его устройства), чипы — в Tasks, где его
-            // задания вместе с остальными.
             onSelect={(child) =>
-              child.server
-                ? router.dismissTo('/family')
-                : router.push({
-                    pathname: '/child/[id]',
-                    params: { id: child.id },
-                  })
+              router.push({
+                pathname: '/child/[id]',
+                params: { id: child.id },
+              })
             }
             onTasksPress={(child, tab) =>
-              child.server
-                ? router.push({ pathname: '/tasks', params: { tab } })
-                : router.push({
-                    pathname: '/child/[id]/tasks',
-                    params: { id: child.id, tab },
-                  })
+              router.push({
+                pathname: '/child/[id]/tasks',
+                params: { id: child.id, tab },
+              })
             }
           />
           <CreateTaskButton onPress={() => router.push('/create-task')} />

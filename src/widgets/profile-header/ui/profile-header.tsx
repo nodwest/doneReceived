@@ -6,8 +6,10 @@ import { styles } from './profile-header.styled';
 
 type ProfileHeaderProps = {
   name: string;
-  avatar: ImageSourcePropType;
-  presence: Presence;
+  /** Фото; null — первая буква имени. */
+  avatar: ImageSourcePropType | null;
+  /** Статус «дома»; у ребёнка с сервера его пока нет — без плашки. */
+  presence?: Presence;
   onBack: () => void;
 };
 
@@ -33,7 +35,7 @@ export function ProfileHeader({
         <Text style={styles.name} numberOfLines={1}>
           {name}
         </Text>
-        <PresenceBadge {...presence} />
+        {presence && <PresenceBadge {...presence} />}
       </View>
       <HeaderAvatar source={avatar} name={name} />
     </View>

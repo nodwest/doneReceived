@@ -233,6 +233,17 @@ export function FamilyPage() {
                 );
               })}
               {newChildren.map((child) => {
+                // Как у моковых: тап — профиль, чипы — его задания.
+                const counts = countChildTasks(
+                  tasks,
+                  child.id,
+                  String(parentMock.id),
+                );
+                const openTasks = (tab: 'all' | 'review') =>
+                  router.push({
+                    pathname: '/child/[id]/tasks',
+                    params: { id: child.id, tab },
+                  });
                 const card = (
                   <MemberCard
                     name={child.displayName}
@@ -241,6 +252,19 @@ export function FamilyPage() {
                     }
                     role="child"
                     subtitle={t('member.childProfile')}
+                    activeTasks={isParent ? counts.active : undefined}
+                    reviewTasks={isParent ? counts.review : undefined}
+                    onPress={
+                      isParent
+                        ? () =>
+                            router.push({
+                              pathname: '/child/[id]',
+                              params: { id: child.id },
+                            })
+                        : undefined
+                    }
+                    onActiveTasksPress={() => openTasks('all')}
+                    onReviewTasksPress={() => openTasks('review')}
                     footer={devicesFooter(
                       familyId,
                       child.id,

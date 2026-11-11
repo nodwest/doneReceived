@@ -15,7 +15,8 @@ import {
   type TasksTab,
   type TasksView,
 } from '@widgets/tasks-header';
-import { useFamilyTasks } from '@features/family-tasks';
+import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
+import { useFamilyChildren } from '@entities/family';
 import { filterTasks, TaskCard, type Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
@@ -50,12 +51,26 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
     tab?: string;
     id?: string;
   }>();
-  const owner =
-    scope === 'child'
-      ? childrenMock.find((child) => String(child.id) === ownerId)
-      : scope === 'parent'
-        ? parentProfilesMock.find((parent) => String(parent.id) === ownerId)
-        : undefined;
+  // Чей список ребёнка: моковые Emma и Liam или ребёнок семьи с сервера.
+  const familyId = useTaskFamilyId();
+  const { data: serverChildren, isPending: childrenPending } =
+    useFamilyChildren(familyId);
+  const owner = useMemo(() => {
+    if (scope === 'parent') {
+      return parentProfilesMock.find((parent) => String(parent.id) === ownerId);
+    }
+    if (scope !== 'child') return undefined;
+    const mock = childrenMock.find((child) => String(child.id) === ownerId);
+    if (mock) return mock;
+    const server = serverChildren?.find((child) => child.id === ownerId);
+    return (
+      server && {
+        id: server.id,
+        name: server.displayName,
+        avatar: server.avatarUrl ? { uri: server.avatarUrl } : null,
+      }
+    );
+  }, [scope, ownerId, serverChildren]);
   // Список из кэша React Query: после создания или правки он перечитывается сам.
   const { data = NO_TASKS, isPending } = useFamilyTasks();
   // Вкладка Tasks — только задания вошедшего родителя: их он проверяет,
@@ -102,7 +117,11 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   );
   const cards = view === 'cards' && tasks.length > 0;
 
-  if (scope !== 'all' && !owner) return <Redirect href="/" />;
+  if (scope !== 'all' && !owner) {
+    // Дети с сервера ещё грузятся — ждём, а не уводим на главную.
+    if (scope === 'child' && familyId && childrenPending) return null;
+    return <Redirect href="/" />;
+  }
 
   const emptyText =
     scope === 'parent' && owner

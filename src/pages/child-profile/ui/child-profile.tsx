@@ -31,6 +31,9 @@ import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
+import { ServerChildProfile } from './server-child-profile';
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
@@ -50,9 +53,16 @@ const openReward = (operation: Operation) =>
  * карте.
  */
 export function ChildProfilePage() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  // Ребёнок семьи с сервера (UUID) — свой профиль из настоящих данных.
+  if (UUID.test(id)) return <ServerChildProfile id={id} />;
+  return <MockChildProfile id={id} />;
+}
+
+/** Профиль мокового ребёнка (Emma, Liam): все блоки на моках. */
+function MockChildProfile({ id }: { id: string }) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
   const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: operations = NO_OPERATIONS } = useOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.

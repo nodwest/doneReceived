@@ -7,8 +7,6 @@ export interface ChildOverview {
   name: string;
   /** Фото; null — первая буква имени (у детей с сервера фото пока нет). */
   avatar: ImageSourcePropType | null;
-  /** Ребёнок с сервера: своего профиля в приложении у него пока нет. */
-  server?: boolean;
   activeTasks: number;
   reviewTasks: number;
   /** Ребёнок сейчас дома: на карточке показываем значок домика. */
