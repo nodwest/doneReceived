@@ -91,6 +91,10 @@ export function MyTasksPage() {
     0,
   );
   const cards = view === 'cards' && tasks.length > 0;
+  // Список уже был на экране: назад из карточек ведёт к нему. Открыли сразу
+  // карточку (с главной) — назад туда, откуда пришли.
+  const [listSeen, setListSeen] = useState(initialTaskId === null);
+  if (view === 'list' && !listSeen) setListSeen(true);
   const earn = activeTasks.reduce((sum, task) => sum + task.reward, 0);
 
   const openCard = (task: Task) => {
@@ -132,7 +136,11 @@ export function MyTasksPage() {
             view={cards ? 'cards' : 'list'}
             onToggleView={() => setView(cards ? 'list' : 'cards')}
             onBack={() =>
-              router.canGoBack() ? router.back() : router.replace('/')
+              cards && listSeen
+                ? setView('list')
+                : router.canGoBack()
+                  ? router.back()
+                  : router.replace('/')
             }
           />
         </View>

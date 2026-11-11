@@ -127,10 +127,15 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
             // даже если до этого смотрели карточками.
             view={cards ? 'cards' : 'list'}
             onToggleView={() => setView(cards ? 'list' : 'cards')}
-            // Назад — туда, откуда пришли (главная, Family, профиль); без
+            // Назад из карточек — к списку (экран всегда открывается им);
+            // из списка — туда, откуда пришли (главная, Family, профиль), без
             // истории (открыли по ссылке) — на главную.
             onBack={() =>
-              router.canGoBack() ? router.back() : router.replace('/')
+              cards
+                ? setView('list')
+                : router.canGoBack()
+                  ? router.back()
+                  : router.replace('/')
             }
             owner={owner}
             tabs={scope !== 'parent'}
