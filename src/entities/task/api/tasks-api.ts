@@ -10,6 +10,7 @@ import {
   cancelServerTask,
   createServerTask,
   fetchServerTasks,
+  reviewServerSubmission,
   submitServerTask,
   updateServerTask,
   withdrawServerSubmission,
@@ -94,14 +95,38 @@ export async function setTaskStatus(
   mockServer.setStatus(payload);
 }
 
-// Проверка родителем — пока только у моковых заданий (шаг 4).
-
-/** Родитель подтвердил задание на проверке: оно выполнено (done). */
-export async function approveTask(id: string): Promise<Task> {
-  return mockServer.approve(id);
+/**
+ * Родитель подтвердил задание на проверке: оно выполнено (done). С сервера
+ * награда из резерва уходит ребёнку.
+ */
+export async function approveTask(
+  task: Task,
+  familyId: string | null,
+): Promise<void> {
+  if (task.serverTaskId) {
+    if (!familyId) throw new Error('No family');
+    await reviewServerSubmission(familyId, task.id, { decision: 'approved' });
+    return;
+  }
+  mockServer.approve(task.id);
 }
 
-/** Родитель вернул задание с причиной: оно снова активно. */
-export async function rejectTask(payload: RejectTaskPayload): Promise<Task> {
-  return mockServer.reject(payload);
+/**
+ * Родитель отклонил задание. Моковое — снова активно с причиной. С сервера —
+ * пока закрывается, резерв возвращается родителю; `reasonText` — причина
+ * для сервера словами.
+ */
+export async function rejectTask(
+  payload: RejectTaskPayload & { serverTaskId?: string; reasonText: string },
+  familyId: string | null,
+): Promise<void> {
+  if (payload.serverTaskId) {
+    if (!familyId) throw new Error('No family');
+    await reviewServerSubmission(familyId, payload.id, {
+      decision: 'rejected',
+      reason: payload.reasonText,
+    });
+    return;
+  }
+  mockServer.reject(payload);
 }

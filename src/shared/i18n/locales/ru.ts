@@ -334,6 +334,7 @@ export const ru: Dictionary = {
     edit: 'Изменить',
     approvedToast: 'Подтверждено · {{amount}} отправлено: {{name}}',
     rejectedToast: 'Возвращено на доработку: {{name}}',
+    closedToast: 'Задание закрыто · награда вернулась в кошелёк',
     cancelledToast: 'Задание отменено',
     cancelFailed: 'Не получилось отменить задание. Попробуйте ещё раз.',
     onlyAuthorApproves: 'Подтвердить и выплатить может только {{name}}',
@@ -437,6 +438,7 @@ export const ru: Dictionary = {
     title: 'Отклонить задание',
     subtitle:
       'Подскажите, что исправить. {{name}} увидит причину и сможет попробовать ещё раз.',
+    subtitleClose: 'Задание закроется, награда вернётся в ваш кошелёк.',
     comment: 'Комментарий',
     commentPlaceholder:
       'Покажите, что нужно исправить, например «кровать не заправлена».',
@@ -444,6 +446,12 @@ export const ru: Dictionary = {
       'not-done-properly': 'Сделано плохо',
       'not-finished': 'Не доделано',
       other: 'Другое',
+    },
+    errors: {
+      withdrawn: 'Ребёнок забрал отчёт — проверять нечего',
+      alreadyReviewed: 'Этот отчёт уже проверен',
+      network: 'Нет связи. Попробуйте ещё раз.',
+      failed: 'Не получилось сохранить решение. Попробуйте ещё раз.',
     },
   },
   auth: {

@@ -326,6 +326,7 @@ export const en = {
     edit: 'Edit',
     approvedToast: 'Approved · {{amount}} sent to {{name}}',
     rejectedToast: 'Sent back to {{name}} to redo',
+    closedToast: 'Task closed · reward returned to your wallet',
     cancelledToast: 'Task cancelled',
     cancelFailed: "Couldn't cancel the task. Please try again.",
     onlyAuthorApproves: 'Only {{name}} can approve and pay for this task',
@@ -427,6 +428,8 @@ export const en = {
     title: 'Reject task',
     subtitle:
       'Tell {{name}} what to fix. {{name}} will see your reason and can try again.',
+    subtitleClose:
+      'The task will be closed and the reward will return to your wallet.',
     comment: 'Add a comment',
     commentPlaceholder:
       'Show what needs to be fixed, for example "the bed is not made".',
@@ -434,6 +437,12 @@ export const en = {
       'not-done-properly': 'Not done properly',
       'not-finished': 'Not finished',
       other: 'Other',
+    },
+    errors: {
+      withdrawn: 'The report was taken back — nothing to review',
+      alreadyReviewed: 'This report has already been reviewed',
+      network: 'No connection. Please try again.',
+      failed: "Couldn't save the decision. Please try again.",
     },
   },
   auth: {

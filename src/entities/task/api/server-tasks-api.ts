@@ -21,6 +21,8 @@ type AssignmentDto = {
   id: string;
   childId: string;
   status: 'assigned' | 'submitted' | 'rejected' | 'approved';
+  /** После отказа можно переделать; false — отказ закрыл назначение. */
+  retryableRejection: boolean;
 };
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
@@ -80,8 +82,9 @@ function toTask(
 /**
  * GET /families/:id/tasks — назначения семьи (ребёнку — только свои), до 100
  * последних, и имена детей (GET /families/:id/children). Ребёнку список
- * детей закрыт (403), его не спрашиваем: имя — из сессии. Отменённые и
- * подтверждённые в список не идут.
+ * детей закрыт (403), его не спрашиваем: имя — из сессии. Отменённые,
+ * подтверждённые и закрытые отказом (`rejected` без `retryableRejection`)
+ * в список не идут.
  */
 export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
   const { familyId } = viewer;
@@ -98,7 +101,9 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
   return items
     .filter(
       ({ task, assignment }) =>
-        task.cancelledAt === null && assignment.status !== 'approved',
+        task.cancelledAt === null &&
+        assignment.status !== 'approved' &&
+        !(assignment.status === 'rejected' && !assignment.retryableRejection),
     )
     .map(({ task, assignment }) => toTask(task, assignment, children, viewer));
 }
@@ -184,6 +189,34 @@ export async function withdrawServerSubmission(
   familyId: string,
   assignmentId: string,
 ) {
+  const submissionId = await findPendingSubmission(familyId, assignmentId);
+  await apiRequest<null>(
+    `/families/${familyId}/task-submissions/${submissionId}`,
+    { method: 'DELETE' },
+  );
+}
+
+/**
+ * Решение родителя по отчёту, который ждёт проверки: POST
+ * /families/:id/task-submissions/:submissionId/review. approved — резерв
+ * уходит ребёнку; rejected (с причиной) — пока назначение закрывается и
+ * резерв возвращается автору (на переделку сервер ещё не умеет, Идеи.md
+ * п. 15). 409 — отчёт отозван (`SUBMISSION_WITHDRAWN`) или уже проверен.
+ */
+export async function reviewServerSubmission(
+  familyId: string,
+  assignmentId: string,
+  review: { decision: 'approved' } | { decision: 'rejected'; reason: string },
+) {
+  const submissionId = await findPendingSubmission(familyId, assignmentId);
+  await apiRequest<unknown>(
+    `/families/${familyId}/task-submissions/${submissionId}/review`,
+    { method: 'POST', body: review },
+  );
+}
+
+/** Отчёт по назначению, который ждёт проверки (отозванные сервер скрывает). */
+async function findPendingSubmission(familyId: string, assignmentId: string) {
   const submissions = await apiRequest<SubmissionDto[]>(
     `/families/${familyId}/task-assignments/${assignmentId}/submissions`,
   );
@@ -191,8 +224,5 @@ export async function withdrawServerSubmission(
     ({ submission, review }) => review === null && !submission.withdrawnAt,
   );
   if (!pending) throw new Error('No pending submission');
-  await apiRequest<null>(
-    `/families/${familyId}/task-submissions/${pending.submission.id}`,
-    { method: 'DELETE' },
-  );
+  return pending.submission.id;
 }

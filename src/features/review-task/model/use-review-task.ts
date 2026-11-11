@@ -1,34 +1,57 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCurrentFamily } from '@entities/family';
 import { addReward, operationKeys } from '@entities/operation';
 import { approveTask, rejectTask, taskKeys, type Task } from '@entities/task';
 import { payReward, walletKeys } from '@entities/wallet';
+import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import type { RejectDecision } from './reject-reasons';
 
+/** Ключ ошибки проверки: `reviewTask.errors.*`. */
+function reviewError(error: unknown) {
+  if (!isApiError(error)) return 'failed' as const;
+  if (error.status === 0) return 'network' as const;
+  const code =
+    error.data && typeof error.data === 'object'
+      ? (error.data as { code?: unknown }).code
+      : null;
+  if (code === 'SUBMISSION_WITHDRAWN') return 'withdrawn' as const;
+  if (error.status === 409) return 'alreadyReviewed' as const;
+  return 'failed' as const;
+}
+
 /**
  * Проверка задания родителем. Approve: задание выполнено (done) и уходит из
- * списков, награда записывается в историю (Rewards history), деньги уходят
- * из кошелька родителя на баланс ребёнка (транзакции, Wallet). Reject:
- * задание снова активно, ребёнок видит причину. Пока бэкенда нет, шаги идут
- * по очереди в моки; с API это будут два запроса — approve и reject.
+ * списков. У задания с сервера награда из резерва уходит ребёнку на сервере;
+ * у мокового награда записывается в моковую историю (`addReward`) и деньги
+ * уходят из мокового кошелька (`payReward`). Reject: моковое снова активно с
+ * причиной; с сервера пока закрывается, резерв возвращается родителю
+ * (переделку сервер ещё не умеет). Кэш задач, истории и кошельков
+ * перечитывается и после ошибки — карточка могла устареть.
  */
 export function useReviewTask() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const familyId = useCurrentFamily()?.id ?? null;
   const refresh = () =>
     Promise.all(
       [taskKeys.all, operationKeys.all, walletKeys.all].map((queryKey) =>
         queryClient.invalidateQueries({ queryKey }),
       ),
     );
+  const onError = (error: unknown) => {
+    showToast(t(`reviewTask.errors.${reviewError(error)}`));
+    return refresh();
+  };
 
   const approve = useMutation({
     mutationFn: async (task: Task) => {
-      // Проверка пока только у моковых заданий: у их детей есть фото.
+      await approveTask(task, familyId);
+      if (task.serverTaskId) return;
+      // Моковая история и кошелёк: у моковых детей есть фото.
       const { assignee } = task;
-      if (!assignee.avatar) throw new Error('Approve is mock-only for now');
-      await approveTask(task.id);
+      if (!assignee.avatar) return;
       const reward = await addReward({
         title: task.title,
         description: task.description,
@@ -59,6 +82,7 @@ export function useReviewTask() {
       );
       return refresh();
     },
+    onError,
   });
 
   const reject = useMutation({
@@ -68,11 +92,29 @@ export function useReviewTask() {
     }: {
       task: Task;
       decision: RejectDecision;
-    }) => rejectTask({ id: task.id, ...decision }),
+    }) => {
+      // Серверу причина нужна словами: подпись причины и комментарий.
+      const label = t(`reviewTask.reasons.${decision.reason}`);
+      const comment = decision.comment.trim();
+      return rejectTask(
+        {
+          id: task.id,
+          serverTaskId: task.serverTaskId,
+          ...decision,
+          reasonText: comment ? `${label}. ${comment}` : label,
+        },
+        familyId,
+      );
+    },
     onSuccess: (_, { task }) => {
-      showToast(t('tasks.rejectedToast', { name: task.assignee.name }));
+      showToast(
+        t(task.serverTaskId ? 'tasks.closedToast' : 'tasks.rejectedToast', {
+          name: task.assignee.name,
+        }),
+      );
       return refresh();
     },
+    onError,
   });
 
   return {

@@ -9,7 +9,8 @@ import { styles } from './review-task.styled';
 
 /**
  * Кнопки проверки внизу карточки задания: Reject открывает шторку с причиной
- * и возвращает задание ребёнку, Approve подтверждает и выплачивает награду.
+ * и возвращает задание ребёнку (задание с сервера пока закрывает), Approve
+ * подтверждает и выплачивает награду.
  */
 export function ReviewActions({ task }: { task: Task }) {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ export function ReviewActions({ task }: { task: Task }) {
       <RejectReasonSheet
         visible={rejecting}
         childName={task.assignee.name}
+        closes={!!task.serverTaskId}
         onCancel={() => setRejecting(false)}
         onReject={(decision) => {
           setRejecting(false);
