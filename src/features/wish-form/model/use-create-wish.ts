@@ -1,11 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createWish, wishKeys } from '@entities/wish';
+import {
+  createWish,
+  wishKeys,
+  type WishlistOwner,
+  type WishPayload,
+} from '@entities/wish';
 
-export function useCreateWish() {
+export function useCreateWish(owner: WishlistOwner | null) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createWish,
-    // Желание добавлено: перечитываем вишлист, как с настоящим сервером.
+    mutationFn: (payload: WishPayload) => {
+      if (!owner) throw new Error('No wishlist owner');
+      return createWish(owner, payload);
+    },
+    // Желание добавлено: перечитываем вишлист.
     onSuccess: () => queryClient.invalidateQueries({ queryKey: wishKeys.all }),
   });
 }

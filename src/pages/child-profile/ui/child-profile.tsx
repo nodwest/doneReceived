@@ -74,7 +74,10 @@ function MockChildProfile({ id }: { id: string }) {
   );
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
   const { balance } = useChildBalance(child ? String(child.id) : null);
-  const wishlist = useWishlistProgress(child?.id ?? -1, balance);
+  const wishlist = useWishlistProgress(
+    { childId: String(child?.id ?? -1), familyId: null },
+    balance,
+  );
   if (!child) return <Redirect href="/" />;
 
   // Активные — все задания ребёнка, на проверке — только свои.

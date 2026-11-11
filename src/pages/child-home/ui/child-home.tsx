@@ -9,7 +9,11 @@ import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import { TaskCarousel } from '@widgets/task-carousel';
 import { WishlistPreview } from '@widgets/wishlist-preview';
-import { useChildTasks, useMyChildBalance } from '@features/family-tasks';
+import {
+  useChildTasks,
+  useMyChildBalance,
+  useMyWishlistOwner,
+} from '@features/family-tasks';
 import { ChildActivityItem } from '@entities/activity';
 import {
   ChildTaskTile,
@@ -65,7 +69,7 @@ export function ChildHomePage() {
   const counts = countTasks(myTasks);
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
   const { balance, isPending: balancePending } = useMyChildBalance();
-  const wishlist = useWishlistProgress(childAccountMock.id, balance);
+  const wishlist = useWishlistProgress(useMyWishlistOwner(), balance);
   // Пока задания и вишлист не пришли, тело не рисуем: иначе на кадр видны
   // нули, «Добавь желание» и экран без карусели, а потом всё прыгает вниз.
   const loading = tasksPending || wishlist.isPending || balancePending;

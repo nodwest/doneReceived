@@ -63,7 +63,10 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
         : allOperations,
     [allOperations, childId],
   );
-  const { data: wishes } = useWishes(childId ?? childAccountMock.id);
+  const { data: wishes } = useWishes({
+    childId: String(childId ?? childAccountMock.id),
+    familyId: null,
+  });
   const { data: childWallet } = useChildWallet(
     String(childId ?? childAccountMock.id),
   );

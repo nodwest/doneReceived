@@ -5,9 +5,9 @@ import { TabScreen } from '@widgets/bottom-nav';
 import { useWishlistProgress, WishRow } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { useChildBalance } from '@entities/wallet';
-import { childProfilesMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import { HeaderAvatar, Icon, ScreenHeader } from '@shared/ui';
+import { useWishlistChild } from '../model/use-wishlist-child';
 import { styles } from './child-wishlist.styled';
 
 /**
@@ -18,11 +18,11 @@ import { styles } from './child-wishlist.styled';
 export function ChildWishlistPage() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const child = childProfilesMock.find((item) => String(item.id) === id);
+  const { child, owner, familyId, loading } = useWishlistChild(id);
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(child ? String(child.id) : null);
-  const { progress, isPending } = useWishlistProgress(child?.id ?? -1, balance);
-  if (!child) return <Redirect href="/" />;
+  const { balance } = useChildBalance(child?.id ?? null, familyId);
+  const { progress, isPending } = useWishlistProgress(owner, balance);
+  if (!child) return loading ? null : <Redirect href="/" />;
 
   return (
     <TabScreen activeKey="family">

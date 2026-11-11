@@ -6,11 +6,15 @@ import { useDeleteWish } from '@features/delete-wish';
 import { useReorderWishes } from '@features/reorder-wishes';
 import { WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
-import { useMyChildBalance } from '@features/family-tasks';
-import { useWishlistProgress, WishRow, type Wish } from '@entities/wish';
+import { useMyChildBalance, useMyWishlistOwner } from '@features/family-tasks';
+import {
+  isServerWishlist,
+  useWishlistProgress,
+  WishRow,
+  type Wish,
+} from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { childAccountMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import { Icon, RoundButton, SortableList, SwipeableRow } from '@shared/ui';
 import { ACTIONS_GAP, ACTIONS_WIDTH, styles } from './wishlist.styled';
@@ -27,17 +31,17 @@ export function WishlistPage() {
   const { t } = useTranslation();
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
   const { balance } = useMyChildBalance();
-  const { progress, isPending } = useWishlistProgress(
-    childAccountMock.id,
-    balance,
-  );
-  const reorder = useReorderWishes(childAccountMock.id);
-  const deleteWish = useDeleteWish();
+  const owner = useMyWishlistOwner();
+  // Порядок желаний сервер пока не хранит: у настоящего ребёнка ручки нет.
+  const sortable = owner !== null && !isServerWishlist(owner);
+  const { progress, isPending } = useWishlistProgress(owner, balance);
+  const reorder = useReorderWishes(owner);
+  const deleteWish = useDeleteWish(owner);
   const [sheetOpen, setSheetOpen] = useState(false);
   // Желание в шторке; undefined — New wish. Не сбрасываем при закрытии, чтобы
   // шторка не переключалась на New wish, пока уезжает.
   const [editing, setEditing] = useState<Wish>();
-  const [openId, setOpenId] = useState<number | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
 
   const position = editing
@@ -150,17 +154,19 @@ export function WishlistPage() {
                   })
                 }
                 aside={
-                  <View
-                    {...dragHandleProps}
-                    accessibilityLabel={t('wishlist.dragHandle')}
-                    style={styles.handle}
-                  >
-                    <Icon
-                      name="drag-handle"
-                      size={20}
-                      color={theme.colors.dragHandle}
-                    />
-                  </View>
+                  sortable ? (
+                    <View
+                      {...dragHandleProps}
+                      accessibilityLabel={t('wishlist.dragHandle')}
+                      style={styles.handle}
+                    >
+                      <Icon
+                        name="drag-handle"
+                        size={20}
+                        color={theme.colors.dragHandle}
+                      />
+                    </View>
+                  ) : undefined
                 }
               />
             </SwipeableRow>
@@ -181,6 +187,7 @@ export function WishlistPage() {
         wish={editing}
         position={position}
         onDelete={editing && (() => remove(editing))}
+        owner={owner}
       />
     </TabScreen>
   );

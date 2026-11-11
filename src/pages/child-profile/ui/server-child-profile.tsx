@@ -7,9 +7,11 @@ import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren } from '@entities/family';
 import { countChildTasks, TaskIconBadge, type Task } from '@entities/task';
 import { ChildTransactionRow, useChildWallet } from '@entities/wallet';
+import { useWishlistProgress, WishRow } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { parentMock } from '@shared/mocks';
-import { ScreenSection } from '@shared/ui';
+import { theme } from '@shared/theme';
+import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
 
 const NO_TASKS: Task[] = [];
@@ -17,8 +19,8 @@ const RECENT_REWARDS = 3;
 
 /**
  * Профиль ребёнка семьи с сервера: имя (без фото — буква), баланс и
- * начисления из его кошелька, задания. Статуса «дома», карты, итогов за
- * период и вишлиста с сервера пока нет — этих блоков нет.
+ * начисления из его кошелька, задания, вишлист. Статуса «дома», карты и
+ * итогов за период с сервера пока нет — этих блоков нет.
  */
 export function ServerChildProfile({ id }: { id: string }) {
   const { t } = useTranslation();
@@ -28,6 +30,10 @@ export function ServerChildProfile({ id }: { id: string }) {
   const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: wallet } = useChildWallet(id, familyId);
   const child = children?.find((item) => item.id === id);
+  const wishlist = useWishlistProgress(
+    { childId: id, familyId },
+    wallet?.balance ?? 0,
+  );
 
   if (!child) {
     // Список детей ещё грузится — ждём, а не уводим на главную.
@@ -62,6 +68,37 @@ export function ServerChildProfile({ id }: { id: string }) {
           onActiveTasksPress={() => openTasks('all')}
           onTasksToReviewPress={() => openTasks('review')}
         />
+        <ScreenSection
+          title={t('wishlist.title')}
+          actionLabel={t('common.seeAll')}
+          onAction={() =>
+            router.push({ pathname: '/child/[id]/wishlist', params: { id } })
+          }
+        >
+          {!wishlist.isPending && wishlist.progress.length === 0 ? (
+            <Text style={styles.empty}>
+              {t('wishCard.noWishes', { name: child.displayName })}
+            </Text>
+          ) : (
+            <SnapCarousel
+              items={wishlist.progress}
+              keyExtractor={(item) => item.wish.id}
+              dotColor={theme.colors.childFrom}
+              renderItem={(item, style) => (
+                <WishRow
+                  {...item}
+                  style={[style, styles.wish]}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/child/[id]/wishlist/[wishId]',
+                      params: { id, wishId: item.wish.id },
+                    })
+                  }
+                />
+              )}
+            />
+          )}
+        </ScreenSection>
         <ScreenSection title={t('memberProfile.recentRewards')}>
           {rewards.length === 0 ? (
             <Text style={styles.empty}>{t('memberProfile.noRewards')}</Text>

@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { useSession } from '@entities/session';
 import { useChildBalance, useChildWallet } from '@entities/wallet';
+import type { WishlistOwner } from '@entities/wish';
 import { childAccountMock } from '@shared/mocks';
 import { useChildTasks } from './use-family-tasks';
 
@@ -33,4 +35,16 @@ export function useMyChildWallet() {
 export function useMyChildBalance() {
   const { childId, familyId } = useChildAccount();
   return useChildBalance(childId, familyId);
+}
+
+/**
+ * Чей вишлист на экранах ребёнка (см. `useChildAccount`); null — ребёнок
+ * ещё не известен.
+ */
+export function useMyWishlistOwner(): WishlistOwner | null {
+  const { childId, familyId } = useChildAccount();
+  return useMemo(
+    () => (childId ? { childId, familyId } : null),
+    [childId, familyId],
+  );
 }
