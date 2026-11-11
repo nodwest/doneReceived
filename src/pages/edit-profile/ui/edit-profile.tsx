@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
+import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
 import { useViewerRole } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
 import { childAccountMock, parentMock } from '@shared/mocks';
@@ -12,6 +13,7 @@ import {
   Icon,
   InputWithIcon,
   Label,
+  LetterAvatar,
   RoundButton,
   SettingsRow,
 } from '@shared/ui';
@@ -25,7 +27,16 @@ import { styles } from './edit-profile.styled';
  */
 export function EditProfilePage() {
   const { t } = useTranslation();
-  const account = useViewerRole() === 'child' ? childAccountMock : parentMock;
+  // Данные вошедшего (GET /users/me); родитель в режиме ребёнка — Emma.
+  const isChild = useViewerRole() === 'child';
+  const childSession = useSessionKind() === 'child';
+  const me = useMe();
+  const myAvatar = useMyAvatar();
+  const mock = isChild ? childAccountMock : parentMock;
+  const account =
+    me && (!isChild || childSession)
+      ? { fullName: me.displayName, email: me.email ?? '', avatar: myAvatar }
+      : mock;
   const [name, setName] = useState(account.fullName);
   const [email, setEmail] = useState(account.email);
 
@@ -54,7 +65,12 @@ export function EditProfilePage() {
             accessibilityLabel={t('editProfile.changePhoto')}
             style={styles.avatarWrap}
           >
-            <Image source={account.avatar} style={styles.avatar} />
+            <LetterAvatar
+              source={account.avatar}
+              name={account.fullName}
+              style={styles.avatar}
+              letterSize={36}
+            />
             <LinearGradient
               colors={[theme.colors.violet, theme.colors.blue]}
               start={{ x: 0, y: 0 }}

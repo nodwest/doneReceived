@@ -35,7 +35,7 @@ export function ProfileHeader({
         </Text>
         <PresenceBadge {...presence} />
       </View>
-      <HeaderAvatar source={avatar} />
+      <HeaderAvatar source={avatar} name={name} />
     </View>
   );
 }

@@ -40,7 +40,7 @@ export function ChildWishlistPage() {
                   params: { id: String(child.id) },
                 })
           }
-          right={<HeaderAvatar source={child.avatar} />}
+          right={<HeaderAvatar source={child.avatar} name={child.name} />}
         />
         <LinearGradient
           colors={[theme.colors.childFrom, theme.colors.childDeep]}

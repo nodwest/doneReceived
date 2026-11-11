@@ -51,7 +51,7 @@ export function ChildWishPage() {
                   params: { id: String(child.id) },
                 })
           }
-          right={<HeaderAvatar source={child.avatar} />}
+          right={<HeaderAvatar source={child.avatar} name={child.name} />}
         />
         <WishDetails
           {...item}

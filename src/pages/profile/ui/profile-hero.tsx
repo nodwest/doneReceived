@@ -1,13 +1,15 @@
-import { Image, Text, type ImageSourcePropType } from 'react-native';
+import { Text, type ImageSourcePropType } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { FamilyRole } from '@entities/user';
 import { theme } from '@shared/theme';
+import { LetterAvatar } from '@shared/ui';
 import { styles } from './profile-hero.styled';
 
 type ProfileHeroProps = {
   name: string;
   email: string;
-  avatar: ImageSourcePropType;
+  /** Фото; null — первая буква имени. */
+  avatar: ImageSourcePropType | null;
   role: FamilyRole;
 };
 
@@ -31,7 +33,12 @@ export function ProfileHero({ name, email, avatar, role }: ProfileHeroProps) {
       style={[styles.hero, role === 'parent' && styles.heroParent]}
     >
       <Text style={styles.name}>{name}</Text>
-      <Image source={avatar} style={styles.avatar} />
+      <LetterAvatar
+        source={avatar}
+        name={name}
+        style={styles.avatar}
+        letterSize={28}
+      />
       <Text style={styles.email}>{email}</Text>
     </LinearGradient>
   );

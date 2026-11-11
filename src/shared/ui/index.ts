@@ -6,6 +6,7 @@ export * from './label';
 export * from './copyable-code';
 export * from './gradient-button';
 export * from './header-avatar';
+export * from './letter-avatar';
 export * from './pill-button';
 export * from './round-button';
 export * from './screen-section';

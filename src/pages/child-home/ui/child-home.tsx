@@ -17,6 +17,7 @@ import {
   sortTasksByUrgency,
   type Task,
 } from '@entities/task';
+import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
 import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
@@ -50,6 +51,11 @@ function greetingKey(hour: number) {
 export function ChildHomePage() {
   const { t } = useTranslation();
   const router = useRouter();
+  // Вошёл сам ребёнок — его имя и фото (GET /users/me); родитель в режиме
+  // ребёнка смотрит моковую Emma.
+  const me = useMe();
+  const myAvatar = useMyAvatar();
+  const childSession = useSessionKind() === 'child';
   const { data: myTasks = NO_TASKS, isPending: tasksPending } = useChildTasks();
   // Ближайшие по сроку — первыми, как в списке «To do».
   const activeTasks = useMemo(
@@ -80,8 +86,8 @@ export function ChildHomePage() {
         >
           <HomeHeader
             greeting={t(greetingKey(new Date().getHours()))}
-            name={childAccountMock.name}
-            avatar={childAccountMock.avatar}
+            name={childSession && me ? me.displayName : childAccountMock.name}
+            avatar={childSession ? myAvatar : childAccountMock.avatar}
           />
           {!loading && (
             <>
