@@ -6,6 +6,7 @@ export {
   isServerChild,
   rejectTask,
   setTaskStatus,
+  tickChecklistItem,
   updateTask,
 } from './api/tasks-api';
 export type { TaskViewer } from './api/server-tasks-api';
@@ -18,3 +19,4 @@ export * from './ui/child-task-tile';
 export * from './ui/child-review-row';
 export * from './ui/child-task-card';
 export * from './ui/task-sheet';
+export * from './ui/task-checklist';

@@ -5,7 +5,11 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { DoneButton, TaskFooterAction } from '@features/complete-task';
+import {
+  DoneButton,
+  TaskFooterAction,
+  useTaskActions,
+} from '@features/complete-task';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
 import {
@@ -63,6 +67,8 @@ export function MyTasksPage() {
   const router = useRouter();
   const params = useLocalSearchParams<{ tab?: string; task?: string }>();
   const { data = NO_TASKS, isPending } = useChildTasks();
+  // Шаги чеклиста отмечаются тапом прямо в карточке.
+  const { toggleStep } = useTaskActions();
   // Порядок как в списке: активные по сроку, затем на проверке — карточки
   // листаются в том же порядке.
   const allTasks = useMemo(() => sortTasksByUrgency(data), [data]);
@@ -180,6 +186,7 @@ export function MyTasksPage() {
                   }
                   onTakePhoto={photoStub}
                   onPickPhoto={photoStub}
+                  onToggleStep={(item) => toggleStep(task, item)}
                   footer={<TaskFooterAction task={task} />}
                   style={style}
                 />

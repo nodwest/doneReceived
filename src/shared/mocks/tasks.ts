@@ -33,6 +33,19 @@ export const tasksMock = [
     expiresAt: at(2 * HOUR + 14 * MINUTE + 36_000),
     doneAt: null,
     photo: null,
+    // Чеклист: Emma отметила два шага из шести.
+    checklist: [
+      { id: 'mock-step-1', title: 'Make the bed', done: true },
+      { id: 'mock-step-2', title: 'Put toys away', done: true },
+      { id: 'mock-step-3', title: 'Vacuum the floor', done: false },
+      { id: 'mock-step-4', title: 'Wipe the desk', done: false },
+      { id: 'mock-step-5', title: 'Sort the books by size', done: false },
+      {
+        id: 'mock-step-6',
+        title: 'Take the laundry basket to the hallway',
+        done: false,
+      },
+    ],
   },
   {
     id: 2,

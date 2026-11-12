@@ -20,6 +20,7 @@ import {
 import { isDeadlineValid } from '../model/deadline';
 import { useCreateTask } from '../model/use-create-task';
 import { useUpdateTask } from '../model/use-update-task';
+import { ChecklistField } from './checklist-field';
 import { CreateTaskButton } from './create-task-button';
 import { DeadlineField } from './deadline-field';
 import { DescriptionInput } from './description-input';
@@ -58,6 +59,8 @@ export function CreateTaskForm({
   // Снимок задачи на момент открытия: фоновое перечитывание списка не должно
   // затирать то, что родитель уже начал править.
   const [initialTask] = useState(task);
+  // Шаг чеклиста тянут за ручку: прокрутка формы не должна его перехватить.
+  const [draggingStep, setDraggingStep] = useState(false);
 
   const title = useCreateTaskStore((state) => state.title);
   const description = useCreateTaskStore((state) => state.description);
@@ -118,6 +121,8 @@ export function CreateTaskForm({
   const shownAssignees = initialTask?.serverTaskId
     ? assignees.filter((child) => child.id === initialTask.assigneeId)
     : assignees;
+  const childName =
+    assignees.find((child) => child.id === assigneeId)?.name ?? null;
 
   return (
     <KeyboardAvoidingView
@@ -133,6 +138,7 @@ export function CreateTaskForm({
           },
         ]}
         keyboardShouldPersistTaps="handled"
+        scrollEnabled={!draggingStep}
         showsVerticalScrollIndicator={false}
       >
         <FormField label={t('createTask.taskTitle')}>
@@ -164,6 +170,11 @@ export function CreateTaskForm({
         <FormField label={t('createTask.description')} optional>
           <DescriptionInput value={description} onChangeText={setDescription} />
         </FormField>
+
+        <ChecklistField
+          childName={childName}
+          onDragActiveChange={setDraggingStep}
+        />
 
         <FormField label={t('createTask.assignTo')}>
           <View style={styles.chips}>

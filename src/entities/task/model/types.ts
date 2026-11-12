@@ -24,6 +24,26 @@ export interface CreateTaskPayload {
   /** ISO-время, когда задача перестаёт быть активной; null — без срока. */
   expiresAt: string | null;
   assigneeId: string;
+  /** Шаги чеклиста по порядку; пустой — без чеклиста. */
+  checklist: ChecklistStepPayload[];
+}
+
+/**
+ * Шаг чеклиста в форме: у сохранённого шага есть `id` (при правке сервер
+ * оставит ему отметку ребёнка), у нового — нет.
+ */
+export interface ChecklistStepPayload {
+  id?: string;
+  title: string;
+}
+
+/** Ребёнок отметил шаг чеклиста или снял отметку. */
+export interface ChecklistTickPayload {
+  /** id задачи в приложении (у задания с сервера — id назначения). */
+  id: string;
+  serverTaskId?: string;
+  itemId: string;
+  done: boolean;
 }
 
 export interface UpdateTaskPayload extends CreateTaskPayload {

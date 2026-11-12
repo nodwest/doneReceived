@@ -105,6 +105,14 @@ export const theme = {
     placeholderSoft: '#A9ADBD',
     closeBg: '#F1F2F7',
     dragHandle: '#B4B8C6',
+    // Чеклист в форме задания: пунктир кнопки Add checklist, подложка
+    // плюса, строка нового шага и его пунктирный квадратик, ручка шага.
+    checklistBorder: '#D9D4FB',
+    checklistPlusBg: '#EFEDFD',
+    checklistDraftBg: '#F6F4FF',
+    checklistHandle: '#C3C6D3',
+    // Чеклист в карточке задания: рамка списка и черта между шагами.
+    checklistLine: '#E4E7EF',
     // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
     heroSubtle: '#D9E0FF',
     violetIcon: '#EDE8FC',
@@ -132,7 +140,6 @@ export const theme = {
     timerWarm: '#FFF3DC',
     timerCool: '#E6F1FD',
     stepperBg: '#F5F3FF',
-    stepperBar: '#E3E0F5',
     dangerBorder: '#FFC9CA',
     dropZone: '#F4F9FF',
     galleryBorder: '#D6E6F8',

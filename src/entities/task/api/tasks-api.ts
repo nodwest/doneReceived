@@ -1,5 +1,6 @@
 import type { Task } from '../model/task';
 import type {
+  ChecklistTickPayload,
   CreateTaskPayload,
   RejectTaskPayload,
   TaskStatusPayload,
@@ -12,6 +13,7 @@ import {
   fetchServerTasks,
   reviewServerSubmission,
   submitServerTask,
+  tickServerChecklist,
   updateServerTask,
   withdrawServerSubmission,
   type TaskViewer,
@@ -93,6 +95,27 @@ export async function setTaskStatus(
     return;
   }
   mockServer.setStatus(payload);
+}
+
+/**
+ * Ребёнок отметил шаг чеклиста или снял отметку: с сервера — по назначению
+ * (`id`), моковое — в моках.
+ */
+export async function tickChecklistItem(
+  payload: ChecklistTickPayload,
+  familyId: string | null,
+): Promise<void> {
+  if (payload.serverTaskId) {
+    if (!familyId) throw new Error('No family');
+    await tickServerChecklist(
+      familyId,
+      payload.id,
+      payload.itemId,
+      payload.done,
+    );
+    return;
+  }
+  mockServer.tickChecklist(payload);
 }
 
 /**
