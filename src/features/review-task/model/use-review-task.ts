@@ -63,6 +63,7 @@ export function useReviewTask() {
         },
         doneAt: task.doneAt,
         photo: task.photo,
+        note: task.note,
       });
       await payReward({
         amount: reward.amount,

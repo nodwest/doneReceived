@@ -113,6 +113,8 @@ export const theme = {
     checklistHandle: '#C3C6D3',
     // Чеклист в карточке задания: рамка списка и черта между шагами.
     checklistLine: '#E4E7EF',
+    // Комментарий ребёнка в карточке на проверке: тёплый пузырь.
+    noteReviewBg: '#FFF6E8',
     // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
     heroSubtle: '#D9E0FF',
     violetIcon: '#EDE8FC',

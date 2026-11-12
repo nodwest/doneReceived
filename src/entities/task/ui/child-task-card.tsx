@@ -21,6 +21,7 @@ import {
   TimerPill,
 } from './task-sheet';
 import { TaskChecklist } from './task-checklist';
+import { TaskNote, TaskNoteField } from './task-note';
 import { styles as sheetStyles } from './task-sheet.styled';
 import { styles } from './child-task-card.styled';
 
@@ -34,6 +35,11 @@ type ChildTaskCardProps = {
   rejectedBy?: Pick<TaskAssignee, 'name'>;
   /** Ребёнок отметил шаг чеклиста; только у активного задания. */
   onToggleStep?: (item: ChecklistItem) => void;
+  /**
+   * Комментарий к сдаче, который ребёнок пишет в активной карточке (уходит с
+   * I did it!); без него поля нет. На проверке показывается `task.note`.
+   */
+  note?: { value: string; onChange: (value: string) => void };
   /** Кнопка внизу карточки: I did it! или Redo task. */
   footer?: ReactNode;
   style?: StyleProp<ViewStyle>;
@@ -42,8 +48,9 @@ type ChildTaskCardProps = {
 /**
  * Крупная карточка задания у ребёнка. Активная — голубая: от кого задание,
  * таймер, описание с наградой, чеклист (шаги отмечаются тапом), срок и когда
- * выдано, фото-отчёт (камера или галерея). На проверке — оранжевая:
- * отправленное фото, описание и чеклист (отметки уже не меняются).
+ * выдано, фото-отчёт (камера или галерея) и комментарий для родителя. На
+ * проверке — оранжевая: описание, чеклист (отметки уже не меняются),
+ * отправленное фото и комментарий.
  */
 export function ChildTaskCard({
   task,
@@ -52,6 +59,7 @@ export function ChildTaskCard({
   onPickPhoto,
   rejectedBy,
   onToggleStep,
+  note,
   footer,
   style,
 }: ChildTaskCardProps) {
@@ -78,9 +86,6 @@ export function ChildTaskCard({
       footer={footer}
       style={style}
     >
-      {review && task.photo && (
-        <PhotoSection label={t('taskCard.yourPhoto')} photo={task.photo} />
-      )}
       {!review && task.rejection && (
         <View style={styles.rejection}>
           <View style={styles.rejectionIcon}>
@@ -118,6 +123,16 @@ export function ChildTaskCard({
               : t('taskCard.checklistChildHint', { name: author.name })
           }
           onToggle={review ? undefined : onToggleStep}
+        />
+      )}
+      {review && task.photo && (
+        <PhotoSection label={t('taskCard.yourPhoto')} photo={task.photo} />
+      )}
+      {review && task.note && (
+        <TaskNote
+          label={t('taskCard.yourNote')}
+          note={task.note}
+          tone="review"
         />
       )}
       {!review && (
@@ -175,6 +190,16 @@ export function ChildTaskCard({
               </Text>
             </View>
           </View>
+          {note && (
+            <TaskNoteField
+              label={t('taskCard.note')}
+              optionalLabel={t('taskCard.optional')}
+              placeholder={t('taskCard.notePlaceholder')}
+              hint={t('taskCard.noteHint')}
+              value={note.value}
+              onChange={note.onChange}
+            />
+          )}
         </>
       )}
     </TaskSheet>

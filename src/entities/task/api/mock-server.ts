@@ -27,6 +27,7 @@ let tasks: Task[] = tasksMock.map((task) => ({
   createdBy: String(task.createdBy),
   assignee: toAssignee(task.assignee),
   rejection: null,
+  note: 'note' in task ? task.note : null,
   checklist:
     'checklist' in task ? task.checklist.map((item) => ({ ...item })) : [],
 }));
@@ -77,6 +78,7 @@ export const mockServer = {
       expiresAt: payload.expiresAt,
       doneAt: null,
       photo: null,
+      note: null,
       rejection: null,
       checklist: toChecklist(payload.checklist),
     };
@@ -114,13 +116,15 @@ export const mockServer = {
     return { ...updated };
   },
 
-  setStatus: ({ id, status }: TaskStatusPayload): Task => {
+  setStatus: ({ id, status, note }: TaskStatusPayload): Task => {
     const current = tasks.find((task) => task.id === id);
     if (!current) throw new Error(`Task ${id} not found`);
     const updated: Task = {
       ...current,
       status,
       doneAt: status === 'review' ? new Date().toISOString() : null,
+      // Как сервер: пробелы по краям срезаны, пустой — null; Redo его снимает.
+      note: (status === 'review' && note?.trim()) || null,
     };
     tasks = tasks.map((task) => (task.id === id ? updated : task));
     return { ...updated };
@@ -140,6 +144,7 @@ export const mockServer = {
       status: 'active',
       doneAt: null,
       photo: null,
+      note: null,
       rejection: { reason, comment, by: String(parentMock.id) },
     };
     tasks = tasks.map((task) => (task.id === id ? updated : task));

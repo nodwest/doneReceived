@@ -111,5 +111,10 @@ export const operationsMock = rows.map(
     description: descriptions[title] ?? '',
     doneMinutesBefore: kind === 'earned' ? 12 + ((index * 7) % 40) : null,
     photo: kind === 'earned' && WITH_PHOTO.has(title) ? roomPhoto : null,
+    // Сегодняшняя уборка Emma — с комментарием: родитель принял её и так.
+    note:
+      index === 0
+        ? 'The vacuum cleaner stopped working, so I swept the floor with a broom instead.'
+        : null,
   }),
 );

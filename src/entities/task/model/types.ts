@@ -61,6 +61,8 @@ export interface TaskStatusPayload {
    */
   serverTaskId?: string;
   status: Exclude<TaskState, 'done'>;
+  /** Комментарий ребёнка к сдаче (только на проверку); пустой — без него. */
+  note?: string;
 }
 
 /** Отказ родителя на проверке: задание снова активно, с причиной. */

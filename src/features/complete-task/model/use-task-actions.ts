@@ -2,6 +2,7 @@ import type { ChecklistItem, Task } from '@entities/task';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
+import { useNoteDraftStore } from './note-draft-store';
 import { useSetTaskStatus } from './use-set-task-status';
 import { useTickChecklistItem } from './use-tick-checklist-item';
 
@@ -21,9 +22,10 @@ function actionError(error: unknown) {
 }
 
 /**
- * Действия ребёнка с заданием: I did it! отправляет его на проверку, Redo
- * забирает непроверенный отчёт — задание снова активно, toggleStep отмечает
- * шаг чеклиста или снимает отметку.
+ * Действия ребёнка с заданием: I did it! отправляет его на проверку вместе с
+ * черновиком комментария, Redo забирает непроверенный отчёт — задание снова
+ * активно, а отправленный комментарий возвращается в поле; toggleStep
+ * отмечает шаг чеклиста или снимает отметку.
  */
 export function useTaskActions() {
   const { t } = useTranslation();
@@ -32,16 +34,38 @@ export function useTaskActions() {
   const onError = (error: unknown) =>
     showToast(t(`completeTask.errors.${actionError(error)}`));
 
-  const markDone = (task: Task) =>
+  const { setDraft, clearDraft } = useNoteDraftStore.getState();
+
+  const markDone = (task: Task) => {
+    const note = useNoteDraftStore.getState().drafts[task.id]?.trim();
     mutate(
-      { id: task.id, serverTaskId: task.serverTaskId, status: 'review' },
-      { onSuccess: () => showToast(t('completeTask.sentToast')), onError },
+      {
+        id: task.id,
+        serverTaskId: task.serverTaskId,
+        status: 'review',
+        ...(note ? { note } : {}),
+      },
+      {
+        onSuccess: () => {
+          clearDraft(task.id);
+          showToast(t('completeTask.sentToast'));
+        },
+        onError,
+      },
     );
+  };
 
   const redo = (task: Task) =>
     mutate(
       { id: task.id, serverTaskId: task.serverTaskId, status: 'active' },
-      { onSuccess: () => showToast(t('completeTask.redoToast')), onError },
+      {
+        onSuccess: () => {
+          // Отчёт отозван, а комментарий не пропадает: снова в поле.
+          if (task.note) setDraft(task.id, task.note);
+          showToast(t('completeTask.redoToast'));
+        },
+        onError,
+      },
     );
 
   const toggleStep = (task: Task, item: ChecklistItem) =>

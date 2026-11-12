@@ -55,6 +55,7 @@ export const mockServer = {
       at: new Date().toISOString(),
       doneAt: payload.doneAt,
       photo: payload.photo,
+      note: payload.note,
     };
     operations = [operation, ...operations];
     return { ...operation };

@@ -23,6 +23,10 @@ type WalletDto = {
     assignmentId: string;
     points: number;
     createdAt: string;
+    /** Когда сдан одобренный отчёт (Идеи.md п. 19, 27); пока не приходит. */
+    submittedAt?: string | null;
+    /** Комментарий ребёнка к одобренному отчёту (Идеи.md п. 27). */
+    submissionNote?: string | null;
   }[];
 };
 
@@ -84,8 +88,9 @@ export async function fetchServerOperations(
         child: toChild(child),
         parentId: item ? author(item.task.createdBy) : '',
         at: entry.createdAt,
-        doneAt: null,
+        doneAt: entry.submittedAt ?? null,
         photo: null,
+        note: entry.submissionNote?.trim() || null,
       };
     }),
   );
@@ -116,6 +121,7 @@ export async function fetchServerOperations(
         at: task.deadlineAt as string,
         doneAt: null,
         photo: null,
+        note: null,
       },
     ];
   });

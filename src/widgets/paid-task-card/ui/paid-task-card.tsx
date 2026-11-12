@@ -6,6 +6,7 @@ import {
   InfoTiles,
   PhotoSection,
   TaskBrief,
+  TaskNote,
   TaskSheet,
   type InfoTileProps,
   type TaskAssignee,
@@ -40,7 +41,8 @@ const percent = (part: number, whole: number): `${number}%` =>
 /**
  * Карточка выплаченного задания — открывается из Rewards history. Зелёная
  * шапка («Done by Emma · Paid $4» у родителя, «Task from Sarah · Earned $4» у
- * ребёнка), фото-отчёт, что нужно было сделать, когда сдано и когда
+ * ребёнка), что нужно было сделать, фото-отчёт, комментарий ребёнка к сдаче,
+ * когда сдано и когда
  * подтверждено; у ребёнка — на сколько награда приблизила желание. Внизу —
  * куда ушли деньги и кто подтвердил.
  */
@@ -120,6 +122,12 @@ export function PaidTaskCard({
         </View>
       }
     >
+      <TaskBrief
+        label={t('taskCard.whatToDo')}
+        reward={operation.amount}
+        paid
+        description={operation.description}
+      />
       {operation.photo && (
         <PhotoSection
           label={
@@ -131,12 +139,17 @@ export function PaidTaskCard({
           height={140}
         />
       )}
-      <TaskBrief
-        label={t('taskCard.whatToDo')}
-        reward={operation.amount}
-        paid
-        description={operation.description}
-      />
+      {operation.note && (
+        <TaskNote
+          label={
+            parent
+              ? t('taskCard.childNote', { name: operation.child.name })
+              : t('taskCard.yourNote')
+          }
+          note={operation.note}
+          tone="paid"
+        />
+      )}
       <InfoTiles tiles={tiles} />
       {!parent && goal && <WishProgress goal={goal} />}
     </TaskSheet>

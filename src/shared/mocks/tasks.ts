@@ -128,6 +128,8 @@ export const tasksMock = [
     expiresAt: at(4 * HOUR),
     doneAt: at(-5 * MINUTE),
     photo: require('./images/photo-report-room.jpg'),
+    // Комментарий Emma к сдаче: родитель видит его на проверке.
+    note: 'The hanger in the closet is broken, so I hung the jacket on the door hook.',
   },
   {
     id: 8,

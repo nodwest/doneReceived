@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ComponentProps } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import {
   SafeAreaView,
@@ -8,6 +8,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   DoneButton,
   TaskFooterAction,
+  useNoteDraft,
   useTaskActions,
 } from '@features/complete-task';
 import { BottomNav } from '@widgets/bottom-nav';
@@ -53,6 +54,15 @@ const authorOf = (task: Task, parentLabel: string) =>
   task.serverTaskId
     ? { name: task.authorName ?? parentLabel, avatar: null }
     : findAuthor(task.createdBy);
+
+/**
+ * Карточка ребёнка с полем комментария: черновик живёт в сторе, чтобы его
+ * отправила и I did it! из плитки списка.
+ */
+function MyTaskCard(props: Omit<ComponentProps<typeof ChildTaskCard>, 'note'>) {
+  const note = useNoteDraft(props.task.id);
+  return <ChildTaskCard {...props} note={note} />;
+}
 
 /**
  * Вкладка Tasks у ребёнка (Emma, временный режим ребёнка). Списком: сверху
@@ -178,7 +188,7 @@ export function MyTasksPage() {
               initialIndex={currentIndex}
               onIndexChange={(index) => setCurrentId(tasks[index].id)}
               renderTask={(task, style) => (
-                <ChildTaskCard
+                <MyTaskCard
                   task={task}
                   author={authorOf(task, t('member.parent'))}
                   rejectedBy={

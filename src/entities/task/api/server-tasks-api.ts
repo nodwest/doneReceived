@@ -88,6 +88,7 @@ function toTask(
     // Когда сдано, фото и отказ — в отчётах назначения (шаги 3–4).
     doneAt: null,
     photo: null,
+    note: null,
     rejection: null,
     checklist: (task.checklist ?? []).map((item) => ({
       id: item.id,
@@ -143,7 +144,7 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
 
 /**
  * Из отчётов назначения: у сданного — когда ребёнок нажал «I did it!»
- * (`doneAt`), у возвращённого на переделку (`rejected` с
+ * (`doneAt`) и его комментарий (`note`), у возвращённого на переделку (`rejected` с
  * `retryableRejection`, Идеи.md п. 15) — причина последнего отказа. Отчёты
  * спрашиваем только у таких назначений; не ответили — задание без них.
  */
@@ -173,6 +174,7 @@ async function withSubmissions(
   return {
     ...task,
     doneAt: pending?.submission.submittedAt ?? task.doneAt,
+    note: pending?.submission.note?.trim() || null,
     // Причина приходит словами («Не доделано. Кровать не заправлена»): она
     // целиком — комментарий.
     rejection:
@@ -263,13 +265,18 @@ export function cancelServerTask(familyId: string, serverTaskId: string) {
 
 /**
  * POST /families/:id/task-assignments/:assignmentId/submissions — ребёнок
- * отправляет отчёт («I did it!»), назначение уходит на проверку. Без фото и
- * заметки — пустое тело. 409 — уже на проверке, принято или срок истёк.
+ * отправляет отчёт («I did it!»), назначение уходит на проверку. Комментарий
+ * ребёнка — в `note`, пустой не отправляем; фото пока нет. 409 — уже на
+ * проверке, принято или срок истёк.
  */
-export function submitServerTask(familyId: string, assignmentId: string) {
+export function submitServerTask(
+  familyId: string,
+  assignmentId: string,
+  note?: string,
+) {
   return apiRequest<unknown>(
     `/families/${familyId}/task-assignments/${assignmentId}/submissions`,
-    { method: 'POST', body: {} },
+    { method: 'POST', body: note ? { note } : {} },
   );
 }
 
@@ -291,7 +298,13 @@ export function tickServerChecklist(
 }
 
 type SubmissionDto = {
-  submission: { id: string; submittedAt: string; withdrawnAt?: string | null };
+  submission: {
+    id: string;
+    submittedAt: string;
+    withdrawnAt?: string | null;
+    /** Комментарий ребёнка к сдаче. */
+    note?: string | null;
+  };
   review: {
     decision: 'approved' | 'rejected';
     reason: string | null;

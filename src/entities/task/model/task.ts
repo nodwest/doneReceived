@@ -32,6 +32,12 @@ export interface ChecklistItem {
 export const CHECKLIST_MAX_ITEMS = 20;
 export const CHECKLIST_ITEM_MAX_LENGTH = 120;
 
+/**
+ * Сколько символов в комментарии ребёнка к сдаче. Сервер принимает до 2000,
+ * но комментарий — пара фраз «чего не было в магазине».
+ */
+export const TASK_NOTE_MAX_LENGTH = 300;
+
 export interface TaskAssignee {
   /** id ребёнка: у моков — число строкой, с сервера — UUID профиля. */
   id: string;
@@ -76,6 +82,11 @@ export interface Task {
   doneAt: string | null;
   /** Фото-отчёт ребёнка; null — снимка нет. */
   photo: ImageSourcePropType | null;
+  /**
+   * Комментарий ребёнка к сданному заданию («в магазине не было масла»);
+   * null — без комментария или задание ещё не сдано.
+   */
+  note: string | null;
   /** Последний отказ родителя; null — задание не возвращали. */
   rejection: TaskRejection | null;
   /** Чеклист по порядку; пустой — задание без чеклиста. */

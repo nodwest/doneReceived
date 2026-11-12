@@ -20,3 +20,4 @@ export * from './ui/child-review-row';
 export * from './ui/child-task-card';
 export * from './ui/task-sheet';
 export * from './ui/task-checklist';
+export * from './ui/task-note';

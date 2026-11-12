@@ -383,6 +383,12 @@ export const ru: Dictionary = {
     optional: 'по желанию',
     yourPhoto: 'Твоё фото',
     childPhoto: 'Фото: {{name}}',
+    note: 'Комментарий',
+    notePlaceholder: 'Напиши комментарий…',
+    noteHint:
+      'Что-то не получилось — в магазине не было, сломалось? Напиши почему.',
+    yourNote: 'Твой комментарий',
+    childNote: 'Комментарий: {{name}}',
     taskFrom: 'Задание от',
     taskFor: 'Задание для',
     sentBack: '{{name}} вернул(а) на доработку',

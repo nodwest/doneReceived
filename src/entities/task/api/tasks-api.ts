@@ -88,7 +88,7 @@ export async function setTaskStatus(
   if (payload.serverTaskId) {
     if (!familyId) throw new Error('No family');
     if (payload.status === 'review') {
-      await submitServerTask(familyId, payload.id);
+      await submitServerTask(familyId, payload.id, payload.note);
     } else {
       await withdrawServerSubmission(familyId, payload.id);
     }
