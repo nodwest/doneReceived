@@ -184,7 +184,9 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                     // чужое задание только видит.
                     task.createdBy !== String(parentMock.id) ? (
                       <ViewOnlyNote
-                        author={findParentName(task.createdBy)}
+                        author={
+                          task.authorName ?? findParentName(task.createdBy)
+                        }
                         review={task.status === 'review'}
                       />
                     ) : task.status === 'review' ? (

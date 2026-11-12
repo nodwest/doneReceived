@@ -1,12 +1,27 @@
+import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Redirect, useRouter } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
+import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
 import { ProfileHeader } from '@widgets/profile-header';
-import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
+import {
+  useFamilyOperations,
+  useFamilyTasks,
+  useTaskFamilyId,
+} from '@features/family-tasks';
 import { useFamilyChildren } from '@entities/family';
-import { countChildTasks, TaskIconBadge, type Task } from '@entities/task';
-import { ChildTransactionRow, useChildWallet } from '@entities/wallet';
+import {
+  latestRewards,
+  OperationRow,
+  operationsInPeriod,
+  PeriodSelect,
+  sumTotals,
+  type Operation,
+  type SummaryPeriod,
+} from '@entities/operation';
+import { countChildTasks, type Task } from '@entities/task';
+import { useChildWallet } from '@entities/wallet';
 import { useWishlistProgress, WishRow } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { parentMock } from '@shared/mocks';
@@ -15,12 +30,14 @@ import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
 
 const NO_TASKS: Task[] = [];
+const NO_OPERATIONS: Operation[] = [];
 const RECENT_REWARDS = 3;
 
 /**
- * Профиль ребёнка семьи с сервера: имя (без фото — буква), баланс и
- * начисления из его кошелька, задания, вишлист. Статуса «дома», карты и
- * итогов за период с сервера пока нет — этих блоков нет.
+ * Профиль ребёнка семьи с сервера: имя (без фото — буква), баланс из его
+ * кошелька, задания, итоги и награды (из истории, собранной из кошелька и
+ * заданий), вишлист. Статуса «дома» и карты с сервера пока нет — этих блоков
+ * нет.
  */
 export function ServerChildProfile({ id }: { id: string }) {
   const { t } = useTranslation();
@@ -29,6 +46,10 @@ export function ServerChildProfile({ id }: { id: string }) {
   const { data: children, isPending } = useFamilyChildren(familyId);
   const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: wallet } = useChildWallet(id, familyId);
+  const { data: operations = NO_OPERATIONS } = useFamilyOperations();
+  // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
+  const [today] = useState(() => new Date());
+  const [period, setPeriod] = useState<SummaryPeriod>('week');
   const child = children?.find((item) => item.id === id);
   const wishlist = useWishlistProgress(
     { childId: id, familyId },
@@ -43,7 +64,17 @@ export function ServerChildProfile({ id }: { id: string }) {
 
   // Активные — все задания ребёнка, на проверке — только свои.
   const counts = countChildTasks(tasks, id, String(parentMock.id));
-  const rewards = (wallet?.transactions ?? []).slice(0, RECENT_REWARDS);
+  const childOperations = operations.filter(
+    (operation) => operation.child.id === id,
+  );
+  const totals = sumTotals(operationsInPeriod(childOperations, period, today));
+  const rewards = latestRewards(childOperations, RECENT_REWARDS);
+  // Тап по своей награде — её карточка в истории наград.
+  const openReward = (operation: Operation) =>
+    router.push({
+      pathname: '/rewards-history',
+      params: { operation: operation.id },
+    });
   const openTasks = (tab: 'all' | 'review') =>
     router.push({ pathname: '/child/[id]/tasks', params: { id, tab } });
 
@@ -67,6 +98,10 @@ export function ServerChildProfile({ id }: { id: string }) {
           tasksToReview={counts.review}
           onActiveTasksPress={() => openTasks('all')}
           onTasksToReviewPress={() => openTasks('review')}
+        />
+        <DaySummary
+          title={<PeriodSelect value={period} onChange={setPeriod} />}
+          {...totals}
         />
         <ScreenSection
           title={t('wishlist.title')}
@@ -99,18 +134,27 @@ export function ServerChildProfile({ id }: { id: string }) {
             />
           )}
         </ScreenSection>
-        <ScreenSection title={t('memberProfile.recentRewards')}>
+        <ScreenSection
+          title={t('memberProfile.recentRewards')}
+          actionLabel={t('common.seeAll')}
+          onAction={() =>
+            router.push({ pathname: '/rewards-history', params: { child: id } })
+          }
+        >
           {rewards.length === 0 ? (
             <Text style={styles.empty}>{t('memberProfile.noRewards')}</Text>
           ) : (
             <View style={styles.list}>
-              {rewards.map((transaction) => (
-                <ChildTransactionRow
-                  key={transaction.id}
-                  transaction={transaction}
-                  rewardIcon={<TaskIconBadge size={40} />}
-                  variant="card"
-                  caption="when"
+              {rewards.map((operation) => (
+                <OperationRow
+                  key={operation.id}
+                  {...operation}
+                  caption="day"
+                  onPress={
+                    operation.parentId === String(parentMock.id)
+                      ? () => openReward(operation)
+                      : undefined
+                  }
                 />
               ))}
             </View>

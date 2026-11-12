@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { formatClock, formatDayLabel } from '@shared/lib';
 import { formatAmount, type Operation } from '../model/operation';
+import { LetterAvatar } from '@shared/ui';
 import { styles } from './operation-row.styled';
 
 type OperationRowProps = Operation & {
@@ -54,7 +55,13 @@ export function OperationRow({
         pressed && styles.pressed,
       ]}
     >
-      {leading ?? <Image source={child.avatar} style={styles.avatar} />}
+      {leading ?? (
+        <LetterAvatar
+          source={child.avatar}
+          name={child.name}
+          style={styles.avatar}
+        />
+      )}
       <View style={styles.middle}>
         <Text style={styles.title} numberOfLines={1}>
           {title}

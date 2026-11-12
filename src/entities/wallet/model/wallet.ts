@@ -3,9 +3,11 @@ import { startOfDay } from '@shared/lib';
 
 /** Участник семьи в транзакции: ребёнок, получивший выплату, или родитель. */
 export interface TransactionPerson {
-  id: number;
+  /** У моков число строкой, с сервера — UUID. */
+  id: string;
   name: string;
-  avatar: ImageSourcePropType;
+  /** null — фото нет, буква имени. */
+  avatar: ImageSourcePropType | null;
 }
 
 interface TransactionBase {
@@ -20,7 +22,7 @@ interface TaskPayment {
   /** Название задания. */
   task: string;
   /** id награды в истории (Rewards history), по нему открывается карточка. */
-  operationId: number;
+  operationId: string;
   /** ISO-время, когда ребёнок отметил задание выполненным. */
   taskDoneAt: string | null;
 }
@@ -55,15 +57,10 @@ export interface Wallet {
 export interface RewardTransaction
   extends TransactionBase, Omit<TaskPayment, 'operationId'> {
   kind: 'reward';
-  /** id награды в истории; null — у наград с сервера истории пока нет. */
-  operationId: number | null;
-  /**
-   * Родитель, который дал и подтвердил задание. С сервера имени пока нет
-   * (пустое) и фото нет (null).
-   */
-  from: Omit<TransactionPerson, 'avatar'> & {
-    avatar: ImageSourcePropType | null;
-  };
+  /** id награды в истории; null — карточки в истории у неё нет. */
+  operationId: string | null;
+  /** Родитель, который дал и подтвердил задание; имя может быть пустым. */
+  from: TransactionPerson;
 }
 
 /** Вывод ребёнком денег на карту. */

@@ -6,15 +6,18 @@ import { WishlistPreview } from '@widgets/wishlist-preview';
 import {
   operationsInPeriod,
   sortByNewest,
-  useOperations,
   type Operation,
 } from '@entities/operation';
 import { TaskIconBadge } from '@entities/task';
-import { useMyChildWallet, useMyWishlistOwner } from '@features/family-tasks';
+import {
+  useChildAccount,
+  useFamilyOperations,
+  useMyChildWallet,
+  useMyWishlistOwner,
+} from '@features/family-tasks';
 import { ChildTransactionRow } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { childAccountMock } from '@shared/mocks';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { RewardsHistoryLink } from './rewards-history-link';
@@ -39,18 +42,18 @@ const RECENT_TRANSACTIONS = 4;
  */
 export function ChildWalletPage() {
   const { t } = useTranslation();
-  const { data: operations = NO_OPERATIONS } = useOperations();
+  const { data: operations = NO_OPERATIONS } = useFamilyOperations();
+  const { childId } = useChildAccount();
   const [today] = useState(() => new Date());
   const earned = useMemo(
     () =>
       sortByNewest(
         operations.filter(
           (operation) =>
-            operation.child.id === childAccountMock.id &&
-            operation.kind === 'earned',
+            operation.child.id === childId && operation.kind === 'earned',
         ),
       ),
-    [operations],
+    [operations, childId],
   );
   const weekEarned = operationsInPeriod(earned, 'week', today).reduce(
     (sum, operation) => sum + operation.amount,

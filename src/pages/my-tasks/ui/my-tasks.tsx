@@ -41,6 +41,16 @@ const findAuthor = (id: string) =>
   parentProfilesMock[0];
 
 /**
+ * Кто дал задание: у задания с сервера — имя из участников семьи (без фото,
+ * буква), а если ребёнку список закрыт — просто «Родитель»; у моковых —
+ * родитель из моков.
+ */
+const authorOf = (task: Task, parentLabel: string) =>
+  task.serverTaskId
+    ? { name: task.authorName ?? parentLabel, avatar: null }
+    : findAuthor(task.createdBy);
+
+/**
  * Вкладка Tasks у ребёнка (Emma, временный режим ребёнка). Списком: сверху
  * «You can earn» — сколько принесут активные задания и насколько приблизят
  * текущее желание, дальше разделы To do (плитки с I did it!) и On review
@@ -118,7 +128,7 @@ export function MyTasksPage() {
         <ChildReviewRow
           key={task.id}
           task={task}
-          author={findAuthor(task.createdBy)}
+          author={authorOf(task, t('member.parent'))}
           onPress={openCard}
         />
       ))}
@@ -164,7 +174,7 @@ export function MyTasksPage() {
               renderTask={(task, style) => (
                 <ChildTaskCard
                   task={task}
-                  author={findAuthor(task.createdBy)}
+                  author={authorOf(task, t('member.parent'))}
                   rejectedBy={
                     task.rejection ? findAuthor(task.rejection.by) : undefined
                   }
@@ -218,7 +228,7 @@ export function MyTasksPage() {
                         <ChildTaskTile
                           key={task.id}
                           task={task}
-                          author={findAuthor(task.createdBy)}
+                          author={authorOf(task, t('member.parent'))}
                           onPress={openCard}
                           action={<DoneButton task={task} />}
                         />

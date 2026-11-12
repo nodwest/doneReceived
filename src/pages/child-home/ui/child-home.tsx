@@ -38,6 +38,16 @@ const findAuthor = (id: string) =>
   parentProfilesMock.find((parent) => String(parent.id) === id) ??
   parentProfilesMock[0];
 
+/**
+ * Кто дал задание: у задания с сервера — имя из участников семьи (без фото,
+ * буква), а если ребёнку список закрыт — просто «Родитель»; у моковых —
+ * родитель из моков.
+ */
+const authorOf = (task: Task, parentLabel: string) =>
+  task.serverTaskId
+    ? { name: task.authorName ?? parentLabel, avatar: null }
+    : findAuthor(task.createdBy);
+
 /** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
 function greetingKey(hour: number) {
   if (hour >= 5 && hour < 12) return 'home.greetingMorning' as const;
@@ -113,7 +123,7 @@ export function ChildHomePage() {
                   renderTask={(task, style) => (
                     <ChildTaskTile
                       task={task}
-                      author={findAuthor(task.createdBy)}
+                      author={authorOf(task, t('member.parent'))}
                       onPress={openTask}
                       action={<DoneButton task={task} />}
                       style={style}

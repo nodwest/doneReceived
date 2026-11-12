@@ -48,7 +48,12 @@ const rewards = operationsMock
         : new Date(
             date.getTime() - operation.doneMinutesBefore * MINUTE,
           ).toISOString();
-    return { ...operation, at: date.toISOString(), doneAt };
+    return {
+      ...operation,
+      child: { ...operation.child, id: String(operation.child.id) },
+      at: date.toISOString(),
+      doneAt,
+    };
   });
 
 const byNewest = <T extends { at: string }>(items: T[]) =>
@@ -64,7 +69,7 @@ const payouts: PayoutTransaction[] = rewards
     at: reward.at,
     child: reward.child,
     task: reward.title,
-    operationId: reward.id,
+    operationId: String(reward.id),
     taskDoneAt: reward.doneAt,
   }));
 
@@ -80,7 +85,7 @@ let parentTransactions: Transaction[] = byNewest([
 function childTransactions(childId: number): ChildTransaction[] {
   return byNewest<ChildTransaction>([
     ...rewards
-      .filter((reward) => reward.child.id === childId)
+      .filter((reward) => reward.child.id === String(childId))
       .map((reward) => {
         const parent =
           parentProfilesMock.find((item) => item.id === reward.parentId) ??
@@ -90,9 +95,13 @@ function childTransactions(childId: number): ChildTransaction[] {
           kind: 'reward' as const,
           amount: reward.amount,
           at: reward.at,
-          from: { id: parent.id, name: parent.name, avatar: parent.avatar },
+          from: {
+            id: String(parent.id),
+            name: parent.name,
+            avatar: parent.avatar,
+          },
           task: reward.title,
-          operationId: reward.id,
+          operationId: String(reward.id),
           taskDoneAt: reward.doneAt,
         };
       }),
@@ -153,7 +162,7 @@ export const mockServer = {
     parentBalance -= payload.amount;
     parentTransactions = [
       {
-        id: payload.operationId,
+        id: Number(payload.operationId),
         kind: 'payout',
         amount: payload.amount,
         at: payload.at,
@@ -162,15 +171,19 @@ export const mockServer = {
       },
       ...parentTransactions,
     ];
-    const wallet = childWallet(payload.child.id);
+    const wallet = childWallet(Number(payload.child.id));
     wallet.balance += payload.amount;
     wallet.transactions = [
       {
-        id: payload.operationId,
+        id: Number(payload.operationId),
         kind: 'reward',
         amount: payload.amount,
         at: payload.at,
-        from: { id: parent.id, name: parent.name, avatar: parent.avatar },
+        from: {
+          id: String(parent.id),
+          name: parent.name,
+          avatar: parent.avatar,
+        },
         ...task,
       },
       ...wallet.transactions,

@@ -3,7 +3,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { DepositSheet } from '@features/deposit-funds';
-import { useCurrentFamily } from '@entities/family';
+import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { TransactionRow, useParentFunds, useWallet } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { childProfilesMock } from '@shared/mocks';
@@ -36,6 +36,8 @@ export function WalletPage() {
   const { data: wallet } = useWallet();
   const familyId = useCurrentFamily()?.id ?? null;
   const { data: funds } = useParentFunds(familyId);
+  // Балансы детей: моковые Emma и Liam и дети семьи с сервера.
+  const { data: serverChildren = [] } = useFamilyChildren(familyId);
   const [depositOpen, setDepositOpen] = useState(false);
   const transactions = wallet?.transactions.slice(0, RECENT_TRANSACTIONS) ?? [];
 
@@ -51,9 +53,18 @@ export function WalletPage() {
           {childProfilesMock.map((child) => (
             <ChildBalance
               key={child.id}
-              childId={child.id}
+              childId={String(child.id)}
               name={child.name}
               avatar={child.avatar}
+            />
+          ))}
+          {serverChildren.map((child) => (
+            <ChildBalance
+              key={child.id}
+              childId={child.id}
+              familyId={familyId}
+              name={child.displayName}
+              avatar={child.avatarUrl ? { uri: child.avatarUrl } : null}
             />
           ))}
         </View>

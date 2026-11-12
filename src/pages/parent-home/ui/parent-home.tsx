@@ -7,10 +7,10 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
-import { useFamilyTasks } from '@features/family-tasks';
+import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { ActivityItem } from '@entities/activity';
-import { sumTotals, useOperations } from '@entities/operation';
+import { sumTotals } from '@entities/operation';
 import { useMe, useMyAvatar } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
@@ -45,11 +45,13 @@ export function ParentHomePage() {
     tasks && countTasks(tasks, { createdBy: String(parentMock.id) });
   // Выплачено вошедшим родителем за всё время — из истории наград: после
   // подтверждения задания сумма растёт.
-  const { data: operations } = useOperations();
+  const { data: operations } = useFamilyOperations();
   const rewardsPaid =
     operations &&
     sumTotals(
-      operations.filter((operation) => operation.parentId === parentMock.id),
+      operations.filter(
+        (operation) => operation.parentId === String(parentMock.id),
+      ),
     ).earned;
   // Дети: моковые Emma и Liam и дети семьи с сервера (созданные через
   // Add a child). Статуса «дома» у настоящих пока нет.

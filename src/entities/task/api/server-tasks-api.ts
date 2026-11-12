@@ -27,6 +27,8 @@ type AssignmentDto = {
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
 
+type MemberDto = { userId: string; displayName: string };
+
 /** Статус назначения → статус задачи в приложении. */
 const STATES: Record<AssignmentDto['status'], TaskState> = {
   assigned: 'active',
@@ -53,6 +55,7 @@ function toTask(
   task: TaskDto,
   assignment: AssignmentDto,
   children: readonly ChildDto[],
+  members: readonly MemberDto[],
   viewer: TaskViewer,
 ): Task {
   const child = children.find((item) => item.id === assignment.childId);
@@ -70,6 +73,8 @@ function toTask(
     },
     createdBy:
       task.createdBy === viewer.userId ? viewer.ownAuthor : task.createdBy,
+    authorName: members.find((member) => member.userId === task.createdBy)
+      ?.displayName,
     createdAt: task.createdAt,
     expiresAt: task.deadlineAt,
     // Когда сдано, фото и отказ — в отчётах назначения (шаги 3–4).
@@ -88,24 +93,87 @@ function toTask(
  */
 export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
   const { familyId } = viewer;
-  const [items, children] = await Promise.all([
+  // Ребёнку списки детей и участников закрыты (403) — не спрашиваем.
+  const parent = viewer.childName === undefined;
+  const [items, children, members] = await Promise.all([
     apiRequest<{ task: TaskDto; assignment: AssignmentDto }[]>(
       `/families/${familyId}/tasks`,
     ),
-    viewer.childName !== undefined
-      ? ([] as ChildDto[])
-      : apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
+    parent
+      ? apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
           () => [] as ChildDto[],
-        ),
+        )
+      : ([] as ChildDto[]),
+    parent
+      ? apiRequest<MemberDto[]>(`/families/${familyId}/members`).catch(
+          () => [] as MemberDto[],
+        )
+      : ([] as MemberDto[]),
   ]);
-  return items
+  const tasks = items
     .filter(
       ({ task, assignment }) =>
         task.cancelledAt === null &&
         assignment.status !== 'approved' &&
         !(assignment.status === 'rejected' && !assignment.retryableRejection),
     )
-    .map(({ task, assignment }) => toTask(task, assignment, children, viewer));
+    .map(({ task, assignment }) => ({
+      task: toTask(task, assignment, children, members, viewer),
+      assignment,
+    }));
+  return Promise.all(
+    tasks.map(({ task, assignment }) =>
+      withSubmissions(task, assignment, viewer),
+    ),
+  );
+}
+
+/**
+ * Из отчётов назначения: у сданного — когда ребёнок нажал «I did it!»
+ * (`doneAt`), у возвращённого на переделку (`rejected` с
+ * `retryableRejection`, Идеи.md п. 15) — причина последнего отказа. Отчёты
+ * спрашиваем только у таких назначений; не ответили — задание без них.
+ */
+async function withSubmissions(
+  task: Task,
+  assignment: AssignmentDto,
+  viewer: TaskViewer,
+): Promise<Task> {
+  const sentBack =
+    assignment.status === 'rejected' && assignment.retryableRejection;
+  if (assignment.status !== 'submitted' && !sentBack) return task;
+  const submissions = await apiRequest<SubmissionDto[]>(
+    `/families/${viewer.familyId}/task-assignments/${assignment.id}/submissions`,
+  ).catch(() => [] as SubmissionDto[]);
+  const latest = (list: SubmissionDto[]) =>
+    [...list].sort((a, b) =>
+      b.submission.submittedAt.localeCompare(a.submission.submittedAt),
+    )[0];
+  const pending = latest(
+    submissions.filter(
+      ({ submission, review }) => review === null && !submission.withdrawnAt,
+    ),
+  );
+  const rejected = latest(
+    submissions.filter(({ review }) => review?.decision === 'rejected'),
+  );
+  return {
+    ...task,
+    doneAt: pending?.submission.submittedAt ?? task.doneAt,
+    // Причина приходит словами («Не доделано. Кровать не заправлена»): она
+    // целиком — комментарий.
+    rejection:
+      sentBack && rejected?.review
+        ? {
+            reason: 'other',
+            comment: rejected.review.reason ?? '',
+            by:
+              rejected.review.reviewedBy === viewer.userId
+                ? viewer.ownAuthor
+                : rejected.review.reviewedBy,
+          }
+        : task.rejection,
+  };
 }
 
 const toBody = (payload: CreateTaskPayload) => ({
@@ -173,8 +241,13 @@ export function submitServerTask(familyId: string, assignmentId: string) {
 }
 
 type SubmissionDto = {
-  submission: { id: string; withdrawnAt?: string | null };
-  review: unknown | null;
+  submission: { id: string; submittedAt: string; withdrawnAt?: string | null };
+  review: {
+    decision: 'approved' | 'rejected';
+    reason: string | null;
+    reviewedBy: string;
+    reviewedAt: string;
+  } | null;
 };
 
 /**

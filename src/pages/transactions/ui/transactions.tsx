@@ -220,10 +220,10 @@ function TransactionsScreen<
 }
 
 // Карточка задания, за которое деньги: открывается в истории наград.
-const openTask = (operationId: number) =>
+const openTask = (operationId: string) =>
   router.push({
     pathname: '/rewards-history',
-    params: { operation: String(operationId) },
+    params: { operation: operationId },
   });
 
 type ParentFilter = 'all' | Transaction['kind'];
@@ -347,7 +347,7 @@ export function ChildTransactionsPage() {
           weekEarned={weekEarned}
           onOpenTask={
             transaction.kind === 'reward' && transaction.operationId !== null
-              ? () => openTask(transaction.operationId as number)
+              ? () => openTask(transaction.operationId as string)
               : undefined
           }
           style={style}

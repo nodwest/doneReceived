@@ -57,7 +57,7 @@ export function useReviewTask() {
         description: task.description,
         amount: task.reward,
         child: {
-          id: Number(assignee.id),
+          id: assignee.id,
           name: assignee.name,
           avatar: assignee.avatar,
         },

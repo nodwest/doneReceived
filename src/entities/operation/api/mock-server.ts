@@ -24,11 +24,18 @@ let operations: Operation[] = operationsMock.map(
       doneMinutesBefore === null
         ? null
         : new Date(at.getTime() - doneMinutesBefore * MINUTE).toISOString();
-    return { ...operation, at: at.toISOString(), doneAt };
+    return {
+      ...operation,
+      id: String(operation.id),
+      child: { ...operation.child, id: String(operation.child.id) },
+      parentId: String(operation.parentId),
+      at: at.toISOString(),
+      doneAt,
+    };
   },
 );
 
-let nextId = Math.max(...operations.map((operation) => operation.id)) + 1;
+let nextId = Math.max(...operationsMock.map((operation) => operation.id)) + 1;
 
 export const mockServer = {
   // Копия, как после сериализации ответа: снаружи данные «сервера» не изменить.
@@ -37,14 +44,14 @@ export const mockServer = {
   // Родитель подтвердил задание: награда начислена сейчас, от его имени.
   addReward: (payload: RewardPayload): Operation => {
     const operation: Operation = {
-      id: nextId++,
+      id: String(nextId++),
       kind: 'earned',
       title: payload.title,
       description: payload.description,
       amount: payload.amount,
       child: payload.child,
       // С API сервер берёт родителя из сессии.
-      parentId: parentMock.id,
+      parentId: String(parentMock.id),
       at: new Date().toISOString(),
       doneAt: payload.doneAt,
       photo: payload.photo,

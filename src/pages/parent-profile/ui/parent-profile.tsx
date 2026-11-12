@@ -11,14 +11,13 @@ import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
-import { useFamilyTasks } from '@features/family-tasks';
+import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
 import {
   latestRewards,
   OperationRow,
   operationsInPeriod,
   PeriodSelect,
   sumTotals,
-  useOperations,
   type Operation,
   type SummaryPeriod,
 } from '@entities/operation';
@@ -50,7 +49,7 @@ export function ParentProfilePage() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: tasks = NO_TASKS } = useFamilyTasks();
-  const { data: operations = NO_OPERATIONS } = useOperations();
+  const { data: operations = NO_OPERATIONS } = useFamilyOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
   const [today] = useState(() => new Date());
   const [period, setPeriod] = useState<SummaryPeriod>('week');
@@ -62,7 +61,7 @@ export function ParentProfilePage() {
 
   const counts = countTasks(tasks, { createdBy: String(parent.id) });
   const parentOperations = operations.filter(
-    (operation) => operation.parentId === parent.id,
+    (operation) => operation.parentId === String(parent.id),
   );
   const totals = sumTotals(operationsInPeriod(parentOperations, period, today));
   const rewards = latestRewards(parentOperations, RECENT_REWARDS);

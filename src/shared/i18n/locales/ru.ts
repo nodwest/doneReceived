@@ -85,6 +85,16 @@ export const ru: Dictionary = {
     active_other: 'активного',
     toReview: 'на проверке',
     childProfile: 'Профиль ребёнка',
+    parent: 'Родитель',
+  },
+  transferOwnership: {
+    button: 'Сделать владельцем',
+    title: 'Сделать {{name}} владельцем?',
+    subtitle:
+      '{{name}} будет управлять семьёй. Вы останетесь в семье родителем.',
+    confirm: 'Передать',
+    doneToast: 'Теперь владелец семьи — {{name}}',
+    failed: 'Не получилось передать семью. Попробуйте ещё раз.',
   },
   presence: {
     atHome: 'Дома',
@@ -92,6 +102,11 @@ export const ru: Dictionary = {
     home: 'Дом',
   },
   family: {
+    role: {
+      owner: 'Владелец семьи',
+      admin: 'Родитель',
+      member: 'Ребёнок',
+    },
     title: 'Семья',
     parents_one: '{{count}} родитель',
     parents_few: '{{count}} родителя',

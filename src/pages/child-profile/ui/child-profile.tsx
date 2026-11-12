@@ -11,14 +11,13 @@ import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
-import { useFamilyTasks } from '@features/family-tasks';
+import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
 import {
   latestRewards,
   OperationRow,
   operationsInPeriod,
   PeriodSelect,
   sumTotals,
-  useOperations,
   type Operation,
   type SummaryPeriod,
 } from '@entities/operation';
@@ -64,7 +63,7 @@ function MockChildProfile({ id }: { id: string }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { data: tasks = NO_TASKS } = useFamilyTasks();
-  const { data: operations = NO_OPERATIONS } = useOperations();
+  const { data: operations = NO_OPERATIONS } = useFamilyOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
   const [today] = useState(() => new Date());
   const [period, setPeriod] = useState<SummaryPeriod>('week');
@@ -87,7 +86,7 @@ function MockChildProfile({ id }: { id: string }) {
     String(parentMock.id),
   );
   const childOperations = operations.filter(
-    (operation) => operation.child.id === child.id,
+    (operation) => operation.child.id === String(child.id),
   );
   const totals = sumTotals(operationsInPeriod(childOperations, period, today));
   const rewards = latestRewards(childOperations, RECENT_REWARDS);
@@ -182,7 +181,7 @@ function MockChildProfile({ id }: { id: string }) {
                   {...operation}
                   caption="day"
                   onPress={
-                    operation.parentId === parentMock.id
+                    operation.parentId === String(parentMock.id)
                       ? () => openReward(operation)
                       : undefined
                   }

@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -10,16 +9,19 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
+import { LetterAvatar } from '@shared/ui';
 import { styles } from './children-filter.styled';
 
 type FilterChild = {
-  id: number;
+  /** У моков число строкой, с сервера — UUID. */
+  id: string;
   name: string;
-  avatar: ImageSourcePropType;
+  /** null — фото нет, буква имени. */
+  avatar: ImageSourcePropType | null;
 };
 
 /** 'all' — все дети, иначе id ребёнка. */
-export type ChildFilterValue = 'all' | number;
+export type ChildFilterValue = 'all' | string;
 
 type ChildrenFilterProps = {
   items: FilterChild[];
@@ -43,9 +45,10 @@ export function ChildrenFilter({
       >
         <View style={styles.stack}>
           {items.map((child, index) => (
-            <Image
+            <LetterAvatar
               key={child.id}
               source={child.avatar}
+              name={child.name}
               style={[
                 styles.avatar,
                 styles.stacked,
@@ -62,7 +65,11 @@ export function ChildrenFilter({
           active={value === child.id}
           onPress={() => onChange(child.id)}
         >
-          <Image source={child.avatar} style={styles.avatar} />
+          <LetterAvatar
+            source={child.avatar}
+            name={child.name}
+            style={styles.avatar}
+          />
         </Segment>
       ))}
     </View>

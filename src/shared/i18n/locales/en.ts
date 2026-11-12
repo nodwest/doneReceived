@@ -84,6 +84,16 @@ export const en = {
     active_other: 'active',
     toReview: 'to review',
     childProfile: 'Child profile',
+    parent: 'Parent',
+  },
+  transferOwnership: {
+    button: 'Make owner',
+    title: 'Make {{name}} the owner?',
+    subtitle:
+      "{{name}} will manage the family. You'll stay in the family as a parent.",
+    confirm: 'Make owner',
+    doneToast: '{{name}} is now the family owner',
+    failed: "Couldn't transfer the family. Please try again.",
   },
   presence: {
     atHome: 'At home',
@@ -91,6 +101,11 @@ export const en = {
     home: 'Home',
   },
   family: {
+    role: {
+      owner: 'Family owner',
+      admin: 'Parent',
+      member: 'Child',
+    },
     title: 'Family',
     parents_one: '{{count}} parent',
     parents_other: '{{count}} parents',

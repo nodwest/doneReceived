@@ -14,11 +14,19 @@ import {
   getHistoryDays,
   isSameDay,
   OperationRow,
-  useOperations,
   type Operation,
 } from '@entities/operation';
+import {
+  useChildAccount,
+  useFamilyOperations,
+  useMyChildWallet,
+  useMyWishlistOwner,
+  useTaskFamilyId,
+} from '@features/family-tasks';
+import { useFamilyChildren } from '@entities/family';
+import { useMe, useMyAvatar } from '@entities/session';
 import { TaskIconBadge } from '@entities/task';
-import { balanceAfter, useChildWallet } from '@entities/wallet';
+import { balanceAfter } from '@entities/wallet';
 import { getRewardGoal, useWishes } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { formatMonthDay } from '@shared/lib';
@@ -34,11 +42,6 @@ import { styles } from './rewards-history.styled';
 
 const NO_OPERATIONS: Operation[] = [];
 
-// Кто дал и подтвердил задание; неизвестный — первый родитель.
-const findApprover = (id: number) =>
-  parentProfilesMock.find((parent) => parent.id === id) ??
-  parentProfilesMock[0];
-
 /**
  * История наград по дням (открывается из Wallet и «See all» в профилях):
  * заработанные и упущенные награды на графике, итоги и награды выбранного дня.
@@ -49,37 +52,65 @@ const findApprover = (id: number) =>
  * его лица: без фильтра по детям, в голубых тонах, в строках вместо аватара
  * значок задания, в карточке — на сколько награда приблизила желание.
  */
-export function RewardsHistoryPage({ childId }: { childId?: number }) {
+export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const { t } = useTranslation();
-  const { data: allOperations = NO_OPERATIONS, isPending } = useOperations();
+  const { data: allOperations = NO_OPERATIONS, isPending } =
+    useFamilyOperations();
+  // Кто дал и подтвердил задание: вошедший родитель — из его профиля, моковые
+  // — из моков, остальные с сервера (их имён у ребёнка нет) — «Родитель».
+  const me = useMe();
+  const myAvatar = useMyAvatar();
+  const findApprover = (id: string) => {
+    if (me?.kind !== 'child' && id === String(parentMock.id) && me) {
+      return { name: me.displayName, avatar: myAvatar };
+    }
+    return (
+      parentProfilesMock.find((parent) => String(parent.id) === id) ?? {
+        name: t('member.parent'),
+        avatar: null,
+      }
+    );
+  };
+  // Фильтр по детям: моковые Emma и Liam и дети семьи с сервера.
+  const { data: serverChildren } = useFamilyChildren(useTaskFamilyId());
+  const filterChildren = useMemo(
+    () => [
+      ...childrenMock.map((child) => ({
+        id: String(child.id),
+        name: child.name,
+        avatar: child.avatar,
+      })),
+      ...(serverChildren ?? []).map((child) => ({
+        id: child.id,
+        name: child.displayName,
+        avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+      })),
+    ],
+    [serverChildren],
+  );
   // Родитель видит награды только по своим заданиям — те, что выплатил из
   // своего кошелька; ребёнок — все свои награды, от любого родителя.
   const operations = useMemo(
     () =>
       childId === undefined
         ? allOperations.filter(
-            (operation) => operation.parentId === parentMock.id,
+            (operation) => operation.parentId === String(parentMock.id),
           )
         : allOperations,
     [allOperations, childId],
   );
-  const { data: wishes } = useWishes({
-    childId: String(childId ?? childAccountMock.id),
-    familyId: null,
-  });
-  const { data: childWallet } = useChildWallet(
-    String(childId ?? childAccountMock.id),
-  );
+  // Копилка — только в истории от лица ребёнка: его вишлист и кошелёк.
+  const { data: wishes } = useWishes(useMyWishlistOwner());
+  const { data: childWallet } = useMyChildWallet();
   // Сегодня фиксируем на время жизни экрана: от него строится лента дней.
   const [today] = useState(() => new Date());
   // «See all» в профиле ребёнка открывает историю сразу с его фильтром;
   // operation — сразу карточку этой награды (из карточки транзакции).
   const { child: childParam, operation: operationParam } =
     useLocalSearchParams<{ child?: string; operation?: string }>();
+  // Дети с сервера могут ещё грузиться — берём id из ссылки как есть.
   const [selectedChild, setFilter] = useState<ChildFilterValue>(
-    () =>
-      childrenMock.find((child) => String(child.id) === childParam)?.id ??
-      'all',
+    () => childParam ?? 'all',
   );
   const filter = childId ?? selectedChild;
   // null — день не выбран, стоим на сегодняшнем (последнем).
@@ -228,7 +259,7 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
           {childId === undefined ? (
             <View style={styles.filter}>
               <ChildrenFilter
-                items={childrenMock}
+                items={filterChildren}
                 value={filter}
                 onChange={setFilter}
               />
@@ -285,7 +316,13 @@ export function RewardsHistoryPage({ childId }: { childId?: number }) {
   );
 }
 
-/** История наград ребёнка от его лица (Emma, временный режим ребёнка). */
-export const ChildRewardsHistoryPage = () => (
-  <RewardsHistoryPage childId={childAccountMock.id} />
-);
+/**
+ * История наград ребёнка от его лица: вошедший ребёнок — его профиль с
+ * сервера, родитель в режиме ребёнка — Emma.
+ */
+export function ChildRewardsHistoryPage() {
+  const { childId } = useChildAccount();
+  return (
+    <RewardsHistoryPage childId={childId ?? String(childAccountMock.id)} />
+  );
+}

@@ -25,8 +25,8 @@ type TaskItemDto = {
  * GET /families/:id/children/:childId/wallet — родитель видит кошелёк
  * ребёнка своей семьи, ребёнок — свой. Начисления становятся наградами
  * (`reward`): название задания — из GET /families/:id/tasks по назначению.
- * Кто дал задание, пока не знаем (имя пустое), истории наград у них нет,
- * выводов на карту на сервере нет.
+ * Кто дал задание, пока не знаем (имя пустое); выводов на карту на сервере
+ * нет.
  */
 export async function fetchServerChildWallet(
   familyId: string,
@@ -51,9 +51,10 @@ export async function fetchServerChildWallet(
       amount: entry.points,
       at: entry.createdAt,
       task: titles.get(entry.assignmentId) ?? '—',
-      operationId: null,
+      // Та же награда в истории (Rewards history) — с тем же id.
+      operationId: entry.id,
       taskDoneAt: null,
-      from: { id: 0, name: '', avatar: null },
+      from: { id: '', name: '', avatar: null },
     }))
     .sort((a, b) => b.at.localeCompare(a.at));
   return { balance: Number(wallet.balancePoints), transactions };

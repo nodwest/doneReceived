@@ -3,7 +3,8 @@ import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   card: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: '40%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
