@@ -33,6 +33,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Проверка типов: `npx tsc --noEmit` (strict; `canvases/` и `obsidian-done/` исключены в `tsconfig.json`).
 - Проверка архитектуры FSD: `npm run lint:fsd` (Steiger, конфиг в `steiger.config.ts`). Запускайте после изменений структуры `src/`.
 
+## Навыки агента
+
+В `.claude/skills/` лежат навыки Claude Code для этого репозитория. Агент видит их названия и описания и подгружает полный текст, только когда задача подходит. Правила этого файла важнее навыков. Подробности, источники и коммиты — в `.claude/skills/README.md`.
+
+- **Свои `dr-*`** — чек-листы для изменений:
+  - `dr-client-state` — запросы, мутации, кэш, хранилища, сессия;
+  - `dr-i18n-accessibility` — тексты, переводы, доступность;
+  - `dr-mobile-api-security` — вход, токены, коды, разрешения, логи;
+  - `dr-expo-testing` — тесты и проверка готового интерфейса.
+
+  Подробные правила по этим темам остаются здесь, в `CLAUDE.md`, а навыки ссылаются на них.
+
+- **Готовые** — копии с зафиксированных коммитов: `expo-router`, `expo-data-fetching`, `expo-design-system`, `expo-animation`, `expo-upgrade`, `vercel-react-native-skills`, `security-best-practices`.
+  - У навыков Expo убран раздел, который велит агенту самому слать отзывы в Expo.
+  - Prettier их не проверяет (`.prettierignore`).
+  - `expo-native-ui` не установлен: он противоречит правилам стилей и dev-build.
+
 ## Архитектура
 
 **Структура Feature-Sliced Design в `src/`**, алиасы заданы в tsconfig через `baseUrl: "src"`: `@app/*`, `@pages/*`, `@widgets/*`, `@features/*`, `@entities/*`, `@shared/*`. Слой может импортировать только слои ниже себя (`app` → `pages` → `widgets` → `features` → `entities` → `shared`), внутри слайса используйте относительные пути, а между слайсами — только публичный API (`index.ts`).

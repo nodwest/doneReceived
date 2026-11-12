@@ -4,3 +4,8 @@ dist
 obsidian-done
 canvases
 package-lock.json
+
+# Готовые навыки агента — копии из внешних репозиториев, форматируются их авторами
+.claude/skills/expo-*/
+.claude/skills/vercel-react-native-skills/
+.claude/skills/security-best-practices/
