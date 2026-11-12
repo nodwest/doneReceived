@@ -12,11 +12,11 @@ import {
   InfoTiles,
   PhotoSection,
   ReviewPill,
-  StatusSteps,
   TaskBrief,
   TaskSheet,
   TimerPill,
 } from './task-sheet';
+import { TaskChecklist } from './task-checklist';
 
 type TaskCardProps = {
   task: Task;
@@ -27,8 +27,9 @@ type TaskCardProps = {
 
 /**
  * Крупная карточка задания у родителя. Активная — фиолетовая: кому задание,
- * таймер, описание с наградой, срок и когда создано, шаги статуса. На
- * проверке — оранжевая: когда ребёнок закончил, его фото и описание.
+ * таймер, описание с наградой, чеклист с отметками ребёнка, срок и когда
+ * создано. На проверке — оранжевая: когда ребёнок закончил, его фото,
+ * описание и что он отметил в чеклисте.
  */
 export function TaskCard({ task, footer, style }: TaskCardProps) {
   const { t } = useTranslation();
@@ -36,6 +37,21 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
   const created = new Date(task.createdAt);
   const expires = task.expiresAt ? new Date(task.expiresAt) : null;
   const done = task.doneAt ? new Date(task.doneAt) : null;
+  const checklist = task.checklist.length > 0 && (
+    <TaskChecklist
+      label={t('taskCard.checklist')}
+      items={task.checklist}
+      progress={t('taskCard.checklistProgressDone', {
+        done: task.checklist.filter((item) => item.done).length,
+        total: task.checklist.length,
+      })}
+      hint={
+        task.status === 'active'
+          ? t('taskCard.checklistParentHint', { name: task.assignee.name })
+          : undefined
+      }
+    />
+  );
 
   if (task.status === 'review') {
     return (
@@ -64,6 +80,7 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
           reward={task.reward}
           description={task.description}
         />
+        {checklist}
       </TaskSheet>
     );
   }
@@ -84,6 +101,7 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
         reward={task.reward}
         description={task.description}
       />
+      {checklist}
       <InfoTiles
         tiles={[
           {
@@ -103,11 +121,6 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
             value: formatClock(created),
           },
         ]}
-      />
-      <StatusSteps
-        label={t('taskCard.status')}
-        steps={[t('tasks.active'), t('tasks.onReview'), t('taskCard.paid')]}
-        current={0}
       />
     </TaskSheet>
   );

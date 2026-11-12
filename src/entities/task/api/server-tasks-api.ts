@@ -1,6 +1,10 @@
 import { apiRequest } from '@shared/api';
 import type { Task, TaskState } from '../model/task';
-import type { CreateTaskPayload, UpdateTaskPayload } from '../model/types';
+import type {
+  ChecklistStepPayload,
+  CreateTaskPayload,
+  UpdateTaskPayload,
+} from '../model/types';
 
 // Настоящие задания: детям семьи с сервера. Задание (task) на сервере
 // назначается детям (assignment); в приложении одна задача — одно
@@ -15,6 +19,8 @@ type TaskDto = {
   rewardPoints: number;
   createdAt: string;
   cancelledAt: string | null;
+  /** Шаги чеклиста по порядку (Идеи.md п. 26); пока сервер их не отдаёт. */
+  checklist?: { id: string; title: string }[];
 };
 
 type AssignmentDto = {
@@ -23,6 +29,8 @@ type AssignmentDto = {
   status: 'assigned' | 'submitted' | 'rejected' | 'approved';
   /** После отказа можно переделать; false — отказ закрыл назначение. */
   retryableRejection: boolean;
+  /** Шаги чеклиста, которые ребёнок отметил (Идеи.md п. 26). */
+  checkedItemIds?: string[];
 };
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
@@ -81,6 +89,11 @@ function toTask(
     doneAt: null,
     photo: null,
     rejection: null,
+    checklist: (task.checklist ?? []).map((item) => ({
+      id: item.id,
+      title: item.title,
+      done: assignment.checkedItemIds?.includes(item.id) ?? false,
+    })),
   };
 }
 
@@ -184,6 +197,21 @@ const toBody = (payload: CreateTaskPayload) => ({
 });
 
 /**
+ * Чеклист для тела запроса. Пока сервер его не принимает (Идеи.md п. 26),
+ * пустой не отправляем, чтобы задания без чеклиста создавались и правились
+ * как раньше. Когда сервер научится, при правке отправлять всегда: `[]`
+ * убирает чеклист.
+ */
+const checklistBody = (checklist: readonly ChecklistStepPayload[]) =>
+  checklist.length > 0
+    ? {
+        checklist: checklist.map(({ id, title }) =>
+          id ? { id, title } : { title },
+        ),
+      }
+    : {};
+
+/**
  * POST /families/:id/tasks — задание ребёнку; награда резервируется в
  * кошельке автора. 409 — не хватает денег на резерв.
  */
@@ -196,6 +224,7 @@ export function createServerTask(familyId: string, payload: CreateTaskPayload) {
       // Пустые необязательные поля не отправляем: сервер ждёт их отсутствия.
       ...(description ? { description } : {}),
       ...(deadlineAt ? { deadlineAt } : {}),
+      ...checklistBody(payload.checklist),
       childIds: [payload.assigneeId],
     },
   });
@@ -213,7 +242,11 @@ export function updateServerTask(familyId: string, payload: UpdateTaskPayload) {
     `/families/${familyId}/tasks/${payload.serverTaskId}`,
     {
       method: 'PATCH',
-      body: { ...body, description: body.description || null },
+      body: {
+        ...body,
+        description: body.description || null,
+        ...checklistBody(payload.checklist),
+      },
     },
   );
 }
@@ -237,6 +270,23 @@ export function submitServerTask(familyId: string, assignmentId: string) {
   return apiRequest<unknown>(
     `/families/${familyId}/task-assignments/${assignmentId}/submissions`,
     { method: 'POST', body: {} },
+  );
+}
+
+/**
+ * PUT /families/:id/task-assignments/:assignmentId/checklist/:itemId —
+ * ребёнок отмечает шаг чеклиста (`done: true`) или снимает отметку
+ * (Идеи.md п. 26). 409 — задание уже на проверке, принято или отменено.
+ */
+export function tickServerChecklist(
+  familyId: string,
+  assignmentId: string,
+  itemId: string,
+  done: boolean,
+) {
+  return apiRequest<unknown>(
+    `/families/${familyId}/task-assignments/${assignmentId}/checklist/${itemId}`,
+    { method: 'PUT', body: { done } },
   );
 }
 

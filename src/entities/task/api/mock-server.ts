@@ -1,6 +1,8 @@
 import { childrenMock, parentMock, tasksMock } from '@shared/mocks';
-import type { Task, TaskAssignee } from '../model/task';
+import type { ChecklistItem, Task, TaskAssignee } from '../model/task';
 import type {
+  ChecklistStepPayload,
+  ChecklistTickPayload,
   CreateTaskPayload,
   RejectTaskPayload,
   TaskStatusPayload,
@@ -25,8 +27,26 @@ let tasks: Task[] = tasksMock.map((task) => ({
   createdBy: String(task.createdBy),
   assignee: toAssignee(task.assignee),
   rejection: null,
+  checklist:
+    'checklist' in task ? task.checklist.map((item) => ({ ...item })) : [],
 }));
 let nextId = Math.max(...tasksMock.map((task) => task.id)) + 1;
+let nextChecklistId = 1;
+
+/**
+ * Шаги из формы: сохранённые (с id) оставляют отметку ребёнка, новые
+ * получают id и приходят неотмеченными, убранные пропадают.
+ */
+function toChecklist(
+  steps: readonly ChecklistStepPayload[],
+  current: readonly ChecklistItem[] = [],
+): ChecklistItem[] {
+  return steps.map((step) => ({
+    id: step.id ?? `c${nextChecklistId++}`,
+    title: step.title,
+    done: current.find((item) => item.id === step.id)?.done ?? false,
+  }));
+}
 
 function findAssignee(id: string) {
   const assignee = childrenMock.find((child) => String(child.id) === id);
@@ -58,6 +78,7 @@ export const mockServer = {
       doneAt: null,
       photo: null,
       rejection: null,
+      checklist: toChecklist(payload.checklist),
     };
     tasks = [task, ...tasks];
     return { ...task };
@@ -73,6 +94,21 @@ export const mockServer = {
       reward: payload.reward,
       expiresAt: payload.expiresAt,
       assignee: findAssignee(payload.assigneeId),
+      checklist: toChecklist(payload.checklist, current.checklist),
+    };
+    tasks = tasks.map((task) => (task.id === id ? updated : task));
+    return { ...updated };
+  },
+
+  /** Ребёнок отметил шаг чеклиста или снял отметку (только у активного). */
+  tickChecklist: ({ id, itemId, done }: ChecklistTickPayload): Task => {
+    const current = mockServer.find(id);
+    if (current.status !== 'active') throw new Error(`Task ${id} not active`);
+    const updated: Task = {
+      ...current,
+      checklist: current.checklist.map((item) =>
+        item.id === itemId ? { ...item, done } : item,
+      ),
     };
     tasks = tasks.map((task) => (task.id === id ? updated : task));
     return { ...updated };

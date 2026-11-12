@@ -1,8 +1,9 @@
-import type { Task } from '@entities/task';
+import type { ChecklistItem, Task } from '@entities/task';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { useSetTaskStatus } from './use-set-task-status';
+import { useTickChecklistItem } from './use-tick-checklist-item';
 
 /** Ключ ошибки: `completeTask.errors.*`. */
 function actionError(error: unknown) {
@@ -15,16 +16,19 @@ function actionError(error: unknown) {
   if (code === 'SUBMISSION_ALREADY_REVIEWED') return 'alreadyReviewed' as const;
   if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed' as const;
   if (code === 'TASK_CANCELLED') return 'cancelled' as const;
+  if (code === 'ASSIGNMENT_NOT_ACTIVE') return 'notActive' as const;
   return 'failed' as const;
 }
 
 /**
  * Действия ребёнка с заданием: I did it! отправляет его на проверку, Redo
- * забирает непроверенный отчёт — задание снова активно.
+ * забирает непроверенный отчёт — задание снова активно, toggleStep отмечает
+ * шаг чеклиста или снимает отметку.
  */
 export function useTaskActions() {
   const { t } = useTranslation();
   const { mutate, isPending } = useSetTaskStatus();
+  const { mutate: tick } = useTickChecklistItem();
   const onError = (error: unknown) =>
     showToast(t(`completeTask.errors.${actionError(error)}`));
 
@@ -40,5 +44,16 @@ export function useTaskActions() {
       { onSuccess: () => showToast(t('completeTask.redoToast')), onError },
     );
 
-  return { markDone, redo, isPending };
+  const toggleStep = (task: Task, item: ChecklistItem) =>
+    tick(
+      {
+        id: task.id,
+        serverTaskId: task.serverTaskId,
+        itemId: item.id,
+        done: !item.done,
+      },
+      { onError },
+    );
+
+  return { markDone, redo, toggleStep, isPending };
 }

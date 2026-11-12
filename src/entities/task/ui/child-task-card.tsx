@@ -10,7 +10,7 @@ import { useTranslation } from '@shared/i18n';
 import { formatClock, formatDayInPhrase, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { Icon, type IconName } from '@shared/ui';
-import type { Task, TaskAssignee } from '../model';
+import type { ChecklistItem, Task, TaskAssignee } from '../model';
 import {
   InfoTiles,
   PhotoSection,
@@ -20,6 +20,7 @@ import {
   TaskSheet,
   TimerPill,
 } from './task-sheet';
+import { TaskChecklist } from './task-checklist';
 import { styles as sheetStyles } from './task-sheet.styled';
 import { styles } from './child-task-card.styled';
 
@@ -31,6 +32,8 @@ type ChildTaskCardProps = {
   onPickPhoto?: () => void;
   /** Кто из родителей вернул задание (если его возвращали). */
   rejectedBy?: Pick<TaskAssignee, 'name'>;
+  /** Ребёнок отметил шаг чеклиста; только у активного задания. */
+  onToggleStep?: (item: ChecklistItem) => void;
   /** Кнопка внизу карточки: I did it! или Redo task. */
   footer?: ReactNode;
   style?: StyleProp<ViewStyle>;
@@ -38,8 +41,9 @@ type ChildTaskCardProps = {
 
 /**
  * Крупная карточка задания у ребёнка. Активная — голубая: от кого задание,
- * таймер, описание с наградой, срок и когда выдано, фото-отчёт (камера или
- * галерея). На проверке — оранжевая: отправленное фото и описание.
+ * таймер, описание с наградой, чеклист (шаги отмечаются тапом), срок и когда
+ * выдано, фото-отчёт (камера или галерея). На проверке — оранжевая:
+ * отправленное фото, описание и чеклист (отметки уже не меняются).
  */
 export function ChildTaskCard({
   task,
@@ -47,6 +51,7 @@ export function ChildTaskCard({
   onTakePhoto,
   onPickPhoto,
   rejectedBy,
+  onToggleStep,
   footer,
   style,
 }: ChildTaskCardProps) {
@@ -99,6 +104,22 @@ export function ChildTaskCard({
         reward={task.reward}
         description={task.description}
       />
+      {task.checklist.length > 0 && (
+        <TaskChecklist
+          label={t('taskCard.checklist')}
+          items={task.checklist}
+          progress={t('taskCard.checklistProgress', {
+            done: task.checklist.filter((item) => item.done).length,
+            total: task.checklist.length,
+          })}
+          hint={
+            review
+              ? undefined
+              : t('taskCard.checklistChildHint', { name: author.name })
+          }
+          onToggle={review ? undefined : onToggleStep}
+        />
+      )}
       {!review && (
         <>
           <InfoTiles

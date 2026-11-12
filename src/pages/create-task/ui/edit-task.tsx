@@ -26,6 +26,7 @@ export function EditTaskPage() {
         description: task.description,
         expiresAt: task.expiresAt,
         assigneeId: task.assignee.id,
+        checklist: task.checklist.map(({ id, title }) => ({ id, title })),
       }}
     />
   );

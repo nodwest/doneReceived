@@ -19,6 +19,19 @@ export interface TaskRejection {
   by: string;
 }
 
+/** Шаг чеклиста задания: ребёнок отмечает его по ходу дела. */
+export interface ChecklistItem {
+  /** id шага: у моков — строка-счётчик, с сервера — UUID. */
+  id: string;
+  title: string;
+  /** Ребёнок отметил шаг. */
+  done: boolean;
+}
+
+/** Сколько шагов в чеклисте и сколько символов в шаге (как на сервере). */
+export const CHECKLIST_MAX_ITEMS = 20;
+export const CHECKLIST_ITEM_MAX_LENGTH = 120;
+
 export interface TaskAssignee {
   /** id ребёнка: у моков — число строкой, с сервера — UUID профиля. */
   id: string;
@@ -65,6 +78,8 @@ export interface Task {
   photo: ImageSourcePropType | null;
   /** Последний отказ родителя; null — задание не возвращали. */
   rejection: TaskRejection | null;
+  /** Чеклист по порядку; пустой — задание без чеклиста. */
+  checklist: ChecklistItem[];
 }
 
 /** Награда в формате карточек: «$5.00». */
