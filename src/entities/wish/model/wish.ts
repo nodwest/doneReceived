@@ -1,9 +1,10 @@
 import type { ImageSourcePropType } from 'react-native';
 
 export interface Wish {
-  id: number;
+  /** У моков число строкой, с сервера — UUID. */
+  id: string;
   /** Чьё желание: у каждого ребёнка свой вишлист. */
-  childId: number;
+  childId: string;
   title: string;
   /** Цена в долларах, целая. */
   price: number;
@@ -28,7 +29,16 @@ export interface WishPayload {
 }
 
 export interface UpdateWishPayload extends WishPayload {
-  id: number;
+  id: string;
+}
+
+/**
+ * Чей вишлист: ребёнок (моковый — число строкой, с сервера — UUID) и семья
+ * (нужна для ребёнка с сервера, у моковых — null).
+ */
+export interface WishlistOwner {
+  childId: string;
+  familyId: string | null;
 }
 
 /** Ссылка на магазин с протоколом: в форме её вставляют и без https://. */

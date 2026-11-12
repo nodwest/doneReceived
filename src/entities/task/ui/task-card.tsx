@@ -41,7 +41,7 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
     return (
       <TaskSheet
         tone="review"
-        avatar={task.assignee.avatar}
+        avatar={task.assignee.avatar ?? undefined}
         caption={
           done
             ? t('tasks.doneAgo', { ago: formatTimeAgo(done, now) })
@@ -71,7 +71,7 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
   return (
     <TaskSheet
       tone="parent"
-      avatar={task.assignee.avatar}
+      avatar={task.assignee.avatar ?? undefined}
       caption={t('taskCard.taskFor')}
       name={task.assignee.name}
       aside={expires && <TimerPill ms={expires.getTime() - now.getTime()} />}

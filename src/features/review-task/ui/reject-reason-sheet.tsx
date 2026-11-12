@@ -15,6 +15,8 @@ const DEFAULT_REASON: RejectReasonKey = 'not-done-properly';
 type RejectReasonSheetProps = {
   visible: boolean;
   childName: string;
+  /** Задание с сервера: отказ его закрывает (на переделку сервер пока не умеет). */
+  closes?: boolean;
   onCancel: () => void;
   onReject: (decision: RejectDecision) => void;
 };
@@ -23,6 +25,7 @@ type RejectReasonSheetProps = {
 export function RejectReasonSheet({
   visible,
   childName,
+  closes = false,
   onCancel,
   onReject,
 }: RejectReasonSheetProps) {
@@ -45,7 +48,9 @@ export function RejectReasonSheet({
         <View style={styles.header}>
           <Text style={styles.title}>{t('reviewTask.title')}</Text>
           <Text style={styles.subtitle}>
-            {t('reviewTask.subtitle', { name: childName })}
+            {closes
+              ? t('reviewTask.subtitleClose')
+              : t('reviewTask.subtitle', { name: childName })}
           </Text>
         </View>
 

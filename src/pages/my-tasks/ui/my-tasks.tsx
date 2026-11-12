@@ -14,19 +14,21 @@ import {
   type TasksView,
 } from '@widgets/tasks-header';
 import {
+  useChildTasks,
+  useMyChildBalance,
+  useMyWishlistOwner,
+} from '@features/family-tasks';
+import {
   ChildReviewRow,
   ChildTaskCard,
   ChildTaskTile,
-  filterTasks,
   sortTasksByUrgency,
-  useTasks,
   type Task,
 } from '@entities/task';
-import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast, useIsCompact } from '@shared/lib';
-import { childAccountMock, parentProfilesMock } from '@shared/mocks';
+import { parentProfilesMock } from '@shared/mocks';
 import { EarnGoalCard } from './earn-goal-card';
 import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
@@ -34,9 +36,19 @@ import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
 const NO_TASKS: Task[] = [];
 
 // Автор задания для «Task from Sarah»; неизвестный — первый родитель.
-const findAuthor = (id: number) =>
-  parentProfilesMock.find((parent) => parent.id === id) ??
+const findAuthor = (id: string) =>
+  parentProfilesMock.find((parent) => String(parent.id) === id) ??
   parentProfilesMock[0];
+
+/**
+ * Кто дал задание: у задания с сервера — имя из участников семьи (без фото,
+ * буква), а если ребёнку список закрыт — просто «Родитель»; у моковых —
+ * родитель из моков.
+ */
+const authorOf = (task: Task, parentLabel: string) =>
+  task.serverTaskId
+    ? { name: task.authorName ?? parentLabel, avatar: null }
+    : findAuthor(task.createdBy);
 
 /**
  * Вкладка Tasks у ребёнка (Emma, временный режим ребёнка). Списком: сверху
@@ -50,16 +62,10 @@ export function MyTasksPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ tab?: string; task?: string }>();
-  const { data = NO_TASKS, isPending } = useTasks();
+  const { data = NO_TASKS, isPending } = useChildTasks();
   // Порядок как в списке: активные по сроку, затем на проверке — карточки
   // листаются в том же порядке.
-  const allTasks = useMemo(
-    () =>
-      sortTasksByUrgency(
-        filterTasks(data, { assigneeId: childAccountMock.id }),
-      ),
-    [data],
-  );
+  const allTasks = useMemo(() => sortTasksByUrgency(data), [data]);
   const activeTasks = useMemo(
     () => allTasks.filter((task) => task.status === 'active'),
     [allTasks],
@@ -69,14 +75,14 @@ export function MyTasksPage() {
     [allTasks],
   );
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(childAccountMock.id);
+  const { balance } = useMyChildBalance();
   const { current: currentWish } = useWishlistProgress(
-    childAccountMock.id,
+    useMyWishlistOwner(),
     balance,
   );
   const { bottom } = useSafeAreaInsets();
   const gutter = useIsCompact() ? 16 : 24;
-  const initialTaskId = params.task ? Number(params.task) : null;
+  const initialTaskId = params.task ?? null;
   const [tab, setTab] = useState<TasksTab>(
     params.tab === 'review' ? 'review' : 'all',
   );
@@ -85,19 +91,23 @@ export function MyTasksPage() {
     initialTaskId === null ? 'list' : 'cards',
   );
   // У каждой вкладки своя карточка: возвращаясь тоглом, видим ту, с которой ушли.
-  const [currentIds, setCurrentIds] = useState<Record<TasksTab, number | null>>(
+  const [currentIds, setCurrentIds] = useState<Record<TasksTab, string | null>>(
     { all: initialTaskId, review: null },
   );
 
   const tasks = tab === 'review' ? reviewTasks : allTasks;
   const currentId = currentIds[tab];
-  const setCurrentId = (id: number) =>
+  const setCurrentId = (id: string) =>
     setCurrentIds((prev) => ({ ...prev, [tab]: id }));
   const currentIndex = Math.max(
     tasks.findIndex((task) => task.id === currentId),
     0,
   );
   const cards = view === 'cards' && tasks.length > 0;
+  // Список уже был на экране: назад из карточек ведёт к нему. Открыли сразу
+  // карточку (с главной) — назад туда, откуда пришли.
+  const [listSeen, setListSeen] = useState(initialTaskId === null);
+  if (view === 'list' && !listSeen) setListSeen(true);
   const earn = activeTasks.reduce((sum, task) => sum + task.reward, 0);
 
   const openCard = (task: Task) => {
@@ -118,7 +128,7 @@ export function MyTasksPage() {
         <ChildReviewRow
           key={task.id}
           task={task}
-          author={findAuthor(task.createdBy)}
+          author={authorOf(task, t('member.parent'))}
           onPress={openCard}
         />
       ))}
@@ -139,7 +149,11 @@ export function MyTasksPage() {
             view={cards ? 'cards' : 'list'}
             onToggleView={() => setView(cards ? 'list' : 'cards')}
             onBack={() =>
-              router.canGoBack() ? router.back() : router.replace('/')
+              cards && listSeen
+                ? setView('list')
+                : router.canGoBack()
+                  ? router.back()
+                  : router.replace('/')
             }
           />
         </View>
@@ -160,7 +174,7 @@ export function MyTasksPage() {
               renderTask={(task, style) => (
                 <ChildTaskCard
                   task={task}
-                  author={findAuthor(task.createdBy)}
+                  author={authorOf(task, t('member.parent'))}
                   rejectedBy={
                     task.rejection ? findAuthor(task.rejection.by) : undefined
                   }
@@ -214,7 +228,7 @@ export function MyTasksPage() {
                         <ChildTaskTile
                           key={task.id}
                           task={task}
-                          author={findAuthor(task.createdBy)}
+                          author={authorOf(task, t('member.parent'))}
                           onPress={openCard}
                           action={<DoneButton task={task} />}
                         />

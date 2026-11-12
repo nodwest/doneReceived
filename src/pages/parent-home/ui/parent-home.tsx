@@ -7,9 +7,13 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
+import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
+import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { ActivityItem } from '@entities/activity';
-import { sumTotals, useOperations } from '@entities/operation';
-import { countChildTasks, countTasks, useTasks } from '@entities/task';
+import { sumTotals } from '@entities/operation';
+import { useMe, useMyAvatar } from '@entities/session';
+import { countChildTasks, countTasks } from '@entities/task';
+import type { ChildOverview } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
 import {
   childProfilesMock,
@@ -29,31 +33,57 @@ function greetingKey(hour: number) {
 export function ParentHomePage() {
   const { t } = useTranslation();
   const router = useRouter();
+  // Имя и фото — вошедшего родителя (GET /users/me).
+  const me = useMe();
+  const myAvatar = useMyAvatar();
   // Счётчики заданий — из того же запроса, что и экран Tasks и профиль
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
   // Пока список грузится, показываем значения из сводки.
-  const { data: tasks } = useTasks();
+  const { data: tasks } = useFamilyTasks();
   // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
-  const total = tasks && countTasks(tasks, { createdBy: parentMock.id });
+  const total =
+    tasks && countTasks(tasks, { createdBy: String(parentMock.id) });
   // Выплачено вошедшим родителем за всё время — из истории наград: после
   // подтверждения задания сумма растёт.
-  const { data: operations } = useOperations();
+  const { data: operations } = useFamilyOperations();
   const rewardsPaid =
     operations &&
     sumTotals(
-      operations.filter((operation) => operation.parentId === parentMock.id),
+      operations.filter(
+        (operation) => operation.parentId === String(parentMock.id),
+      ),
     ).earned;
-  const children = childProfilesMock.map((child) => {
-    const counts = countChildTasks(tasks ?? [], child.id, parentMock.id);
-    return {
-      id: child.id,
-      name: child.name,
-      avatar: child.avatar,
-      activeTasks: counts.active,
-      reviewTasks: counts.review,
-      atHome: child.presence.atHome,
-    };
-  });
+  // Дети: моковые Emma и Liam и дети семьи с сервера (созданные через
+  // Add a child). Статуса «дома» у настоящих пока нет.
+  const { data: serverChildren } = useFamilyChildren(
+    useCurrentFamily()?.id ?? null,
+  );
+  const counts = (id: string) =>
+    countChildTasks(tasks ?? [], id, String(parentMock.id));
+  const children: ChildOverview[] = [
+    ...childProfilesMock.map((child) => {
+      const { active, review } = counts(String(child.id));
+      return {
+        id: String(child.id),
+        name: child.name,
+        avatar: child.avatar,
+        activeTasks: active,
+        reviewTasks: review,
+        atHome: child.presence.atHome,
+      };
+    }),
+    ...(serverChildren ?? []).map((child) => {
+      const { active, review } = counts(child.id);
+      return {
+        id: child.id,
+        name: child.displayName,
+        avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+        activeTasks: active,
+        reviewTasks: review,
+        atHome: false,
+      };
+    }),
+  ];
 
   return (
     <View style={styles.screen}>
@@ -65,8 +95,8 @@ export function ParentHomePage() {
         >
           <HomeHeader
             greeting={t(greetingKey(new Date().getHours()))}
-            name={parentMock.name}
-            avatar={parentMock.avatar}
+            name={me?.displayName ?? parentMock.name}
+            avatar={me ? myAvatar : parentMock.avatar}
           />
           <HomeSummary
             amount={rewardsPaid ?? familySummaryMock.rewardsPaid}
@@ -84,13 +114,13 @@ export function ParentHomePage() {
             onSelect={(child) =>
               router.push({
                 pathname: '/child/[id]',
-                params: { id: String(child.id) },
+                params: { id: child.id },
               })
             }
             onTasksPress={(child, tab) =>
               router.push({
                 pathname: '/child/[id]/tasks',
-                params: { id: String(child.id), tab },
+                params: { id: child.id, tab },
               })
             }
           />

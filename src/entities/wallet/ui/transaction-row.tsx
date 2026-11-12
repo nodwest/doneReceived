@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useTranslation } from '@shared/i18n';
 import { formatClock, formatDayLabel, startOfDay } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { Icon } from '@shared/ui';
+import { Icon, LetterAvatar } from '@shared/ui';
 import {
   formatTransactionAmount,
   type ChildTransaction,
@@ -132,8 +132,9 @@ export function TransactionRow({
       <RowFrame
         {...look}
         leading={
-          <Image
+          <LetterAvatar
             source={transaction.child.avatar}
+            name={transaction.child.name}
             style={[styles.avatar, large && styles.avatarLarge]}
           />
         }
@@ -180,9 +181,11 @@ export function ChildTransactionRow({
         {...look}
         leading={rewardIcon}
         title={transaction.task}
-        subtitle={`${t('transactions.rewardFromName', {
-          name: transaction.from.name,
-        })} · ${when}`}
+        subtitle={`${
+          transaction.from.name
+            ? t('transactions.rewardFromName', { name: transaction.from.name })
+            : t('transactions.reward')
+        } · ${when}`}
         amount={formatTransactionAmount(transaction)}
         tone="income"
       />

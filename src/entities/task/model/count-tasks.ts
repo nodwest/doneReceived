@@ -2,9 +2,9 @@ import type { Task } from './task';
 
 type TaskFilter = {
   /** Задачи одного ребёнка. */
-  assigneeId?: number;
+  assigneeId?: string;
   /** Задачи, созданные одним родителем. */
-  createdBy?: number;
+  createdBy?: string;
 };
 
 /** Задачи по фильтру; без фильтра — все. */
@@ -38,23 +38,12 @@ export function countTasks(tasks: readonly Task[], filter?: TaskFilter) {
  */
 export function countChildTasks(
   tasks: readonly Task[],
-  childId: number,
-  parentId: number,
+  childId: string,
+  parentId: string,
 ) {
   return {
     active: countTasks(tasks, { assigneeId: childId }).active,
     review: countTasks(tasks, { assigneeId: childId, createdBy: parentId })
       .review,
   };
-}
-
-/**
- * Сколько денег родителя в резерве: награды его заданий, которые ещё не
- * выплачены — активные и на проверке. Подтверждённое выплачено, из резерва
- * ушло.
- */
-export function reservedRewards(tasks: readonly Task[], createdBy: number) {
-  return filterTasks(tasks, { createdBy })
-    .filter((task) => task.status === 'active' || task.status === 'review')
-    .reduce((sum, task) => sum + task.reward, 0);
 }

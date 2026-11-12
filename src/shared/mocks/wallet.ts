@@ -9,7 +9,8 @@ const [emma, liam] = childrenMock;
  * (operationsMock): задания, которые дала и подтвердила Sarah.
  */
 export const walletMock = {
-  // Пока бек не умеет пополнять кошелёк, у родителя на моках $1000.
+  // Баланс для моковой истории транзакций; деньги родителя на экранах — с
+  // сервера (GET /families/:id/wallet).
   balance: 1000,
   cardTransactions: [
     {

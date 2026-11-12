@@ -4,11 +4,10 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useDeleteWish } from '@features/delete-wish';
 import { WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
-import { useChildBalance } from '@entities/wallet';
+import { useMyChildBalance, useMyWishlistOwner } from '@features/family-tasks';
 import { useWishlistProgress, WishDetails } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { childAccountMock } from '@shared/mocks';
 import { RoundButton, ScreenHeader, SourceTile } from '@shared/ui';
 import { styles } from './my-wish.styled';
 
@@ -21,12 +20,10 @@ export function MyWishPage() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(childAccountMock.id);
-  const { progress, isPending } = useWishlistProgress(
-    childAccountMock.id,
-    balance,
-  );
-  const deleteWish = useDeleteWish();
+  const { balance } = useMyChildBalance();
+  const owner = useMyWishlistOwner();
+  const { progress, isPending } = useWishlistProgress(owner, balance);
+  const deleteWish = useDeleteWish(owner);
   const [editing, setEditing] = useState(false);
 
   const index = progress.findIndex((item) => String(item.wish.id) === id);
@@ -81,6 +78,7 @@ export function MyWishPage() {
         onClose={() => setEditing(false)}
         wish={item.wish}
         position={index + 1}
+        owner={owner}
         onDelete={() => {
           setEditing(false);
           deleteWish.mutate(item.wish.id, {

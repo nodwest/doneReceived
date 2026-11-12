@@ -84,6 +84,16 @@ export const en = {
     active_other: 'active',
     toReview: 'to review',
     childProfile: 'Child profile',
+    parent: 'Parent',
+  },
+  transferOwnership: {
+    button: 'Make owner',
+    title: 'Make {{name}} the owner?',
+    subtitle:
+      "{{name}} will manage the family. You'll stay in the family as a parent.",
+    confirm: 'Make owner',
+    doneToast: '{{name}} is now the family owner',
+    failed: "Couldn't transfer the family. Please try again.",
   },
   presence: {
     atHome: 'At home',
@@ -91,6 +101,11 @@ export const en = {
     home: 'Home',
   },
   family: {
+    role: {
+      owner: 'Family owner',
+      admin: 'Parent',
+      member: 'Child',
+    },
     title: 'Family',
     parents_one: '{{count}} parent',
     parents_other: '{{count}} parents',
@@ -173,6 +188,9 @@ export const en = {
     validFor: 'Valid for',
     expired: 'Code expired',
     newCode: 'New code',
+    loading: 'Getting a code…',
+    failed: "Couldn't get a code",
+    retry: 'Try again',
     footnote:
       'After {{name}} signs in, the code stops working and the device appears here.',
   },
@@ -232,6 +250,17 @@ export const en = {
     fromCard: 'From card •• {{card}}',
     toCard: 'To card •• {{card}}',
   },
+  deposit: {
+    title: 'Deposit',
+    amount: 'Amount',
+    testHint:
+      'Test money for now: it goes to your wallet right away. Real payments will come later.',
+    action: 'Deposit {{amount}}',
+    actionEmpty: 'Enter an amount',
+    done: '{{amount}} added to your wallet',
+    disabled: 'Test deposits are turned off on the server',
+    failed: "Couldn't top up. Please try again.",
+  },
   transactions: {
     title: 'Transactions',
     all: 'All',
@@ -248,6 +277,7 @@ export const en = {
     withdrawalTo: 'Withdrawal to',
     rewardFrom: 'Reward from',
     rewardFromName: 'Reward from {{name}}',
+    reward: 'Reward for a task',
     card: 'Card •• {{card}}',
     forTask: 'For task',
     details: 'Details',
@@ -312,7 +342,9 @@ export const en = {
     edit: 'Edit',
     approvedToast: 'Approved · {{amount}} sent to {{name}}',
     rejectedToast: 'Sent back to {{name}} to redo',
+    closedToast: 'Task closed · reward returned to your wallet',
     cancelledToast: 'Task cancelled',
+    cancelFailed: "Couldn't cancel the task. Please try again.",
     onlyAuthorApproves: 'Only {{name}} can approve and pay for this task',
     onlyAuthorEdits: 'Only {{name}} can edit or cancel this task',
     doneAgo: 'Done {{ago}}',
@@ -359,6 +391,14 @@ export const en = {
     create: 'Create Task',
     save: 'Save changes',
     shortBy: 'Short by {{amount}}',
+    errors: {
+      insufficientFunds:
+        'Not enough money in your wallet for this reward. Top up or lower it.',
+      onReview:
+        'The child has already sent this task for review — check it first.',
+      network: "Can't reach the server. Check your connection and try again.",
+      failed: "Couldn't save the task. Please try again.",
+    },
     budget: {
       title: 'Available for rewards',
       notEnough: 'Not enough for this reward',
@@ -370,7 +410,6 @@ export const en = {
       short: 'Short',
       walletLimit: 'Wallet {{amount}} ↑',
       noteOver: 'Lower the reward to {{amount}} or top up your wallet.',
-      depositSoon: 'Top-ups are coming soon',
     },
     taskTitle: 'Task Title',
     taskTitlePlaceholder: 'Clean your room',
@@ -405,6 +444,8 @@ export const en = {
     title: 'Reject task',
     subtitle:
       'Tell {{name}} what to fix. {{name}} will see your reason and can try again.',
+    subtitleClose:
+      'The task will be closed and the reward will return to your wallet.',
     comment: 'Add a comment',
     commentPlaceholder:
       'Show what needs to be fixed, for example "the bed is not made".',
@@ -412,6 +453,12 @@ export const en = {
       'not-done-properly': 'Not done properly',
       'not-finished': 'Not finished',
       other: 'Other',
+    },
+    errors: {
+      withdrawn: 'The report was taken back — nothing to review',
+      alreadyReviewed: 'This report has already been reviewed',
+      network: 'No connection. Please try again.',
+      failed: "Couldn't save the decision. Please try again.",
     },
   },
   auth: {
@@ -553,6 +600,13 @@ export const en = {
     redo: 'Redo task',
     sentToast: 'Great job! Sent for review',
     redoToast: 'The task is active again',
+    errors: {
+      alreadyReviewed: 'A parent has already checked this task.',
+      deadlinePassed: 'The deadline has passed, the task can no longer change.',
+      cancelled: 'This task was cancelled.',
+      network: "Can't reach the server. Check your connection and try again.",
+      failed: 'Something went wrong. Please try again.',
+    },
   },
   roleSelect: {
     title: "Who's joining?",

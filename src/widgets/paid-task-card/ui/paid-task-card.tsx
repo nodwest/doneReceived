@@ -84,7 +84,7 @@ export function PaidTaskCard({
   return (
     <TaskSheet
       tone="paid"
-      avatar={parent ? operation.child.avatar : approver.avatar}
+      avatar={(parent ? operation.child.avatar : approver.avatar) ?? undefined}
       caption={parent ? t('rewardCard.doneBy') : t('taskCard.taskFrom')}
       name={parent ? operation.child.name : approver.name}
       aside={

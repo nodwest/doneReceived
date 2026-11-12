@@ -4,8 +4,8 @@ import { TabScreen } from '@widgets/bottom-nav';
 import { useWishlistProgress, WishDetails } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { useChildBalance } from '@entities/wallet';
-import { childProfilesMock } from '@shared/mocks';
 import { HeaderAvatar, ScreenHeader } from '@shared/ui';
+import { useWishlistChild } from '../model/use-wishlist-child';
 import { styles } from './child-wishlist.styled';
 
 /**
@@ -16,13 +16,13 @@ import { styles } from './child-wishlist.styled';
 export function ChildWishPage() {
   const { t } = useTranslation();
   const { id, wishId } = useLocalSearchParams<{ id: string; wishId: string }>();
-  const child = childProfilesMock.find((item) => String(item.id) === id);
+  const { child, owner, familyId, loading } = useWishlistChild(id);
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(child?.id ?? -1);
-  const { progress, isPending } = useWishlistProgress(child?.id ?? -1, balance);
+  const { balance } = useChildBalance(child?.id ?? null, familyId);
+  const { progress, isPending } = useWishlistProgress(owner, balance);
   const index = progress.findIndex((item) => String(item.wish.id) === wishId);
   const item = progress[index];
-  if (!child) return <Redirect href="/" />;
+  if (!child) return loading ? null : <Redirect href="/" />;
   if (!isPending && !item) {
     return (
       <Redirect
@@ -51,7 +51,7 @@ export function ChildWishPage() {
                   params: { id: String(child.id) },
                 })
           }
-          right={<HeaderAvatar source={child.avatar} />}
+          right={<HeaderAvatar source={child.avatar} name={child.name} />}
         />
         <WishDetails
           {...item}

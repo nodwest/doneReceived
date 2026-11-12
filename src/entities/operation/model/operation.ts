@@ -3,20 +3,26 @@ import type { ImageSourcePropType } from 'react-native';
 /** earned — награда начислена; missed — задача не выполнена в срок, награда упущена. */
 export type OperationKind = 'earned' | 'missed';
 
+/** Ребёнок в истории: у моков id — число строкой, с сервера — UUID. */
 export interface OperationChild {
-  id: number;
+  id: string;
   name: string;
-  avatar: ImageSourcePropType;
+  /** null — фото нет, буква имени. */
+  avatar: ImageSourcePropType | null;
 }
 
 export interface Operation {
-  id: number;
+  /** У моков число строкой, с сервера — id начисления или назначения. */
+  id: string;
   title: string;
   kind: OperationKind;
   amount: number;
   child: OperationChild;
-  /** id родителя, создавшего задачу; он же её подтвердил. */
-  parentId: number;
+  /**
+   * id родителя, создавшего задачу (он же её подтвердил): у моков число
+   * строкой, у вошедшего родителя — id моковой Sarah, у второго — его userId.
+   */
+  parentId: string;
   /** ISO-время операции: награда начислена или упущена. */
   at: string;
   /** Что нужно было сделать: описание задания. */

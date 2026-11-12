@@ -4,6 +4,7 @@ import {
   type Family,
   type FamilyChild,
   type FamilyInvitePreview,
+  type FamilyMember,
   type FamilyMembership,
   type ParentInvite,
 } from '../model/family';
@@ -86,4 +87,24 @@ export function deleteChild(familyId: string, childId: string) {
   return apiRequest<null>(`/families/${familyId}/children/${childId}`, {
     method: 'DELETE',
   });
+}
+
+/**
+ * GET /families/:id/members — участники с активным членством (родители и
+ * дети). Только родителям: ребёнку 403 (Идеи.md п. 8).
+ */
+export function fetchFamilyMembers(familyId: string) {
+  return apiRequest<FamilyMember[]>(`/families/${familyId}/members`);
+}
+
+/**
+ * POST /families/:id/members/:memberId/transfer-ownership — владелец
+ * передаёт роль owner другому родителю (memberId — id членства), сам
+ * становится admin. 403 — вошедший не владелец.
+ */
+export function transferOwnership(familyId: string, memberId: string) {
+  return apiRequest<null>(
+    `/families/${familyId}/members/${memberId}/transfer-ownership`,
+    { method: 'POST' },
+  );
 }

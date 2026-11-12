@@ -3,6 +3,7 @@ import type { ParentInvite } from '../model/family';
 import {
   createParentInvite,
   fetchFamilyChildren,
+  fetchFamilyMembers,
   fetchMyFamilies,
   previewFamilyInvite,
 } from './families-api';
@@ -15,6 +16,8 @@ export const familiesKeys = {
     [...familiesKeys.all, familyId, 'parent-invite'] as const,
   children: (familyId: string | null) =>
     [...familiesKeys.all, familyId, 'children'] as const,
+  members: (familyId: string | null) =>
+    [...familiesKeys.all, familyId, 'members'] as const,
   invitePreview: (code: string) =>
     [...familiesKeys.all, 'invite-preview', code] as const,
 };
@@ -66,6 +69,17 @@ export function useParentInvite(familyId: string | null, enabled: boolean) {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     retry: 1,
+  });
+}
+
+/**
+ * Участники семьи с сервера (родители и дети); без семьи (null) запроса нет.
+ * Ребёнку ручка закрыта — у него передавайте null.
+ */
+export function useFamilyMembers(familyId: string | null) {
+  return useQuery({
+    queryKey: familiesKeys.members(familyId),
+    queryFn: familyId ? () => fetchFamilyMembers(familyId) : skipToken,
   });
 }
 

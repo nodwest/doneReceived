@@ -1,5 +1,4 @@
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -11,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
-import { RoundButton } from '@shared/ui';
+import { LetterAvatar, RoundButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { styles } from './tasks-header.styled';
@@ -45,7 +44,8 @@ const TONE_GRADIENTS = {
   child: [theme.colors.childFrom, theme.colors.childDeep],
 } as const;
 
-type Owner = { name: string; avatar: ImageSourcePropType };
+/** Чьи задания; avatar null — первая буква имени (ребёнок с сервера). */
+type Owner = { name: string; avatar: ImageSourcePropType | null };
 
 /** Шапка экрана заданий: назад, переключатель All / Review и вид списком. */
 export function TasksHeader({
@@ -192,7 +192,7 @@ function OwnerTitle({
   const { t } = useTranslation();
   return (
     <View style={style}>
-      <Image source={avatar} style={styles.ownerAvatar} />
+      <LetterAvatar source={avatar} name={name} style={styles.ownerAvatar} />
       <Text style={styles.ownerName} numberOfLines={1}>
         {t('tasks.ownerTasks', { name })}
       </Text>

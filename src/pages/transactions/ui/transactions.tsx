@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { ScrollView, Text, View, type ViewStyle } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
+import { useMyChildWallet } from '@features/family-tasks';
 import {
   ChildTransactionCard,
   TransactionCard,
@@ -12,7 +13,6 @@ import {
   ChildTransactionRow,
   groupByDay,
   TransactionRow,
-  useChildWallet,
   useWallet,
   type ChildTransaction,
   type Transaction,
@@ -26,7 +26,6 @@ import {
   formatWeekdayShort,
   startOfDay,
 } from '@shared/lib';
-import { childAccountMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import { RoundButton, SegmentedFilter, SnapCarousel } from '@shared/ui';
 import { styles } from './transactions.styled';
@@ -221,10 +220,10 @@ function TransactionsScreen<
 }
 
 // Карточка задания, за которое деньги: открывается в истории наград.
-const openTask = (operationId: number) =>
+const openTask = (operationId: string) =>
   router.push({
     pathname: '/rewards-history',
-    params: { operation: String(operationId) },
+    params: { operation: operationId },
   });
 
 type ParentFilter = 'all' | Transaction['kind'];
@@ -296,7 +295,7 @@ type ChildFilter = 'all' | ChildTransaction['kind'];
  */
 export function ChildTransactionsPage() {
   const { t } = useTranslation();
-  const { data: wallet, isPending } = useChildWallet(childAccountMock.id);
+  const { data: wallet, isPending } = useMyChildWallet();
   const [filter, setFilter] = useState<ChildFilter>('all');
   const [today] = useState(() => startOfDay(new Date()));
   const days = useMemo(
@@ -347,8 +346,8 @@ export function ChildTransactionsPage() {
           }
           weekEarned={weekEarned}
           onOpenTask={
-            transaction.kind === 'reward'
-              ? () => openTask(transaction.operationId)
+            transaction.kind === 'reward' && transaction.operationId !== null
+              ? () => openTask(transaction.operationId as string)
               : undefined
           }
           style={style}

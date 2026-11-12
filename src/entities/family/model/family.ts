@@ -52,6 +52,19 @@ export interface FamilyChild {
   avatarUrl: string | null;
 }
 
+/**
+ * Участник семьи: GET /families/:id/members (только родителям). `id` —
+ * членство (для передачи владения), `userId` — аккаунт (автор заданий).
+ */
+export interface FamilyMember {
+  id: string;
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  role: MemberRole;
+  kind: 'parent' | 'child';
+}
+
 /** Сколько символов можно в имени ребёнка (на сервере до 100). */
 export const CHILD_NAME_MAX_LENGTH = 40;
 

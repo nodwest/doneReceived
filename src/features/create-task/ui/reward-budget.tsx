@@ -6,7 +6,6 @@ import {
   type ParentFunds,
 } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
 import { styles } from './reward-budget.styled';
@@ -16,6 +15,8 @@ type RewardBudgetProps = {
   funds: ParentFunds;
   /** Сколько зарезервирует это задание. */
   amount: number;
+  /** Deposit: открыть шторку пополнения. */
+  onDeposit?: () => void;
 };
 
 /**
@@ -25,7 +26,7 @@ type RewardBudgetProps = {
  * влезает — карточка красная, полоса растягивается и нехватка торчит красным
  * за край кошелька, подсказка, до скольки снизить, и Deposit.
  */
-export function RewardBudget({ funds, amount }: RewardBudgetProps) {
+export function RewardBudget({ funds, amount, onDeposit }: RewardBudgetProps) {
   const { t } = useTranslation();
   const { total, reserved, available } = funds;
   const over = amount > available;
@@ -136,8 +137,7 @@ export function RewardBudget({ funds, amount }: RewardBudgetProps) {
           </Text>
           <Pressable
             accessibilityRole="button"
-            // Пополнение появится вместе с ручкой бэкенда (п. 12 в Идеи.md).
-            onPress={() => showToast(t('createTask.budget.depositSoon'))}
+            onPress={onDeposit}
             style={({ pressed }) => [styles.deposit, pressed && styles.pressed]}
           >
             <Icon name="plus" size={16} color={theme.colors.white} />

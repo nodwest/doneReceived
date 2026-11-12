@@ -1,5 +1,4 @@
 import {
-  Image,
   Platform,
   Pressable,
   Text,
@@ -9,7 +8,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
-import { Icon } from '@shared/ui';
+import { Icon, LetterAvatar } from '@shared/ui';
 import { theme } from '@shared/theme';
 import type { ChildOverview } from '../model/child-overview';
 import { styles } from './child-card.styled';
@@ -47,7 +46,12 @@ export function ChildCard({
       style={({ pressed }) => [styles.card, pressed && styles.pressed, style]}
     >
       <View style={styles.child}>
-        <Image source={avatar} style={styles.avatar} />
+        <LetterAvatar
+          source={avatar}
+          name={name}
+          style={styles.avatar}
+          letterSize={22}
+        />
         <Text style={styles.name}>{name}</Text>
       </View>
       {/* Чипы — отдельные кнопки внутри карточки: тап по ним не открывает профиль. */}

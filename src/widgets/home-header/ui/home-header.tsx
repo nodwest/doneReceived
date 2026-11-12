@@ -5,7 +5,8 @@ import { styles } from './home-header.styled';
 type HomeHeaderProps = {
   greeting: string;
   name: string;
-  avatar: ImageSourcePropType;
+  /** Фото; null — первая буква имени. */
+  avatar: ImageSourcePropType | null;
 };
 
 export function HomeHeader({ greeting, name, avatar }: HomeHeaderProps) {
@@ -15,7 +16,7 @@ export function HomeHeader({ greeting, name, avatar }: HomeHeaderProps) {
         <Text style={styles.greetingText}>{greeting}</Text>
         <Text style={styles.name}>{name}</Text>
       </View>
-      <HeaderAvatar source={avatar} />
+      <HeaderAvatar source={avatar} name={name} />
     </View>
   );
 }

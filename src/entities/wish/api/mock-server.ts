@@ -6,8 +6,12 @@ import type { UpdateWishPayload, Wish, WishPayload } from '../model/wish';
  * памяти до перезапуска приложения, порядок в массиве — порядок приоритета
  * внутри вишлиста ребёнка. С настоящим API этот файл удаляется целиком.
  */
-let wishes: Wish[] = wishesMock.map((wish) => ({ ...wish }));
-let nextId = Math.max(...wishes.map((wish) => wish.id)) + 1;
+let wishes: Wish[] = wishesMock.map((wish) => ({
+  ...wish,
+  id: String(wish.id),
+  childId: String(wish.childId),
+}));
+let nextId = Math.max(...wishesMock.map((wish) => wish.id)) + 1;
 
 const fields = ({ title, price, description, link, photos }: WishPayload) => ({
   title,
@@ -19,7 +23,7 @@ const fields = ({ title, price, description, link, photos }: WishPayload) => ({
 
 export const mockServer = {
   // Копия, как после сериализации ответа: снаружи данные «сервера» не изменить.
-  list: (childId: number): Wish[] =>
+  list: (childId: string): Wish[] =>
     wishes
       .filter((wish) => wish.childId === childId)
       .map((wish) => ({ ...wish })),
@@ -27,8 +31,8 @@ export const mockServer = {
   create: (payload: WishPayload): Wish => {
     // Желания добавляет сам ребёнок: сервер берёт его из сессии.
     const wish: Wish = {
-      id: nextId++,
-      childId: childAccountMock.id,
+      id: String(nextId++),
+      childId: String(childAccountMock.id),
       createdAt: new Date().toISOString(),
       ...fields(payload),
     };
@@ -48,12 +52,12 @@ export const mockServer = {
     return { ...updated };
   },
 
-  remove: (id: number) => {
+  remove: (id: string) => {
     wishes = wishes.filter((wish) => wish.id !== id);
   },
 
   /** Новый порядок вишлиста одного ребёнка; чужие желания не трогаем. */
-  reorder: (ids: readonly number[]) => {
+  reorder: (ids: readonly string[]) => {
     const byId = new Map(wishes.map((wish) => [wish.id, wish]));
     const ordered = ids.flatMap((id) => byId.get(id) ?? []);
     wishes = [...wishes.filter((wish) => !ids.includes(wish.id)), ...ordered];

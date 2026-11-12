@@ -2,6 +2,7 @@ export * from './model';
 export {
   createWish,
   deleteWish,
+  isServerWishlist,
   reorderWishes,
   updateWish,
 } from './api/wishes-api';

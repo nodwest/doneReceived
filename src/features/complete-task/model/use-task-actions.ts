@@ -1,26 +1,43 @@
 import type { Task } from '@entities/task';
+import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { useSetTaskStatus } from './use-set-task-status';
 
+/** Ключ ошибки: `completeTask.errors.*`. */
+function actionError(error: unknown) {
+  if (!isApiError(error)) return 'failed' as const;
+  if (error.status === 0) return 'network' as const;
+  const code =
+    error.data && typeof error.data === 'object'
+      ? (error.data as { code?: unknown }).code
+      : null;
+  if (code === 'SUBMISSION_ALREADY_REVIEWED') return 'alreadyReviewed' as const;
+  if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed' as const;
+  if (code === 'TASK_CANCELLED') return 'cancelled' as const;
+  return 'failed' as const;
+}
+
 /**
- * Действия ребёнка с заданием: I did it! отправляет его на проверку,
- * «Переделать» возвращает в активные. Тосты пока заглушки.
+ * Действия ребёнка с заданием: I did it! отправляет его на проверку, Redo
+ * забирает непроверенный отчёт — задание снова активно.
  */
 export function useTaskActions() {
   const { t } = useTranslation();
   const { mutate, isPending } = useSetTaskStatus();
+  const onError = (error: unknown) =>
+    showToast(t(`completeTask.errors.${actionError(error)}`));
 
   const markDone = (task: Task) =>
     mutate(
-      { id: task.id, status: 'review' },
-      { onSuccess: () => showToast(t('completeTask.sentToast')) },
+      { id: task.id, serverTaskId: task.serverTaskId, status: 'review' },
+      { onSuccess: () => showToast(t('completeTask.sentToast')), onError },
     );
 
   const redo = (task: Task) =>
     mutate(
-      { id: task.id, status: 'active' },
-      { onSuccess: () => showToast(t('completeTask.redoToast')) },
+      { id: task.id, serverTaskId: task.serverTaskId, status: 'active' },
+      { onSuccess: () => showToast(t('completeTask.redoToast')), onError },
     );
 
   return { markDone, redo, isPending };

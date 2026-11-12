@@ -5,20 +5,20 @@ import { AddMember } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
 import { ChildDevices } from '@widgets/child-devices';
 import { useDeleteChild } from '@features/delete-child';
+import { useFamilyTasks } from '@features/family-tasks';
+import { TransferOwnershipButton } from '@features/transfer-ownership';
 import { useMockDevices, type Device } from '@entities/device';
 import {
   useCurrentFamily,
   useFamilyChildren,
+  useFamilyMembers,
   useInviteCodes,
   type FamilyChild,
+  type FamilyMember,
 } from '@entities/family';
+import { useSessionUser } from '@entities/session';
 import { isApiError } from '@shared/api';
-import {
-  countChildTasks,
-  countTasks,
-  useTasks,
-  type Task,
-} from '@entities/task';
+import { countChildTasks, countTasks, type Task } from '@entities/task';
 import { MemberCard, useViewerRole } from '@entities/user';
 import {
   childProfilesMock,
@@ -34,6 +34,7 @@ import { DELETE_ACTION_WIDTH, REVEAL_GAP, styles } from './family.styled';
 const NO_TASKS: Task[] = [];
 const NO_DEVICES: Device[] = [];
 const NO_CHILDREN: FamilyChild[] = [];
+const NO_MEMBERS: FamilyMember[] = [];
 
 /**
  * Вкладка Family: кнопка приглашения и карточки родителей и детей. Тап по
@@ -48,13 +49,21 @@ export function FamilyPage() {
   const { t } = useTranslation();
   const router = useRouter();
   // Счётчики — из того же списка задач, что на главной и в профилях.
-  const { data: tasks = NO_TASKS } = useTasks();
+  const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: codes } = useInviteCodes();
   const { data: devices = NO_DEVICES } = useMockDevices();
-  const familyId = useCurrentFamily()?.id ?? null;
+  const family = useCurrentFamily();
+  const familyId = family?.id ?? null;
   const { data: newChildren = NO_CHILDREN } = useFamilyChildren(familyId);
   const deleteChild = useDeleteChild();
   const isParent = useViewerRole() === 'parent';
+  // Родители с сервера (ребёнку список закрыт); пока их нет — моковые.
+  const me = useSessionUser();
+  const { data: members = NO_MEMBERS } = useFamilyMembers(
+    isParent ? familyId : null,
+  );
+  const serverParents = members.filter((member) => member.kind === 'parent');
+  const isOwner = family?.role === 'owner';
   // Открытая смахиванием карточка: одновременно — только одна.
   const [swipedId, setSwipedId] = useState<string | null>(null);
   // Раскрытые устройства: одновременно — только у одного ребёнка.
@@ -63,6 +72,7 @@ export function FamilyPage() {
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
   const parents = parentProfilesMock;
+  const parentsCount = serverParents.length || parents.length;
   const children = childProfilesMock;
   const childrenCount = children.length + newChildren.length;
 
@@ -143,29 +153,31 @@ export function FamilyPage() {
           <View style={styles.header}>
             <Text style={styles.title}>{t('family.title')}</Text>
             <Text style={styles.count}>
-              {t('family.parents', { count: parents.length })} ·{' '}
+              {t('family.parents', { count: parentsCount })} ·{' '}
               {t('family.children', { count: childrenCount })}
             </Text>
           </View>
           <AddMember codes={codes} />
           <ScreenSection title={t('family.parentsSection')}>
             <View style={styles.list}>
-              {parents.map((parent) => {
-                const id = String(parent.id);
-                if (parent.id === parentMock.id) {
-                  // Владелец аккаунта: те же цифры, что на главной. Карточка
-                  // переключает на главную (как вкладка Home), чипы открывают
-                  // Tasks поверх Family — «назад» вернёт сюда.
-                  const total = countTasks(tasks, { createdBy: parentMock.id });
+              {serverParents.map((parent) => {
+                // Вошедший: те же цифры, что на главной (его задания
+                // помечены как задания моковой Sarah), карточка — на главную.
+                if (parent.userId === me?.id) {
+                  const total = countTasks(tasks, {
+                    createdBy: String(parentMock.id),
+                  });
                   const openTasks = (tab: 'all' | 'review') =>
                     router.push({ pathname: '/tasks', params: { tab } });
                   return (
                     <MemberCard
                       key={parent.id}
-                      name={parent.name}
-                      avatar={parent.avatar}
+                      name={parent.displayName}
+                      avatar={
+                        parent.avatarUrl ? { uri: parent.avatarUrl } : undefined
+                      }
                       role="parent"
-                      presence={parent.presence}
+                      subtitle={t(`family.role.${parent.role}`)}
                       isYou
                       activeTasks={total.active}
                       reviewTasks={total.review}
@@ -175,30 +187,88 @@ export function FamilyPage() {
                     />
                   );
                 }
-                // Второй родитель: только созданные им активные задачи — его
-                // задачи на проверке нам не видны.
+                // Второй родитель: его активные задания; профиля с сервера у
+                // него пока нет. Владелец может передать ему семью.
                 return (
                   <MemberCard
                     key={parent.id}
-                    name={parent.name}
-                    avatar={parent.avatar}
+                    name={parent.displayName}
+                    avatar={
+                      parent.avatarUrl ? { uri: parent.avatarUrl } : undefined
+                    }
                     role="parent"
-                    presence={parent.presence}
+                    subtitle={t(`family.role.${parent.role}`)}
                     activeTasks={
-                      countTasks(tasks, { createdBy: parent.id }).active
+                      countTasks(tasks, { createdBy: parent.userId }).active
                     }
-                    onPress={() =>
-                      router.push({ pathname: '/parent/[id]', params: { id } })
-                    }
-                    onActiveTasksPress={() =>
-                      router.push({
-                        pathname: '/parent/[id]/tasks',
-                        params: { id },
-                      })
+                    footer={
+                      isOwner && (
+                        <TransferOwnershipButton
+                          familyId={familyId}
+                          memberId={parent.id}
+                          name={parent.displayName}
+                        />
+                      )
                     }
                   />
                 );
               })}
+              {serverParents.length === 0 &&
+                parents.map((parent) => {
+                  const id = String(parent.id);
+                  if (parent.id === parentMock.id) {
+                    // Владелец аккаунта: те же цифры, что на главной. Карточка
+                    // переключает на главную (как вкладка Home), чипы открывают
+                    // Tasks поверх Family — «назад» вернёт сюда.
+                    const total = countTasks(tasks, {
+                      createdBy: String(parentMock.id),
+                    });
+                    const openTasks = (tab: 'all' | 'review') =>
+                      router.push({ pathname: '/tasks', params: { tab } });
+                    return (
+                      <MemberCard
+                        key={parent.id}
+                        name={parent.name}
+                        avatar={parent.avatar}
+                        role="parent"
+                        presence={parent.presence}
+                        isYou
+                        activeTasks={total.active}
+                        reviewTasks={total.review}
+                        onPress={() => router.dismissTo('/')}
+                        onActiveTasksPress={() => openTasks('all')}
+                        onReviewTasksPress={() => openTasks('review')}
+                      />
+                    );
+                  }
+                  // Второй родитель: только созданные им активные задачи — его
+                  // задачи на проверке нам не видны.
+                  return (
+                    <MemberCard
+                      key={parent.id}
+                      name={parent.name}
+                      avatar={parent.avatar}
+                      role="parent"
+                      presence={parent.presence}
+                      activeTasks={
+                        countTasks(tasks, { createdBy: String(parent.id) })
+                          .active
+                      }
+                      onPress={() =>
+                        router.push({
+                          pathname: '/parent/[id]',
+                          params: { id },
+                        })
+                      }
+                      onActiveTasksPress={() =>
+                        router.push({
+                          pathname: '/parent/[id]/tasks',
+                          params: { id },
+                        })
+                      }
+                    />
+                  );
+                })}
             </View>
           </ScreenSection>
           <ScreenSection title={t('family.childrenSection')}>
@@ -206,7 +276,11 @@ export function FamilyPage() {
               {children.map((child) => {
                 const id = String(child.id);
                 // Активные — все задания ребёнка, на проверке — только свои.
-                const counts = countChildTasks(tasks, child.id, parentMock.id);
+                const counts = countChildTasks(
+                  tasks,
+                  String(child.id),
+                  String(parentMock.id),
+                );
                 const openTasks = (tab: 'all' | 'review') =>
                   router.push({
                     pathname: '/child/[id]/tasks',
@@ -231,6 +305,17 @@ export function FamilyPage() {
                 );
               })}
               {newChildren.map((child) => {
+                // Как у моковых: тап — профиль, чипы — его задания.
+                const counts = countChildTasks(
+                  tasks,
+                  child.id,
+                  String(parentMock.id),
+                );
+                const openTasks = (tab: 'all' | 'review') =>
+                  router.push({
+                    pathname: '/child/[id]/tasks',
+                    params: { id: child.id, tab },
+                  });
                 const card = (
                   <MemberCard
                     name={child.displayName}
@@ -239,6 +324,19 @@ export function FamilyPage() {
                     }
                     role="child"
                     subtitle={t('member.childProfile')}
+                    activeTasks={isParent ? counts.active : undefined}
+                    reviewTasks={isParent ? counts.review : undefined}
+                    onPress={
+                      isParent
+                        ? () =>
+                            router.push({
+                              pathname: '/child/[id]',
+                              params: { id: child.id },
+                            })
+                        : undefined
+                    }
+                    onActiveTasksPress={() => openTasks('all')}
+                    onReviewTasksPress={() => openTasks('review')}
                     footer={devicesFooter(
                       familyId,
                       child.id,

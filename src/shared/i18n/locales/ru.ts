@@ -85,6 +85,16 @@ export const ru: Dictionary = {
     active_other: 'активного',
     toReview: 'на проверке',
     childProfile: 'Профиль ребёнка',
+    parent: 'Родитель',
+  },
+  transferOwnership: {
+    button: 'Сделать владельцем',
+    title: 'Сделать {{name}} владельцем?',
+    subtitle:
+      '{{name}} будет управлять семьёй. Вы останетесь в семье родителем.',
+    confirm: 'Передать',
+    doneToast: 'Теперь владелец семьи — {{name}}',
+    failed: 'Не получилось передать семью. Попробуйте ещё раз.',
   },
   presence: {
     atHome: 'Дома',
@@ -92,6 +102,11 @@ export const ru: Dictionary = {
     home: 'Дом',
   },
   family: {
+    role: {
+      owner: 'Владелец семьи',
+      admin: 'Родитель',
+      member: 'Ребёнок',
+    },
     title: 'Семья',
     parents_one: '{{count}} родитель',
     parents_few: '{{count}} родителя',
@@ -181,6 +196,9 @@ export const ru: Dictionary = {
     validFor: 'Действует',
     expired: 'Код истёк',
     newCode: 'Новый код',
+    loading: 'Получаем код…',
+    failed: 'Не удалось получить код',
+    retry: 'Ещё раз',
     footnote:
       'Когда {{name}} войдёт, код перестанет работать, а устройство появится здесь.',
   },
@@ -240,6 +258,17 @@ export const ru: Dictionary = {
     fromCard: 'С карты •• {{card}}',
     toCard: 'На карту •• {{card}}',
   },
+  deposit: {
+    title: 'Пополнить кошелёк',
+    amount: 'Сумма',
+    testHint:
+      'Пока это тестовые деньги: они сразу появятся в кошельке. Настоящие платежи будут позже.',
+    action: 'Пополнить на {{amount}}',
+    actionEmpty: 'Введите сумму',
+    done: 'Кошелёк пополнен на {{amount}}',
+    disabled: 'Тестовое пополнение выключено на сервере',
+    failed: 'Не получилось пополнить. Попробуйте ещё раз.',
+  },
   transactions: {
     title: 'Транзакции',
     all: 'Все',
@@ -256,6 +285,7 @@ export const ru: Dictionary = {
     withdrawalTo: 'Вывод на',
     rewardFrom: 'Награда от',
     rewardFromName: 'Награда от {{name}}',
+    reward: 'Награда за задание',
     card: 'Карта •• {{card}}',
     forTask: 'За задание',
     details: 'Подробности',
@@ -320,7 +350,9 @@ export const ru: Dictionary = {
     edit: 'Изменить',
     approvedToast: 'Подтверждено · {{amount}} отправлено: {{name}}',
     rejectedToast: 'Возвращено на доработку: {{name}}',
+    closedToast: 'Задание закрыто · награда вернулась в кошелёк',
     cancelledToast: 'Задание отменено',
+    cancelFailed: 'Не получилось отменить задание. Попробуйте ещё раз.',
     onlyAuthorApproves: 'Подтвердить и выплатить может только {{name}}',
     onlyAuthorEdits: 'Изменить или отменить может только {{name}}',
     doneAgo: 'Сделано {{ago}}',
@@ -369,6 +401,14 @@ export const ru: Dictionary = {
     create: 'Создать задание',
     save: 'Сохранить',
     shortBy: 'Не хватает {{amount}}',
+    errors: {
+      insufficientFunds:
+        'В кошельке не хватает денег на эту награду. Пополните кошелёк или уменьшите награду.',
+      onReview:
+        'Ребёнок уже отправил это задание на проверку — сначала проверьте его.',
+      network: 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.',
+      failed: 'Не получилось сохранить задание. Попробуйте ещё раз.',
+    },
     budget: {
       title: 'Доступно на награды',
       notEnough: 'Не хватает на эту награду',
@@ -380,7 +420,6 @@ export const ru: Dictionary = {
       short: 'Не хватает',
       walletLimit: 'Кошелёк {{amount}} ↑',
       noteOver: 'Уменьшите награду до {{amount}} или пополните кошелёк.',
-      depositSoon: 'Пополнение скоро появится',
     },
     taskTitle: 'Название',
     taskTitlePlaceholder: 'Убрать в комнате',
@@ -415,6 +454,7 @@ export const ru: Dictionary = {
     title: 'Отклонить задание',
     subtitle:
       'Подскажите, что исправить. {{name}} увидит причину и сможет попробовать ещё раз.',
+    subtitleClose: 'Задание закроется, награда вернётся в ваш кошелёк.',
     comment: 'Комментарий',
     commentPlaceholder:
       'Покажите, что нужно исправить, например «кровать не заправлена».',
@@ -422,6 +462,12 @@ export const ru: Dictionary = {
       'not-done-properly': 'Сделано плохо',
       'not-finished': 'Не доделано',
       other: 'Другое',
+    },
+    errors: {
+      withdrawn: 'Ребёнок забрал отчёт — проверять нечего',
+      alreadyReviewed: 'Этот отчёт уже проверен',
+      network: 'Нет связи. Попробуйте ещё раз.',
+      failed: 'Не получилось сохранить решение. Попробуйте ещё раз.',
     },
   },
   auth: {
@@ -567,6 +613,13 @@ export const ru: Dictionary = {
     redo: 'Переделать',
     sentToast: 'Молодец! Отправлено на проверку',
     redoToast: 'Задание снова активно',
+    errors: {
+      alreadyReviewed: 'Родитель уже проверил это задание.',
+      deadlinePassed: 'Срок задания прошёл, его больше нельзя изменить.',
+      cancelled: 'Это задание отменили.',
+      network: 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.',
+      failed: 'Что-то пошло не так. Попробуйте ещё раз.',
+    },
   },
   roleSelect: {
     title: 'Кто вы?',

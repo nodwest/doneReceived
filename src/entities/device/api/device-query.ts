@@ -58,6 +58,8 @@ export function useConnectCode(
     staleTime: (query) => codeLeft(query.state.data),
     // Меню закрыли — код забываем, следующее открытие спросит сервер.
     gcTime: 0,
+    // Не вышло — сразу показываем ошибку и «Try again», а не ждём повторов.
+    retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });

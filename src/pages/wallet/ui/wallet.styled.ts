@@ -18,8 +18,10 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
+  // Детей может быть больше двух: по двое в ряд, лишние — ниже.
   children: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   sectionHeader: {

@@ -11,17 +11,17 @@ import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
 import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
+import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
 import {
   latestRewards,
   OperationRow,
   operationsInPeriod,
   PeriodSelect,
   sumTotals,
-  useOperations,
   type Operation,
   type SummaryPeriod,
 } from '@entities/operation';
-import { countChildTasks, useTasks, type Task } from '@entities/task';
+import { countChildTasks, type Task } from '@entities/task';
 import type { ChildProfile } from '@entities/user';
 import { useChildBalance } from '@entities/wallet';
 import { useWishlistProgress, WishRow } from '@entities/wish';
@@ -30,6 +30,9 @@ import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
+import { ServerChildProfile } from './server-child-profile';
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
@@ -49,11 +52,18 @@ const openReward = (operation: Operation) =>
  * карте.
  */
 export function ChildProfilePage() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  // Ребёнок семьи с сервера (UUID) — свой профиль из настоящих данных.
+  if (UUID.test(id)) return <ServerChildProfile id={id} />;
+  return <MockChildProfile id={id} />;
+}
+
+/** Профиль мокового ребёнка (Emma, Liam): все блоки на моках. */
+function MockChildProfile({ id }: { id: string }) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: tasks = NO_TASKS } = useTasks();
-  const { data: operations = NO_OPERATIONS } = useOperations();
+  const { data: tasks = NO_TASKS } = useFamilyTasks();
+  const { data: operations = NO_OPERATIONS } = useFamilyOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
   const [today] = useState(() => new Date());
   const [period, setPeriod] = useState<SummaryPeriod>('week');
@@ -62,14 +72,21 @@ export function ChildProfilePage() {
     (item) => String(item.id) === id,
   );
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
-  const { balance } = useChildBalance(child?.id ?? -1);
-  const wishlist = useWishlistProgress(child?.id ?? -1, balance);
+  const { balance } = useChildBalance(child ? String(child.id) : null);
+  const wishlist = useWishlistProgress(
+    { childId: String(child?.id ?? -1), familyId: null },
+    balance,
+  );
   if (!child) return <Redirect href="/" />;
 
   // Активные — все задания ребёнка, на проверке — только свои.
-  const counts = countChildTasks(tasks, child.id, parentMock.id);
+  const counts = countChildTasks(
+    tasks,
+    String(child.id),
+    String(parentMock.id),
+  );
   const childOperations = operations.filter(
-    (operation) => operation.child.id === child.id,
+    (operation) => operation.child.id === String(child.id),
   );
   const totals = sumTotals(operationsInPeriod(childOperations, period, today));
   const rewards = latestRewards(childOperations, RECENT_REWARDS);
@@ -164,7 +181,7 @@ export function ChildProfilePage() {
                   {...operation}
                   caption="day"
                   onPress={
-                    operation.parentId === parentMock.id
+                    operation.parentId === String(parentMock.id)
                       ? () => openReward(operation)
                       : undefined
                   }

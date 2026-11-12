@@ -6,7 +6,7 @@ import {
   formatMoney,
   FundsBar,
   FundsLegendItem,
-  getParentFunds,
+  type ParentFunds,
 } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
@@ -14,17 +14,19 @@ import { Icon } from '@shared/ui';
 import { styles } from './balance-card.styled';
 
 type BalanceCardProps = {
-  balance: number;
+  /** Баланс ребёнка. */
+  balance?: number;
   /** parent — тёмно-синяя с Deposit и Withdraw; child — голубая, только Withdraw. */
   role?: FamilyRole;
   /** Сколько ребёнок заработал за неделю: плашка «+$28 this week». */
   weekEarned?: number;
   /**
-   * Родитель: сколько из баланса в резерве за ещё не выплаченные задания.
-   * Тогда крупно — доступное на новые задания, под ним полоса резерв /
-   * доступно от всего кошелька.
+   * Деньги родителя с сервера: крупно — доступное на новые задания, под ним
+   * полоса «в резерве / доступно» от всего кошелька. Пока грузятся — прочерк.
    */
-  reserved?: number;
+  funds?: ParentFunds;
+  /** Deposit у родителя: открыть шторку пополнения. */
+  onDeposit?: () => void;
 };
 
 const GRADIENTS = {
@@ -35,19 +37,18 @@ const GRADIENTS = {
 /**
  * Карточка баланса на вкладке Wallet: у родителя — доступное на задания,
  * полоса «в резерве / доступно» от всего кошелька и кнопки Deposit и
- * Withdraw, у ребёнка — баланс, Withdraw и заработанное за неделю. Кнопки
- * пока ничего не делают.
+ * Withdraw, у ребёнка — баланс, Withdraw и заработанное за неделю. Deposit
+ * открывает шторку пополнения, Withdraw пока ничего не делает.
  */
 export function BalanceCard({
   balance,
   role = 'parent',
   weekEarned,
-  reserved,
+  funds,
+  onDeposit,
 }: BalanceCardProps) {
   const { t } = useTranslation();
   const child = role === 'child';
-  const funds =
-    !child && reserved !== undefined ? getParentFunds(balance, reserved) : null;
 
   return (
     <LinearGradient
@@ -59,16 +60,16 @@ export function BalanceCard({
       style={[styles.card, !child && styles.cardParent]}
     >
       <Text style={[styles.caption, child && styles.captionChild]}>
-        {child
-          ? t('wallet.yourBalance')
-          : funds
-            ? t('wallet.availableForTasks')
-            : t('wallet.balance')}
+        {child ? t('wallet.yourBalance') : t('wallet.availableForTasks')}
       </Text>
       <Text style={styles.balance}>
-        {funds ? formatMoney(funds.available) : formatBalance(balance)}
+        {child
+          ? formatBalance(balance ?? 0)
+          : funds
+            ? formatMoney(funds.available)
+            : '—'}
       </Text>
-      {funds && (
+      {!child && funds && (
         <View style={styles.meter}>
           <FundsBar
             height={10}
@@ -118,6 +119,7 @@ export function BalanceCard({
         {!child && (
           <Pressable
             accessibilityRole="button"
+            onPress={onDeposit}
             style={({ pressed }) => [
               styles.button,
               styles.deposit,

@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import {
-  Image,
   Pressable,
   Text,
   View,
@@ -14,6 +13,7 @@ import { Icon } from '@shared/ui';
 import type { Task, TaskAssignee } from '../model';
 import { RewardChip } from './task-sheet';
 import { styles } from './child-task-tile.styled';
+import { AssigneeAvatar } from './assignee-avatar';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -58,7 +58,11 @@ export function ChildTaskTile({
         style={({ pressed }) => [styles.main, pressed && styles.pressed]}
       >
         <View style={styles.head}>
-          <Image source={author.avatar} style={styles.avatar} />
+          <AssigneeAvatar
+            source={author.avatar}
+            name={author.name}
+            style={styles.avatar}
+          />
           <View style={styles.titleWrap}>
             <Text style={styles.title} numberOfLines={1}>
               {task.title}
