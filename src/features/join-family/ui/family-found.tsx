@@ -1,13 +1,16 @@
 import { Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import type { FamilyInvite } from '@entities/family';
+import type { InviteRole } from '@entities/family';
 import { RoleIcon } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
 import { styles } from './family-found.styled';
 
-type FamilyFoundProps = FamilyInvite & {
+type FamilyFoundProps = {
+  familyName: string;
+  /** Кем войдёт человек. */
+  role: InviteRole;
   /** Кто уже в семье — строкой под ролью; нет — строки нет. */
   members?: readonly string[];
 };

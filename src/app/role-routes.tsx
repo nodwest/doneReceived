@@ -11,9 +11,8 @@ import { ChildWalletPage, WalletPage } from '@pages/wallet';
 import { useViewerRole } from '@entities/user';
 
 /**
- * ВРЕМЕННО: вкладки, у которых свой экран для ребёнка. Роль переключается
- * тоглом Child mode в профиле; когда появится вход ребёнка, роль будет
- * браться из сессии.
+ * Вкладки, у которых свой экран для ребёнка: роль берётся по `kind`
+ * вошедшего аккаунта (`useViewerRole`).
  */
 export function HomeRoute() {
   return useViewerRole() === 'child' ? <ChildHomePage /> : <ParentHomePage />;

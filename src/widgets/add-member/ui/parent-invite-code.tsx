@@ -9,11 +9,6 @@ import { useNow } from '@shared/lib';
 import { CopyableCode } from '@shared/ui';
 import { styles } from './parent-invite-code.styled';
 
-type ParentInviteCodeProps = {
-  /** Код из моков: без семьи на сервере (временный пропуск ребёнка). */
-  fallbackCode?: string;
-};
-
 /**
  * Код для второго родителя в «Add family member». Компонент есть, только
  * пока панель открыта, — значит, родитель хочет пригласить: тогда и
@@ -21,15 +16,13 @@ type ParentInviteCodeProps = {
  * при открытой панели — `useParentInvite` сам запрашивает новый, и на
  * месте старого появляется актуальный.
  */
-export function ParentInviteCode({ fallbackCode }: ParentInviteCodeProps) {
+export function ParentInviteCode() {
   const { t } = useTranslation();
   const family = useCurrentFamily();
   const { data, isError } = useParentInvite(family?.id ?? null, true);
   const now = useNow(1000);
 
-  if (!family) {
-    return fallbackCode ? <CopyableCode code={fallbackCode} /> : null;
-  }
+  if (!family) return null;
 
   // Истёкший код (новый ещё в пути) не показываем: его уже не примут.
   const alive = !!data && new Date(data.expiresAt).getTime() > now.getTime();

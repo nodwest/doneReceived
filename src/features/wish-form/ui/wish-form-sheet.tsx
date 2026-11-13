@@ -1,11 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import {
-  isServerWishlist,
-  type Wish,
-  type WishlistOwner,
-} from '@entities/wish';
+import { type Wish, type WishlistOwner } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -13,7 +9,6 @@ import { BottomSheet, Icon, SheetField, Toggle } from '@shared/ui';
 import { useCreateWish } from '../model/use-create-wish';
 import { useUpdateWish } from '../model/use-update-wish';
 import { useWishForm } from '../model/use-wish-form';
-import { PhotoPicker } from './photo-picker';
 import { styles } from './wish-form-sheet.styled';
 
 type WishFormSheetProps = {
@@ -49,12 +44,9 @@ export function WishFormSheet({
   const form = useWishForm();
   const createWish = useCreateWish(owner);
   const updateWish = useUpdateWish(owner);
-  // Фото желаний с сервера пока не загружаем: у настоящего ребёнка в форме
-  // их нет.
-  const server = owner !== null && isServerWishlist(owner);
   const editing = wish !== undefined;
   const pending = createWish.isPending || updateWish.isPending;
-  const { title, price, description, link, photos, top } = form.fields;
+  const { title, price, description, link, top } = form.fields;
 
   // Каждое открытие — с данными желания или с чистого листа, до отрисовки.
   useLayoutEffect(() => {
@@ -116,7 +108,7 @@ export function WishFormSheet({
           keyboardType="number-pad"
           prefix={<Text style={styles.currency}>$</Text>}
         />
-        {!server && <PhotoPicker photos={photos} onRemove={form.removePhoto} />}
+        {/* Фото желаний появятся с выбором фото (п. 22). */}
         <SheetField
           label={t('wishForm.description')}
           value={description}

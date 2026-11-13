@@ -11,9 +11,7 @@ import {
   type ParentInvite,
 } from '../model/family';
 
-// Настоящие эндпоинты семьи. Ошибки приходят как ApiError из @shared/api.
-// Остальное в family-api.ts (коды для ребёнка, новые профили детей) пока
-// ходит в mock-server.
+// Эндпоинты семьи. Ошибки приходят как ApiError из @shared/api.
 
 /** GET /families — семьи, где у вошедшего есть членство, и его роль в них. */
 export function fetchMyFamilies() {

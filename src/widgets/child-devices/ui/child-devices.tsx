@@ -12,15 +12,10 @@ import { styles } from './child-devices.styled';
 const NO_DEVICES: Device[] = [];
 
 type ChildDevicesProps = {
-  /**
-   * Семья на сервере: устройства, код и отключение — настоящие. null —
-   * моковый ребёнок (Emma, Liam), устройства передаёт страница.
-   */
+  /** Семья ребёнка; пока не загрузилась (null) — устройств не спрашиваем. */
   familyId: string | null;
   childId: string;
   childName: string;
-  /** Устройства мокового ребёнка; у ребёнка с сервера не нужны. */
-  mockDevices?: Device[];
   /**
    * Раскрыт ли блок. Открытостью управляет страница: раскрыли у одного
    * ребёнка — у другого он сворачивается.
@@ -47,7 +42,6 @@ export function ChildDevices({
   familyId,
   childId,
   childName,
-  mockDevices = NO_DEVICES,
   expanded,
   onExpandedChange,
   onReveal,
@@ -55,21 +49,12 @@ export function ChildDevices({
   const { t } = useTranslation();
   const [panel, setPanel] = useState<Panel>('list');
   const blockRef = useRef<View>(null);
-  const { data: serverDevices = NO_DEVICES } = useChildDevices(
-    familyId,
-    childId,
-  );
-  const devices = familyId ? serverDevices : mockDevices;
+  const { data: devices = NO_DEVICES } = useChildDevices(familyId, childId);
   const hasDevices = devices.length > 0;
   const revoke = useRevokeDevice(familyId ?? '', childId);
 
-  // Корзина: устройство с сервера отключается (на нём ребёнок выйдет), у
-  // моковых — только тост.
+  // Корзина: устройство отключается — на нём ребёнок выйдет.
   const remove = (device: Device) => {
-    if (!familyId) {
-      showToast(t('devices.removeSoon'));
-      return;
-    }
     revoke.mutate(device.id, {
       onSuccess: () => showToast(t('devices.removed', { name: device.name })),
       onError: () => showToast(t('devices.removeFailed')),

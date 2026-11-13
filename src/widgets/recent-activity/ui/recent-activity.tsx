@@ -5,7 +5,7 @@ import { SectionHeader } from '@shared/ui';
 import { styles } from './recent-activity.styled';
 
 type RecentActivityProps = {
-  /** Пункты ленты: ActivityItem у родителя, ChildActivityItem у ребёнка. */
+  /** Пункты ленты: события `FeedItem`. */
   children: ReactNode;
   onSeeAll?: () => void;
 };
