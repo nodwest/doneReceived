@@ -9,6 +9,8 @@ export const theme = {
     // Просмотр фото на весь экран: почти чёрный фон и полупрозрачные кнопки на нём.
     viewerBg: '#0B0C12',
     viewerChrome: 'rgba(255, 255, 255, 0.14)',
+    // Затемнение вокруг круга при обрезке аватарки.
+    viewerScrim: 'rgba(11, 12, 18, 0.62)',
     success: '#2ECC71',
     white: '#FFFFFF',
     line: '#ECEDF3',

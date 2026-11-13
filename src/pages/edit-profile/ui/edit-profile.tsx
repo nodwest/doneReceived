@@ -13,9 +13,15 @@ import {
 } from '@entities/session';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { choosePhotos, photoUploadError, showToast } from '@shared/lib';
+import {
+  choosePhotos,
+  photoUploadError,
+  showToast,
+  type PickedPhoto,
+} from '@shared/lib';
 import { theme } from '@shared/theme';
 import {
+  AvatarCropper,
   GradientButton,
   Icon,
   InputWithIcon,
@@ -35,7 +41,8 @@ import { styles } from './edit-profile.styled';
  * Change — тост «скоро» (на сервере смены почты нет, Идеи.md п. 29). Change
  * password — отдельный экран `/change-password` (только у родителя: у
  * ребёнка пароля нет). Фото: тап по аватару или Change photo — меню «снять,
- * из галереи, убрать» (PUT / DELETE /users/me/avatar).
+ * из галереи, убрать»; снятое или выбранное открывается в `AvatarCropper`,
+ * Use photo загружает вырезанный квадрат (PUT / DELETE /users/me/avatar).
  */
 /** Что выбрали в меню фото; none — ничего не отмечено галочкой. */
 type PhotoChoice = 'camera' | 'library' | 'remove' | 'none';
@@ -65,6 +72,8 @@ export function EditProfilePage() {
   const photoButton = useRef<View>(null);
   const [photoAnchor, setPhotoAnchor] = useState<AnchorRect | null>(null);
   const [photoMenu, setPhotoMenu] = useState(false);
+  // Выбранное фото на экране обрезки; null — экран закрыт.
+  const [cropping, setCropping] = useState<PickedPhoto | null>(null);
   const photoOptions = [
     { value: 'camera', label: t('taskCard.takePhoto') },
     { value: 'library', label: t('taskCard.addFromGallery') },
@@ -82,21 +91,27 @@ export function EditProfilePage() {
     });
   };
 
+  const uploadPhoto = (photo: PickedPhoto | null) =>
+    avatarChange.mutate(photo, {
+      onSuccess: () => {
+        setCropping(null);
+        showToast(
+          t(photo ? 'editProfile.photoSaved' : 'editProfile.photoRemoved'),
+        );
+      },
+      // Не загрузилось — экран обрезки остаётся: можно нажать ещё раз.
+      onError: (error) => showToast(t(`photos.${photoUploadError(error)}`)),
+    });
+
   const changePhoto = async (choice: PhotoChoice) => {
     setPhotoMenu(false);
     if (choice === 'none') return;
-    let photo = null;
-    if (choice !== 'remove') {
-      [photo] = await choosePhotos(choice);
-      if (!photo) return;
+    if (choice === 'remove') {
+      uploadPhoto(null);
+      return;
     }
-    avatarChange.mutate(photo, {
-      onSuccess: () =>
-        showToast(
-          t(photo ? 'editProfile.photoSaved' : 'editProfile.photoRemoved'),
-        ),
-      onError: (error) => showToast(t(`photos.${photoUploadError(error)}`)),
-    });
+    const [photo] = await choosePhotos(choice);
+    if (photo) setCropping(photo);
   };
 
   const trimmed = name.trim();
@@ -260,6 +275,12 @@ export function EditProfilePage() {
         onSelect={changePhoto}
         onClose={() => setPhotoMenu(false)}
         width={220}
+      />
+      <AvatarCropper
+        photo={cropping}
+        saving={avatarChange.isPending}
+        onCancel={() => setCropping(null)}
+        onConfirm={uploadPhoto}
       />
     </TabScreen>
   );

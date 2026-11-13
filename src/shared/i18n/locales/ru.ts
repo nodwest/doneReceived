@@ -798,6 +798,15 @@ export const ru: Dictionary = {
     greeting: 'Привет, {{name}}!',
     account: 'Семья {{family}} · ваш аккаунт',
   },
+  avatarCrop: {
+    title: 'Выберите область',
+    hint: 'Двумя пальцами — масштаб, одним — сдвиг',
+    zoom: 'Масштаб',
+    zoomIn: 'Увеличить',
+    zoomOut: 'Уменьшить',
+    usePhoto: 'Готово',
+    saving: 'Сохраняем…',
+  },
   editProfile: {
     title: 'Редактировать профиль',
     changePhoto: 'Сменить фото',

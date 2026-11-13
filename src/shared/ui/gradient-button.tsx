@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme, tracking } from '../theme';
 import { Button } from './button';
@@ -13,6 +13,8 @@ type GradientButtonProps = {
   compact?: boolean;
   /** Ниже (44) и с меньшим скруглением — кнопка внутри карточки. */
   small?: boolean;
+  /** Идёт запрос: спиннер вместо иконки, кнопка не нажимается. */
+  loading?: boolean;
 };
 
 /** Широкая фиолетово-синяя кнопка высотой 56: Create Task, + Family member. */
@@ -23,6 +25,7 @@ export function GradientButton({
   disabled,
   compact,
   small,
+  loading,
 }: GradientButtonProps) {
   return (
     <LinearGradient
@@ -34,6 +37,7 @@ export function GradientButton({
         styles.gradient,
         small && styles.small,
         disabled && styles.disabled,
+        loading && styles.loading,
       ]}
     >
       <Button
@@ -44,14 +48,18 @@ export function GradientButton({
           pressed && styles.buttonPressed,
         ]}
         onPress={onPress}
-        disabled={disabled}
+        disabled={disabled || loading}
       >
-        {icon && (
-          <Icon
-            name={icon}
-            size={small ? 16 : compact ? 18 : 22}
-            color={theme.colors.white}
-          />
+        {loading ? (
+          <ActivityIndicator size="small" color={theme.colors.white} />
+        ) : (
+          icon && (
+            <Icon
+              name={icon}
+              size={small ? 16 : compact ? 18 : 22}
+              color={theme.colors.white}
+            />
+          )
         )}
         <Text
           style={[
@@ -81,6 +89,9 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
+  },
+  loading: {
+    opacity: 0.85,
   },
   button: {
     height: 56,

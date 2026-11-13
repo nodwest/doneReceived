@@ -30,3 +30,4 @@ export * from './card-button';
 export * from './segmented-filter';
 export * from './api-image';
 export * from './photo-viewer';
+export * from './avatar-cropper';

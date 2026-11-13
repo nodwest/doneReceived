@@ -774,6 +774,15 @@ export const en = {
     greeting: 'Hi, {{name}}!',
     account: '{{family}} family · your account',
   },
+  avatarCrop: {
+    title: 'Move and scale',
+    hint: 'Pinch to zoom, drag to move',
+    zoom: 'Zoom',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    usePhoto: 'Use photo',
+    saving: 'Saving…',
+  },
   editProfile: {
     title: 'Edit profile',
     changePhoto: 'Change photo',
