@@ -17,7 +17,16 @@ export async function fetchMockDevices(): Promise<Device[]> {
   return mockServer.devices();
 }
 
-type DeviceDto = { id: string; label: string; createdAt: string };
+type DeviceDto = {
+  id: string;
+  label: string;
+  createdAt: string;
+  /** Последний запрос с токеном устройства; null — ещё не было. */
+  lastSeenAt: string | null;
+};
+
+/** Был запрос не дольше этого назад — устройство «на связи». */
+const ONLINE_WINDOW_MS = 2 * 60_000;
 
 /** GET /families/:id/children/:childId/devices — подключённые устройства. */
 export async function fetchChildDevices(
@@ -32,6 +41,10 @@ export async function fetchChildDevices(
     childId,
     name: device.label,
     connectedAt: device.createdAt,
+    lastSeenAt: device.lastSeenAt ?? undefined,
+    online:
+      device.lastSeenAt !== null &&
+      Date.now() - new Date(device.lastSeenAt).getTime() < ONLINE_WINDOW_MS,
   }));
 }
 

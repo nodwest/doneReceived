@@ -18,8 +18,8 @@ type DeviceRowProps = {
  */
 export function DeviceRow({ device, onRemove }: DeviceRowProps) {
   const { t } = useTranslation();
-  // С сервера приходит только время подключения, у моков — последний выход
-  // на связь.
+  // Последний выход на связь; у устройства, которое ещё не выходило, — время
+  // подключения.
   const lastSeen = useTimeAgo(device.lastSeenAt ?? device.connectedAt ?? '');
   const online = !!device.online;
 

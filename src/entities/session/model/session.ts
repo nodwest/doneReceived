@@ -61,6 +61,11 @@ export type PairDevicePayload = {
   code: string;
   /** Как устройство увидит родитель в списке, например «Chrome · macOS». */
   label: string;
+  /**
+   * UUID этой установки приложения: повторное подключение с ним заменяет
+   * прежнее устройство ребёнка, а не добавляет дубль.
+   */
+  installationId: string;
 };
 
 /** Ответ POST /child-devices/pair: сессия ребёнка и его устройство. */
