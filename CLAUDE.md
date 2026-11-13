@@ -10,6 +10,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Проект на ранней стадии: главный экран (`/`) — `ParentHomePage` (дашборд родителя), а у ребёнка — `ChildHomePage` (роль просмотра `useViewerRoleStore` ставится по `kind` вошедшего аккаунта: вход, подключение устройства ребёнка, поднятая при запуске сессия); так же `/tasks` — `TasksPage` или `MyTasksPage`, `/wallet` — `WalletPage` или `ChildWalletPage`, `/rewards-history` — `RewardsHistoryPage` или `ChildRewardsHistoryPage`, `/transactions` — `TransactionsPage` или `ChildTransactionsPage` (выбор в `src/app/role-routes.tsx`), карта (`/map`, веб-виджет) и регистрация (`/registration`) — отдельные роуты. Виджет `task-short-view` пока нигде не используется.
 
+## Описание PR
+
+Когда автор просит «дай название, PR и описание» (или похоже), без уточняющих вопросов перезаписать файл `Описание PR.md` в корне репозитория: старое содержимое удалить целиком, положить только актуальное — название PR и описание в Markdown, готовые к копированию в GitHub. PR вливаются в `develop`; описание — по коммитам ветки относительно `origin/develop`. Файл в `.gitignore`, это локальный технический файл автора: не коммитить, не упоминать в коммитах, PR и других файлах. Правило «Без упоминаний Claude» действует и для этого файла.
+
 ## Коммиты
 
 Формат из `obsidian-done/Сделал-получил/Соглашения.md`:
