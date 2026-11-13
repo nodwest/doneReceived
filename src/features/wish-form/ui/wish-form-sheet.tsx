@@ -1,7 +1,11 @@
 import { useLayoutEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { type Wish, type WishlistOwner } from '@entities/wish';
+import {
+  isWishlistLimitError,
+  type Wish,
+  type WishlistOwner,
+} from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -61,14 +65,22 @@ export function WishFormSheet({
       showToast(message);
       onClose();
     };
+    // Форма остаётся открытой: при лимите можно закрыть её и удалить лишнее.
+    const failed = (error: unknown) =>
+      showToast(
+        isWishlistLimitError(error)
+          ? t('wishlist.limitReached')
+          : t('wishlist.saveFailed'),
+      );
     if (wish) {
       updateWish.mutate(
         { id: wish.id, ...form.payload() },
-        { onSuccess: done(t('wishForm.savedToast')) },
+        { onSuccess: done(t('wishForm.savedToast')), onError: failed },
       );
     } else {
       createWish.mutate(form.payload(), {
         onSuccess: done(t('wishForm.addedToast')),
+        onError: failed,
       });
     }
   };

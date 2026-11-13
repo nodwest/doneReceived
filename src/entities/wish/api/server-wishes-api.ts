@@ -1,10 +1,11 @@
-import { apiRequest } from '@shared/api';
+import { apiRequest, authorizedImage } from '@shared/api';
 import type { Wish, WishPayload } from '../model/wish';
 
 // Вишлист ребёнка на сервере. Цена — в центах с валютой (у нас целые
 // доллары, USD); описание — note, ссылка — storeUrl (только https://).
 // Порядок — position (0 — главное желание), «Make it my top wish» — top.
-// Фото желаний фронт пока не загружает (нет выбора фото).
+// Фото приходят списком и читаются с Bearer-токеном; загружать их фронт
+// пока не умеет (нет выбора фото).
 
 type WishDto = {
   id: string;
@@ -16,6 +17,8 @@ type WishDto = {
   storeUrl: string | null;
   /** Место в списке: 0 — самое важное желание. */
   position: number;
+  /** Фото желания: url — относительный адрес картинки (WebP). */
+  photos?: { id: string; url: string }[];
   createdAt: string;
 };
 
@@ -26,8 +29,9 @@ const toWish = (dto: WishDto): Wish => ({
   price: Math.round((dto.priceMinor ?? 0) / 100),
   description: dto.note ?? '',
   link: dto.storeUrl ?? '',
-  photos: [],
+  photos: (dto.photos ?? []).map((photo) => authorizedImage(photo.url)),
   createdAt: dto.createdAt,
+  position: dto.position,
 });
 
 /**
@@ -50,10 +54,15 @@ const httpsUrl = (link: string) =>
 const base = (familyId: string, childId: string) =>
   `/families/${familyId}/children/${childId}/wishes`;
 
-/** GET …/wishes — до 100 желаний по порядку, главное первым. */
+/** GET …/wishes — все желания по порядку (position, затем id), главное первым. */
 export async function fetchServerWishes(familyId: string, childId: string) {
   const list = await apiRequest<WishDto[]>(base(familyId, childId));
-  return [...list].sort((a, b) => a.position - b.position).map(toWish);
+  return [...list]
+    .sort(
+      (a, b) =>
+        a.position - b.position || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    )
+    .map(toWish);
 }
 
 /**
@@ -72,7 +81,10 @@ export function reorderServerWishes(
   });
 }
 
-/** POST …/wishes — добавляет только сам ребёнок. */
+/**
+ * POST …/wishes — добавляет только сам ребёнок; уже WISHLIST_MAX_ITEMS —
+ * 409 `WISHLIST_LIMIT_REACHED`.
+ */
 export async function createServerWish(
   familyId: string,
   childId: string,

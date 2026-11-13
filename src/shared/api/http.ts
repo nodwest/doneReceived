@@ -50,6 +50,19 @@ export function setAccessTokenGetter(getter: () => string | null) {
   getAccessToken = getter;
 }
 
+/**
+ * Картинка API для `<Image>`: относительный адрес дополняется API_URL,
+ * запрос идёт с Bearer-токеном (без него сервер ответит 401). Адрес с
+ * токеном не логируем.
+ */
+export function authorizedImage(url: string) {
+  const token = getAccessToken();
+  return {
+    uri: /^https?:\/\//i.test(url) ? url : `${API_URL}${url}`,
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  };
+}
+
 // Обновление токенов подставляет сессия: true — новая пара сохранена.
 let refreshTokens: (() => Promise<boolean>) | null = null;
 // Идущее обновление: несколько запросов с протухшим токеном ждут одно.

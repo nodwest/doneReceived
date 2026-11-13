@@ -11,6 +11,10 @@ type RoundButtonProps = {
    * внутри карточки (закрыть панель).
    */
   size?: 'md' | 'sm';
+  /** Неактивна: приглушена, не нажимается, читалка экрана так и озвучит. */
+  disabled?: boolean;
+  /** Пояснение для читалки экрана, например почему кнопка неактивна. */
+  accessibilityHint?: string;
 };
 
 /** Круглая кнопка с иконкой: «назад», вид списка, закрыть. */
@@ -19,15 +23,24 @@ export function RoundButton({
   accessibilityLabel,
   onPress,
   size = 'md',
+  disabled = false,
+  accessibilityHint,
 }: RoundButtonProps) {
   const small = size === 'sm';
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
       hitSlop={small ? 6 : undefined}
-      style={[styles.button, small && styles.small]}
+      style={[
+        styles.button,
+        small && styles.small,
+        disabled && styles.disabled,
+      ]}
     >
       <Icon name={icon} size={small ? 18 : 22} color={theme.colors.ink} />
     </Pressable>
@@ -50,5 +63,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: theme.colors.prime,
     boxShadow: 'none',
+  },
+  disabled: {
+    opacity: 0.4,
   },
 });

@@ -1,4 +1,5 @@
 import type { ImageSourcePropType } from 'react-native';
+import { isApiError } from '@shared/api';
 
 export interface Wish {
   /** У моков число строкой, с сервера — UUID. */
@@ -15,7 +16,21 @@ export interface Wish {
   photos: ImageSourcePropType[];
   /** ISO-время, когда желание добавили. */
   createdAt: string;
+  /** Место в списке с сервера: 0 — главное желание. */
+  position?: number;
 }
+
+/**
+ * Сколько желаний ребёнок может добавить; должно совпадать с
+ * WISHLIST_MAX_ITEMS на бэкенде. Лимит только на создание: желания сверх
+ * него (старые) видны, правятся, удаляются и переставляются.
+ */
+export const WISHLIST_MAX_ITEMS = 10;
+
+/** Сервер не дал добавить желание: уже WISHLIST_MAX_ITEMS (409). */
+export const isWishlistLimitError = (error: unknown) =>
+  isApiError(error) &&
+  (error.data as { code?: unknown } | null)?.code === 'WISHLIST_LIMIT_REACHED';
 
 /** Поля формы New wish / Edit wish. */
 export interface WishPayload {

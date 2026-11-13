@@ -646,6 +646,9 @@ export const en = {
     dragHandle: 'Drag to change the order',
     empty: 'Add a wish to start saving',
     allReady: 'Every wish is ready to buy',
+    limitHint: 'You can add up to {{limit}} wishes. Delete one to add another.',
+    limitReached: 'You have reached the wish limit. Delete one to add another.',
+    saveFailed: 'Could not save the wish. Try again.',
   },
   wishCard: {
     myWish: 'My wish',
