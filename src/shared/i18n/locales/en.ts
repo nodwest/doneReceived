@@ -279,6 +279,7 @@ export const en = {
     rewardFromName: 'Reward from {{name}}',
     reward: 'Reward for a task',
     card: 'Card •• {{card}}',
+    walletTopUp: 'Wallet top-up',
     forTask: 'For task',
     details: 'Details',
     date: 'Date',

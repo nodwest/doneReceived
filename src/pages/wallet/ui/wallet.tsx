@@ -32,9 +32,9 @@ const RECENT_TRANSACTIONS = 4;
  */
 export function WalletPage() {
   const { t } = useTranslation();
-  // Транзакции пока на моках, деньги родителя — с сервера.
-  const { data: wallet } = useWallet();
+  // Деньги и транзакции родителя — с сервера (без семьи — моки).
   const familyId = useCurrentFamily()?.id ?? null;
+  const { data: wallet } = useWallet(familyId);
   const { data: funds } = useParentFunds(familyId);
   // Балансы детей: моковые Emma и Liam и дети семьи с сервера.
   const { data: serverChildren = [] } = useFamilyChildren(familyId);

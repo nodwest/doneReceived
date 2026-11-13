@@ -151,11 +151,16 @@ export function TransactionRow({
       {...look}
       leading={<CardIcon withdrawal={!deposit} large={large} />}
       title={deposit ? t('wallet.deposit') : t('wallet.withdrawal')}
-      subtitle={`${
-        deposit
-          ? t('wallet.fromCard', { card: transaction.card })
-          : t('wallet.toCard', { card: transaction.card })
-      } · ${when}`}
+      // Без карты (тестовое пополнение) — только время.
+      subtitle={
+        transaction.card
+          ? `${
+              deposit
+                ? t('wallet.fromCard', { card: transaction.card })
+                : t('wallet.toCard', { card: transaction.card })
+            } · ${when}`
+          : when
+      }
       amount={formatTransactionAmount(transaction)}
       tone={deposit ? 'income' : 'withdrawal'}
     />

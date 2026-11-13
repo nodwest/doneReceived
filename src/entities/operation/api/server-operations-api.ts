@@ -19,6 +19,7 @@ export type OperationsViewer = {
 type WalletDto = {
   entries: {
     id: string;
+    assignmentId: string;
     points: number;
     createdAt: string;
     /** Название и описание задания на момент запроса истории. */
@@ -91,6 +92,7 @@ export async function fetchServerOperations(
         doneAt: entry.submittedAt,
         photo: null,
         note: entry.submissionNote?.trim() || null,
+        assignmentId: entry.assignmentId,
       }),
     );
     const lost = missed.items.map(

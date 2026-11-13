@@ -149,7 +149,10 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   if (linkPending && operations.length > 0) {
     setLinkPending(false);
     const target = filtered.find(
-      (operation) => String(operation.id) === operationParam,
+      // Ссылка из транзакции: id награды или (выплата с сервера) назначения.
+      (operation) =>
+        String(operation.id) === operationParam ||
+        operation.assignmentId === operationParam,
     );
     const dayIndex = target
       ? days.findIndex((date) => isSameDay(target, date))

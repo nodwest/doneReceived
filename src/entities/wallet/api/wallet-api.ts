@@ -1,13 +1,17 @@
 import type { ChildWallet, PayoutPayload, Wallet } from '../model/wallet';
 import { fetchServerChildWallet } from './child-wallet-api';
+import { fetchServerWallet } from './parent-wallet-api';
 import { mockServer } from './mock-server';
 
-// Эндпоинты кошелька. Кошелёк ребёнка с сервера (его id — UUID) — из API,
-// моковых Emma и Liam и история транзакций родителя — из mockServer.
+// Эндпоинты кошелька. Кошелёк ребёнка с сервера (его id — UUID) и
+// транзакции родителя с семьёй — из API, моковых Emma и Liam и родителя без
+// семьи — из mockServer.
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export async function fetchWallet(): Promise<Wallet> {
+/** Транзакции вошедшего родителя: с семьёй — с сервера, без неё — моки. */
+export async function fetchWallet(familyId: string | null): Promise<Wallet> {
+  if (familyId) return fetchServerWallet(familyId);
   return mockServer.wallet();
 }
 

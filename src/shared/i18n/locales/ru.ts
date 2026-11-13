@@ -287,6 +287,7 @@ export const ru: Dictionary = {
     rewardFromName: 'Награда от {{name}}',
     reward: 'Награда за задание',
     card: 'Карта •• {{card}}',
+    walletTopUp: 'Пополнение кошелька',
     forTask: 'За задание',
     details: 'Подробности',
     date: 'Дата',
