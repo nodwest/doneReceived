@@ -24,7 +24,7 @@ type CardButtonProps = {
   variant?: CardButtonVariant;
   /** Иконка слева от подписи. */
   icon?: IconName;
-  /** lg — 56pt (низ карточки), md — 44pt (плитка и строка). */
+  /** lg — 48pt (низ карточки), md — 44pt (плитка и строка). */
   size?: 'lg' | 'md';
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -84,9 +84,7 @@ export function CardButton({
         />
       )}
       <View style={styles.content}>
-        {icon && (
-          <Icon name={icon} size={size === 'md' ? 18 : 20} color={color} />
-        )}
+        {icon && <Icon name={icon} size={18} color={color} />}
         <Text
           style={[styles.label, size === 'md' && styles.labelMd, { color }]}
         >
@@ -100,8 +98,8 @@ export function CardButton({
 const styles = StyleSheet.create({
   button: {
     flex: 1,
-    height: 56,
-    borderRadius: 16,
+    height: 48,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -113,17 +111,17 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   primary: {
-    boxShadow: '0px 8px 18px rgba(108, 92, 231, 0.3)',
+    boxShadow: '0px 4px 12px rgba(108, 92, 231, 0.22)',
   },
   child: {
-    boxShadow: '0px 8px 18px rgba(31, 94, 184, 0.3)',
+    boxShadow: '0px 4px 12px rgba(31, 94, 184, 0.22)',
   },
   dark: {
     backgroundColor: theme.colors.ink,
-    boxShadow: '0px 8px 18px rgba(26, 26, 46, 0.25)',
+    boxShadow: '0px 4px 12px rgba(26, 26, 46, 0.18)',
   },
   outline: {
     borderWidth: 1.5,
@@ -144,8 +142,8 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   label: {
-    fontSize: 18,
-    letterSpacing: tracking(18),
+    fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
   },
   labelMd: {

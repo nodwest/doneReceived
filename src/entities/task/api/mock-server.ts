@@ -137,8 +137,13 @@ export const mockServer = {
     return { ...updated };
   },
 
-  reject: ({ id, reason, comment }: RejectTaskPayload): Task => {
+  /** Отказ: на переделку — снова активно с причиной, иначе — закрыто. */
+  reject: ({ id, reason, comment, retry }: RejectTaskPayload): Task => {
     const current = mockServer.find(id);
+    if (!retry) {
+      tasks = tasks.filter((task) => task.id !== id);
+      return { ...current };
+    }
     const updated: Task = {
       ...current,
       status: 'active',

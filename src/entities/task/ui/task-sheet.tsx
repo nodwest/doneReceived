@@ -16,14 +16,14 @@ import { formatRewardShort } from '../model';
 import { styles } from './task-sheet.styled';
 
 /**
- * parent — фиолетовая шапка, child — голубая, review — оранжевая «на
+ * parent и child — голубая шапка, review — оранжевая «на
  * проверке», paid — зелёная: награда выплачена, wallet — тёмно-синяя, как
  * карточка баланса: транзакция кошелька.
  */
 export type TaskSheetTone = 'parent' | 'child' | 'review' | 'paid' | 'wallet';
 
 const HERO_GRADIENTS = {
-  parent: [theme.colors.heroParentFrom, theme.colors.heroParentTo],
+  parent: [theme.colors.heroChildFrom, theme.colors.childDeep],
   child: [theme.colors.heroChildFrom, theme.colors.childDeep],
   review: [theme.colors.heroReviewFrom, theme.colors.heroReviewTo],
   paid: [theme.colors.heroPaidFrom, theme.colors.earnedDark],

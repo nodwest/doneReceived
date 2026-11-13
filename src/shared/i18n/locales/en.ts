@@ -469,13 +469,23 @@ export const en = {
     reject: 'Reject',
     approve: 'Approve',
     title: 'Reject task',
-    subtitle:
-      'Tell {{name}} what to fix. {{name}} will see your reason and can try again.',
-    subtitleClose:
-      'The task will be closed and the reward will return to your wallet.',
-    comment: 'Add a comment',
-    commentPlaceholder:
-      'Show what needs to be fixed, for example "the bed is not made".',
+    subtitle: 'Tell {{name}} what’s wrong — {{name}} will see your reason.',
+    comment: 'Comment',
+    required: ' · required',
+    commentPlaceholderRedo: 'What to fix, e.g. “the bed is not made”',
+    commentPlaceholderClose: 'Why it’s closed, e.g. “we’ll do it on Sunday”',
+    commentPlaceholderOther: 'Tell {{name}} what’s wrong',
+    redoTitle: 'Let {{name}} redo it',
+    redoOnHint:
+      '{{name}} fixes it and sends it again. The {{amount}} stays reserved.',
+    redoOffHint: 'The task closes and {{amount}} goes back to your wallet.',
+    expiredTitle: 'Time’s up — no redo',
+    expiredHint:
+      'The deadline has passed, so the task closes and {{amount}} goes back to your wallet.',
+    sendBack: 'Send back to {{name}}',
+    closeTask: 'Close task',
+    needCommentRedo: 'Write a comment to send back',
+    needCommentClose: 'Write a comment to close',
     reasons: {
       'not-done-properly': 'Not done properly',
       'not-finished': 'Not finished',
@@ -483,6 +493,7 @@ export const en = {
     },
     errors: {
       withdrawn: 'The report was taken back — nothing to review',
+      deadlinePassed: 'The deadline has passed — the task can only be closed',
       alreadyReviewed: 'This report has already been reviewed',
       network: 'No connection. Please try again.',
       failed: "Couldn't save the decision. Please try again.",

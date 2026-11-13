@@ -67,9 +67,15 @@ export interface TaskStatusPayload {
   note?: string;
 }
 
-/** Отказ родителя на проверке: задание снова активно, с причиной. */
+/**
+ * Отказ родителя на проверке: с `retry` задание возвращается ребёнку на
+ * переделку (награда остаётся в резерве), без — закрывается (награда
+ * возвращается родителю).
+ */
 export interface RejectTaskPayload {
   id: string;
   reason: RejectReasonKey;
+  /** Комментарий родителя; пустая строка — без него (у `other` обязателен). */
   comment: string;
+  retry: boolean;
 }

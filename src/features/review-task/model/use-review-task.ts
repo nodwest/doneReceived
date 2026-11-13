@@ -17,6 +17,7 @@ function reviewError(error: unknown) {
       ? (error.data as { code?: unknown }).code
       : null;
   if (code === 'SUBMISSION_WITHDRAWN') return 'withdrawn' as const;
+  if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed' as const;
   if (error.status === 409) return 'alreadyReviewed' as const;
   return 'failed' as const;
 }
@@ -25,9 +26,9 @@ function reviewError(error: unknown) {
  * Проверка задания родителем. Approve: задание выполнено (done) и уходит из
  * списков. У задания с сервера награда из резерва уходит ребёнку на сервере;
  * у мокового награда записывается в моковую историю (`addReward`) и деньги
- * уходят из мокового кошелька (`payReward`). Reject: моковое снова активно с
- * причиной; с сервера пока закрывается, резерв возвращается родителю
- * (переделку сервер ещё не умеет). Кэш задач, истории и кошельков
+ * уходят из мокового кошелька (`payReward`). Reject: на переделку — задание
+ * снова активно с причиной, награда остаётся в резерве; закрыть — задание
+ * уходит из списков, у задания с сервера резерв возвращается родителю. Кэш задач, истории и кошельков
  * перечитывается и после ошибки — карточка могла устареть.
  */
 export function useReviewTask() {
@@ -93,24 +94,20 @@ export function useReviewTask() {
     }: {
       task: Task;
       decision: RejectDecision;
-    }) => {
-      // Серверу причина нужна словами: подпись причины и комментарий.
-      const label = t(`reviewTask.reasons.${decision.reason}`);
-      const comment = decision.comment.trim();
-      return rejectTask(
+    }) =>
+      rejectTask(
         {
           id: task.id,
           serverTaskId: task.serverTaskId,
           submissionId: task.submissionId,
           ...decision,
-          reasonText: comment ? `${label}. ${comment}` : label,
+          comment: decision.comment.trim(),
         },
         familyId,
-      );
-    },
-    onSuccess: (_, { task }) => {
+      ),
+    onSuccess: (_, { task, decision }) => {
       showToast(
-        t(task.serverTaskId ? 'tasks.closedToast' : 'tasks.rejectedToast', {
+        t(decision.retry ? 'tasks.rejectedToast' : 'tasks.closedToast', {
           name: task.assignee.name,
         }),
       );

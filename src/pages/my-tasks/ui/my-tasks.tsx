@@ -191,8 +191,11 @@ export function MyTasksPage() {
                 <MyTaskCard
                   task={task}
                   author={authorOf(task, t('member.parent'))}
+                  // У задания с сервера отклоняет его автор: имя — как у автора.
                   rejectedBy={
-                    task.rejection ? findAuthor(task.rejection.by) : undefined
+                    task.rejection && !task.serverTaskId
+                      ? findAuthor(task.rejection.by)
+                      : undefined
                   }
                   onTakePhoto={photoStub}
                   onPickPhoto={photoStub}

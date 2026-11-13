@@ -11,6 +11,7 @@ import {
   cancelServerTask,
   createServerTask,
   fetchServerTasks,
+  REJECT_REASON_CODES,
   reviewServerSubmission,
   submitServerTask,
   tickServerChecklist,
@@ -138,15 +139,14 @@ export async function approveTask(
 }
 
 /**
- * Родитель отклонил задание. Моковое — снова активно с причиной. С сервера —
- * пока закрывается, резерв возвращается родителю; `reasonText` — причина
- * для сервера словами.
+ * Родитель отклонил задание: с `retry` — на переделку (снова активно с
+ * причиной, награда в резерве), без — закрыто (у задания с сервера резерв
+ * возвращается родителю).
  */
 export async function rejectTask(
   payload: RejectTaskPayload & {
     serverTaskId?: string;
     submissionId?: string;
-    reasonText: string;
   },
   familyId: string | null,
 ): Promise<void> {
@@ -154,7 +154,9 @@ export async function rejectTask(
     if (!familyId) throw new Error('No family');
     await reviewServerSubmission(familyId, payload, {
       decision: 'rejected',
-      reason: payload.reasonText,
+      reasonCode: REJECT_REASON_CODES[payload.reason],
+      ...(payload.comment ? { comment: payload.comment } : {}),
+      retry: payload.retry,
     });
     return;
   }

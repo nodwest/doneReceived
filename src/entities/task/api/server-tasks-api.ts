@@ -52,13 +52,21 @@ type LastRejectionDto = {
   reviewedAt: string;
 };
 
+type RejectReasonCode = LastRejectionDto['reasonCode'];
+
 /** Код причины отказа на сервере → ключ причины в приложении. */
-const REJECT_REASONS: Record<LastRejectionDto['reasonCode'], RejectReasonKey> =
-  {
-    not_done_properly: 'not-done-properly',
-    not_finished: 'not-finished',
-    other: 'other',
-  };
+const REJECT_REASONS: Record<RejectReasonCode, RejectReasonKey> = {
+  not_done_properly: 'not-done-properly',
+  not_finished: 'not-finished',
+  other: 'other',
+};
+
+/** Ключ причины в приложении → код причины для сервера. */
+export const REJECT_REASON_CODES: Record<RejectReasonKey, RejectReasonCode> = {
+  'not-done-properly': 'not_done_properly',
+  'not-finished': 'not_finished',
+  other: 'other',
+};
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
 
@@ -300,14 +308,23 @@ export async function withdrawServerSubmission(
 /**
  * Решение родителя по отчёту, который ждёт проверки: POST
  * /families/:id/task-submissions/:submissionId/review. approved — резерв
- * уходит ребёнку; rejected (с причиной) — пока без `retry`: назначение
- * закрывается и резерв возвращается автору (переделка — Идеи.md п. 28).
- * 409 — отчёт отозван (`SUBMISSION_WITHDRAWN`) или уже проверен.
+ * уходит ребёнку. rejected — причина кодом и комментарий (у `other`
+ * обязателен); `retry: true` — назначение остаётся открытым (на переделку,
+ * резерв не трогается), `false` — закрывается, резерв возвращается автору.
+ * 409 — отчёт отозван (`SUBMISSION_WITHDRAWN`), уже проверен или срок
+ * прошёл, а просили переделку (`TASK_DEADLINE_PASSED`).
  */
 export async function reviewServerSubmission(
   familyId: string,
   assignment: PendingRef,
-  review: { decision: 'approved' } | { decision: 'rejected'; reason: string },
+  review:
+    | { decision: 'approved' }
+    | {
+        decision: 'rejected';
+        reasonCode: RejectReasonCode;
+        comment?: string;
+        retry: boolean;
+      },
 ) {
   const submissionId = await pendingSubmissionId(familyId, assignment);
   await apiRequest<unknown>(

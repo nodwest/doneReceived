@@ -51,6 +51,7 @@ import { RefreshIcon } from './refresh';
 import { ClockIcon } from './clock';
 import { CalendarIcon } from './calendar';
 import { SparkleIcon } from './sparkle';
+import { UndoIcon } from './undo';
 
 export const icons = {
   price: PriceIcon,
@@ -106,4 +107,5 @@ export const icons = {
   clock: ClockIcon,
   calendar: CalendarIcon,
   sparkle: SparkleIcon,
+  undo: UndoIcon,
 };
