@@ -41,12 +41,12 @@ import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
 const NO_TASKS: Task[] = [];
 
 /**
- * Кто дал задание: имя из участников семьи (без фото — буква), не знаем —
- * просто «Родитель».
+ * Кто дал задание: имя и фото из участников семьи (без фото — буква), не
+ * знаем — просто «Родитель».
  */
 const authorOf = (task: Task, parentLabel: string) => ({
   name: task.authorName ?? parentLabel,
-  avatar: null,
+  avatar: task.authorAvatar ?? null,
 });
 
 /**

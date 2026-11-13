@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useFeed, type FeedViewer } from '@entities/activity';
-import { useSession } from '@entities/session';
+import { useMe, useSession } from '@entities/session';
 import { useChildAccount } from './use-child-account';
 import { useTaskViewer } from './use-family-tasks';
 
@@ -12,6 +12,7 @@ import { useTaskViewer } from './use-family-tasks';
 export function useFamilyFeed() {
   const viewer = useTaskViewer();
   const session = useSession();
+  const me = useMe();
   const { childId } = useChildAccount();
   const childSession = session?.user.kind === 'child';
   const feedViewer = useMemo<FeedViewer | null>(() => {
@@ -23,8 +24,13 @@ export function useFamilyFeed() {
     return {
       familyId: viewer.familyId,
       userId: viewer.userId,
-      child: { id: childId, name: session.user.displayName },
+      child: {
+        id: childId,
+        name: session.user.displayName,
+        // Своё фото ребёнок видит из профиля: список детей ему закрыт.
+        avatarUrl: me?.avatarUrl ?? session.user.avatarUrl,
+      },
     };
-  }, [viewer, childSession, childId, session]);
+  }, [viewer, childSession, childId, session, me?.avatarUrl]);
   return { feedViewer, ...useFeed(feedViewer) };
 }

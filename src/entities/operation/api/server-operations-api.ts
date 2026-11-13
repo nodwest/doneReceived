@@ -11,7 +11,7 @@ export type OperationsViewer = {
   /** id аккаунта вошедшего. */
   userId: string;
   /** Вошёл ребёнок: только его история (список детей ему закрыт). */
-  child?: { id: string; name: string };
+  child?: { id: string; name: string; avatarUrl: string | null };
 };
 
 type WalletDto = {
@@ -54,7 +54,13 @@ export async function fetchServerOperations(
 ): Promise<Operation[]> {
   const { familyId } = viewer;
   const children: ChildDto[] = viewer.child
-    ? [{ id: viewer.child.id, displayName: viewer.child.name, avatarUrl: null }]
+    ? [
+        {
+          id: viewer.child.id,
+          displayName: viewer.child.name,
+          avatarUrl: viewer.child.avatarUrl,
+        },
+      ]
     : await apiRequest<ChildDto[]>(`/families/${familyId}/children`);
   // По каждому ребёнку — кошелёк и упущенные; не ответили — у ребёнка пусто.
   const histories = await Promise.all(

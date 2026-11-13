@@ -42,5 +42,5 @@ export interface FeedEvent {
 export interface FeedViewer {
   familyId: string;
   userId: string;
-  child?: { id: string; name: string };
+  child?: { id: string; name: string; avatarUrl: string | null };
 }
