@@ -1,12 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { useSessionStore } from '@entities/session';
+import { useCurrentFamily, useFamilyChildren } from '@entities/family';
+import { useSessionKind, useSessionStore } from '@entities/session';
 import { LOCATION_WS_URL } from '@shared/config';
 import { startLocationTracking } from '@shared/lib';
 import type { Location } from '@entities/user';
 
+/**
+ * Сокет геолокации. Координаты отправляет только ребёнок — у родителя
+ * геолокация даже не запрашивается, он лишь получает позиции детей. На карту
+ * идут только события детей: без `childId` (прислал не ребёнок) и, когда
+ * дети семьи уже загружены, чужие — отбрасываются. Координаты и токен не
+ * логируем.
+ */
 export const useLocationSocket = (onLocation: (location: Location) => void) => {
   const accessToken = useSessionStore((state) => state.session?.accessToken);
+  const kind = useSessionKind();
+  const family = useCurrentFamily();
+  const { data: children } = useFamilyChildren(
+    kind === 'parent' ? (family?.id ?? null) : null,
+  );
+  // Список детей — в ref, чтобы его загрузка не переоткрывала сокет.
+  const childIds = useRef<ReadonlySet<string> | null>(null);
+  useEffect(() => {
+    childIds.current = children ? new Set(children.map((c) => c.id)) : null;
+  }, [children]);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -25,6 +43,7 @@ export const useLocationSocket = (onLocation: (location: Location) => void) => {
       const message = JSON.parse(event.data);
 
       if (message.event === 'authenticated' && message.data === true) {
+        if (kind !== 'child') return;
         stopLocationTracking ??= startLocationTracking((lat, lng) => {
           if (socket.readyState !== WebSocket.OPEN) return;
 
@@ -37,20 +56,18 @@ export const useLocationSocket = (onLocation: (location: Location) => void) => {
 
       if (message.event !== 'location') return;
 
-      const { userId, lat, lng } = message.data;
+      const location = message.data as Location;
+      if (!location.childId) return;
+      if (childIds.current && !childIds.current.has(location.childId)) return;
 
-      onLocation({
-        userId,
-        lat,
-        lng,
-      });
+      onLocation(location);
     };
 
     socket.onclose = ({ code }) => {
       stopLocationTracking?.();
       stopLocationTracking = undefined;
       if (code === 1006) {
-        console.warn('Location WebSocket connection lost:', LOCATION_WS_URL);
+        console.warn('Location WebSocket connection lost');
       }
     };
 
@@ -61,5 +78,5 @@ export const useLocationSocket = (onLocation: (location: Location) => void) => {
       stopLocationTracking?.();
       socket.close();
     };
-  }, [accessToken, onLocation]);
+  }, [accessToken, kind, onLocation]);
 };

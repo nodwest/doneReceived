@@ -18,6 +18,8 @@ function actionError(error: unknown) {
   if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed' as const;
   if (code === 'TASK_CANCELLED') return 'cancelled' as const;
   if (code === 'ASSIGNMENT_NOT_ACTIVE') return 'notActive' as const;
+  // 10 попыток сдачи на задание (отозванные тоже считаются).
+  if (code === 'SUBMISSION_LIMIT_REACHED') return 'tooManyAttempts' as const;
   return 'failed' as const;
 }
 

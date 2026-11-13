@@ -697,6 +697,8 @@ export const en = {
       deadlinePassed: 'The deadline has passed, the task can no longer change.',
       cancelled: 'This task was cancelled.',
       notActive: 'The task is already on review — steps can’t change now.',
+      tooManyAttempts:
+        'Too many attempts to hand in this task. Ask a parent to check it.',
       network: "Can't reach the server. Check your connection and try again.",
       failed: 'Something went wrong. Please try again.',
     },
