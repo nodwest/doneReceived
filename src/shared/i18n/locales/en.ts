@@ -744,6 +744,38 @@ export const en = {
     security: 'Security',
     changePassword: 'Change password',
     save: 'Save changes',
+    changeEmail: 'Change',
+    emailSoon: 'Changing your email is coming soon',
+    saved: 'Name saved',
+    errors: {
+      network: "Can't reach the server. Check your connection and try again.",
+      failed: "Couldn't save your name. Try again.",
+    },
+  },
+  changePassword: {
+    title: 'Change password',
+    intro:
+      "Use at least 8 characters. You'll stay signed in here — other devices will be signed out.",
+    current: 'Current password',
+    currentPlaceholder: 'Enter your current password',
+    currentHint: 'Your Kids Tasks sign-in password, not your email one',
+    new: 'New password',
+    newPlaceholder: 'Create a new password',
+    confirm: 'Confirm new password',
+    confirmPlaceholder: 'Repeat the new password',
+    strong: 'Strong password',
+    match: 'Passwords match',
+    submit: 'Update password',
+    updated: 'Password updated',
+    errors: {
+      wrongCurrent: 'Current password is incorrect',
+      sameAsCurrent: 'The new password must be different from the current one',
+      tooManyAttempts_one: 'Too many attempts. Try again in {{count}} minute',
+      tooManyAttempts_other:
+        'Too many attempts. Try again in {{count}} minutes',
+      network: "Can't reach the server. Check your connection and try again.",
+      failed: "Couldn't change the password. Try again.",
+    },
   },
   profile: {
     title: 'Profile',

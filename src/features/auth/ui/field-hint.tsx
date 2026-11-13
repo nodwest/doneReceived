@@ -5,9 +5,9 @@ import { styles } from './field-hint.styled';
 
 /**
  * hint — что нужно (синяя), met — выполнено (зелёная с галочкой),
- * error — ошибка (красная).
+ * error — ошибка (красная), muted — пояснение к полю (серая).
  */
-export type HintTone = 'hint' | 'met' | 'error';
+export type HintTone = 'hint' | 'met' | 'error' | 'muted';
 
 type FieldHintProps = {
   text: string;
@@ -22,7 +22,13 @@ export function FieldHint({ text, tone }: FieldHintProps) {
         {tone === 'met' ? (
           <Icon name="check" size={14} color={theme.colors.readyText} />
         ) : (
-          <View style={[styles.dot, tone === 'error' && styles.dotError]} />
+          <View
+            style={[
+              styles.dot,
+              tone === 'error' && styles.dotError,
+              tone === 'muted' && styles.dotMuted,
+            ]}
+          />
         )}
       </View>
       <Text style={[styles.text, styles[tone]]}>{text}</Text>

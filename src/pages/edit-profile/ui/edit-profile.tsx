@@ -3,9 +3,18 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
-import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
+import { FieldHint } from '@features/auth';
+import { useUpdateMe } from '@features/update-profile';
+import {
+  DISPLAY_NAME_MAX_LENGTH,
+  useMe,
+  useMyAvatar,
+  useSessionKind,
+} from '@entities/session';
 import { useViewerRole } from '@entities/user';
+import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
+import { showToast } from '@shared/lib';
 import { childAccountMock, parentMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import {
@@ -20,10 +29,13 @@ import {
 import { styles } from './edit-profile.styled';
 
 /**
- * Редактирование профиля вошедшего пользователя (из меню Profile): фото, имя,
- * почта, смена пароля и Save changes. В режиме ребёнка — данные Emma. Пока
- * только вёрстка: фото, пароль и сохранение ничего не делают, поля правятся
- * только на экране.
+ * Редактирование профиля вошедшего пользователя (из меню Profile). Здесь
+ * меняется только имя: Save changes активна, когда имя изменили хотя бы на
+ * символ, и сохраняет его (PATCH /users/me). Почта только показывается,
+ * Change — тост «скоро» (на сервере смены почты нет, Идеи.md п. 29). Change
+ * password — отдельный экран `/change-password` (только у родителя: у
+ * ребёнка пароля нет). Фото пока не меняется. Родитель в режиме ребёнка
+ * видит моковую Emma — сохранять там нечего.
  */
 export function EditProfilePage() {
   const { t } = useTranslation();
@@ -37,8 +49,47 @@ export function EditProfilePage() {
     me && (!isChild || childSession)
       ? { fullName: me.displayName, email: me.email ?? '', avatar: myAvatar }
       : mock;
+  // Настоящий аккаунт, а не моковая Emma: только его имя можно сохранить.
+  const editable = !!me && (!isChild || childSession);
   const [name, setName] = useState(account.fullName);
-  const [email, setEmail] = useState(account.email);
+  // Имя с сервера пришло позже или сохранилось — поле за ним, если его не
+  // трогали.
+  const [savedName, setSavedName] = useState(account.fullName);
+  if (account.fullName !== savedName) {
+    setSavedName(account.fullName);
+    if (name === savedName) setName(account.fullName);
+  }
+  const { mutate, isPending } = useUpdateMe();
+
+  const trimmed = name.trim();
+  const nameError = !trimmed
+    ? 'nameRequired'
+    : trimmed.length > DISPLAY_NAME_MAX_LENGTH
+      ? 'nameTooLong'
+      : null;
+  const changed = trimmed !== account.fullName;
+  const canSave = editable && changed && !nameError && !isPending;
+
+  const save = () => {
+    if (!canSave) return;
+    mutate(
+      { displayName: trimmed },
+      {
+        onSuccess: (user) => {
+          setName(user.displayName);
+          showToast(t('editProfile.saved'));
+        },
+        onError: (error) =>
+          showToast(
+            t(
+              isApiError(error) && error.status === 0
+                ? 'editProfile.errors.network'
+                : 'editProfile.errors.failed',
+            ),
+          ),
+      },
+    );
+  };
 
   return (
     <TabScreen activeKey="profile">
@@ -98,35 +149,60 @@ export function EditProfilePage() {
               onChangeText={setName}
               placeholder={t('auth.fullName')}
               iconName="user"
+              error={changed && !!nameError}
+              autoComplete="name"
+              textContentType="name"
             />
+            {changed && nameError && (
+              <FieldHint tone="error" text={t(`auth.errors.${nameError}`)} />
+            )}
           </View>
           <View style={styles.field}>
             <Label htmlFor="email" style={styles.label}>
               {t('auth.email')}
             </Label>
-            <InputWithIcon
-              id="email"
-              value={email}
-              onChangeText={setEmail}
-              placeholder={t('auth.email')}
-              iconName="message"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={styles.field}>
-            <Text style={styles.label}>{t('editProfile.security')}</Text>
-            <View style={styles.card}>
-              <SettingsRow
-                icon="lock"
-                label={t('editProfile.changePassword')}
+            {/* Почта только показывается: меняется отдельно, с подтверждением. */}
+            <View>
+              <InputWithIcon
+                id="email"
+                value={account.email}
+                editable={false}
+                iconName="message"
+                style={styles.emailInput}
               />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('editProfile.changeEmail')}
+                hitSlop={8}
+                onPress={() => showToast(t('editProfile.emailSoon'))}
+                style={styles.changeEmail}
+              >
+                <Text style={styles.changeEmailText}>
+                  {t('editProfile.changeEmail')}
+                </Text>
+              </Pressable>
             </View>
           </View>
+          {!isChild && (
+            <View style={styles.field}>
+              <Text style={styles.label}>{t('editProfile.security')}</Text>
+              <View style={styles.card}>
+                <SettingsRow
+                  icon="lock"
+                  label={t('editProfile.changePassword')}
+                  onPress={() => router.push('/change-password')}
+                />
+              </View>
+            </View>
+          )}
         </View>
 
         <View style={styles.footer}>
-          <GradientButton label={t('editProfile.save')} />
+          <GradientButton
+            label={t('editProfile.save')}
+            onPress={save}
+            disabled={!canSave}
+          />
         </View>
       </ScrollView>
     </TabScreen>

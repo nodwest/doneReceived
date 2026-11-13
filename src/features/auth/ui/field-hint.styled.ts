@@ -22,6 +22,9 @@ export const styles = StyleSheet.create({
   dotError: {
     backgroundColor: theme.colors.danger,
   },
+  dotMuted: {
+    backgroundColor: theme.colors.grey,
+  },
   text: {
     flexShrink: 1,
     fontSize: theme.fontSize.xs,
@@ -36,5 +39,8 @@ export const styles = StyleSheet.create({
   },
   error: {
     color: theme.colors.danger,
+  },
+  muted: {
+    color: theme.colors.grey,
   },
 });
