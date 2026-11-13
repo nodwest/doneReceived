@@ -245,7 +245,6 @@ export const en = {
     namePlaceholder: 'Name',
     photo: 'Photo (optional)',
     photoHint: "Shown on the family screen and on the child's device.",
-    photoSoon: 'Adding a photo is coming soon',
     nextTitle: 'Next: connect the device',
     nextHint:
       "Then you'll get a one-time code. {{name}} enters it on their device — no email or password.",
@@ -253,6 +252,8 @@ export const en = {
       "Then you'll get a one-time code. The child enters it on their device — no email or password.",
     create: 'Create profile',
     created: "{{name}}'s profile is created",
+    createdNoPhoto:
+      "{{name}}'s profile is created, but the photo didn't upload. Try again later.",
     failed: "Couldn't create the profile. Please try again.",
   },
   memberProfile: {
@@ -438,7 +439,7 @@ export const en = {
     gallery: 'Gallery',
     addFromGallery: 'Add from gallery',
     photoHint: 'Show {{name}} the result — it helps to approve faster',
-    photoSoon: 'Photo reports are coming soon',
+    photoCountHint: '{{count}} of {{max}} photos — they go with I did it!',
     reward: 'Reward',
     penalty: 'Penalty',
     titlePlaceholder: 'Task title',
@@ -650,6 +651,13 @@ export const en = {
     limitReached: 'You have reached the wish limit. Delete one to add another.',
     saveFailed: 'Could not save the wish. Try again.',
   },
+  photos: {
+    cameraDenied: 'No access to the camera. Allow it in Settings.',
+    pickFailed: "Couldn't open the photo. Try another one.",
+    uploadFailed: "Couldn't upload the photos. Try again.",
+    tooLarge: 'The photo is too large — choose a smaller one.',
+    busy: 'The server is busy with photos. Try again in a minute.',
+  },
   wishCard: {
     myWish: 'My wish',
     childWish: "{{name}}'s wish",
@@ -673,7 +681,7 @@ export const en = {
     photo: 'Add a photo',
     photoHint: 'Add a photo so your parents know exactly what you want',
     removePhoto: 'Remove photo',
-    photoSoon: 'Photos are coming soon',
+    photoLimit: 'Up to {{max}} photos',
     description: 'Description (optional)',
     descriptionPlaceholder: 'Color, size, model — anything that helps',
     link: 'Link (optional)',
@@ -766,6 +774,10 @@ export const en = {
   editProfile: {
     title: 'Edit profile',
     changePhoto: 'Change photo',
+    removePhoto: 'Remove photo',
+    photoUploading: 'Uploading…',
+    photoSaved: 'Photo updated',
+    photoRemoved: 'Photo removed',
     security: 'Security',
     changePassword: 'Change password',
     save: 'Save changes',

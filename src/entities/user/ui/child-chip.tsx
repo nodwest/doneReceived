@@ -1,10 +1,5 @@
-import {
-  Image,
-  Pressable,
-  Text,
-  View,
-  type ImageSourcePropType,
-} from 'react-native';
+import { ApiImage } from '@shared/ui';
+import { Pressable, Text, View, type ImageSourcePropType } from 'react-native';
 import { styles } from './child-chip.styled';
 
 /** Ребёнок в чипе: моковый (фото) или с сервера (фото может не быть). */
@@ -30,7 +25,7 @@ export function ChildChip({ child, selected, onPress }: ChildChipProps) {
       style={[styles.chip, selected && styles.chipSelected]}
     >
       {child.avatar ? (
-        <Image source={child.avatar} style={styles.avatar} />
+        <ApiImage source={child.avatar} style={styles.avatar} />
       ) : (
         <View style={[styles.avatar, styles.initial]}>
           <Text style={styles.letter}>

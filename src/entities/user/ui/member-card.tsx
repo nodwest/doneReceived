@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
+import { ApiImage } from '@shared/ui';
 import {
-  Image,
   Platform,
   Pressable,
   Text,
@@ -73,7 +73,7 @@ export function MemberCard({
           style={({ pressed }) => [styles.main, pressed && styles.pressed]}
         >
           {avatar ? (
-            <Image source={avatar} style={styles.avatar} />
+            <ApiImage source={avatar} style={styles.avatar} />
           ) : (
             <View style={[styles.avatar, styles.initial]}>
               <Text style={styles.initialText}>

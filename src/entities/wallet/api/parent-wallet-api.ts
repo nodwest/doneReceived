@@ -1,4 +1,4 @@
-import { apiRequest } from '@shared/api';
+import { apiRequest, authorizedImage } from '@shared/api';
 import type { Transaction, Wallet } from '../model/wallet';
 
 /**
@@ -55,7 +55,7 @@ export async function fetchServerWallet(familyId: string): Promise<Wallet> {
         child: {
           id: item.childId ?? '',
           name: child?.displayName ?? '—',
-          avatar: child?.avatarUrl ? { uri: child.avatarUrl } : null,
+          avatar: child?.avatarUrl ? authorizedImage(child.avatarUrl) : null,
         },
       };
     }

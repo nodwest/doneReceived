@@ -2,12 +2,22 @@ import { useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useDeleteWish } from '@features/delete-wish';
-import { WishFormSheet } from '@features/wish-form';
+import { useUpdateWish, WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useMyChildBalance, useMyWishlistOwner } from '@features/family-tasks';
-import { useWishlistProgress, WishDetails } from '@entities/wish';
+import {
+  useWishlistProgress,
+  WISH_PHOTOS_MAX,
+  WishDetails,
+  WishPhotosError,
+} from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import {
+  choosePhotos,
+  photoUploadError,
+  showToast,
+  type PhotoSource,
+} from '@shared/lib';
 import { RoundButton, ScreenHeader, SourceTile } from '@shared/ui';
 import { styles } from './my-wish.styled';
 
@@ -24,6 +34,7 @@ export function MyWishPage() {
   const owner = useMyWishlistOwner();
   const { progress, isPending } = useWishlistProgress(owner, balance);
   const deleteWish = useDeleteWish(owner);
+  const updateWish = useUpdateWish(owner);
   const [editing, setEditing] = useState(false);
 
   const index = progress.findIndex((item) => String(item.wish.id) === id);
@@ -31,7 +42,34 @@ export function MyWishPage() {
   if (!isPending && !item) return <Redirect href="/wishlist" />;
   if (!item) return null;
 
-  const photoSoon = () => showToast(t('wishForm.photoSoon'));
+  // Фото нет: плитки сразу добавляют снимки к желанию (остальное как было).
+  const addPhotos = async (source: PhotoSource) => {
+    const picked = await choosePhotos(source, WISH_PHOTOS_MAX);
+    if (picked.length === 0) return;
+    const { wish } = item;
+    updateWish.mutate(
+      {
+        id: wish.id,
+        title: wish.title,
+        price: wish.price,
+        description: wish.description,
+        link: wish.link,
+        top: false,
+        photos: picked.map((file) => ({ source: { uri: file.uri }, file })),
+      },
+      {
+        onSuccess: () => showToast(t('wishForm.savedToast')),
+        onError: (error) =>
+          showToast(
+            t(
+              `photos.${photoUploadError(
+                error instanceof WishPhotosError ? error.cause : error,
+              )}`,
+            ),
+          ),
+      },
+    );
+  };
   const back = () =>
     router.canGoBack() ? router.back() : router.replace('/wishlist');
 
@@ -61,12 +99,12 @@ export function MyWishPage() {
               <SourceTile
                 icon="camera-outline"
                 accessibilityLabel={t('taskCard.takePhoto')}
-                onPress={photoSoon}
+                onPress={() => addPhotos('camera')}
               />
               <SourceTile
                 icon="image-add"
                 accessibilityLabel={t('taskCard.addFromGallery')}
-                onPress={photoSoon}
+                onPress={() => addPhotos('library')}
               />
             </>
           }

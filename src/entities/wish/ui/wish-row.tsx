@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react';
 import {
-  Image,
   Pressable,
   Text,
   View,
@@ -10,7 +9,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
-import { Icon } from '@shared/ui';
+import { Icon, ApiImage } from '@shared/ui';
 import type { WishProgress } from '../model';
 import { styles } from './wish-row.styled';
 
@@ -167,7 +166,7 @@ export function WishThumb({
   status,
 }: Pick<WishProgress, 'wish' | 'status'>) {
   const [photo] = wish.photos;
-  if (photo) return <Image source={photo} style={styles.photo} />;
+  if (photo) return <ApiImage source={photo} style={styles.photo} />;
   if (status === 'current') {
     return (
       <LinearGradient

@@ -128,14 +128,14 @@ export function PaidTaskCard({
         paid
         description={operation.description}
       />
-      {operation.photo && (
+      {operation.photos.length > 0 && (
         <PhotoSection
           label={
             parent
               ? t('taskCard.childPhoto', { name: operation.child.name })
               : t('taskCard.yourPhoto')
           }
-          photo={operation.photo}
+          photos={operation.photos}
           height={140}
         />
       )}

@@ -253,7 +253,6 @@ export const ru: Dictionary = {
     namePlaceholder: 'Имя',
     photo: 'Фото (необязательно)',
     photoHint: 'Видно на вкладке Family и на устройстве ребёнка.',
-    photoSoon: 'Добавить фото пока нельзя',
     nextTitle: 'Дальше: подключите устройство',
     nextHint:
       'Потом вы получите одноразовый код. {{name}} введёт его на своём устройстве — без почты и пароля.',
@@ -261,6 +260,8 @@ export const ru: Dictionary = {
       'Потом вы получите одноразовый код. Ребёнок введёт его на своём устройстве — без почты и пароля.',
     create: 'Создать профиль',
     created: 'Профиль создан: {{name}}',
+    createdNoPhoto:
+      'Профиль создан: {{name}}, но фото не загрузилось. Попробуйте позже.',
     failed: 'Не получилось создать профиль. Попробуйте ещё раз.',
   },
   memberProfile: {
@@ -449,7 +450,7 @@ export const ru: Dictionary = {
     gallery: 'Галерея',
     addFromGallery: 'Из галереи',
     photoHint: 'Покажи результат: {{name}} быстрее проверит задание',
-    photoSoon: 'Фотоотчёты скоро появятся',
+    photoCountHint: '{{count}} из {{max}} фото — уйдут вместе с I did it!',
     reward: 'Награда',
     penalty: 'Штраф',
     titlePlaceholder: 'Название задачи',
@@ -669,6 +670,13 @@ export const ru: Dictionary = {
     limitReached: 'Достигнут лимит желаний. Удали одно, чтобы добавить новое.',
     saveFailed: 'Не удалось сохранить желание. Попробуй ещё раз.',
   },
+  photos: {
+    cameraDenied: 'Нет доступа к камере. Разреши его в настройках.',
+    pickFailed: 'Не получилось открыть фото. Попробуй другое.',
+    uploadFailed: 'Не получилось загрузить фото. Попробуй ещё раз.',
+    tooLarge: 'Фото слишком большое — выбери поменьше.',
+    busy: 'Сервер занят обработкой фото. Попробуй через минуту.',
+  },
   wishCard: {
     myWish: 'Моё желание',
     childWish: 'Желание: {{name}}',
@@ -691,8 +699,8 @@ export const ru: Dictionary = {
     price: 'Цена',
     photo: 'Добавь фото',
     photoHint: 'Добавь фото, чтобы родители точно знали, что ты хочешь',
+    photoLimit: 'До {{max}} фото',
     removePhoto: 'Убрать фото',
-    photoSoon: 'Фото скоро можно будет добавить',
     description: 'Описание (необязательно)',
     descriptionPlaceholder: 'Цвет, размер, модель — всё, что поможет',
     link: 'Ссылка (необязательно)',
@@ -790,6 +798,10 @@ export const ru: Dictionary = {
   editProfile: {
     title: 'Редактировать профиль',
     changePhoto: 'Сменить фото',
+    removePhoto: 'Убрать фото',
+    photoUploading: 'Загружаем…',
+    photoSaved: 'Фото обновлено',
+    photoRemoved: 'Фото убрано',
     security: 'Безопасность',
     changePassword: 'Сменить пароль',
     save: 'Сохранить изменения',

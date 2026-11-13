@@ -3,16 +3,18 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   isWishlistLimitError,
+  WishPhotosError,
   type Wish,
   type WishlistOwner,
 } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { photoUploadError, showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { BottomSheet, Icon, SheetField, Toggle } from '@shared/ui';
 import { useCreateWish } from '../model/use-create-wish';
 import { useUpdateWish } from '../model/use-update-wish';
 import { useWishForm } from '../model/use-wish-form';
+import { PhotoPicker } from './photo-picker';
 import { styles } from './wish-form-sheet.styled';
 
 type WishFormSheetProps = {
@@ -50,7 +52,7 @@ export function WishFormSheet({
   const updateWish = useUpdateWish(owner);
   const editing = wish !== undefined;
   const pending = createWish.isPending || updateWish.isPending;
-  const { title, price, description, link, top } = form.fields;
+  const { title, price, description, link, photos, top } = form.fields;
 
   // Каждое открытие — с данными желания или с чистого листа, до отрисовки.
   useLayoutEffect(() => {
@@ -66,12 +68,19 @@ export function WishFormSheet({
       onClose();
     };
     // Форма остаётся открытой: при лимите можно закрыть её и удалить лишнее.
-    const failed = (error: unknown) =>
+    const failed = (error: unknown) => {
+      // Желание сохранилось, не загрузились только фото: закрываем форму.
+      if (error instanceof WishPhotosError) {
+        showToast(t(`photos.${photoUploadError(error.cause)}`));
+        onClose();
+        return;
+      }
       showToast(
         isWishlistLimitError(error)
           ? t('wishlist.limitReached')
           : t('wishlist.saveFailed'),
       );
+    };
     if (wish) {
       updateWish.mutate(
         { id: wish.id, ...form.payload() },
@@ -120,7 +129,11 @@ export function WishFormSheet({
           keyboardType="number-pad"
           prefix={<Text style={styles.currency}>$</Text>}
         />
-        {/* Фото желаний появятся с выбором фото (п. 22). */}
+        <PhotoPicker
+          photos={photos}
+          onAdd={form.addPhotos}
+          onRemove={form.removePhoto}
+        />
         <SheetField
           label={t('wishForm.description')}
           value={description}

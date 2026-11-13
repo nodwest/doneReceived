@@ -1,4 +1,5 @@
 import { apiRequest } from '@shared/api';
+import { appendPhoto, type PickedPhoto } from '@shared/lib';
 import {
   inviteCodeForApi,
   type Family,
@@ -107,6 +108,24 @@ export function createChild(familyId: string, displayName: string) {
   return apiRequest<{ id: string; displayName: string }>(
     `/families/${familyId}/children`,
     { method: 'POST', body: { displayName } },
+  );
+}
+
+/**
+ * PUT /families/:id/children/:childId/avatar — фото ребёнку от родителя
+ * (owner или admin): multipart, поле `photo`, PNG/JPEG/WebP до 2 МиБ.
+ * 413 — файл велик, 503 — сервер занят обработкой фото.
+ */
+export async function setChildAvatar(
+  familyId: string,
+  childId: string,
+  photo: PickedPhoto,
+) {
+  const form = new FormData();
+  await appendPhoto(form, 'photo', photo);
+  return apiRequest<unknown>(
+    `/families/${familyId}/children/${childId}/avatar`,
+    { method: 'PUT', body: form },
   );
 }
 

@@ -29,8 +29,8 @@ export interface Operation {
   description: string;
   /** ISO-время, когда ребёнок отметил задание выполненным; у упущенных — null. */
   doneAt: string | null;
-  /** Фото-отчёт ребёнка; null — снимка нет. */
-  photo: ImageSourcePropType | null;
+  /** Фото одобренного отчёта (пока сервер их хранит); пусто — без фото. */
+  photos: ImageSourcePropType[];
   /** Комментарий ребёнка к сдаче; null — без комментария. */
   note: string | null;
   /**
@@ -43,7 +43,7 @@ export interface Operation {
 /** Что сервер записывает в историю, когда родитель подтвердил задание. */
 export type RewardPayload = Pick<
   Operation,
-  'title' | 'description' | 'amount' | 'child' | 'doneAt' | 'photo' | 'note'
+  'title' | 'description' | 'amount' | 'child' | 'doneAt' | 'photos' | 'note'
 >;
 
 /** Сумма в формате истории: «$10». */

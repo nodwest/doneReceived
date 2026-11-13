@@ -3,6 +3,7 @@ import type { ImageSourcePropType } from 'react-native';
 import { useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren } from '@entities/family';
 import type { WishlistOwner } from '@entities/wish';
+import { authorizedImage } from '@shared/api';
 
 type WishlistChild = {
   id: string;
@@ -23,7 +24,7 @@ export function useWishlistChild(id: string) {
       server && {
         id,
         name: server.displayName,
-        avatar: server.avatarUrl ? { uri: server.avatarUrl } : null,
+        avatar: server.avatarUrl ? authorizedImage(server.avatarUrl) : null,
       }
     );
   }, [id, serverChildren]);

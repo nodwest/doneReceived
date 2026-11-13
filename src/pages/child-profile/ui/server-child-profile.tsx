@@ -28,6 +28,7 @@ import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
+import { authorizedImage } from '@shared/api';
 
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
@@ -87,7 +88,7 @@ export function ServerChildProfile({ id }: { id: string }) {
       >
         <ProfileHeader
           name={child.displayName}
-          avatar={child.avatarUrl ? { uri: child.avatarUrl } : null}
+          avatar={child.avatarUrl ? authorizedImage(child.avatarUrl) : null}
           onBack={() =>
             router.canGoBack() ? router.back() : router.replace('/')
           }

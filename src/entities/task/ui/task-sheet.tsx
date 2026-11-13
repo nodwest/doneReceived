@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react';
 import {
-  Image,
   ScrollView,
   Text,
   View,
@@ -9,7 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Icon, type IconName } from '@shared/ui';
+import { ApiImage, Icon, PhotoCarousel, type IconName } from '@shared/ui';
 import {
   formatCountdown,
   KeepInViewContext,
@@ -109,7 +108,7 @@ export function TaskSheet({
               <Icon name={icon} size={20} color={theme.colors.white} />
             </View>
           ) : (
-            avatar && <Image source={avatar} style={styles.avatar} />
+            avatar && <ApiImage source={avatar} style={styles.avatar} />
           )}
           <View style={styles.who}>
             <Text
@@ -299,31 +298,36 @@ export function InfoTiles({ tiles }: { tiles: readonly InfoTileProps[] }) {
 
 type PhotoSectionProps = {
   label: string;
-  photo: ImageSourcePropType;
-  /** «1 / 1» справа от заголовка. */
-  counter?: string;
+  /** Фото отчёта; несколько — листаются со счётчиком «1 / 3». */
+  photos: readonly ImageSourcePropType[];
   /** Высота снимка; меньше — когда в карточке много других секций. */
   height?: number;
 };
 
-/** Фото-отчёт: заголовок и снимок на всю ширину. */
+/** Фото-отчёт: заголовок и снимок (или листаемые снимки) на всю ширину. */
 export function PhotoSection({
   label,
-  photo,
-  counter,
-  height,
+  photos,
+  height = PHOTO_HEIGHT,
 }: PhotoSectionProps) {
   return (
     <View style={styles.section}>
       <View style={styles.photoHead}>
         <SectionLabel>{label}</SectionLabel>
-        {counter && <Text style={styles.photoCounter}>{counter}</Text>}
       </View>
-      <Image
-        source={photo}
-        style={[styles.photo, height !== undefined && { height }]}
-        resizeMode="cover"
-      />
+      {photos.length > 1 ? (
+        <View style={styles.photoCarousel}>
+          <PhotoCarousel photos={photos} height={height} />
+        </View>
+      ) : (
+        <ApiImage
+          source={photos[0]}
+          style={[styles.photo, { height }]}
+          resizeMode="cover"
+        />
+      )}
     </View>
   );
 }
+
+const PHOTO_HEIGHT = 200;

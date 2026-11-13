@@ -1,4 +1,5 @@
 import { apiRequest } from '@shared/api';
+import { appendPhoto, type PickedPhoto } from '@shared/lib';
 import type {
   ChangePasswordPayload,
   LoginPayload,
@@ -116,4 +117,23 @@ export function changePassword(payload: ChangePasswordPayload) {
     method: 'POST',
     body: payload,
   });
+}
+
+/**
+ * PUT /users/me/avatar — поставить или заменить своё фото: multipart, поле
+ * `photo`, PNG/JPEG/WebP до 2 МиБ. Ответ — профиль с новым `avatarUrl`.
+ * 413 — файл велик, 503 — сервер занят обработкой фото.
+ */
+export async function uploadMyAvatar(photo: PickedPhoto) {
+  const form = new FormData();
+  await appendPhoto(form, 'photo', photo);
+  return apiRequest<SessionUser>('/users/me/avatar', {
+    method: 'PUT',
+    body: form,
+  });
+}
+
+/** DELETE /users/me/avatar — убрать своё фото (вместо него — буква). */
+export function deleteMyAvatar() {
+  return apiRequest<null>('/users/me/avatar', { method: 'DELETE' });
 }

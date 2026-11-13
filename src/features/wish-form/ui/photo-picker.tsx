@@ -1,23 +1,26 @@
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import type { ImageSourcePropType } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { WISH_PHOTOS_MAX, type WishPhotoDraft } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { choosePhotos, type PickedPhoto, type PhotoSource } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { Icon, SourceTile } from '@shared/ui';
+import { ApiImage, Icon, SourceTile } from '@shared/ui';
 import { styles } from './wish-form-sheet.styled';
 
 type PhotoPickerProps = {
-  photos: readonly ImageSourcePropType[];
+  photos: readonly WishPhotoDraft[];
+  onAdd: (photos: PickedPhoto[]) => void;
   onRemove: (index: number) => void;
 };
 
 /**
- * Фото желания: выбранные с крестиком и плитки камеры и галереи. Снимать и
- * выбирать фото пока нельзя — плитки показывают тост; убрать фото можно.
+ * Фото желания: выбранные с крестиком и плитки камеры и галереи (пока фото
+ * меньше WISH_PHOTOS_MAX). Новые фото уменьшаются до загрузки.
  */
-export function PhotoPicker({ photos, onRemove }: PhotoPickerProps) {
+export function PhotoPicker({ photos, onAdd, onRemove }: PhotoPickerProps) {
   const { t } = useTranslation();
-  const soon = () => showToast(t('wishForm.photoSoon'));
+  const left = WISH_PHOTOS_MAX - photos.length;
+  const pick = async (source: PhotoSource) =>
+    onAdd(await choosePhotos(source, left));
 
   return (
     <View style={styles.field}>
@@ -32,7 +35,7 @@ export function PhotoPicker({ photos, onRemove }: PhotoPickerProps) {
         {photos.map((photo, index) => (
           // Фото не переставляются, только убираются: индекс годится в ключ.
           <View key={index}>
-            <Image source={photo} style={styles.photo} />
+            <ApiImage source={photo.source} style={styles.photo} />
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t('wishForm.removePhoto')}
@@ -44,20 +47,26 @@ export function PhotoPicker({ photos, onRemove }: PhotoPickerProps) {
             </Pressable>
           </View>
         ))}
-        <SourceTile
-          icon="camera-outline"
-          accessibilityLabel={t('taskCard.takePhoto')}
-          onPress={soon}
-        />
-        <SourceTile
-          icon="image-add"
-          accessibilityLabel={t('taskCard.addFromGallery')}
-          onPress={soon}
-        />
+        {left > 0 && (
+          <>
+            <SourceTile
+              icon="camera-outline"
+              accessibilityLabel={t('taskCard.takePhoto')}
+              onPress={() => pick('camera')}
+            />
+            <SourceTile
+              icon="image-add"
+              accessibilityLabel={t('taskCard.addFromGallery')}
+              onPress={() => pick('library')}
+            />
+          </>
+        )}
       </ScrollView>
-      {photos.length === 0 && (
-        <Text style={styles.hint}>{t('wishForm.photoHint')}</Text>
-      )}
+      <Text style={styles.hint}>
+        {photos.length === 0
+          ? t('wishForm.photoHint')
+          : t('wishForm.photoLimit', { max: WISH_PHOTOS_MAX })}
+      </Text>
     </View>
   );
 }

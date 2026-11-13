@@ -20,6 +20,7 @@ import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
 import { styles } from './parent-home.styled';
+import { authorizedImage } from '@shared/api';
 
 /** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
 function greetingKey(hour: number) {
@@ -58,7 +59,7 @@ export function ParentHomePage() {
     return {
       id: child.id,
       name: child.displayName,
-      avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+      avatar: child.avatarUrl ? authorizedImage(child.avatarUrl) : null,
       activeTasks: active,
       reviewTasks: review,
       atHome: false,

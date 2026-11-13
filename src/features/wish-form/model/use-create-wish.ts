@@ -13,7 +13,7 @@ export function useCreateWish(owner: WishlistOwner | null) {
       if (!owner) throw new Error('No wishlist owner');
       return createWish(owner, payload);
     },
-    // Желание добавлено: перечитываем вишлист.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: wishKeys.all }),
+    // Перечитываем вишлист и после ошибки: желание могло сохраниться без фото.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: wishKeys.all }),
   });
 }

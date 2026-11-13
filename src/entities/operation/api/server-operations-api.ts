@@ -1,4 +1,4 @@
-import { apiRequest } from '@shared/api';
+import { apiRequest, authorizedImage } from '@shared/api';
 import type { Operation } from '../model/operation';
 
 // История наград детей с сервера: заработанные — начисления из кошельков
@@ -29,6 +29,8 @@ type WalletDto = {
     submittedAt: string | null;
     /** Комментарий ребёнка к одобренному отчёту; null — не писал. */
     submissionNote: string | null;
+    /** Фото одобренного отчёта, у которых не истёк срок хранения. */
+    attachmentIds?: string[];
   }[];
 };
 
@@ -70,7 +72,7 @@ export async function fetchServerOperations(
   const toChild = (child: ChildDto) => ({
     id: child.id,
     name: child.displayName,
-    avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+    avatar: child.avatarUrl ? authorizedImage(child.avatarUrl) : null,
   });
 
   return children.flatMap((child, index) => {
@@ -86,7 +88,9 @@ export async function fetchServerOperations(
         parentId: entry.approvedBy ?? '',
         at: entry.createdAt,
         doneAt: entry.submittedAt,
-        photo: null,
+        photos: (entry.attachmentIds ?? []).map((id) =>
+          authorizedImage(`/families/${familyId}/task-attachments/${id}`),
+        ),
         note: entry.submissionNote?.trim() || null,
         assignmentId: entry.assignmentId,
       }),
@@ -102,7 +106,7 @@ export async function fetchServerOperations(
         parentId: item.createdBy,
         at: item.deadlineAt,
         doneAt: null,
-        photo: null,
+        photos: [],
         note: null,
       }),
     );

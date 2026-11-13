@@ -67,7 +67,12 @@ export async function setTaskStatus(
   familyId: string | null,
 ): Promise<void> {
   if (payload.status === 'review') {
-    await submitServerTask(family(familyId), payload.id, payload.note);
+    await submitServerTask(
+      family(familyId),
+      payload.id,
+      payload.note,
+      payload.photos,
+    );
     return;
   }
   await withdrawServerSubmission(family(familyId), {

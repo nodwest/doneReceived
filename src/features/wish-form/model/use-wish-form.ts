@@ -1,6 +1,11 @@
 import { useState } from 'react';
-import type { ImageSourcePropType } from 'react-native';
-import type { Wish, WishPayload } from '@entities/wish';
+import {
+  WISH_PHOTOS_MAX,
+  type Wish,
+  type WishPayload,
+  type WishPhotoDraft,
+} from '@entities/wish';
+import type { PickedPhoto } from '@shared/lib';
 
 // Цена — целые доллары, как награды за задания.
 const MAX_PRICE_DIGITS = 5;
@@ -14,7 +19,9 @@ export function useWishForm() {
   const [price, setPriceText] = useState('');
   const [description, setDescription] = useState('');
   const [link, setLink] = useState('');
-  const [photos, setPhotos] = useState<ImageSourcePropType[]>([]);
+  const [photos, setPhotos] = useState<WishPhotoDraft[]>([]);
+  // Набор фото меняли: только тогда он уходит на сервер.
+  const [photosChanged, setPhotosChanged] = useState(false);
   const [top, setTop] = useState(false);
 
   const reset = (wish?: Wish) => {
@@ -22,7 +29,8 @@ export function useWishForm() {
     setPriceText(wish ? String(wish.price) : '');
     setDescription(wish?.description ?? '');
     setLink(wish?.link ?? '');
-    setPhotos(wish?.photos ?? []);
+    setPhotos((wish?.photos ?? []).map((source) => ({ source, file: null })));
+    setPhotosChanged(false);
     setTop(false);
   };
 
@@ -30,8 +38,22 @@ export function useWishForm() {
   const setPrice = (text: string) =>
     setPriceText(text.replace(/\D/g, '').slice(0, MAX_PRICE_DIGITS));
 
-  const removePhoto = (index: number) =>
+  const removePhoto = (index: number) => {
     setPhotos((current) => current.filter((_, i) => i !== index));
+    setPhotosChanged(true);
+  };
+
+  /** Добавить выбранные фото; сверх WISH_PHOTOS_MAX — отбрасываются. */
+  const addPhotos = (picked: readonly PickedPhoto[]) => {
+    if (picked.length === 0) return;
+    setPhotos((current) =>
+      [
+        ...current,
+        ...picked.map((file) => ({ source: { uri: file.uri }, file })),
+      ].slice(0, WISH_PHOTOS_MAX),
+    );
+    setPhotosChanged(true);
+  };
 
   const priceValue = Number(price);
   const valid = title.trim().length > 0 && priceValue > 0;
@@ -41,7 +63,7 @@ export function useWishForm() {
     price: priceValue,
     description: description.trim(),
     link: link.trim(),
-    photos,
+    photos: photosChanged ? photos : null,
     top,
   });
 
@@ -52,6 +74,7 @@ export function useWishForm() {
     setDescription,
     setLink,
     removePhoto,
+    addPhotos,
     setTop,
     reset,
     valid,

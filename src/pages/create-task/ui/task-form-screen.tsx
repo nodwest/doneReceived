@@ -12,6 +12,7 @@ import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
 import { styles } from './create-task.styled';
+import { authorizedImage } from '@shared/api';
 
 type TaskFormScreenProps = {
   title: string;
@@ -40,7 +41,7 @@ export function TaskFormScreen({
       (serverChildren ?? []).map((child) => ({
         id: child.id,
         name: child.displayName,
-        avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+        avatar: child.avatarUrl ? authorizedImage(child.avatarUrl) : null,
       })),
     [serverChildren],
   );

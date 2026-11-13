@@ -76,10 +76,10 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
           description={task.description}
         />
         {checklist}
-        {task.photo && (
+        {task.photos.length > 0 && (
           <PhotoSection
             label={t('taskCard.childPhoto', { name: task.assignee.name })}
-            photo={task.photo}
+            photos={task.photos}
           />
         )}
         {task.note && (

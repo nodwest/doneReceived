@@ -1,3 +1,4 @@
+import type { PickedPhoto } from '@shared/lib';
 import type { RejectReasonKey, TaskState } from './task';
 
 export enum TaskStatus {
@@ -65,6 +66,8 @@ export interface TaskStatusPayload {
   status: Exclude<TaskState, 'done'>;
   /** Комментарий ребёнка к сдаче (только на проверку); пустой — без него. */
   note?: string;
+  /** Фото-отчёт (только на проверку, до TASK_PHOTOS_MAX). */
+  photos?: PickedPhoto[];
 }
 
 /**

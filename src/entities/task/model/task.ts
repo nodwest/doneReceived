@@ -85,8 +85,8 @@ export interface Task {
   expiresAt: string | null;
   /** ISO-время, когда ребёнок отметил задачу выполненной. */
   doneAt: string | null;
-  /** Фото-отчёт ребёнка; null — снимка нет. */
-  photo: ImageSourcePropType | null;
+  /** Фото-отчёт ребёнка (до 3), с сервера — с токеном; пусто — без фото. */
+  photos: ImageSourcePropType[];
   /**
    * Комментарий ребёнка к сданному заданию («в магазине не было масла»);
    * null — без комментария или задание ещё не сдано.
@@ -104,3 +104,6 @@ export const formatReward = (reward: number) => `$${reward.toFixed(2)}`;
 /** Награда коротко, без копеек: «$5». */
 export const formatRewardShort = (reward: number) =>
   Number.isInteger(reward) ? `$${reward}` : `$${reward.toFixed(2)}`;
+
+/** Сколько фото можно приложить к отчёту: столько принимает сервер. */
+export const TASK_PHOTOS_MAX = 3;

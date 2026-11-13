@@ -24,6 +24,7 @@ import { CardButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
 import { CARDS_PADDING_BOTTOM, styles } from './tasks.styled';
 import { ViewOnlyNote } from './view-only-note';
+import { authorizedImage } from '@shared/api';
 
 const NO_TASKS: Task[] = [];
 
@@ -75,7 +76,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
     return {
       id: 'userId' in person ? person.userId : person.id,
       name: person.displayName,
-      avatar: person.avatarUrl ? { uri: person.avatarUrl } : null,
+      avatar: person.avatarUrl ? authorizedImage(person.avatarUrl) : null,
     };
   }, [scope, ownerId, serverChildren, members]);
   // Список из кэша React Query: после создания или правки он перечитывается сам.

@@ -11,6 +11,7 @@ import { BalanceCard } from './balance-card';
 import { ChildBalance } from './child-balance';
 import { RewardsHistoryLink } from './rewards-history-link';
 import { styles } from './wallet.styled';
+import { authorizedImage } from '@shared/api';
 
 // Тап по транзакции — её карточка в истории транзакций.
 const openTransaction = (id: number) =>
@@ -55,7 +56,7 @@ export function WalletPage() {
               childId={child.id}
               familyId={familyId}
               name={child.displayName}
-              avatar={child.avatarUrl ? { uri: child.avatarUrl } : null}
+              avatar={child.avatarUrl ? authorizedImage(child.avatarUrl) : null}
             />
           ))}
         </View>

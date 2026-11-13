@@ -3,14 +3,20 @@ import {
   Pressable,
   Text,
   View,
+  type ImageSourcePropType,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 import { useTranslation } from '@shared/i18n';
 import { formatClock, formatDayInPhrase, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { Icon, type IconName } from '@shared/ui';
-import type { ChecklistItem, Task, TaskAssignee } from '../model';
+import { ApiImage, Icon, type IconName } from '@shared/ui';
+import {
+  TASK_PHOTOS_MAX,
+  type ChecklistItem,
+  type Task,
+  type TaskAssignee,
+} from '../model';
 import {
   InfoTiles,
   PhotoSection,
@@ -25,12 +31,24 @@ import { TaskNote, TaskNoteField } from './task-note';
 import { styles as sheetStyles } from './task-sheet.styled';
 import { styles } from './child-task-card.styled';
 
+export type ReportPhotos = {
+  items: readonly ImageSourcePropType[];
+  /** Можно добавить ещё (меньше TASK_PHOTOS_MAX). */
+  canAdd: boolean;
+  onTakePhoto: () => void;
+  onPickPhoto: () => void;
+  onRemove: (index: number) => void;
+};
+
 type ChildTaskCardProps = {
   task: Task;
   /** Родитель, который дал задание: «Task from Sarah». */
   author: Pick<TaskAssignee, 'name' | 'avatar'>;
-  onTakePhoto?: () => void;
-  onPickPhoto?: () => void;
+  /**
+   * Фото-отчёт, который ребёнок готовит к сдаче (уходит с I did it!): что
+   * выбрано, снять, выбрать из галереи, убрать. Без него — только кнопки.
+   */
+  photos?: ReportPhotos;
   /** Кто из родителей вернул задание (если его возвращали). */
   rejectedBy?: Pick<TaskAssignee, 'name'>;
   /** Ребёнок отметил шаг чеклиста; только у активного задания. */
@@ -55,8 +73,7 @@ type ChildTaskCardProps = {
 export function ChildTaskCard({
   task,
   author,
-  onTakePhoto,
-  onPickPhoto,
+  photos,
   rejectedBy,
   onToggleStep,
   note,
@@ -135,8 +152,8 @@ export function ChildTaskCard({
           onToggle={review ? undefined : onToggleStep}
         />
       )}
-      {review && task.photo && (
-        <PhotoSection label={t('taskCard.yourPhoto')} photo={task.photo} />
+      {review && task.photos.length > 0 && (
+        <PhotoSection label={t('taskCard.yourPhoto')} photos={task.photos} />
       )}
       {review && task.note && (
         <TaskNote
@@ -181,22 +198,52 @@ export function ChildTaskCard({
               </View>
             </View>
             <View style={styles.drop}>
-              <View style={styles.sources}>
-                <PhotoSource
-                  icon="camera-outline"
-                  label={t('taskCard.takePhoto')}
-                  onPress={onTakePhoto}
-                  variant="camera"
-                />
-                <PhotoSource
-                  icon="image-add"
-                  label={t('taskCard.gallery')}
-                  onPress={onPickPhoto}
-                  variant="gallery"
-                />
-              </View>
+              {photos && photos.items.length > 0 && (
+                <View style={styles.picked}>
+                  {photos.items.map((photo, index) => (
+                    // Фото не переставляются, только убираются: индекс — ключ.
+                    <View key={index} style={styles.pickedItem}>
+                      <ApiImage source={photo} style={styles.pickedPhoto} />
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={t('wishForm.removePhoto')}
+                        hitSlop={8}
+                        onPress={() => photos.onRemove(index)}
+                        style={styles.pickedRemove}
+                      >
+                        <Icon
+                          name="close"
+                          size={8}
+                          color={theme.colors.white}
+                        />
+                      </Pressable>
+                    </View>
+                  ))}
+                </View>
+              )}
+              {(!photos || photos.canAdd) && (
+                <View style={styles.sources}>
+                  <PhotoSource
+                    icon="camera-outline"
+                    label={t('taskCard.takePhoto')}
+                    onPress={photos?.onTakePhoto}
+                    variant="camera"
+                  />
+                  <PhotoSource
+                    icon="image-add"
+                    label={t('taskCard.gallery')}
+                    onPress={photos?.onPickPhoto}
+                    variant="gallery"
+                  />
+                </View>
+              )}
               <Text style={styles.hint}>
-                {t('taskCard.photoHint', { name: author.name })}
+                {photos && photos.items.length > 0
+                  ? t('taskCard.photoCountHint', {
+                      count: photos.items.length,
+                      max: TASK_PHOTOS_MAX,
+                    })
+                  : t('taskCard.photoHint', { name: author.name })}
               </Text>
             </View>
           </View>

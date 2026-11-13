@@ -1,4 +1,5 @@
-import { apiRequest } from '@shared/api';
+import { apiRequest, authorizedImage } from '@shared/api';
+import { appendPhoto, type PickedPhoto } from '@shared/lib';
 import type { RejectReasonKey, Task, TaskState } from '../model/task';
 import type {
   ChecklistStepPayload,
@@ -42,7 +43,11 @@ type PendingSubmissionDto = {
   submittedAt: string;
   /** Комментарий ребёнка к сдаче; null — не писал. */
   note: string | null;
+  /** Фото отчёта — когда бек добавит их сюда (Идеи.md п. 30). */
+  attachments?: AttachmentDto[];
 };
+
+type AttachmentDto = { id: string; contentType: string };
 
 type LastRejectionDto = {
   reasonCode: 'not_done_properly' | 'not_finished' | 'other';
@@ -89,12 +94,17 @@ export type TaskViewer = {
   childName?: string;
 };
 
+/** Фото отчёта для `<Image>`: читается с токеном. */
+const attachmentImage = (familyId: string, id: string) =>
+  authorizedImage(`/families/${familyId}/task-attachments/${id}`);
+
 function toTask(
   task: TaskDto,
   assignment: AssignmentDto,
   children: readonly ChildDto[],
   members: readonly MemberDto[],
   viewer: TaskViewer,
+  attachments: readonly AttachmentDto[],
 ): Task {
   const child = children.find((item) => item.id === assignment.childId);
   const pending = assignment.pendingSubmission ?? null;
@@ -109,17 +119,17 @@ function toTask(
     assignee: {
       id: assignment.childId,
       name: child?.displayName ?? viewer.childName ?? '—',
-      avatar: child?.avatarUrl ? { uri: child.avatarUrl } : null,
+      avatar: child?.avatarUrl ? authorizedImage(child.avatarUrl) : null,
     },
     createdBy: task.createdBy,
     authorName: members.find((member) => member.userId === task.createdBy)
       ?.displayName,
     createdAt: task.createdAt,
     expiresAt: task.deadlineAt,
-    // Отчёт на проверке: когда сдано и комментарий ребёнка. Фото пока нет.
+    // Отчёт на проверке: когда сдано, фото и комментарий ребёнка.
     submissionId: pending?.id,
     doneAt: pending?.submittedAt ?? null,
-    photo: null,
+    photos: attachments.map(({ id }) => attachmentImage(viewer.familyId, id)),
     note: pending?.note?.trim() || null,
     // Последний отказ остаётся и после новой сдачи: родитель видит, за что
     // возвращал.
@@ -164,16 +174,38 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
       () => [] as MemberDto[],
     ),
   ]);
-  return items
-    .filter(
-      ({ task, assignment }) =>
-        task.cancelledAt === null &&
-        assignment.status !== 'approved' &&
-        !(assignment.status === 'rejected' && !assignment.retryableRejection),
-    )
-    .map(({ task, assignment }) =>
-      toTask(task, assignment, children, members, viewer),
-    );
+  const visible = items.filter(
+    ({ task, assignment }) =>
+      task.cancelledAt === null &&
+      assignment.status !== 'approved' &&
+      !(assignment.status === 'rejected' && !assignment.retryableRejection),
+  );
+  const photos = await Promise.all(
+    visible.map(({ assignment }) => pendingAttachments(familyId, assignment)),
+  );
+  return visible.map(({ task, assignment }, index) =>
+    toTask(task, assignment, children, members, viewer, photos[index]),
+  );
+}
+
+/**
+ * Фото отчёта на проверке. Пока бек не отдаёт их в `pendingSubmission`
+ * (Идеи.md п. 30), берём из отчётов назначения — запрос на каждое задание на
+ * проверке; не ответили — без фото.
+ */
+async function pendingAttachments(
+  familyId: string,
+  { id, pendingSubmission }: AssignmentDto,
+): Promise<AttachmentDto[]> {
+  if (!pendingSubmission) return [];
+  if (pendingSubmission.attachments) return pendingSubmission.attachments;
+  const submissions = await apiRequest<SubmissionDto[]>(
+    `/families/${familyId}/task-assignments/${id}/submissions`,
+  ).catch(() => [] as SubmissionDto[]);
+  return (
+    submissions.find(({ submission }) => submission.id === pendingSubmission.id)
+      ?.attachments ?? []
+  );
 }
 
 const toBody = (payload: CreateTaskPayload) => ({
@@ -244,18 +276,27 @@ export function cancelServerTask(familyId: string, serverTaskId: string) {
 /**
  * POST /families/:id/task-assignments/:assignmentId/submissions — ребёнок
  * отправляет отчёт («I did it!»), назначение уходит на проверку. Комментарий
- * ребёнка — в `note`, пустой не отправляем; фото пока нет. 409 — уже на
- * проверке, принято или срок истёк.
+ * ребёнка — в `note`, пустой не отправляем. С фото — multipart: `note` и
+ * поле `photos` на каждый файл (до 3, по 2 МиБ). 409 — уже на проверке,
+ * принято, срок истёк или `SUBMISSION_LIMIT_REACHED`; 413 — файл велик.
  */
-export function submitServerTask(
+export async function submitServerTask(
   familyId: string,
   assignmentId: string,
   note?: string,
+  photos: readonly PickedPhoto[] = [],
 ) {
-  return apiRequest<unknown>(
-    `/families/${familyId}/task-assignments/${assignmentId}/submissions`,
-    { method: 'POST', body: note ? { note } : {} },
-  );
+  const path = `/families/${familyId}/task-assignments/${assignmentId}/submissions`;
+  if (photos.length === 0) {
+    return apiRequest<unknown>(path, {
+      method: 'POST',
+      body: note ? { note } : {},
+    });
+  }
+  const form = new FormData();
+  if (note) form.append('note', note);
+  for (const photo of photos) await appendPhoto(form, 'photos', photo);
+  return apiRequest<unknown>(path, { method: 'POST', body: form });
 }
 
 /**
@@ -278,6 +319,7 @@ export function tickServerChecklist(
 type SubmissionDto = {
   submission: { id: string; withdrawnAt: string | null };
   review: unknown | null;
+  attachments?: AttachmentDto[];
 };
 
 /**

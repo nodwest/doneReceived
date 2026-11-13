@@ -78,6 +78,31 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(74, 158, 240, 0.45)',
     backgroundColor: theme.colors.dropZone,
   },
+  picked: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  pickedItem: {
+    flex: 1,
+    maxWidth: '33%',
+    aspectRatio: 1,
+  },
+  pickedPhoto: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 14,
+  },
+  pickedRemove: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+  },
   sources: {
     flexDirection: 'row',
     gap: 10,

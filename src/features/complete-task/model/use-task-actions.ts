@@ -1,7 +1,7 @@
 import type { ChecklistItem, Task } from '@entities/task';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { photoUploadError, showToast } from '@shared/lib';
 import { useNoteDraftStore } from './note-draft-store';
 import { useSetTaskStatus } from './use-set-task-status';
 import { useTickChecklistItem } from './use-tick-checklist-item';
@@ -34,18 +34,26 @@ export function useTaskActions() {
   const { mutate, isPending } = useSetTaskStatus();
   const { mutate: tick } = useTickChecklistItem();
   const onError = (error: unknown) =>
-    showToast(t(`completeTask.errors.${actionError(error)}`));
+    showToast(
+      // Фото не приняли (велико или сервер занят) — фото-ошибкой.
+      isApiError(error) && (error.status === 413 || error.status === 503)
+        ? t(`photos.${photoUploadError(error)}`)
+        : t(`completeTask.errors.${actionError(error)}`),
+    );
 
   const { setDraft, clearDraft } = useNoteDraftStore.getState();
 
   const markDone = (task: Task) => {
-    const note = useNoteDraftStore.getState().drafts[task.id]?.trim();
+    const draft = useNoteDraftStore.getState();
+    const note = draft.drafts[task.id]?.trim();
+    const photos = draft.photos[task.id] ?? [];
     mutate(
       {
         id: task.id,
         serverTaskId: task.serverTaskId,
         status: 'review',
         ...(note ? { note } : {}),
+        ...(photos.length > 0 ? { photos } : {}),
       },
       {
         onSuccess: () => {

@@ -1,8 +1,8 @@
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
-import { Icon } from '@shared/ui';
+import { Icon, ApiImage } from '@shared/ui';
 import type { ChildAccount } from '../model/use-child-code';
 import { styles } from './child-account-found.styled';
 
@@ -20,7 +20,7 @@ export function ChildAccountFound({ name, avatar, familyName }: ChildAccount) {
       style={styles.card}
     >
       {avatar ? (
-        <Image source={avatar} style={styles.avatar} />
+        <ApiImage source={avatar} style={styles.avatar} />
       ) : (
         <View style={[styles.avatar, styles.initial]}>
           <Text style={styles.initialText}>{name.charAt(0).toUpperCase()}</Text>

@@ -1,5 +1,5 @@
+import { ApiImage } from '@shared/ui';
 import {
-  Image,
   StyleSheet,
   Text,
   View,
@@ -19,7 +19,7 @@ type AssigneeAvatarProps = {
 
 /** Фото ребёнка или родителя, без фото — первая буква имени на фиолетовом. */
 export function AssigneeAvatar({ source, name, style }: AssigneeAvatarProps) {
-  if (source) return <Image source={source} style={style} />;
+  if (source) return <ApiImage source={source} style={style} />;
   return (
     <View style={[style, styles.initial]}>
       <Text style={styles.letter}>{name.charAt(0).toUpperCase()}</Text>

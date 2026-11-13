@@ -269,15 +269,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  photoCounter: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
-  },
   photo: {
     width: '100%',
-    height: 200,
     borderRadius: 20,
+  },
+  photoCarousel: {
+    borderRadius: 20,
+    overflow: 'hidden',
   },
 });

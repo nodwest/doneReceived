@@ -3,9 +3,20 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CHILD_NAME_MAX_LENGTH } from '@entities/family';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import {
+  choosePhotos,
+  showToast,
+  type PhotoSource,
+  type PickedPhoto,
+} from '@shared/lib';
 import { theme } from '@shared/theme';
-import { BottomSheet, Icon, SheetField, SourceTile } from '@shared/ui';
+import {
+  ApiImage,
+  BottomSheet,
+  Icon,
+  SheetField,
+  SourceTile,
+} from '@shared/ui';
 import { useCreateChild } from '../model/use-create-child';
 import { styles } from './add-child-sheet.styled';
 
@@ -17,7 +28,7 @@ type AddChildSheetProps = {
 };
 
 /**
- * Шторка New child: имя ребёнка и фото (пока только плитки-заглушки) —
+ * Шторка New child: имя ребёнка и фото (камера или галерея) —
  * Create profile создаёт профиль в семье на сервере, без устройства.
  * Устройство подключают потом кодом из карточки ребёнка.
  */
@@ -28,6 +39,7 @@ export function AddChildSheet({
 }: AddChildSheetProps) {
   const { t } = useTranslation();
   const [name, setName] = useState('');
+  const [photo, setPhoto] = useState<PickedPhoto | null>(null);
   const createChild = useCreateChild();
   const trimmed = name.trim();
   const disabled = !trimmed || createChild.isPending;
@@ -36,21 +48,33 @@ export function AddChildSheet({
   // открытие с пустого поля.
   const close = () => {
     setName('');
+    setPhoto(null);
     onClose();
   };
 
-  const photoSoon = () => showToast(t('newChild.photoSoon'));
+  const pick = async (source: PhotoSource) => {
+    const [picked] = await choosePhotos(source);
+    if (picked) setPhoto(picked);
+  };
 
   const submit = () => {
     if (disabled) return;
-    createChild.mutate(trimmed, {
-      onSuccess: (child) => {
-        showToast(t('newChild.created', { name: child.displayName }));
-        setName('');
-        onCreated();
+    createChild.mutate(
+      { name: trimmed, photo },
+      {
+        onSuccess: ({ child, avatarError }) => {
+          showToast(
+            avatarError
+              ? t('newChild.createdNoPhoto', { name: child.displayName })
+              : t('newChild.created', { name: child.displayName }),
+          );
+          setName('');
+          setPhoto(null);
+          onCreated();
+        },
+        onError: () => showToast(t('newChild.failed')),
       },
-      onError: () => showToast(t('newChild.failed')),
-    });
+    );
   };
 
   return (
@@ -85,16 +109,33 @@ export function AddChildSheet({
         <View style={styles.field}>
           <Text style={styles.label}>{t('newChild.photo')}</Text>
           <View style={styles.photos}>
-            <SourceTile
-              icon="camera-outline"
-              accessibilityLabel={t('taskCard.takePhoto')}
-              onPress={photoSoon}
-            />
-            <SourceTile
-              icon="image-add"
-              accessibilityLabel={t('taskCard.addFromGallery')}
-              onPress={photoSoon}
-            />
+            {photo ? (
+              <View>
+                <ApiImage source={{ uri: photo.uri }} style={styles.avatar} />
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('wishForm.removePhoto')}
+                  hitSlop={8}
+                  onPress={() => setPhoto(null)}
+                  style={styles.remove}
+                >
+                  <Icon name="close" size={8} color={theme.colors.white} />
+                </Pressable>
+              </View>
+            ) : (
+              <>
+                <SourceTile
+                  icon="camera-outline"
+                  accessibilityLabel={t('taskCard.takePhoto')}
+                  onPress={() => pick('camera')}
+                />
+                <SourceTile
+                  icon="image-add"
+                  accessibilityLabel={t('taskCard.addFromGallery')}
+                  onPress={() => pick('library')}
+                />
+              </>
+            )}
           </View>
           <Text style={styles.hint}>{t('newChild.photoHint')}</Text>
         </View>
