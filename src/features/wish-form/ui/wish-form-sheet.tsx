@@ -49,7 +49,8 @@ export function WishFormSheet({
   const form = useWishForm();
   const createWish = useCreateWish(owner);
   const updateWish = useUpdateWish(owner);
-  // На сервере у желаний нет фото и своего порядка: этих полей в форме нет.
+  // Фото желаний с сервера пока не загружаем: у настоящего ребёнка в форме
+  // их нет.
   const server = owner !== null && isServerWishlist(owner);
   const editing = wish !== undefined;
   const pending = createWish.isPending || updateWish.isPending;
@@ -134,30 +135,28 @@ export function WishFormSheet({
             <Icon name="link" size={18} color={theme.colors.placeholderSoft} />
           }
         />
-        {!server && (
-          <View style={styles.topWish}>
-            <LinearGradient
-              colors={[theme.colors.childTint, theme.colors.childTintLight]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              locations={[0, 0.7071]}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.topWishText}>
-              <Text style={styles.topWishTitle}>{t('wishForm.top')}</Text>
-              <Text style={styles.topWishHint}>
-                {editing
-                  ? t('wishForm.topNow', { position })
-                  : t('wishForm.topOtherwise', { position })}
-              </Text>
-            </View>
-            <Toggle
-              value={top}
-              onValueChange={form.setTop}
-              accessibilityLabel={t('wishForm.top')}
-            />
+        <View style={styles.topWish}>
+          <LinearGradient
+            colors={[theme.colors.childTint, theme.colors.childTintLight]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            locations={[0, 0.7071]}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.topWishText}>
+            <Text style={styles.topWishTitle}>{t('wishForm.top')}</Text>
+            <Text style={styles.topWishHint}>
+              {editing
+                ? t('wishForm.topNow', { position })
+                : t('wishForm.topOtherwise', { position })}
+            </Text>
           </View>
-        )}
+          <Toggle
+            value={top}
+            onValueChange={form.setTop}
+            accessibilityLabel={t('wishForm.top')}
+          />
+        </View>
         {editing && onDelete && (
           <Pressable
             accessibilityRole="button"

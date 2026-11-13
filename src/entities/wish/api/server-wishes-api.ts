@@ -2,9 +2,9 @@ import { apiRequest } from '@shared/api';
 import type { Wish, WishPayload } from '../model/wish';
 
 // Вишлист ребёнка на сервере. Цена — в центах с валютой (у нас целые
-// доллары, USD); описание — note, ссылка — storeUrl (только https://). Фото
-// и порядка на сервере нет (Идеи.md п. 17): фото не отправляем, порядок —
-// по времени добавления, старые сверху.
+// доллары, USD); описание — note, ссылка — storeUrl (только https://).
+// Порядок — position (0 — главное желание), «Make it my top wish» — top.
+// Фото желаний фронт пока не загружает (нет выбора фото).
 
 type WishDto = {
   id: string;
@@ -14,6 +14,8 @@ type WishDto = {
   priceMinor: number | null;
   currency: string | null;
   storeUrl: string | null;
+  /** Место в списке: 0 — самое важное желание. */
+  position: number;
   createdAt: string;
 };
 
@@ -28,9 +30,14 @@ const toWish = (dto: WishDto): Wish => ({
   createdAt: dto.createdAt,
 });
 
-/** Тело POST и PUT: пустые необязательные поля не отправляем (PUT их очистит). */
-const toBody = ({ title, price, description, link }: WishPayload) => ({
+/**
+ * Тело POST и PUT: пустые необязательные поля не отправляем (PUT их очистит).
+ * top — поставить желание первым; без него новое встаёт в конец, правленое
+ * остаётся на своём месте.
+ */
+const toBody = ({ title, price, description, link, top }: WishPayload) => ({
   title,
+  ...(top ? { top: true } : {}),
   ...(description ? { note: description } : {}),
   ...(price > 0 ? { priceMinor: price * 100, currency: 'USD' } : {}),
   ...(link ? { storeUrl: httpsUrl(link) } : {}),
@@ -43,12 +50,26 @@ const httpsUrl = (link: string) =>
 const base = (familyId: string, childId: string) =>
   `/families/${familyId}/children/${childId}/wishes`;
 
-/** GET …/wishes — до 100 желаний; сервер отдаёт новые первыми. */
+/** GET …/wishes — до 100 желаний по порядку, главное первым. */
 export async function fetchServerWishes(familyId: string, childId: string) {
   const list = await apiRequest<WishDto[]>(base(familyId, childId));
-  return list
-    .map(toWish)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  return [...list].sort((a, b) => a.position - b.position).map(toWish);
+}
+
+/**
+ * PUT …/wishes/order — новый порядок: все id ребёнка ровно по разу, сверху
+ * вниз. Меняет только сам ребёнок; 400 `WISH_ORDER_MISMATCH` — список не
+ * совпал с сервером (кто-то добавил или удалил желание).
+ */
+export function reorderServerWishes(
+  familyId: string,
+  childId: string,
+  ids: readonly string[],
+) {
+  return apiRequest<null>(`${base(familyId, childId)}/order`, {
+    method: 'PUT',
+    body: { ids },
+  });
 }
 
 /** POST …/wishes — добавляет только сам ребёнок. */

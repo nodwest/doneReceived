@@ -9,6 +9,7 @@ import {
   createServerWish,
   deleteServerWish,
   fetchServerWishes,
+  reorderServerWishes,
   updateServerWish,
 } from './server-wishes-api';
 
@@ -17,7 +18,7 @@ import {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Вишлист ребёнка с сервера: на нём нет фото и своего порядка. */
+/** Вишлист ребёнка с сервера (UUID): фото желаний пока не загружаем. */
 export const isServerWishlist = ({ childId }: WishlistOwner) =>
   UUID.test(childId);
 
@@ -66,11 +67,14 @@ export async function deleteWish(
   mockServer.remove(id);
 }
 
-/** Новый порядок желаний: id сверху вниз. Сервер порядок пока не хранит. */
+/** Новый порядок желаний: id сверху вниз. */
 export async function reorderWishes(
   owner: WishlistOwner,
   ids: readonly string[],
 ): Promise<void> {
-  if (isServerWishlist(owner)) return;
+  if (isServerWishlist(owner)) {
+    await reorderServerWishes(serverFamily(owner), owner.childId, ids);
+    return;
+  }
   mockServer.reorder(ids);
 }

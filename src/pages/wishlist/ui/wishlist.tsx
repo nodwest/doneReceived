@@ -7,12 +7,7 @@ import { useReorderWishes } from '@features/reorder-wishes';
 import { WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useMyChildBalance, useMyWishlistOwner } from '@features/family-tasks';
-import {
-  isServerWishlist,
-  useWishlistProgress,
-  WishRow,
-  type Wish,
-} from '@entities/wish';
+import { useWishlistProgress, WishRow, type Wish } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -32,8 +27,8 @@ export function WishlistPage() {
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
   const { balance } = useMyChildBalance();
   const owner = useMyWishlistOwner();
-  // Порядок желаний сервер пока не хранит: у настоящего ребёнка ручки нет.
-  const sortable = owner !== null && !isServerWishlist(owner);
+  // Порядок меняет только сам ребёнок: на его экране ручка есть всегда.
+  const sortable = owner !== null;
   const { progress, isPending } = useWishlistProgress(owner, balance);
   const reorder = useReorderWishes(owner);
   const deleteWish = useDeleteWish(owner);
