@@ -87,6 +87,13 @@ export const useSession = () => useSessionStore((state) => state.session);
 export const useSessionUser = () =>
   useSessionStore((state) => state.session?.user ?? null);
 
+/**
+ * id аккаунта вошедшего (`user.id`); без входа — пустая строка. По нему
+ * экраны узнают «свои» задания, награды и карточку «You».
+ */
+export const useMyId = () =>
+  useSessionStore((state) => state.session?.user.id ?? '');
+
 /** Родитель или ребёнок вошёл; без поля в сессии (старая) — родитель. */
 export const useSessionKind = () =>
   useSessionStore((state) =>

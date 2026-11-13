@@ -18,10 +18,11 @@ import {
 import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren } from '@entities/family';
 import { filterTasks, TaskCard, TaskRow, type Task } from '@entities/task';
+import { useMyId } from '@entities/session';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
-import { childrenMock, parentMock, parentProfilesMock } from '@shared/mocks';
+import { childrenMock, parentProfilesMock } from '@shared/mocks';
 import { CARDS_PADDING_BOTTOM, styles } from './tasks.styled';
 import { ViewOnlyNote } from './view-only-note';
 
@@ -57,6 +58,7 @@ type TasksScope = 'all' | 'child' | 'parent';
  * Family. У родителя нет вкладки Review — показываем только активные.
  */
 export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
+  const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
   // Плитка Tasks to Review открывает экран сразу на вкладке проверки.
@@ -92,21 +94,20 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   // обоих родителей; чужие — без кнопок, чтобы знать, что уже задано, и не
   // повторять.
   const allTasks = useMemo(() => {
-    if (!owner) return filterTasks(data, { createdBy: String(parentMock.id) });
+    if (!owner) return filterTasks(data, { createdBy: myId });
     return scope === 'parent'
       ? filterTasks(data, { createdBy: String(owner.id) }).filter(
           (task) => task.status === 'active',
         )
       : filterTasks(data, { assigneeId: String(owner.id) });
-  }, [data, scope, owner]);
+  }, [data, scope, owner, myId]);
   // На проверке — только то, что может проверить вошедший родитель.
   const reviewTasks = useMemo(
     () =>
       allTasks.filter(
-        (task) =>
-          task.status === 'review' && task.createdBy === String(parentMock.id),
+        (task) => task.status === 'review' && task.createdBy === myId,
       ),
-    [allTasks],
+    [allTasks, myId],
   );
   const { bottom } = useSafeAreaInsets();
   const gutter = useIsCompact() ? 16 : 24;
@@ -195,7 +196,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                     // Reject возвращает его ребёнку, Cancel task — отменяет.
                     // Всё это — только у автора задания; второй родитель
                     // чужое задание только видит.
-                    task.createdBy !== String(parentMock.id) ? (
+                    task.createdBy !== myId ? (
                       <ViewOnlyNote
                         author={
                           task.authorName ?? findParentName(task.createdBy)

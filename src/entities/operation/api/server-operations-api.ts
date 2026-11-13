@@ -10,8 +10,6 @@ export type OperationsViewer = {
   familyId: string;
   /** id аккаунта вошедшего. */
   userId: string;
-  /** Каким id пометить вошедшего родителя (экраны считают его «собой»). */
-  ownAuthor: string;
   /** Вошёл ребёнок: только его история (список детей ему закрыт). */
   child?: { id: string; name: string };
 };
@@ -69,8 +67,6 @@ export async function fetchServerOperations(
       ]),
     ),
   );
-  const author = (userId: string) =>
-    userId === viewer.userId ? viewer.ownAuthor : userId;
   const toChild = (child: ChildDto) => ({
     id: child.id,
     name: child.displayName,
@@ -87,7 +83,7 @@ export async function fetchServerOperations(
         description: entry.taskDescription ?? '',
         amount: entry.points,
         child: toChild(child),
-        parentId: entry.approvedBy ? author(entry.approvedBy) : '',
+        parentId: entry.approvedBy ?? '',
         at: entry.createdAt,
         doneAt: entry.submittedAt,
         photo: null,
@@ -103,7 +99,7 @@ export async function fetchServerOperations(
         description: item.taskDescription ?? '',
         amount: item.rewardPoints,
         child: toChild(child),
-        parentId: author(item.createdBy),
+        parentId: item.createdBy,
         at: item.deadlineAt,
         doneAt: null,
         photo: null,

@@ -3,13 +3,12 @@ import { useFocusEffect } from 'expo-router';
 import { useCurrentFamily } from '@entities/family';
 import { useSessionUser } from '@entities/session';
 import { filterTasks, useTasks, type TaskViewer } from '@entities/task';
-import { childAccountMock, parentMock } from '@shared/mocks';
+import { childAccountMock } from '@shared/mocks';
 
 /**
  * Кто смотрит задания: семья (у родителя — из GET /families, у ребёнка — из
  * сессии) и его аккаунт. Без семьи — null, тогда только моковые задания.
- * Задания вошедшего родителя помечаются автором моковой Sarah: экраны уже
- * считают «моими» её задания.
+ * «Свои» задания экраны узнают по `createdBy === userId` (`useMyId`).
  */
 export function useTaskViewer(): TaskViewer | null {
   const family = useCurrentFamily();
@@ -21,7 +20,6 @@ export function useTaskViewer(): TaskViewer | null {
         ? {
             familyId,
             userId: user.id,
-            ownAuthor: String(parentMock.id),
             childName: user.kind === 'child' ? user.displayName : undefined,
           }
         : null,

@@ -16,7 +16,7 @@ import {
   type FamilyChild,
   type FamilyMember,
 } from '@entities/family';
-import { useSessionUser } from '@entities/session';
+import { useSessionUser, useMyId } from '@entities/session';
 import { isApiError } from '@shared/api';
 import { countChildTasks, countTasks, type Task } from '@entities/task';
 import { MemberCard, useViewerRole } from '@entities/user';
@@ -46,6 +46,7 @@ const NO_MEMBERS: FamilyMember[] = [];
  * смахнув карточку влево.
  */
 export function FamilyPage() {
+  const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
   // Счётчики — из того же списка задач, что на главной и в профилях.
@@ -165,7 +166,7 @@ export function FamilyPage() {
                 // помечены как задания моковой Sarah), карточка — на главную.
                 if (parent.userId === me?.id) {
                   const total = countTasks(tasks, {
-                    createdBy: String(parentMock.id),
+                    createdBy: myId,
                   });
                   const openTasks = (tab: 'all' | 'review') =>
                     router.push({ pathname: '/tasks', params: { tab } });
@@ -221,7 +222,7 @@ export function FamilyPage() {
                     // переключает на главную (как вкладка Home), чипы открывают
                     // Tasks поверх Family — «назад» вернёт сюда.
                     const total = countTasks(tasks, {
-                      createdBy: String(parentMock.id),
+                      createdBy: myId,
                     });
                     const openTasks = (tab: 'all' | 'review') =>
                       router.push({ pathname: '/tasks', params: { tab } });
@@ -276,11 +277,7 @@ export function FamilyPage() {
               {children.map((child) => {
                 const id = String(child.id);
                 // Активные — все задания ребёнка, на проверке — только свои.
-                const counts = countChildTasks(
-                  tasks,
-                  String(child.id),
-                  String(parentMock.id),
-                );
+                const counts = countChildTasks(tasks, String(child.id), myId);
                 const openTasks = (tab: 'all' | 'review') =>
                   router.push({
                     pathname: '/child/[id]/tasks',
@@ -306,11 +303,7 @@ export function FamilyPage() {
               })}
               {newChildren.map((child) => {
                 // Как у моковых: тап — профиль, чипы — его задания.
-                const counts = countChildTasks(
-                  tasks,
-                  child.id,
-                  String(parentMock.id),
-                );
+                const counts = countChildTasks(tasks, child.id, myId);
                 const openTasks = (tab: 'all' | 'review') =>
                   router.push({
                     pathname: '/child/[id]/tasks',

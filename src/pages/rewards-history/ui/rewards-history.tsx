@@ -24,7 +24,7 @@ import {
   useTaskFamilyId,
 } from '@features/family-tasks';
 import { useFamilyChildren, useFamilyMembers } from '@entities/family';
-import { useMe, useMyAvatar } from '@entities/session';
+import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { TaskIconBadge } from '@entities/task';
 import { balanceAfter } from '@entities/wallet';
 import { getRewardGoal, useWishes } from '@entities/wish';
@@ -33,7 +33,6 @@ import { formatDayLabel, formatMonthDay, startOfDay } from '@shared/lib';
 import {
   childAccountMock,
   childrenMock,
-  parentMock,
   parentProfilesMock,
 } from '@shared/mocks';
 import { theme } from '@shared/theme';
@@ -55,6 +54,7 @@ const NO_OPERATIONS: Operation[] = [];
  * значок задания, в карточке — на сколько награда приблизила желание.
  */
 export function RewardsHistoryPage({ childId }: { childId?: string }) {
+  const myId = useMyId();
   const { t } = useTranslation();
   const { data: allOperations = NO_OPERATIONS, isPending } =
     useFamilyOperations();
@@ -66,7 +66,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const familyId = useTaskFamilyId();
   const { data: members } = useFamilyMembers(familyId);
   const findApprover = (id: string) => {
-    if (me?.kind !== 'child' && id === String(parentMock.id) && me) {
+    if (me?.kind !== 'child' && id === myId && me) {
       return { name: me.displayName, avatar: myAvatar };
     }
     const mock = parentProfilesMock.find((parent) => String(parent.id) === id);
@@ -99,11 +99,9 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const operations = useMemo(
     () =>
       childId === undefined
-        ? allOperations.filter(
-            (operation) => operation.parentId === String(parentMock.id),
-          )
+        ? allOperations.filter((operation) => operation.parentId === myId)
         : allOperations,
-    [allOperations, childId],
+    [allOperations, childId, myId],
   );
   // Копилка — только в истории от лица ребёнка: его вишлист и кошелёк.
   const { data: wishes } = useWishes(useMyWishlistOwner());

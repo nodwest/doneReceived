@@ -85,11 +85,6 @@ export type TaskViewer = {
   familyId: string;
   /** id аккаунта вошедшего (`user.id` в сессии). */
   userId: string;
-  /**
-   * Каким автором пометить задания вошедшего родителя: экраны считают
-   * «моими» задания этого автора (пока это id моковой Sarah).
-   */
-  ownAuthor: string;
   /** Ребёнок не видит список детей семьи (403): имя — его собственное. */
   childName?: string;
 };
@@ -104,8 +99,6 @@ function toTask(
   const child = children.find((item) => item.id === assignment.childId);
   const pending = assignment.pendingSubmission ?? null;
   const rejected = assignment.lastRejection ?? null;
-  const author = (userId: string) =>
-    userId === viewer.userId ? viewer.ownAuthor : userId;
   return {
     id: assignment.id,
     serverTaskId: task.id,
@@ -118,7 +111,7 @@ function toTask(
       name: child?.displayName ?? viewer.childName ?? '—',
       avatar: child?.avatarUrl ? { uri: child.avatarUrl } : null,
     },
-    createdBy: author(task.createdBy),
+    createdBy: task.createdBy,
     authorName: members.find((member) => member.userId === task.createdBy)
       ?.displayName,
     createdAt: task.createdAt,
@@ -134,7 +127,7 @@ function toTask(
       ? {
           reason: REJECT_REASONS[rejected.reasonCode] ?? 'other',
           comment: rejected.comment ?? '',
-          by: author(rejected.reviewedBy),
+          by: rejected.reviewedBy,
         }
       : null,
     checklist: task.checklist.map((item) => ({

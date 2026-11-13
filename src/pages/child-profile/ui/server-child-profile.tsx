@@ -23,8 +23,8 @@ import {
 import { countChildTasks, type Task } from '@entities/task';
 import { useChildWallet } from '@entities/wallet';
 import { useWishlistProgress, WishRow } from '@entities/wish';
+import { useMyId } from '@entities/session';
 import { useTranslation } from '@shared/i18n';
-import { parentMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
@@ -40,6 +40,7 @@ const RECENT_REWARDS = 3;
  * нет.
  */
 export function ServerChildProfile({ id }: { id: string }) {
+  const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
   const familyId = useTaskFamilyId();
@@ -63,7 +64,7 @@ export function ServerChildProfile({ id }: { id: string }) {
   }
 
   // Активные — все задания ребёнка, на проверке — только свои.
-  const counts = countChildTasks(tasks, id, String(parentMock.id));
+  const counts = countChildTasks(tasks, id, myId);
   const childOperations = operations.filter(
     (operation) => operation.child.id === id,
   );
@@ -151,7 +152,7 @@ export function ServerChildProfile({ id }: { id: string }) {
                   {...operation}
                   caption="day"
                   onPress={
-                    operation.parentId === String(parentMock.id)
+                    operation.parentId === myId
                       ? () => openReward(operation)
                       : undefined
                   }

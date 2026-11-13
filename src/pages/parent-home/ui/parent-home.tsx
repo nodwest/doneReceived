@@ -15,7 +15,7 @@ import {
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { ActivityItem, FeedItem } from '@entities/activity';
 import { sumTotals } from '@entities/operation';
-import { useMe, useMyAvatar } from '@entities/session';
+import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
@@ -35,6 +35,7 @@ function greetingKey(hour: number) {
 }
 
 export function ParentHomePage() {
+  const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
   // Имя и фото — вошедшего родителя (GET /users/me).
@@ -47,25 +48,20 @@ export function ParentHomePage() {
   // Лента — события семьи с сервера; без семьи — моки.
   const { feedViewer, data: feed = [] } = useFamilyFeed();
   // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
-  const total =
-    tasks && countTasks(tasks, { createdBy: String(parentMock.id) });
+  const total = tasks && countTasks(tasks, { createdBy: myId });
   // Выплачено вошедшим родителем за всё время — из истории наград: после
   // подтверждения задания сумма растёт.
   const { data: operations } = useFamilyOperations();
   const rewardsPaid =
     operations &&
-    sumTotals(
-      operations.filter(
-        (operation) => operation.parentId === String(parentMock.id),
-      ),
-    ).earned;
+    sumTotals(operations.filter((operation) => operation.parentId === myId))
+      .earned;
   // Дети: моковые Emma и Liam и дети семьи с сервера (созданные через
   // Add a child). Статуса «дома» у настоящих пока нет.
   const { data: serverChildren } = useFamilyChildren(
     useCurrentFamily()?.id ?? null,
   );
-  const counts = (id: string) =>
-    countChildTasks(tasks ?? [], id, String(parentMock.id));
+  const counts = (id: string) => countChildTasks(tasks ?? [], id, myId);
   const children: ChildOverview[] = [
     ...childProfilesMock.map((child) => {
       const { active, review } = counts(String(child.id));
