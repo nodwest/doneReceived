@@ -26,6 +26,8 @@ type CardButtonProps = {
   icon?: IconName;
   /** lg — 48pt (низ карточки), md — 44pt (плитка и строка). */
   size?: 'lg' | 'md';
+  /** По ширине подписи, а не на всё свободное место (I did it! в плитке). */
+  fit?: boolean;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -54,6 +56,7 @@ export function CardButton({
   variant = 'primary',
   icon,
   size = 'lg',
+  fit,
   disabled,
   style,
 }: CardButtonProps) {
@@ -70,6 +73,9 @@ export function CardButton({
       style={({ pressed }) => [
         styles.button,
         size === 'md' && styles.buttonMd,
+        // Обычная кнопка делит место с соседними; fit — по ширине подписи
+        // (на любом языке) с постоянными отступами.
+        fit ? styles.fit : styles.stretch,
         styles[variant],
         (pressed || disabled) && styles.dimmed,
         style,
@@ -97,7 +103,6 @@ export function CardButton({
 
 const styles = StyleSheet.create({
   button: {
-    flex: 1,
     height: 48,
     borderRadius: 14,
     alignItems: 'center',
@@ -107,6 +112,14 @@ const styles = StyleSheet.create({
   buttonMd: {
     height: 44,
     borderRadius: 14,
+  },
+  stretch: {
+    flex: 1,
+  },
+  fit: {
+    flexShrink: 0,
+    paddingLeft: 22,
+    paddingRight: 24,
   },
   content: {
     flexDirection: 'row',

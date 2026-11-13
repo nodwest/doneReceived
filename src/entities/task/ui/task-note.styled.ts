@@ -1,4 +1,9 @@
-import { StyleSheet } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 import { withAlpha } from '@shared/lib';
 import { theme, tracking } from '@shared/theme';
 
@@ -42,7 +47,6 @@ export const styles = StyleSheet.create({
     color: theme.colors.grey,
   },
   field: {
-    gap: 10,
     paddingTop: 14,
     paddingBottom: 12,
     paddingHorizontal: 16,
@@ -50,9 +54,10 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.checklistLine,
     backgroundColor: theme.colors.white,
-  },
-  fieldFocused: {
-    borderColor: withAlpha(theme.colors.childFrom, 0.6),
+    // На вебе над всем полем — текстовый курсор, как над самим текстом.
+    ...Platform.select<ViewStyle>({
+      web: { cursor: 'text' } as unknown as ViewStyle,
+    }),
   },
   input: {
     minHeight: 44,
@@ -63,10 +68,35 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.regular,
     color: theme.colors.ink,
     textAlignVertical: 'top',
+    // Браузерную рамку фокуса и ручку ресайза на вебе убираем.
+    ...Platform.select<TextStyle>({
+      web: { outlineStyle: 'none', resize: 'none' } as unknown as TextStyle,
+    }),
   },
+  // Зеркало текста для замера высоты: невидимое, поверх поля.
+  mirror: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    minHeight: 0,
+    opacity: 0,
+  },
+  // Счётчик — плашка в правом нижнем углу, по центру последней строки
+  // (строка 22, плашка 18: снизу паддинг поля 12 + 2).
   counter: {
-    alignSelf: 'flex-end',
+    position: 'absolute',
+    right: 16,
+    bottom: 14,
+    height: 18,
+    justifyContent: 'center',
+    paddingHorizontal: 7,
+    borderRadius: 6,
+    backgroundColor: theme.colors.prime,
+  },
+  counterText: {
     fontSize: 11,
+    lineHeight: 14,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,

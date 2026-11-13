@@ -324,6 +324,10 @@ export const en = {
     earned: 'Earned',
     missed: 'Missed',
     noRewardsThisDay: 'No rewards this day',
+    noRewards: 'No rewards yet',
+    approved: 'Approved',
+    paidAt: 'Paid {{time}}',
+    doneAt: 'Done {{time}}',
   },
   tasks: {
     allTasks: 'All tasks',
@@ -352,7 +356,7 @@ export const en = {
     sentAgo: 'Sent {{ago}}',
     photoCount_one: '{{count}} photo',
     photoCount_other: '{{count}} photos',
-    checking: '{{name}} is checking…',
+    checking: '{{name}} is checking',
   },
   taskCard: {
     due: 'Due',
@@ -382,6 +386,7 @@ export const en = {
     taskFor: 'Task for',
     sentBack: '{{name}} sent it back to redo',
     sentBackShort: 'Sent back to redo',
+    quote: '“{{text}}”',
     from: 'from',
     takePhoto: 'Take a photo',
     gallery: 'Gallery',

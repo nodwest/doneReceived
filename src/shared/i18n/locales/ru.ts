@@ -332,6 +332,10 @@ export const ru: Dictionary = {
     earned: 'Получено',
     missed: 'Упущено',
     noRewardsThisDay: 'В этот день наград не было',
+    noRewards: 'Наград пока нет',
+    approved: 'Принято',
+    paidAt: 'Выплачено {{time}}',
+    doneAt: 'Сдано {{time}}',
   },
   tasks: {
     allTasks: 'Все',
@@ -362,7 +366,7 @@ export const ru: Dictionary = {
     photoCount_few: '{{count}} фото',
     photoCount_many: '{{count}} фото',
     photoCount_other: '{{count}} фото',
-    checking: '{{name}} проверяет…',
+    checking: '{{name}} проверяет',
   },
   taskCard: {
     due: 'Срок',
@@ -393,6 +397,7 @@ export const ru: Dictionary = {
     taskFor: 'Задание для',
     sentBack: '{{name}} вернул(а) на доработку',
     sentBackShort: 'Вернули на доработку',
+    quote: '«{{text}}»',
     from: 'от',
     takePhoto: 'Снять',
     gallery: 'Галерея',

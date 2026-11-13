@@ -1,10 +1,20 @@
-import { Platform, StyleSheet, type TextStyle } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
 // Убирает браузерную рамку фокуса; в типах RN этих значений нет.
 const webInputReset = Platform.select({
   web: { outlineWidth: 0, outlineStyle: 'none' },
 }) as unknown as TextStyle;
+
+// Кнопкам — без браузерной рамки фокуса.
+const webNoOutline = Platform.select({
+  web: { outlineWidth: 0, outlineStyle: 'none' },
+}) as unknown as ViewStyle;
 
 export const styles = StyleSheet.create({
   // Свёрнуто: пунктирная кнопка Add checklist.
@@ -119,6 +129,8 @@ export const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 13,
     paddingHorizontal: 14,
+    // Браузерную рамку фокуса не рисуем.
+    ...webNoOutline,
   },
   addStepText: {
     fontSize: theme.fontSize.sm,

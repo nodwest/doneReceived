@@ -17,7 +17,7 @@ import {
 } from '@widgets/tasks-header';
 import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren } from '@entities/family';
-import { filterTasks, TaskCard, type Task } from '@entities/task';
+import { filterTasks, TaskCard, TaskRow, type Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
@@ -30,6 +30,19 @@ const NO_TASKS: Task[] = [];
 // Имя автора чужого задания; автор с сервера не из моков — пусто.
 const findParentName = (id: string) =>
   parentProfilesMock.find((parent) => String(parent.id) === id)?.name ?? '';
+
+/**
+ * Автор задания для шапки плитки: моковый родитель — с фото, с сервера — имя
+ * из участников семьи и буква, иначе просто «Родитель».
+ */
+const authorOf = (task: Task, parentLabel: string) => {
+  const mock = parentProfilesMock.find(
+    (parent) => String(parent.id) === task.createdBy,
+  );
+  return mock
+    ? { name: mock.name, avatar: mock.avatar }
+    : { name: task.authorName ?? parentLabel, avatar: null };
+};
 
 /**
  * Чей список: all — вкладка Tasks, задачи всех детей; child — задачи ребёнка
@@ -227,6 +240,21 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                     setCurrentId(task.id);
                     setView('cards');
                   }}
+                  // Задания одного ребёнка: в шапке плитки — от кого они.
+                  renderTask={
+                    scope === 'child'
+                      ? (task) => (
+                          <TaskRow
+                            task={task}
+                            author={authorOf(task, t('member.parent'))}
+                            onPress={() => {
+                              setCurrentId(task.id);
+                              setView('cards');
+                            }}
+                          />
+                        )
+                      : undefined
+                  }
                 />
               )}
             </ScrollView>

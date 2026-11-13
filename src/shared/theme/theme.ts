@@ -18,6 +18,8 @@ export const theme = {
     reviewChip: '#FFE9CC',
     reviewChipText: '#B8650A',
     reviewBorder: '#F8CC94',
+    // Значок задания без фото в строке «на проверке»: спокойный янтарный.
+    reviewIconSoft: '#E0A23A',
     // Подтверждённая запись активности.
     approvedFrom: '#E0F8E7',
     approvedTo: '#C5EFD5',
@@ -141,6 +143,14 @@ export const theme = {
     timerCool: '#E6F1FD',
     stepperBg: '#F5F3FF',
     dangerBorder: '#FFC9CA',
+    // Задание вернули на переделку: коралловый — заметно, но не тревожно,
+    // как красный.
+    sentBack: '#C24A2A',
+    sentBackIcon: '#F2643F',
+    sentBackBg: '#FFF2EE',
+    sentBackBorder: 'rgba(255, 122, 89, 0.3)',
+    sentBackChip: '#FFE0D6',
+    sentBackChipText: '#B8441F',
     dropZone: '#F4F9FF',
     galleryBorder: '#D6E6F8',
     cardBorder: '#E6E8F0',

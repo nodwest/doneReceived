@@ -154,7 +154,9 @@ function toTask(
  */
 export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
   const { familyId } = viewer;
-  // Ребёнку списки детей и участников закрыты (403) — не спрашиваем.
+  // Ребёнку список детей закрыт (403) — не спрашиваем. Участников семьи
+  // ребёнок видит (Идеи.md п. 8): из них имя родителя («Task from Sarah»).
+  // Не ответили — автор «Родитель».
   const parent = viewer.childName === undefined;
   const [items, children, members] = await Promise.all([
     apiRequest<{ task: TaskDto; assignment: AssignmentDto }[]>(
@@ -165,11 +167,9 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
           () => [] as ChildDto[],
         )
       : ([] as ChildDto[]),
-    parent
-      ? apiRequest<MemberDto[]>(`/families/${familyId}/members`).catch(
-          () => [] as MemberDto[],
-        )
-      : ([] as MemberDto[]),
+    apiRequest<MemberDto[]>(`/families/${familyId}/members`).catch(
+      () => [] as MemberDto[],
+    ),
   ]);
   return items
     .filter(

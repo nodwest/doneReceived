@@ -10,7 +10,7 @@ import { AssigneeAvatar } from './assignee-avatar';
 
 type ChildReviewRowProps = {
   task: Task;
-  /** Родитель, который проверяет: «Sarah is checking…». */
+  /** Родитель, который проверяет: «Sarah is checking». */
   author: Pick<TaskAssignee, 'name' | 'avatar'>;
   onPress?: (task: Task) => void;
 };
@@ -41,7 +41,7 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
           <Image source={task.photo} style={styles.thumb} resizeMode="cover" />
         ) : (
           <View style={styles.thumbIcon}>
-            <Icon name="task" size={24} color={theme.colors.reviewAccent} />
+            <Icon name="task" size={24} color={theme.colors.reviewIconSoft} />
           </View>
         )}
         <View style={styles.info}>
@@ -76,7 +76,7 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
           {t('tasks.checking', { name: author.name })}
         </Text>
         <Icon name="coin" size={18} color={theme.colors.yellow} />
-        <Text style={styles.reward}>+{formatRewardShort(task.reward)}</Text>
+        <Text style={styles.reward}>{formatRewardShort(task.reward)}</Text>
       </View>
     </Pressable>
   );

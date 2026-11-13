@@ -14,6 +14,7 @@ export function DoneButton({ task }: { task: Task }) {
       variant="child"
       icon="check"
       size="md"
+      fit
       disabled={isPending}
       onPress={() => markDone(task)}
     />

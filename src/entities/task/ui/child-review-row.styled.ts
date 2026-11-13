@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.reviewTo,
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
   },
   info: {
     flex: 1,

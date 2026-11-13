@@ -87,9 +87,11 @@ export function ChildTaskCard({
       style={style}
     >
       {!review && task.rejection && (
+        // Вернули на переделку: кто вернул, причина чипом (у Other её нет —
+        // она ничего не говорит) и комментарий родителя словами.
         <View style={styles.rejection}>
           <View style={styles.rejectionIcon}>
-            <Icon name="refresh" size={16} color={theme.colors.dangerText} />
+            <Icon name="undo" size={16} color={theme.colors.sentBackIcon} />
           </View>
           <View style={styles.rejectionText}>
             <Text style={styles.rejectionTitle}>
@@ -97,10 +99,18 @@ export function ChildTaskCard({
                 name: rejectedBy?.name ?? author.name,
               })}
             </Text>
-            <Text style={styles.rejectionReason}>
-              {t(`reviewTask.reasons.${task.rejection.reason}`)}
-              {task.rejection.comment ? ` · «${task.rejection.comment}»` : ''}
-            </Text>
+            {task.rejection.reason !== 'other' && (
+              <View style={styles.rejectionChip}>
+                <Text style={styles.rejectionChipText}>
+                  {t(`reviewTask.reasons.${task.rejection.reason}`)}
+                </Text>
+              </View>
+            )}
+            {!!task.rejection.comment && (
+              <Text style={styles.rejectionComment}>
+                {t('taskCard.quote', { text: task.rejection.comment })}
+              </Text>
+            )}
           </View>
         </View>
       )}
