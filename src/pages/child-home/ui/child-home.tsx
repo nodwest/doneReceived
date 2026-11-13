@@ -10,11 +10,12 @@ import { RecentActivity } from '@widgets/recent-activity';
 import { TaskCarousel } from '@widgets/task-carousel';
 import { WishlistPreview } from '@widgets/wishlist-preview';
 import {
+  useFamilyFeed,
   useChildTasks,
   useMyChildBalance,
   useMyWishlistOwner,
 } from '@features/family-tasks';
-import { ChildActivityItem } from '@entities/activity';
+import { ChildActivityItem, FeedItem } from '@entities/activity';
 import {
   ChildTaskTile,
   countTasks,
@@ -69,6 +70,9 @@ export function ChildHomePage() {
   const me = useMe();
   const myAvatar = useMyAvatar();
   const childSession = useSessionKind() === 'child';
+  // Лента: вошёл сам ребёнок — его события с сервера; родитель в режиме
+  // ребёнка — моки Emma.
+  const { feedViewer, data: feed = [] } = useFamilyFeed();
   const { data: myTasks = NO_TASKS, isPending: tasksPending } = useChildTasks();
   // Ближайшие по сроку — первыми, как в списке «To do».
   const activeTasks = useMemo(
@@ -136,11 +140,21 @@ export function ChildHomePage() {
                 current={wishlist.current}
                 onPress={() => router.push('/wishlist')}
               />
-              <RecentActivity>
-                {childActivityMock.map(({ id, ...item }) => (
-                  <ChildActivityItem key={id} {...item} />
-                ))}
-              </RecentActivity>
+              {feedViewer ? (
+                feed.length > 0 && (
+                  <RecentActivity>
+                    {feed.map((event) => (
+                      <FeedItem key={event.id} event={event} viewer="child" />
+                    ))}
+                  </RecentActivity>
+                )
+              ) : (
+                <RecentActivity>
+                  {childActivityMock.map(({ id, ...item }) => (
+                    <ChildActivityItem key={id} {...item} />
+                  ))}
+                </RecentActivity>
+              )}
             </>
           )}
         </ScrollView>

@@ -7,9 +7,13 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
-import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
+import {
+  useFamilyFeed,
+  useFamilyOperations,
+  useFamilyTasks,
+} from '@features/family-tasks';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
-import { ActivityItem } from '@entities/activity';
+import { ActivityItem, FeedItem } from '@entities/activity';
 import { sumTotals } from '@entities/operation';
 import { useMe, useMyAvatar } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
@@ -40,6 +44,8 @@ export function ParentHomePage() {
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
   // Пока список грузится, показываем значения из сводки.
   const { data: tasks } = useFamilyTasks();
+  // Лента — события семьи с сервера; без семьи — моки.
+  const { feedViewer, data: feed = [] } = useFamilyFeed();
   // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
   const total =
     tasks && countTasks(tasks, { createdBy: String(parentMock.id) });
@@ -125,11 +131,21 @@ export function ParentHomePage() {
             }
           />
           <CreateTaskButton onPress={() => router.push('/create-task')} />
-          <RecentActivity>
-            {recentActivityMock.map(({ id, ...item }) => (
-              <ActivityItem key={id} {...item} />
-            ))}
-          </RecentActivity>
+          {feedViewer ? (
+            feed.length > 0 && (
+              <RecentActivity>
+                {feed.map((event) => (
+                  <FeedItem key={event.id} event={event} viewer="parent" />
+                ))}
+              </RecentActivity>
+            )
+          ) : (
+            <RecentActivity>
+              {recentActivityMock.map(({ id, ...item }) => (
+                <ActivityItem key={id} {...item} />
+              ))}
+            </RecentActivity>
+          )}
         </ScrollView>
         <BottomNav activeKey="home" />
       </SafeAreaView>
