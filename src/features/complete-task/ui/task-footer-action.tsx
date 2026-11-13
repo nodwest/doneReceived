@@ -16,7 +16,7 @@ export function TaskFooterAction({ task }: { task: Task }) {
       label={t('completeTask.redo')}
       variant="review-outline"
       icon="refresh"
-      disabled={isPending}
+      loading={isPending}
       onPress={() => redo(task)}
     />
   ) : (
@@ -24,7 +24,7 @@ export function TaskFooterAction({ task }: { task: Task }) {
       label={t('completeTask.done')}
       variant="child"
       icon="check"
-      disabled={isPending}
+      loading={isPending}
       onPress={() => markDone(task)}
     />
   );
