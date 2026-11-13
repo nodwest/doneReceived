@@ -40,6 +40,22 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
+  avatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+  },
+  remove: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+  },
   hint: {
     fontSize: 13,
     letterSpacing: tracking(13),

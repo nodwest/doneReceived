@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { FieldHint } from '@features/auth';
-import { useUpdateMe } from '@features/update-profile';
+import { useMyAvatarChange, useUpdateMe } from '@features/update-profile';
 import {
   DISPLAY_NAME_MAX_LENGTH,
   useMe,
@@ -13,7 +13,7 @@ import {
 } from '@entities/session';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { choosePhotos, photoUploadError, showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
 import {
   GradientButton,
@@ -22,7 +22,9 @@ import {
   Label,
   LetterAvatar,
   RoundButton,
+  SelectMenu,
   SettingsRow,
+  type AnchorRect,
 } from '@shared/ui';
 import { styles } from './edit-profile.styled';
 
@@ -32,8 +34,12 @@ import { styles } from './edit-profile.styled';
  * символ, и сохраняет его (PATCH /users/me). Почта только показывается,
  * Change — тост «скоро» (на сервере смены почты нет, Идеи.md п. 29). Change
  * password — отдельный экран `/change-password` (только у родителя: у
- * ребёнка пароля нет). Фото пока не меняется.
+ * ребёнка пароля нет). Фото: тап по аватару или Change photo — меню «снять,
+ * из галереи, убрать» (PUT / DELETE /users/me/avatar).
  */
+/** Что выбрали в меню фото; none — ничего не отмечено галочкой. */
+type PhotoChoice = 'camera' | 'library' | 'remove' | 'none';
+
 export function EditProfilePage() {
   const { t } = useTranslation();
   // Данные вошедшего (GET /users/me).
@@ -55,6 +61,43 @@ export function EditProfilePage() {
     if (name === savedName) setName(account.fullName);
   }
   const { mutate, isPending } = useUpdateMe();
+  const avatarChange = useMyAvatarChange();
+  const photoButton = useRef<View>(null);
+  const [photoAnchor, setPhotoAnchor] = useState<AnchorRect | null>(null);
+  const [photoMenu, setPhotoMenu] = useState(false);
+  const photoOptions = [
+    { value: 'camera', label: t('taskCard.takePhoto') },
+    { value: 'library', label: t('taskCard.addFromGallery') },
+    ...(account.avatar
+      ? [{ value: 'remove', label: t('editProfile.removePhoto') }]
+      : []),
+  ] as { value: PhotoChoice; label: string }[];
+
+  // Меню раскрывается у «Change photo» — меряем, где оно сейчас на экране.
+  const openPhotoMenu = () => {
+    if (!editable || avatarChange.isPending) return;
+    photoButton.current?.measureInWindow((x, y, width, height) => {
+      setPhotoAnchor({ x, y, width, height });
+      setPhotoMenu(true);
+    });
+  };
+
+  const changePhoto = async (choice: PhotoChoice) => {
+    setPhotoMenu(false);
+    if (choice === 'none') return;
+    let photo = null;
+    if (choice !== 'remove') {
+      [photo] = await choosePhotos(choice);
+      if (!photo) return;
+    }
+    avatarChange.mutate(photo, {
+      onSuccess: () =>
+        showToast(
+          t(photo ? 'editProfile.photoSaved' : 'editProfile.photoRemoved'),
+        ),
+      onError: (error) => showToast(t(`photos.${photoUploadError(error)}`)),
+    });
+  };
 
   const trimmed = name.trim();
   const nameError = !trimmed
@@ -109,6 +152,7 @@ export function EditProfilePage() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t('editProfile.changePhoto')}
+            onPress={openPhotoMenu}
             style={styles.avatarWrap}
           >
             <LetterAvatar
@@ -126,9 +170,16 @@ export function EditProfilePage() {
               <Icon name="camera" size={16} color={theme.colors.white} />
             </LinearGradient>
           </Pressable>
-          <Pressable accessibilityRole="button" hitSlop={8}>
+          <Pressable
+            ref={photoButton}
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={openPhotoMenu}
+          >
             <Text style={styles.changePhoto}>
-              {t('editProfile.changePhoto')}
+              {avatarChange.isPending
+                ? t('editProfile.photoUploading')
+                : t('editProfile.changePhoto')}
             </Text>
           </Pressable>
         </View>
@@ -200,6 +251,16 @@ export function EditProfilePage() {
           />
         </View>
       </ScrollView>
+      <SelectMenu
+        visible={photoMenu}
+        anchor={photoAnchor}
+        align="left"
+        options={photoOptions}
+        value={'none' as PhotoChoice}
+        onSelect={changePhoto}
+        onClose={() => setPhotoMenu(false)}
+        width={220}
+      />
     </TabScreen>
   );
 }

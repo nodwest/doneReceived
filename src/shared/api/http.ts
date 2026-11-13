@@ -34,6 +34,7 @@ export const isApiError = (error: unknown): error is ApiError =>
 
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  /** JSON-тело; FormData — multipart с файлами. */
   body?: unknown;
   /**
    * Не обновлять токены при 401: сам запрос обновления и выход — их 401
@@ -48,6 +49,19 @@ let getAccessToken: () => string | null = () => null;
 /** Откуда брать токен для заголовка `Authorization: Bearer …`. */
 export function setAccessTokenGetter(getter: () => string | null) {
   getAccessToken = getter;
+}
+
+/**
+ * Картинка API для `<Image>`: относительный адрес дополняется API_URL,
+ * запрос идёт с Bearer-токеном (без него сервер ответит 401). Адрес с
+ * токеном не логируем.
+ */
+export function authorizedImage(url: string) {
+  const token = getAccessToken();
+  return {
+    uri: /^https?:\/\//i.test(url) ? url : `${API_URL}${url}`,
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  };
 }
 
 // Обновление токенов подставляет сессия: true — новая пара сохранена.
@@ -81,13 +95,21 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const send = async (token: string | null) => {
     const headers: Record<string, string> = { Accept: 'application/json' };
-    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    // FormData (файлы) уходит как есть: границу multipart fetch проставит сам.
+    const form = body instanceof FormData;
+    if (body !== undefined && !form) {
+      headers['Content-Type'] = 'application/json';
+    }
     if (token) headers.Authorization = `Bearer ${token}`;
     try {
       return await fetch(`${API_URL}${path}`, {
         method,
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body: form
+          ? body
+          : body === undefined
+            ? undefined
+            : JSON.stringify(body),
       });
     } catch {
       throw new ApiError(0, []);

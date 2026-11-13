@@ -7,7 +7,12 @@ import { useReorderWishes } from '@features/reorder-wishes';
 import { WishFormSheet } from '@features/wish-form';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useMyChildBalance, useMyWishlistOwner } from '@features/family-tasks';
-import { useWishlistProgress, WishRow, type Wish } from '@entities/wish';
+import {
+  useWishlistProgress,
+  WISHLIST_MAX_ITEMS,
+  WishRow,
+  type Wish,
+} from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -38,6 +43,9 @@ export function WishlistPage() {
   const [editing, setEditing] = useState<Wish>();
   const [openId, setOpenId] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  // Лимит только на создание: старые желания сверх него остаются в списке.
+  const atLimit = progress.length >= WISHLIST_MAX_ITEMS;
+  const limitHint = t('wishlist.limitHint', { limit: WISHLIST_MAX_ITEMS });
 
   const position = editing
     ? progress.findIndex((item) => item.wish.id === editing.id) + 1
@@ -76,6 +84,8 @@ export function WishlistPage() {
           <RoundButton
             icon="plus"
             accessibilityLabel={t('wishForm.newTitle')}
+            accessibilityHint={atLimit ? limitHint : undefined}
+            disabled={atLimit}
             onPress={() => openSheet()}
           />
         </View>
@@ -169,12 +179,20 @@ export function WishlistPage() {
         />
         <Pressable
           accessibilityRole="button"
+          accessibilityHint={atLimit ? limitHint : undefined}
+          accessibilityState={{ disabled: atLimit }}
+          disabled={atLimit}
           onPress={() => openSheet()}
-          style={({ pressed }) => [styles.add, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.add,
+            atLimit && styles.addDisabled,
+            pressed && styles.pressed,
+          ]}
         >
           <Icon name="plus" size={18} color={theme.colors.childDeep} />
           <Text style={styles.addLabel}>{t('wishlist.add')}</Text>
         </Pressable>
+        {atLimit && <Text style={styles.limitHint}>{limitHint}</Text>}
       </ScrollView>
       <WishFormSheet
         visible={sheetOpen}

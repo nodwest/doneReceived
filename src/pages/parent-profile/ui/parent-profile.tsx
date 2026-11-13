@@ -30,6 +30,7 @@ import { countTasks, type Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './parent-profile.styled';
+import { authorizedImage } from '@shared/api';
 
 const NO_TASKS: Task[] = [];
 const NO_OPERATIONS: Operation[] = [];
@@ -81,7 +82,7 @@ export function ParentProfilePage() {
       >
         <ProfileHeader
           name={parent.displayName}
-          avatar={parent.avatarUrl ? { uri: parent.avatarUrl } : null}
+          avatar={parent.avatarUrl ? authorizedImage(parent.avatarUrl) : null}
           onBack={() =>
             router.canGoBack() ? router.back() : router.replace('/family')
           }

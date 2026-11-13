@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { ApiImage } from './api-image';
 import {
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -51,7 +51,7 @@ export function PhotoCarousel({ photos, height = 300 }: PhotoCarouselProps) {
               key={i}
               style={[styles.page, { width: page }]}
             >
-              <Image
+              <ApiImage
                 source={photo}
                 style={[styles.photo, { width, height }]}
                 resizeMode="cover"

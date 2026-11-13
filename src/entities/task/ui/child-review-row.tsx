@@ -1,9 +1,9 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { Icon } from '@shared/ui';
+import { Icon, ApiImage } from '@shared/ui';
 import { formatRewardShort, type Task, type TaskAssignee } from '../model';
 import { styles } from './child-review-row.styled';
 import { AssigneeAvatar } from './assignee-avatar';
@@ -37,8 +37,12 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
         style={StyleSheet.absoluteFill}
       />
       <View style={styles.head}>
-        {task.photo ? (
-          <Image source={task.photo} style={styles.thumb} resizeMode="cover" />
+        {task.photos.length > 0 ? (
+          <ApiImage
+            source={task.photos[0]}
+            style={styles.thumb}
+            resizeMode="cover"
+          />
         ) : (
           <View style={styles.thumbIcon}>
             <Icon name="task" size={24} color={theme.colors.reviewIconSoft} />
@@ -56,10 +60,10 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
                 })}
               </Text>
             )}
-            {task.photo && (
+            {task.photos.length > 0 && (
               <View style={styles.photoChip}>
                 <Text style={styles.photoChipText}>
-                  {t('tasks.photoCount', { count: 1 })}
+                  {t('tasks.photoCount', { count: task.photos.length })}
                 </Text>
               </View>
             )}

@@ -15,7 +15,7 @@ export function DoneButton({ task }: { task: Task }) {
       icon="check"
       size="md"
       fit
-      disabled={isPending}
+      loading={isPending}
       onPress={() => markDone(task)}
     />
   );

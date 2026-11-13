@@ -22,4 +22,7 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
+  pressed: {
+    opacity: 0.8,
+  },
 });

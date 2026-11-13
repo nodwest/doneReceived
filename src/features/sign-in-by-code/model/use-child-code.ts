@@ -5,7 +5,7 @@ import {
   isCompleteConnectCode,
   usePairingPreview,
 } from '@entities/device';
-import { isApiError } from '@shared/api';
+import { isApiError, authorizedImage } from '@shared/api';
 
 /** Аккаунт, в который войдёт ребёнок по введённому коду. */
 export type ChildAccount = {
@@ -62,7 +62,9 @@ export function useChildCode(): ChildCodeState {
         ? {
             id: data.childId,
             name: data.name,
-            avatar: data.avatarUrl ? { uri: data.avatarUrl } : undefined,
+            avatar: data.avatarUrl
+              ? authorizedImage(data.avatarUrl)
+              : undefined,
             familyName: data.familyName,
           }
         : null,

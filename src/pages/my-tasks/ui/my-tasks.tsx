@@ -9,6 +9,7 @@ import {
   DoneButton,
   TaskFooterAction,
   useNoteDraft,
+  usePhotoDraft,
   useTaskActions,
 } from '@features/complete-task';
 import { BottomNav } from '@widgets/bottom-nav';
@@ -32,7 +33,7 @@ import {
 } from '@entities/task';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { showToast, useIsCompact } from '@shared/lib';
+import { useIsCompact } from '@shared/lib';
 import { EarnGoalCard } from './earn-goal-card';
 import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
@@ -52,9 +53,12 @@ const authorOf = (task: Task, parentLabel: string) => ({
  * Карточка ребёнка с полем комментария: черновик живёт в сторе, чтобы его
  * отправила и I did it! из плитки списка.
  */
-function MyTaskCard(props: Omit<ComponentProps<typeof ChildTaskCard>, 'note'>) {
+function MyTaskCard(
+  props: Omit<ComponentProps<typeof ChildTaskCard>, 'note' | 'photos'>,
+) {
   const note = useNoteDraft(props.task.id);
-  return <ChildTaskCard {...props} note={note} />;
+  const photos = usePhotoDraft(props.task.id);
+  return <ChildTaskCard {...props} note={note} photos={photos} />;
 }
 
 /**
@@ -123,7 +127,6 @@ export function MyTasksPage() {
     setCurrentId(task.id);
     setView('cards');
   };
-  const photoStub = () => showToast(t('taskCard.photoSoon'));
 
   const reviewSection = reviewTasks.length > 0 && (
     <View style={styles.section}>
@@ -184,8 +187,6 @@ export function MyTasksPage() {
                 <MyTaskCard
                   task={task}
                   author={authorOf(task, t('member.parent'))}
-                  onTakePhoto={photoStub}
-                  onPickPhoto={photoStub}
                   onToggleStep={(item) => toggleStep(task, item)}
                   footer={<TaskFooterAction task={task} />}
                   style={style}

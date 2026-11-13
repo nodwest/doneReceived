@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
@@ -29,6 +30,11 @@ type CardButtonProps = {
   /** По ширине подписи, а не на всё свободное место (I did it! в плитке). */
   fit?: boolean;
   disabled?: boolean;
+  /**
+   * Идёт запрос: вместо иконки крутится спиннер, кнопка не нажимается.
+   * Подпись остаётся — ширина кнопки не прыгает.
+   */
+  loading?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -58,8 +64,10 @@ export function CardButton({
   size = 'lg',
   fit,
   disabled,
+  loading = false,
   style,
 }: CardButtonProps) {
+  const inactive = disabled || loading;
   const gradient = variant === 'primary' || variant === 'child';
   const color = LABEL_COLORS[variant];
 
@@ -67,9 +75,9 @@ export function CardButton({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled: inactive, busy: loading }}
       onPress={onPress}
-      disabled={disabled}
+      disabled={inactive}
       style={({ pressed }) => [
         styles.button,
         size === 'md' && styles.buttonMd,
@@ -77,7 +85,7 @@ export function CardButton({
         // (на любом языке) с постоянными отступами.
         fit ? styles.fit : styles.stretch,
         styles[variant],
-        (pressed || disabled) && styles.dimmed,
+        (pressed || inactive) && styles.dimmed,
         style,
       ]}
     >
@@ -90,7 +98,15 @@ export function CardButton({
         />
       )}
       <View style={styles.content}>
-        {icon && <Icon name={icon} size={18} color={color} />}
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color={color}
+            style={styles.spinner}
+          />
+        ) : (
+          icon && <Icon name={icon} size={18} color={color} />
+        )}
         <Text
           style={[styles.label, size === 'md' && styles.labelMd, { color }]}
         >
@@ -150,6 +166,11 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: theme.colors.reviewBorder,
     backgroundColor: theme.colors.white,
+  },
+  // Спиннер в размер иконки: подпись не сдвигается.
+  spinner: {
+    width: 18,
+    height: 18,
   },
   dimmed: {
     opacity: 0.85,

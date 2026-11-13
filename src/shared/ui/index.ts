@@ -28,3 +28,4 @@ export * from './screen-header';
 export * from './code-input';
 export * from './card-button';
 export * from './segmented-filter';
+export * from './api-image';

@@ -1,5 +1,5 @@
+import { ApiImage } from './api-image';
 import {
-  Image,
   StyleSheet,
   Text,
   View,
@@ -26,7 +26,7 @@ export function LetterAvatar({
   style,
   letterSize = theme.fontSize.sm,
 }: LetterAvatarProps) {
-  if (source) return <Image source={source} style={style} />;
+  if (source) return <ApiImage source={source} style={style} />;
   return (
     <View style={[style, styles.initial]}>
       <Text

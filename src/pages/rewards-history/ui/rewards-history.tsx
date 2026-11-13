@@ -33,6 +33,7 @@ import { formatDayLabel, formatMonthDay, startOfDay } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { RoundButton, SnapCarousel } from '@shared/ui';
 import { styles } from './rewards-history.styled';
+import { authorizedImage } from '@shared/api';
 
 const NO_OPERATIONS: Operation[] = [];
 
@@ -79,7 +80,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
       (serverChildren ?? []).map((child) => ({
         id: child.id,
         name: child.displayName,
-        avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+        avatar: child.avatarUrl ? authorizedImage(child.avatarUrl) : null,
       })),
     [serverChildren],
   );

@@ -90,6 +90,17 @@ export const styles = StyleSheet.create({
     borderColor: 'rgba(74, 158, 240, 0.6)',
     backgroundColor: 'rgba(74, 158, 240, 0.06)',
   },
+  addDisabled: {
+    opacity: 0.4,
+  },
+  limitHint: {
+    marginTop: -8,
+    textAlign: 'center',
+    fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
+  },
   addLabel: {
     fontSize: 15,
     letterSpacing: tracking(15),
