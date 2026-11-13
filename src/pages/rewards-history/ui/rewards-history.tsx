@@ -30,11 +30,6 @@ import { balanceAfter } from '@entities/wallet';
 import { getRewardGoal, useWishes } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { formatDayLabel, formatMonthDay, startOfDay } from '@shared/lib';
-import {
-  childAccountMock,
-  childrenMock,
-  parentProfilesMock,
-} from '@shared/mocks';
 import { theme } from '@shared/theme';
 import { RoundButton, SnapCarousel } from '@shared/ui';
 import { styles } from './rewards-history.styled';
@@ -58,9 +53,9 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const { t } = useTranslation();
   const { data: allOperations = NO_OPERATIONS, isPending } =
     useFamilyOperations();
-  // Кто дал и подтвердил задание: вошедший родитель — из его профиля, моковые
-  // — из моков, родители с сервера — из участников семьи (их видит и
-  // ребёнок; фото нет — буква), не нашли — «Родитель».
+  // Кто дал и подтвердил задание: вошедший родитель — из его профиля,
+  // остальные — из участников семьи (их видит и ребёнок; фото нет — буква),
+  // не нашли — «Родитель».
   const me = useMe();
   const myAvatar = useMyAvatar();
   const familyId = useTaskFamilyId();
@@ -69,29 +64,23 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     if (me?.kind !== 'child' && id === myId && me) {
       return { name: me.displayName, avatar: myAvatar };
     }
-    const mock = parentProfilesMock.find((parent) => String(parent.id) === id);
-    if (mock) return mock;
     const member = members?.find((item) => item.userId === id);
     return {
       name: member?.displayName ?? t('member.parent'),
       avatar: null,
     };
   };
-  // Фильтр по детям: моковые Emma и Liam и дети семьи с сервера.
-  const { data: serverChildren } = useFamilyChildren(familyId);
+  // Фильтр по детям семьи (ребёнку список закрыт — у него фильтра нет).
+  const { data: serverChildren } = useFamilyChildren(
+    childId === undefined ? familyId : null,
+  );
   const filterChildren = useMemo(
-    () => [
-      ...childrenMock.map((child) => ({
-        id: String(child.id),
-        name: child.name,
-        avatar: child.avatar,
-      })),
-      ...(serverChildren ?? []).map((child) => ({
+    () =>
+      (serverChildren ?? []).map((child) => ({
         id: child.id,
         name: child.displayName,
         avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
       })),
-    ],
     [serverChildren],
   );
   // Родитель видит награды только по своим заданиям — те, что выплатил из
@@ -411,13 +400,8 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   );
 }
 
-/**
- * История наград ребёнка от его лица: вошедший ребёнок — его профиль с
- * сервера, родитель в режиме ребёнка — Emma.
- */
+/** История наград вошедшего ребёнка от его лица. */
 export function ChildRewardsHistoryPage() {
   const { childId } = useChildAccount();
-  return (
-    <RewardsHistoryPage childId={childId ?? String(childAccountMock.id)} />
-  );
+  return <RewardsHistoryPage childId={childId ?? ''} />;
 }

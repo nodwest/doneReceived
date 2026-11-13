@@ -6,7 +6,6 @@ import { DepositSheet } from '@features/deposit-funds';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { TransactionRow, useParentFunds, useWallet } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { childProfilesMock } from '@shared/mocks';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { ChildBalance } from './child-balance';
@@ -50,14 +49,6 @@ export function WalletPage() {
         <Text style={styles.title}>{t('wallet.title')}</Text>
         <BalanceCard funds={funds} onDeposit={() => setDepositOpen(true)} />
         <View style={styles.children}>
-          {childProfilesMock.map((child) => (
-            <ChildBalance
-              key={child.id}
-              childId={String(child.id)}
-              name={child.name}
-              avatar={child.avatar}
-            />
-          ))}
           {serverChildren.map((child) => (
             <ChildBalance
               key={child.id}

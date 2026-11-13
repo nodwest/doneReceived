@@ -9,9 +9,13 @@ import {
 import { TabScreen } from '@widgets/bottom-nav';
 import { DaySummary } from '@widgets/day-summary';
 import { HomeSummary } from '@widgets/home-summary';
-import { MapPreview } from '@widgets/map';
 import { ProfileHeader } from '@widgets/profile-header';
-import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
+import {
+  useFamilyOperations,
+  useFamilyTasks,
+  useTaskFamilyId,
+} from '@features/family-tasks';
+import { useFamilyMembers } from '@entities/family';
 import {
   latestRewards,
   OperationRow,
@@ -21,9 +25,8 @@ import {
   type Operation,
   type SummaryPeriod,
 } from '@entities/operation';
+import { useMyId } from '@entities/session';
 import { countTasks, type Task } from '@entities/task';
-import type { ParentProfile } from '@entities/user';
-import { parentMock, parentProfilesMock } from '@shared/mocks';
 import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './parent-profile.styled';
@@ -33,7 +36,7 @@ const NO_OPERATIONS: Operation[] = [];
 const RECENT_REWARDS = 3;
 
 // Тап по награде — карточка задания в истории наград. В истории родителя
-// только его награды, поэтому открываются они.
+// только его награды, поэтому открываются только они.
 const openReward = (operation: Operation) =>
   appRouter.push({
     pathname: '/rewards-history',
@@ -41,32 +44,34 @@ const openReward = (operation: Operation) =>
   });
 
 /**
- * Профиль родителя: как у ребёнка, но вместо баланса — выплаченные награды,
- * задач на проверке нет, а итоги и награды — по задачам, которые он создал.
+ * Профиль родителя (/parent/[id], id — userId участника семьи): выплаченные
+ * награды и активные задания, итоги за период и последние награды — по
+ * заданиям, которые он создал.
  */
 export function ParentProfilePage() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const myId = useMyId();
+  const { data: members, isPending } = useFamilyMembers(useTaskFamilyId());
   const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: operations = NO_OPERATIONS } = useFamilyOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
   const [today] = useState(() => new Date());
   const [period, setPeriod] = useState<SummaryPeriod>('week');
 
-  const parent: ParentProfile | undefined = parentProfilesMock.find(
-    (item) => String(item.id) === id,
+  const parent = members?.find(
+    (member) => member.userId === id && member.kind === 'parent',
   );
+  if (isPending) return null;
   if (!parent) return <Redirect href="/" />;
 
-  const counts = countTasks(tasks, { createdBy: String(parent.id) });
+  const counts = countTasks(tasks, { createdBy: parent.userId });
   const parentOperations = operations.filter(
-    (operation) => operation.parentId === String(parent.id),
+    (operation) => operation.parentId === parent.userId,
   );
   const totals = sumTotals(operationsInPeriod(parentOperations, period, today));
   const rewards = latestRewards(parentOperations, RECENT_REWARDS);
-
-  const openMap = () => router.replace('/map');
 
   return (
     <TabScreen activeKey="family">
@@ -75,9 +80,8 @@ export function ParentProfilePage() {
         showsVerticalScrollIndicator={false}
       >
         <ProfileHeader
-          name={parent.name}
-          avatar={parent.avatar}
-          presence={parent.presence}
+          name={parent.displayName}
+          avatar={parent.avatarUrl ? { uri: parent.avatarUrl } : null}
           onBack={() =>
             router.canGoBack() ? router.back() : router.replace('/family')
           }
@@ -89,7 +93,7 @@ export function ParentProfilePage() {
           onActiveTasksPress={() =>
             router.push({
               pathname: '/parent/[id]/tasks',
-              params: { id: String(parent.id) },
+              params: { id: parent.userId },
             })
           }
         />
@@ -118,7 +122,7 @@ export function ParentProfilePage() {
                   {...operation}
                   caption="child-day"
                   onPress={
-                    parent.id === parentMock.id
+                    parent.userId === myId
                       ? () => openReward(operation)
                       : undefined
                   }
@@ -126,18 +130,6 @@ export function ParentProfilePage() {
               ))}
             </View>
           )}
-        </ScreenSection>
-        <ScreenSection
-          title={t('memberProfile.location')}
-          actionLabel={t('memberProfile.openMap')}
-          onAction={openMap}
-        >
-          <MapPreview
-            position={parent.position}
-            avatar={parent.avatar}
-            presence={parent.presence}
-            onPress={openMap}
-          />
         </ScreenSection>
       </ScrollView>
     </TabScreen>

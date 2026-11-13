@@ -169,6 +169,12 @@ export const en = {
     },
     join: 'Join family',
     joined: 'You joined the {{family}}',
+    errors: {
+      alreadyInFamily:
+        "You're already in a family with members. Leave it first to join another one.",
+      network: 'No connection. Please try again.',
+      failed: "Couldn't join the family. Please try again.",
+    },
   },
   inviteCodes: {
     title: 'Add family member',

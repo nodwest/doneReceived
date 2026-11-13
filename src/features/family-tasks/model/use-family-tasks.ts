@@ -2,8 +2,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useCurrentFamily } from '@entities/family';
 import { useSessionUser } from '@entities/session';
-import { filterTasks, useTasks, type TaskViewer } from '@entities/task';
-import { childAccountMock } from '@shared/mocks';
+import { useTasks, type TaskViewer } from '@entities/task';
 
 /**
  * Кто смотрит задания: семья (у родителя — из GET /families, у ребёнка — из
@@ -51,19 +50,16 @@ export function useTaskFamilyId() {
 }
 
 /**
- * Задания ребёнка для его экранов. Вошёл сам ребёнок — его настоящие задания
- * (сервер отдаёт ребёнку только его назначения). Родитель смотрит в режиме
- * ребёнка — моковые задания Emma.
+ * Задания ребёнка для его экранов: сервер отдаёт вошедшему ребёнку только его
+ * назначения. У родителя экранов ребёнка нет — пустой список.
  */
 export function useChildTasks() {
   const user = useSessionUser();
   const { data, isPending } = useFamilyTasks();
   const childSession = user?.kind === 'child';
-  const tasks = useMemo(() => {
-    if (!data) return undefined;
-    return childSession
-      ? data.filter((task) => task.serverTaskId)
-      : filterTasks(data, { assigneeId: String(childAccountMock.id) });
-  }, [data, childSession]);
+  const tasks = useMemo(
+    () => (data && childSession ? data : data && []),
+    [data, childSession],
+  );
   return { data: tasks, isPending };
 }

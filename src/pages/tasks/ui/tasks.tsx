@@ -16,34 +16,25 @@ import {
   type TasksView,
 } from '@widgets/tasks-header';
 import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
-import { useFamilyChildren } from '@entities/family';
+import { useFamilyChildren, useFamilyMembers } from '@entities/family';
 import { filterTasks, TaskCard, TaskRow, type Task } from '@entities/task';
 import { useMyId } from '@entities/session';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
-import { childrenMock, parentProfilesMock } from '@shared/mocks';
 import { CARDS_PADDING_BOTTOM, styles } from './tasks.styled';
 import { ViewOnlyNote } from './view-only-note';
 
 const NO_TASKS: Task[] = [];
 
-// Имя автора чужого задания; автор с сервера не из моков — пусто.
-const findParentName = (id: string) =>
-  parentProfilesMock.find((parent) => String(parent.id) === id)?.name ?? '';
-
 /**
- * Автор задания для шапки плитки: моковый родитель — с фото, с сервера — имя
- * из участников семьи и буква, иначе просто «Родитель».
+ * Автор задания для шапки плитки: имя из участников семьи (без фото —
+ * буква), не знаем — просто «Родитель».
  */
-const authorOf = (task: Task, parentLabel: string) => {
-  const mock = parentProfilesMock.find(
-    (parent) => String(parent.id) === task.createdBy,
-  );
-  return mock
-    ? { name: mock.name, avatar: mock.avatar }
-    : { name: task.authorName ?? parentLabel, avatar: null };
-};
+const authorOf = (task: Task, parentLabel: string) => ({
+  name: task.authorName ?? parentLabel,
+  avatar: null,
+});
 
 /**
  * Чей список: all — вкладка Tasks, задачи всех детей; child — задачи ребёнка
@@ -66,26 +57,27 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
     tab?: string;
     id?: string;
   }>();
-  // Чей список ребёнка: моковые Emma и Liam или ребёнок семьи с сервера.
+  // Чей список: ребёнок семьи (id профиля) или второй родитель (userId).
   const familyId = useTaskFamilyId();
   const { data: serverChildren, isPending: childrenPending } =
-    useFamilyChildren(familyId);
+    useFamilyChildren(scope === 'child' ? familyId : null);
+  const { data: members, isPending: membersPending } = useFamilyMembers(
+    scope === 'parent' ? familyId : null,
+  );
   const owner = useMemo(() => {
-    if (scope === 'parent') {
-      return parentProfilesMock.find((parent) => String(parent.id) === ownerId);
-    }
-    if (scope !== 'child') return undefined;
-    const mock = childrenMock.find((child) => String(child.id) === ownerId);
-    if (mock) return mock;
-    const server = serverChildren?.find((child) => child.id === ownerId);
-    return (
-      server && {
-        id: server.id,
-        name: server.displayName,
-        avatar: server.avatarUrl ? { uri: server.avatarUrl } : null,
-      }
-    );
-  }, [scope, ownerId, serverChildren]);
+    const person =
+      scope === 'parent'
+        ? members?.find((member) => member.userId === ownerId)
+        : scope === 'child'
+          ? serverChildren?.find((child) => child.id === ownerId)
+          : undefined;
+    if (!person) return undefined;
+    return {
+      id: 'userId' in person ? person.userId : person.id,
+      name: person.displayName,
+      avatar: person.avatarUrl ? { uri: person.avatarUrl } : null,
+    };
+  }, [scope, ownerId, serverChildren, members]);
   // Список из кэша React Query: после создания или правки он перечитывается сам.
   const { data = NO_TASKS, isPending } = useFamilyTasks();
   // Вкладка Tasks — только задания вошедшего родителя: их он проверяет,
@@ -134,6 +126,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   if (scope !== 'all' && !owner) {
     // Дети с сервера ещё грузятся — ждём, а не уводим на главную.
     if (scope === 'child' && familyId && childrenPending) return null;
+    if (scope === 'parent' && familyId && membersPending) return null;
     return <Redirect href="/" />;
   }
 
@@ -198,9 +191,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                     // чужое задание только видит.
                     task.createdBy !== myId ? (
                       <ViewOnlyNote
-                        author={
-                          task.authorName ?? findParentName(task.createdBy)
-                        }
+                        author={task.authorName ?? t('member.parent')}
                         review={task.status === 'review'}
                       />
                     ) : task.status === 'review' ? (

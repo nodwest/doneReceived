@@ -3,7 +3,6 @@ import type { ImageSourcePropType } from 'react-native';
 import { useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren } from '@entities/family';
 import type { WishlistOwner } from '@entities/wish';
-import { childProfilesMock } from '@shared/mocks';
 
 type WishlistChild = {
   id: string;
@@ -13,15 +12,12 @@ type WishlistChild = {
 };
 
 /**
- * Чей вишлист смотрит родитель: моковые Emma и Liam или ребёнок семьи с
- * сервера. `loading` — дети с сервера ещё грузятся, уводить рано.
+ * Чей вишлист смотрит родитель: ребёнок семьи с сервера. `loading` — дети с сервера ещё грузятся, уводить рано.
  */
 export function useWishlistChild(id: string) {
   const familyId = useTaskFamilyId();
   const { data: serverChildren, isPending } = useFamilyChildren(familyId);
   const child = useMemo<WishlistChild | undefined>(() => {
-    const mock = childProfilesMock.find((item) => String(item.id) === id);
-    if (mock) return { id, name: mock.name, avatar: mock.avatar };
     const server = serverChildren?.find((item) => item.id === id);
     return (
       server && {

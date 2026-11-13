@@ -33,27 +33,20 @@ import {
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast, useIsCompact } from '@shared/lib';
-import { parentProfilesMock } from '@shared/mocks';
 import { EarnGoalCard } from './earn-goal-card';
 import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
 
 const NO_TASKS: Task[] = [];
 
-// Автор задания для «Task from Sarah»; неизвестный — первый родитель.
-const findAuthor = (id: string) =>
-  parentProfilesMock.find((parent) => String(parent.id) === id) ??
-  parentProfilesMock[0];
-
 /**
- * Кто дал задание: у задания с сервера — имя из участников семьи (без фото,
- * буква), а если ребёнку список закрыт — просто «Родитель»; у моковых —
- * родитель из моков.
+ * Кто дал задание: имя из участников семьи (без фото — буква), не знаем —
+ * просто «Родитель».
  */
-const authorOf = (task: Task, parentLabel: string) =>
-  task.serverTaskId
-    ? { name: task.authorName ?? parentLabel, avatar: null }
-    : findAuthor(task.createdBy);
+const authorOf = (task: Task, parentLabel: string) => ({
+  name: task.authorName ?? parentLabel,
+  avatar: null,
+});
 
 /**
  * Карточка ребёнка с полем комментария: черновик живёт в сторе, чтобы его
@@ -191,12 +184,6 @@ export function MyTasksPage() {
                 <MyTaskCard
                   task={task}
                   author={authorOf(task, t('member.parent'))}
-                  // У задания с сервера отклоняет его автор: имя — как у автора.
-                  rejectedBy={
-                    task.rejection && !task.serverTaskId
-                      ? findAuthor(task.rejection.by)
-                      : undefined
-                  }
                   onTakePhoto={photoStub}
                   onPickPhoto={photoStub}
                   onToggleStep={(item) => toggleStep(task, item)}

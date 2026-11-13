@@ -20,19 +20,14 @@ type InviteCodeFieldProps = {
 
 /**
  * Поле кода приглашения: подпись, ввод с шаблоном кода в плейсхолдере,
- * подсказка или ошибка под ним и зелёная плашка найденной семьи. Общее для
- * панели Join family и карточки Kid на выборе роли.
+ * подсказка или ошибка под ним и зелёная плашка найденной семьи (с теми, кто
+ * в ней уже есть).
  */
 export function InviteCodeField({ state, hint }: InviteCodeFieldProps) {
   const { t } = useTranslation();
   const [focused, setFocused] = useState(false);
-  const { code, setCode, status, invite, role } = state;
-  const error =
-    status === 'not-found'
-      ? t('joinFamily.notFound')
-      : status === 'wrong-role'
-        ? t(`joinFamily.wrongRole.${role}`)
-        : null;
+  const { code, setCode, status, invite } = state;
+  const error = status === 'not-found' ? t('joinFamily.notFound') : null;
 
   return (
     <View style={styles.container}>

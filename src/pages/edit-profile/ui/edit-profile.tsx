@@ -11,11 +11,9 @@ import {
   useMyAvatar,
   useSessionKind,
 } from '@entities/session';
-import { useViewerRole } from '@entities/user';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { childAccountMock, parentMock } from '@shared/mocks';
 import { theme } from '@shared/theme';
 import {
   GradientButton,
@@ -34,23 +32,20 @@ import { styles } from './edit-profile.styled';
  * символ, и сохраняет его (PATCH /users/me). Почта только показывается,
  * Change — тост «скоро» (на сервере смены почты нет, Идеи.md п. 29). Change
  * password — отдельный экран `/change-password` (только у родителя: у
- * ребёнка пароля нет). Фото пока не меняется. Родитель в режиме ребёнка
- * видит моковую Emma — сохранять там нечего.
+ * ребёнка пароля нет). Фото пока не меняется.
  */
 export function EditProfilePage() {
   const { t } = useTranslation();
-  // Данные вошедшего (GET /users/me); родитель в режиме ребёнка — Emma.
-  const isChild = useViewerRole() === 'child';
-  const childSession = useSessionKind() === 'child';
+  // Данные вошедшего (GET /users/me).
+  const isChild = useSessionKind() === 'child';
   const me = useMe();
   const myAvatar = useMyAvatar();
-  const mock = isChild ? childAccountMock : parentMock;
-  const account =
-    me && (!isChild || childSession)
-      ? { fullName: me.displayName, email: me.email ?? '', avatar: myAvatar }
-      : mock;
-  // Настоящий аккаунт, а не моковая Emma: только его имя можно сохранить.
-  const editable = !!me && (!isChild || childSession);
+  const account = {
+    fullName: me?.displayName ?? '',
+    email: me?.email ?? '',
+    avatar: myAvatar,
+  };
+  const editable = !!me;
   const [name, setName] = useState(account.fullName);
   // Имя с сервера пришло позже или сохранилось — поле за ним, если его не
   // трогали.
