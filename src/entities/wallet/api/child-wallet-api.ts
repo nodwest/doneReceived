@@ -12,6 +12,8 @@ type ChildWalletDto = {
     assignmentId: string;
     points: number;
     createdAt: string;
+    /** Когда сдан одобренный отчёт. */
+    submittedAt: string | null;
   }[];
 };
 
@@ -53,7 +55,7 @@ export async function fetchServerChildWallet(
       task: titles.get(entry.assignmentId) ?? '—',
       // Та же награда в истории (Rewards history) — с тем же id.
       operationId: entry.id,
-      taskDoneAt: null,
+      taskDoneAt: entry.submittedAt,
       from: { id: '', name: '', avatar: null },
     }))
     .sort((a, b) => b.at.localeCompare(a.at));

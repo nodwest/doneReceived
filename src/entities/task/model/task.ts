@@ -58,6 +58,11 @@ export interface Task {
    * назначается одному ребёнку.
    */
   serverTaskId?: string;
+  /**
+   * Задание с сервера на проверке: id отчёта, который ждёт решения (по нему
+   * Approve, Reject и Redo). У моковых и не сданных — нет.
+   */
+  submissionId?: string;
   title: string;
   description: string;
   reward: number;

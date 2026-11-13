@@ -1,5 +1,5 @@
 import { apiRequest } from '@shared/api';
-import type { Task, TaskState } from '../model/task';
+import type { RejectReasonKey, Task, TaskState } from '../model/task';
 import type {
   ChecklistStepPayload,
   CreateTaskPayload,
@@ -19,8 +19,8 @@ type TaskDto = {
   rewardPoints: number;
   createdAt: string;
   cancelledAt: string | null;
-  /** Шаги чеклиста по порядку (Идеи.md п. 26); пока сервер их не отдаёт. */
-  checklist?: { id: string; title: string }[];
+  /** Шаги чеклиста по порядку; `[]` — без чеклиста. */
+  checklist: { id: string; title: string }[];
 };
 
 type AssignmentDto = {
@@ -29,9 +29,36 @@ type AssignmentDto = {
   status: 'assigned' | 'submitted' | 'rejected' | 'approved';
   /** После отказа можно переделать; false — отказ закрыл назначение. */
   retryableRejection: boolean;
-  /** Шаги чеклиста, которые ребёнок отметил (Идеи.md п. 26). */
-  checkedItemIds?: string[];
+  /** Шаги чеклиста, которые ребёнок отметил. */
+  checkedItemIds: string[];
+  /** Отчёт, который ждёт проверки; null — не сдано, отозвано или проверено. */
+  pendingSubmission?: PendingSubmissionDto | null;
+  /** Последний отказ по назначению; null — отказов не было. */
+  lastRejection?: LastRejectionDto | null;
 };
+
+type PendingSubmissionDto = {
+  id: string;
+  submittedAt: string;
+  /** Комментарий ребёнка к сдаче; null — не писал. */
+  note: string | null;
+};
+
+type LastRejectionDto = {
+  reasonCode: 'not_done_properly' | 'not_finished' | 'other';
+  comment: string | null;
+  /** id аккаунта родителя, который отклонил. */
+  reviewedBy: string;
+  reviewedAt: string;
+};
+
+/** Код причины отказа на сервере → ключ причины в приложении. */
+const REJECT_REASONS: Record<LastRejectionDto['reasonCode'], RejectReasonKey> =
+  {
+    not_done_properly: 'not-done-properly',
+    not_finished: 'not-finished',
+    other: 'other',
+  };
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
 
@@ -67,6 +94,10 @@ function toTask(
   viewer: TaskViewer,
 ): Task {
   const child = children.find((item) => item.id === assignment.childId);
+  const pending = assignment.pendingSubmission ?? null;
+  const rejected = assignment.lastRejection ?? null;
+  const author = (userId: string) =>
+    userId === viewer.userId ? viewer.ownAuthor : userId;
   return {
     id: assignment.id,
     serverTaskId: task.id,
@@ -79,21 +110,29 @@ function toTask(
       name: child?.displayName ?? viewer.childName ?? '—',
       avatar: child?.avatarUrl ? { uri: child.avatarUrl } : null,
     },
-    createdBy:
-      task.createdBy === viewer.userId ? viewer.ownAuthor : task.createdBy,
+    createdBy: author(task.createdBy),
     authorName: members.find((member) => member.userId === task.createdBy)
       ?.displayName,
     createdAt: task.createdAt,
     expiresAt: task.deadlineAt,
-    // Когда сдано, фото и отказ — в отчётах назначения (шаги 3–4).
-    doneAt: null,
+    // Отчёт на проверке: когда сдано и комментарий ребёнка. Фото пока нет.
+    submissionId: pending?.id,
+    doneAt: pending?.submittedAt ?? null,
     photo: null,
-    note: null,
-    rejection: null,
-    checklist: (task.checklist ?? []).map((item) => ({
+    note: pending?.note?.trim() || null,
+    // Последний отказ остаётся и после новой сдачи: родитель видит, за что
+    // возвращал.
+    rejection: rejected
+      ? {
+          reason: REJECT_REASONS[rejected.reasonCode] ?? 'other',
+          comment: rejected.comment ?? '',
+          by: author(rejected.reviewedBy),
+        }
+      : null,
+    checklist: task.checklist.map((item) => ({
       id: item.id,
       title: item.title,
-      done: assignment.checkedItemIds?.includes(item.id) ?? false,
+      done: assignment.checkedItemIds.includes(item.id),
     })),
   };
 }
@@ -124,71 +163,16 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
         )
       : ([] as MemberDto[]),
   ]);
-  const tasks = items
+  return items
     .filter(
       ({ task, assignment }) =>
         task.cancelledAt === null &&
         assignment.status !== 'approved' &&
         !(assignment.status === 'rejected' && !assignment.retryableRejection),
     )
-    .map(({ task, assignment }) => ({
-      task: toTask(task, assignment, children, members, viewer),
-      assignment,
-    }));
-  return Promise.all(
-    tasks.map(({ task, assignment }) =>
-      withSubmissions(task, assignment, viewer),
-    ),
-  );
-}
-
-/**
- * Из отчётов назначения: у сданного — когда ребёнок нажал «I did it!»
- * (`doneAt`) и его комментарий (`note`), у возвращённого на переделку (`rejected` с
- * `retryableRejection`, Идеи.md п. 15) — причина последнего отказа. Отчёты
- * спрашиваем только у таких назначений; не ответили — задание без них.
- */
-async function withSubmissions(
-  task: Task,
-  assignment: AssignmentDto,
-  viewer: TaskViewer,
-): Promise<Task> {
-  const sentBack =
-    assignment.status === 'rejected' && assignment.retryableRejection;
-  if (assignment.status !== 'submitted' && !sentBack) return task;
-  const submissions = await apiRequest<SubmissionDto[]>(
-    `/families/${viewer.familyId}/task-assignments/${assignment.id}/submissions`,
-  ).catch(() => [] as SubmissionDto[]);
-  const latest = (list: SubmissionDto[]) =>
-    [...list].sort((a, b) =>
-      b.submission.submittedAt.localeCompare(a.submission.submittedAt),
-    )[0];
-  const pending = latest(
-    submissions.filter(
-      ({ submission, review }) => review === null && !submission.withdrawnAt,
-    ),
-  );
-  const rejected = latest(
-    submissions.filter(({ review }) => review?.decision === 'rejected'),
-  );
-  return {
-    ...task,
-    doneAt: pending?.submission.submittedAt ?? task.doneAt,
-    note: pending?.submission.note?.trim() || null,
-    // Причина приходит словами («Не доделано. Кровать не заправлена»): она
-    // целиком — комментарий.
-    rejection:
-      sentBack && rejected?.review
-        ? {
-            reason: 'other',
-            comment: rejected.review.reason ?? '',
-            by:
-              rejected.review.reviewedBy === viewer.userId
-                ? viewer.ownAuthor
-                : rejected.review.reviewedBy,
-          }
-        : task.rejection,
-  };
+    .map(({ task, assignment }) =>
+      toTask(task, assignment, children, members, viewer),
+    );
 }
 
 const toBody = (payload: CreateTaskPayload) => ({
@@ -199,19 +183,12 @@ const toBody = (payload: CreateTaskPayload) => ({
 });
 
 /**
- * Чеклист для тела запроса. Пока сервер его не принимает (Идеи.md п. 26),
- * пустой не отправляем, чтобы задания без чеклиста создавались и правились
- * как раньше. Когда сервер научится, при правке отправлять всегда: `[]`
- * убирает чеклист.
+ * Чеклист для тела запроса — весь список по порядку. Шаг с `id` сервер
+ * оставляет с отметкой ребёнка, без `id` — создаёт новый, пропавшие удаляет;
+ * `[]` — без чеклиста (при правке убирает его).
  */
 const checklistBody = (checklist: readonly ChecklistStepPayload[]) =>
-  checklist.length > 0
-    ? {
-        checklist: checklist.map(({ id, title }) =>
-          id ? { id, title } : { title },
-        ),
-      }
-    : {};
+  checklist.map(({ id, title }) => (id ? { id, title } : { title }));
 
 /**
  * POST /families/:id/tasks — задание ребёнку; награда резервируется в
@@ -226,7 +203,7 @@ export function createServerTask(familyId: string, payload: CreateTaskPayload) {
       // Пустые необязательные поля не отправляем: сервер ждёт их отсутствия.
       ...(description ? { description } : {}),
       ...(deadlineAt ? { deadlineAt } : {}),
-      ...checklistBody(payload.checklist),
+      checklist: checklistBody(payload.checklist),
       childIds: [payload.assigneeId],
     },
   });
@@ -247,7 +224,7 @@ export function updateServerTask(familyId: string, payload: UpdateTaskPayload) {
       body: {
         ...body,
         description: body.description || null,
-        ...checklistBody(payload.checklist),
+        checklist: checklistBody(payload.checklist),
       },
     },
   );
@@ -282,8 +259,8 @@ export function submitServerTask(
 
 /**
  * PUT /families/:id/task-assignments/:assignmentId/checklist/:itemId —
- * ребёнок отмечает шаг чеклиста (`done: true`) или снимает отметку
- * (Идеи.md п. 26). 409 — задание уже на проверке, принято или отменено.
+ * ребёнок отмечает шаг чеклиста (`done: true`) или снимает отметку;
+ * повтор с тем же `done` — не ошибка. 409 — задание уже на проверке, принято или отменено.
  */
 export function tickServerChecklist(
   familyId: string,
@@ -298,35 +275,23 @@ export function tickServerChecklist(
 }
 
 type SubmissionDto = {
-  submission: {
-    id: string;
-    submittedAt: string;
-    withdrawnAt?: string | null;
-    /** Комментарий ребёнка к сдаче. */
-    note?: string | null;
-  };
-  review: {
-    decision: 'approved' | 'rejected';
-    reason: string | null;
-    reviewedBy: string;
-    reviewedAt: string;
-  } | null;
+  submission: { id: string; withdrawnAt: string | null };
+  review: unknown | null;
 };
 
 /**
- * Redo: ребёнок забирает непроверенный отчёт — назначение снова активно,
- * резерв не трогается. Сначала находим отчёт, который ждёт проверки (GET
- * …/submissions, отозванные сервер скрывает), потом DELETE
- * /families/:id/task-submissions/:submissionId. 409 — уже проверен
- * (`SUBMISSION_ALREADY_REVIEWED`), срок прошёл (`TASK_DEADLINE_PASSED`),
- * задание отменено.
+ * Redo: ребёнок забирает непроверенный отчёт — DELETE
+ * /families/:id/task-submissions/:submissionId, назначение снова активно,
+ * резерв не трогается. Ответ — отозванный отчёт с комментарием. 409 — уже
+ * проверен (`SUBMISSION_ALREADY_REVIEWED`), срок прошёл
+ * (`TASK_DEADLINE_PASSED`), задание отменено.
  */
 export async function withdrawServerSubmission(
   familyId: string,
-  assignmentId: string,
+  assignment: PendingRef,
 ) {
-  const submissionId = await findPendingSubmission(familyId, assignmentId);
-  await apiRequest<null>(
+  const submissionId = await pendingSubmissionId(familyId, assignment);
+  return apiRequest<{ note: string | null }>(
     `/families/${familyId}/task-submissions/${submissionId}`,
     { method: 'DELETE' },
   );
@@ -335,26 +300,37 @@ export async function withdrawServerSubmission(
 /**
  * Решение родителя по отчёту, который ждёт проверки: POST
  * /families/:id/task-submissions/:submissionId/review. approved — резерв
- * уходит ребёнку; rejected (с причиной) — пока назначение закрывается и
- * резерв возвращается автору (на переделку сервер ещё не умеет, Идеи.md
- * п. 15). 409 — отчёт отозван (`SUBMISSION_WITHDRAWN`) или уже проверен.
+ * уходит ребёнку; rejected (с причиной) — пока без `retry`: назначение
+ * закрывается и резерв возвращается автору (переделка — Идеи.md п. 28).
+ * 409 — отчёт отозван (`SUBMISSION_WITHDRAWN`) или уже проверен.
  */
 export async function reviewServerSubmission(
   familyId: string,
-  assignmentId: string,
+  assignment: PendingRef,
   review: { decision: 'approved' } | { decision: 'rejected'; reason: string },
 ) {
-  const submissionId = await findPendingSubmission(familyId, assignmentId);
+  const submissionId = await pendingSubmissionId(familyId, assignment);
   await apiRequest<unknown>(
     `/families/${familyId}/task-submissions/${submissionId}/review`,
     { method: 'POST', body: review },
   );
 }
 
-/** Отчёт по назначению, который ждёт проверки (отозванные сервер скрывает). */
-async function findPendingSubmission(familyId: string, assignmentId: string) {
+/** Назначение и его отчёт на проверке, если он уже есть в списке заданий. */
+export type PendingRef = { id: string; submissionId?: string };
+
+/**
+ * Отчёт, который ждёт проверки: обычно уже пришёл в списке заданий
+ * (`pendingSubmission`). Если список ещё не перечитан после сдачи — ищем
+ * в отчётах назначения (отозванные сервер скрывает).
+ */
+async function pendingSubmissionId(
+  familyId: string,
+  { id, submissionId }: PendingRef,
+) {
+  if (submissionId) return submissionId;
   const submissions = await apiRequest<SubmissionDto[]>(
-    `/families/${familyId}/task-assignments/${assignmentId}/submissions`,
+    `/families/${familyId}/task-assignments/${id}/submissions`,
   );
   const pending = submissions.find(
     ({ submission, review }) => review === null && !submission.withdrawnAt,

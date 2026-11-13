@@ -101,6 +101,7 @@ export function useReviewTask() {
         {
           id: task.id,
           serverTaskId: task.serverTaskId,
+          submissionId: task.submissionId,
           ...decision,
           reasonText: comment ? `${label}. ${comment}` : label,
         },

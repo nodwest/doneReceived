@@ -57,7 +57,12 @@ export function useTaskActions() {
 
   const redo = (task: Task) =>
     mutate(
-      { id: task.id, serverTaskId: task.serverTaskId, status: 'active' },
+      {
+        id: task.id,
+        serverTaskId: task.serverTaskId,
+        submissionId: task.submissionId,
+        status: 'active',
+      },
       {
         onSuccess: () => {
           // Отчёт отозван, а комментарий не пропадает: снова в поле.

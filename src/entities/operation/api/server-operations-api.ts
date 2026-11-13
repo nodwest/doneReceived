@@ -23,10 +23,10 @@ type WalletDto = {
     assignmentId: string;
     points: number;
     createdAt: string;
-    /** Когда сдан одобренный отчёт (Идеи.md п. 19, 27); пока не приходит. */
-    submittedAt?: string | null;
-    /** Комментарий ребёнка к одобренному отчёту (Идеи.md п. 27). */
-    submissionNote?: string | null;
+    /** Когда сдан одобренный отчёт. */
+    submittedAt: string | null;
+    /** Комментарий ребёнка к одобренному отчёту; null — не писал. */
+    submissionNote: string | null;
   }[];
 };
 

@@ -60,6 +60,8 @@ export interface TaskStatusPayload {
    * отзыв отчёта (Redo). У моковых — нет.
    */
   serverTaskId?: string;
+  /** Redo задания с сервера: отчёт, который отзываем. */
+  submissionId?: string;
   status: Exclude<TaskState, 'done'>;
   /** Комментарий ребёнка к сдаче (только на проверку); пустой — без него. */
   note?: string;

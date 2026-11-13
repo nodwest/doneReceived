@@ -90,7 +90,10 @@ export async function setTaskStatus(
     if (payload.status === 'review') {
       await submitServerTask(familyId, payload.id, payload.note);
     } else {
-      await withdrawServerSubmission(familyId, payload.id);
+      await withdrawServerSubmission(familyId, {
+        id: payload.id,
+        submissionId: payload.submissionId,
+      });
     }
     return;
   }
@@ -128,7 +131,7 @@ export async function approveTask(
 ): Promise<void> {
   if (task.serverTaskId) {
     if (!familyId) throw new Error('No family');
-    await reviewServerSubmission(familyId, task.id, { decision: 'approved' });
+    await reviewServerSubmission(familyId, task, { decision: 'approved' });
     return;
   }
   mockServer.approve(task.id);
@@ -140,12 +143,16 @@ export async function approveTask(
  * для сервера словами.
  */
 export async function rejectTask(
-  payload: RejectTaskPayload & { serverTaskId?: string; reasonText: string },
+  payload: RejectTaskPayload & {
+    serverTaskId?: string;
+    submissionId?: string;
+    reasonText: string;
+  },
   familyId: string | null,
 ): Promise<void> {
   if (payload.serverTaskId) {
     if (!familyId) throw new Error('No family');
-    await reviewServerSubmission(familyId, payload.id, {
+    await reviewServerSubmission(familyId, payload, {
       decision: 'rejected',
       reason: payload.reasonText,
     });
