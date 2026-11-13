@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentFamily } from '@entities/family';
-import { addReward, operationKeys } from '@entities/operation';
+import { operationKeys } from '@entities/operation';
 import { approveTask, rejectTask, taskKeys, type Task } from '@entities/task';
-import { payReward, walletKeys } from '@entities/wallet';
+import { walletKeys } from '@entities/wallet';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
@@ -17,17 +17,16 @@ function reviewError(error: unknown) {
       ? (error.data as { code?: unknown }).code
       : null;
   if (code === 'SUBMISSION_WITHDRAWN') return 'withdrawn' as const;
+  if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed' as const;
   if (error.status === 409) return 'alreadyReviewed' as const;
   return 'failed' as const;
 }
 
 /**
  * Проверка задания родителем. Approve: задание выполнено (done) и уходит из
- * списков. У задания с сервера награда из резерва уходит ребёнку на сервере;
- * у мокового награда записывается в моковую историю (`addReward`) и деньги
- * уходят из мокового кошелька (`payReward`). Reject: моковое снова активно с
- * причиной; с сервера пока закрывается, резерв возвращается родителю
- * (переделку сервер ещё не умеет). Кэш задач, истории и кошельков
+ * списков, награда из резерва уходит ребёнку. Reject: на переделку —
+ * задание снова активно с причиной, награда остаётся в резерве; закрыть —
+ * задание уходит из списков, резерв возвращается родителю. Кэш задач, истории и кошельков
  * перечитывается и после ошибки — карточка могла устареть.
  */
 export function useReviewTask() {
@@ -46,33 +45,7 @@ export function useReviewTask() {
   };
 
   const approve = useMutation({
-    mutationFn: async (task: Task) => {
-      await approveTask(task, familyId);
-      if (task.serverTaskId) return;
-      // Моковая история и кошелёк: у моковых детей есть фото.
-      const { assignee } = task;
-      if (!assignee.avatar) return;
-      const reward = await addReward({
-        title: task.title,
-        description: task.description,
-        amount: task.reward,
-        child: {
-          id: assignee.id,
-          name: assignee.name,
-          avatar: assignee.avatar,
-        },
-        doneAt: task.doneAt,
-        photo: task.photo,
-      });
-      await payReward({
-        amount: reward.amount,
-        at: reward.at,
-        child: reward.child,
-        task: reward.title,
-        operationId: reward.id,
-        taskDoneAt: reward.doneAt,
-      });
-    },
+    mutationFn: (task: Task) => approveTask(task, familyId),
     onSuccess: (_, task) => {
       showToast(
         t('tasks.approvedToast', {
@@ -92,23 +65,19 @@ export function useReviewTask() {
     }: {
       task: Task;
       decision: RejectDecision;
-    }) => {
-      // Серверу причина нужна словами: подпись причины и комментарий.
-      const label = t(`reviewTask.reasons.${decision.reason}`);
-      const comment = decision.comment.trim();
-      return rejectTask(
+    }) =>
+      rejectTask(
         {
           id: task.id,
-          serverTaskId: task.serverTaskId,
+          submissionId: task.submissionId,
           ...decision,
-          reasonText: comment ? `${label}. ${comment}` : label,
+          comment: decision.comment.trim(),
         },
         familyId,
-      );
-    },
-    onSuccess: (_, { task }) => {
+      ),
+    onSuccess: (_, { task, decision }) => {
       showToast(
-        t(task.serverTaskId ? 'tasks.closedToast' : 'tasks.rejectedToast', {
+        t(decision.retry ? 'tasks.rejectedToast' : 'tasks.closedToast', {
           name: task.assignee.name,
         }),
       );

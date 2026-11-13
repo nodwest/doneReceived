@@ -60,12 +60,22 @@ export interface TaskStatusPayload {
    * отзыв отчёта (Redo). У моковых — нет.
    */
   serverTaskId?: string;
+  /** Redo задания с сервера: отчёт, который отзываем. */
+  submissionId?: string;
   status: Exclude<TaskState, 'done'>;
+  /** Комментарий ребёнка к сдаче (только на проверку); пустой — без него. */
+  note?: string;
 }
 
-/** Отказ родителя на проверке: задание снова активно, с причиной. */
+/**
+ * Отказ родителя на проверке: с `retry` задание возвращается ребёнку на
+ * переделку (награда остаётся в резерве), без — закрывается (награда
+ * возвращается родителю).
+ */
 export interface RejectTaskPayload {
   id: string;
   reason: RejectReasonKey;
+  /** Комментарий родителя; пустая строка — без него (у `other` обязателен). */
   comment: string;
+  retry: boolean;
 }

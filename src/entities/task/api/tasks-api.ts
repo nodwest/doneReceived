@@ -6,11 +6,11 @@ import type {
   TaskStatusPayload,
   UpdateTaskPayload,
 } from '../model/types';
-import { mockServer } from './mock-server';
 import {
   cancelServerTask,
   createServerTask,
   fetchServerTasks,
+  REJECT_REASON_CODES,
   reviewServerSubmission,
   submitServerTask,
   tickServerChecklist,
@@ -19,137 +19,98 @@ import {
   type TaskViewer,
 } from './server-tasks-api';
 
-// Эндпоинты задач. Задания настоящих детей (их id — UUID) ходят в API,
-// моковых Emma и Liam — в mockServer, пока их профили и кошельки на моках.
+// Эндпоинты задач: всё — на сервере, в семье вошедшего.
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/** Ребёнок с сервера (UUID), а не моковый. */
-export const isServerChild = (childId: string) => UUID.test(childId);
-
-/**
- * Все задачи: моковые и, если есть семья, с сервера. Сервер не ответил —
- * показываем моковые, чтобы экраны не пустели.
- */
-export async function fetchTasks(viewer: TaskViewer | null): Promise<Task[]> {
-  const mocks = mockServer.list();
-  if (!viewer) return mocks;
-  const server = await fetchServerTasks(viewer).catch(() => [] as Task[]);
-  return [...server, ...mocks];
+/** Семья нужна каждому запросу: без неё (ещё не загрузилась) — ошибка. */
+function family(familyId: string | null) {
+  if (!familyId) throw new Error('No family');
+  return familyId;
 }
 
-/** Создать задание: настоящему ребёнку — на сервере, моковому — в моках. */
+/** Задания семьи (ребёнку — только свои); без семьи — пусто. */
+export async function fetchTasks(viewer: TaskViewer | null): Promise<Task[]> {
+  if (!viewer) return [];
+  return fetchServerTasks(viewer);
+}
+
+/** Создать задание ребёнку семьи: награда резервируется у автора. */
 export async function createTask(
   payload: CreateTaskPayload,
   familyId: string | null,
 ): Promise<void> {
-  if (isServerChild(payload.assigneeId)) {
-    if (!familyId) throw new Error('No family');
-    await createServerTask(familyId, payload);
-    return;
-  }
-  mockServer.create(payload);
+  await createServerTask(family(familyId), payload);
 }
 
-/** Править задание: с сервера — PATCH, моковое — в моках. */
+/** Править задание (PATCH, только автор). */
 export async function updateTask(
   payload: UpdateTaskPayload,
   familyId: string | null,
 ): Promise<void> {
-  if (payload.serverTaskId) {
-    if (!familyId) throw new Error('No family');
-    await updateServerTask(familyId, payload);
-    return;
-  }
-  mockServer.update(payload);
+  await updateServerTask(family(familyId), payload);
 }
 
-/** Родитель отменил задание: с сервера — резерв вернётся в кошелёк. */
+/** Родитель отменил задание: резерв вернётся в кошелёк. */
 export async function cancelTask(
   task: Task,
   familyId: string | null,
 ): Promise<void> {
-  if (task.serverTaskId) {
-    if (!familyId) throw new Error('No family');
-    await cancelServerTask(familyId, task.serverTaskId);
-    return;
-  }
-  mockServer.cancel(task.id);
+  if (!task.serverTaskId) throw new Error('No server task');
+  await cancelServerTask(family(familyId), task.serverTaskId);
 }
 
 /**
  * Ребёнок: «I did it!» (review) — отчёт на проверку, Redo (active) — отзыв
- * непроверенного отчёта. С сервера — по назначению, моковое — в моках.
+ * непроверенного отчёта.
  */
 export async function setTaskStatus(
   payload: TaskStatusPayload,
   familyId: string | null,
 ): Promise<void> {
-  if (payload.serverTaskId) {
-    if (!familyId) throw new Error('No family');
-    if (payload.status === 'review') {
-      await submitServerTask(familyId, payload.id);
-    } else {
-      await withdrawServerSubmission(familyId, payload.id);
-    }
+  if (payload.status === 'review') {
+    await submitServerTask(family(familyId), payload.id, payload.note);
     return;
   }
-  mockServer.setStatus(payload);
+  await withdrawServerSubmission(family(familyId), {
+    id: payload.id,
+    submissionId: payload.submissionId,
+  });
 }
 
-/**
- * Ребёнок отметил шаг чеклиста или снял отметку: с сервера — по назначению
- * (`id`), моковое — в моках.
- */
+/** Ребёнок отметил шаг чеклиста или снял отметку (`id` — назначение). */
 export async function tickChecklistItem(
   payload: ChecklistTickPayload,
   familyId: string | null,
 ): Promise<void> {
-  if (payload.serverTaskId) {
-    if (!familyId) throw new Error('No family');
-    await tickServerChecklist(
-      familyId,
-      payload.id,
-      payload.itemId,
-      payload.done,
-    );
-    return;
-  }
-  mockServer.tickChecklist(payload);
+  await tickServerChecklist(
+    family(familyId),
+    payload.id,
+    payload.itemId,
+    payload.done,
+  );
 }
 
-/**
- * Родитель подтвердил задание на проверке: оно выполнено (done). С сервера
- * награда из резерва уходит ребёнку.
- */
+/** Родитель подтвердил задание: награда из резерва уходит ребёнку. */
 export async function approveTask(
   task: Task,
   familyId: string | null,
 ): Promise<void> {
-  if (task.serverTaskId) {
-    if (!familyId) throw new Error('No family');
-    await reviewServerSubmission(familyId, task.id, { decision: 'approved' });
-    return;
-  }
-  mockServer.approve(task.id);
+  await reviewServerSubmission(family(familyId), task, {
+    decision: 'approved',
+  });
 }
 
 /**
- * Родитель отклонил задание. Моковое — снова активно с причиной. С сервера —
- * пока закрывается, резерв возвращается родителю; `reasonText` — причина
- * для сервера словами.
+ * Родитель отклонил задание: с `retry` — на переделку (снова активно с
+ * причиной, награда в резерве), без — закрыто (резерв возвращается).
  */
 export async function rejectTask(
-  payload: RejectTaskPayload & { serverTaskId?: string; reasonText: string },
+  payload: RejectTaskPayload & { submissionId?: string },
   familyId: string | null,
 ): Promise<void> {
-  if (payload.serverTaskId) {
-    if (!familyId) throw new Error('No family');
-    await reviewServerSubmission(familyId, payload.id, {
-      decision: 'rejected',
-      reason: payload.reasonText,
-    });
-    return;
-  }
-  mockServer.reject(payload);
+  await reviewServerSubmission(family(familyId), payload, {
+    decision: 'rejected',
+    reasonCode: REJECT_REASON_CODES[payload.reason],
+    ...(payload.comment ? { comment: payload.comment } : {}),
+    retry: payload.retry,
+  });
 }

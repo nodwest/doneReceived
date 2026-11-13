@@ -3,12 +3,9 @@ import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   row: {
-    height: 114,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 14,
-    borderRadius: 20,
+    gap: 10,
+    padding: 16,
+    borderRadius: 24,
     borderWidth: 1,
     overflow: 'hidden',
   },
@@ -24,58 +21,8 @@ export const styles = StyleSheet.create({
   pressed: {
     opacity: 0.85,
   },
-  assignee: {
-    alignItems: 'center',
-    gap: 6,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-  },
-  name: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
-  },
-  info: {
-    flex: 1,
-    gap: 6,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  title: {
-    flex: 1,
-    fontSize: 15,
-    letterSpacing: tracking(15),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
-  },
-  aside: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.violet,
-    fontVariant: ['tabular-nums'],
-  },
-  asideReview: {
-    color: theme.colors.reviewText,
-  },
-  description: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    lineHeight: 16,
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+  meta: {
+    gap: 4,
   },
   chip: {
     paddingVertical: 3,
@@ -95,10 +42,8 @@ export const styles = StyleSheet.create({
   chipTextReview: {
     color: theme.colors.reviewText,
   },
-  reward: {
-    fontSize: 17,
-    letterSpacing: tracking(17),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.yellow,
+  footer: {
+    flexDirection: 'row',
+    paddingTop: 4,
   },
 });

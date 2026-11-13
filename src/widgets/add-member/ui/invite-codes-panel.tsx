@@ -1,5 +1,4 @@
 import { Text, View } from 'react-native';
-import type { InviteCodes } from '@entities/family';
 import { useTranslation } from '@shared/i18n';
 import { GradientButton, RoundButton } from '@shared/ui';
 import { InviteCodeCard } from './invite-code-card';
@@ -7,12 +6,6 @@ import { ParentInviteCode } from './parent-invite-code';
 import { styles } from './invite-codes-panel.styled';
 
 type InviteCodesPanelProps = {
-  /**
-   * Моковые коды: для ребёнка в профиле и для родителя без семьи на
-   * сервере. Код второго родителя при семье выдаёт сервер, когда панель
-   * открыли.
-   */
-  codes?: InviteCodes;
   onClose: () => void;
   /**
    * Add a child: у ребёнка вместо кода — кнопка создать профиль (вкладка
@@ -28,7 +21,6 @@ type InviteCodesPanelProps = {
  * устройство одноразовым кодом), в профиле — код для ребёнка.
  */
 export function InviteCodesPanel({
-  codes,
   onClose,
   onAddChild,
 }: InviteCodesPanelProps) {
@@ -52,16 +44,8 @@ export function InviteCodesPanel({
         title={t('inviteCodes.parent.title')}
         hint={t('inviteCodes.parent.hint')}
       >
-        <ParentInviteCode fallbackCode={codes?.parent} />
+        <ParentInviteCode />
       </InviteCodeCard>
-      {codes && !onAddChild && (
-        <InviteCodeCard
-          role="child"
-          title={t('inviteCodes.child.title')}
-          hint={t('inviteCodes.child.hint')}
-          code={codes.child}
-        />
-      )}
       {onAddChild && (
         <InviteCodeCard
           role="child"

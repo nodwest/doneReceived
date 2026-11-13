@@ -2,15 +2,18 @@ import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
+  // Плашка «вернули на переделку»: коралловая, без тревожного красного.
   rejection: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
-    padding: 12,
+    paddingVertical: 12,
+    paddingLeft: 12,
+    paddingRight: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.dangerBorder,
-    backgroundColor: theme.colors.dangerSoft,
+    borderColor: theme.colors.sentBackBorder,
+    backgroundColor: theme.colors.sentBackBg,
   },
   rejectionIcon: {
     width: 28,
@@ -22,20 +25,36 @@ export const styles = StyleSheet.create({
   },
   rejectionText: {
     flex: 1,
-    gap: 2,
+    alignItems: 'flex-start',
+    gap: 8,
   },
   rejectionTitle: {
+    alignSelf: 'stretch',
     fontSize: theme.fontSize.sm,
+    lineHeight: 20,
     letterSpacing: tracking(theme.fontSize.sm),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.dangerText,
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.sentBack,
   },
-  rejectionReason: {
-    fontSize: 13,
-    lineHeight: 18,
-    letterSpacing: tracking(13),
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+  rejectionChip: {
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    backgroundColor: theme.colors.sentBackChip,
+  },
+  rejectionChipText: {
+    fontSize: 12,
+    letterSpacing: tracking(12),
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.sentBackChipText,
+  },
+  rejectionComment: {
+    alignSelf: 'stretch',
+    fontSize: theme.fontSize.sm,
+    lineHeight: 20,
+    letterSpacing: tracking(theme.fontSize.sm),
+    fontFamily: theme.fonts.regular,
+    color: theme.colors.ink,
   },
   optional: {
     paddingVertical: 2,

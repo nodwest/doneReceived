@@ -1,3 +1,4 @@
+import { useCurrentFamily } from '@entities/family';
 import { useMemo, useState, type ReactNode } from 'react';
 import { ScrollView, Text, View, type ViewStyle } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -234,7 +235,7 @@ type ParentFilter = 'all' | Transaction['kind'];
  */
 export function TransactionsPage() {
   const { t } = useTranslation();
-  const { data: wallet, isPending } = useWallet();
+  const { data: wallet, isPending } = useWallet(useCurrentFamily()?.id ?? null);
   const [filter, setFilter] = useState<ParentFilter>('all');
   const days = useMemo(
     () =>

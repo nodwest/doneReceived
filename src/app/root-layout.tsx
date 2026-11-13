@@ -38,6 +38,7 @@ const APP_SCREENS = [
   'wallet',
   'profile',
   'edit-profile',
+  'change-password',
   'map',
   'rewards-history',
   'transactions',

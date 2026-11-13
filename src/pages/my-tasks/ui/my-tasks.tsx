@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ComponentProps } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import {
   SafeAreaView,
@@ -8,6 +8,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   DoneButton,
   TaskFooterAction,
+  useNoteDraft,
   useTaskActions,
 } from '@features/complete-task';
 import { BottomNav } from '@widgets/bottom-nav';
@@ -32,27 +33,29 @@ import {
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast, useIsCompact } from '@shared/lib';
-import { parentProfilesMock } from '@shared/mocks';
 import { EarnGoalCard } from './earn-goal-card';
 import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
 
 const NO_TASKS: Task[] = [];
 
-// Автор задания для «Task from Sarah»; неизвестный — первый родитель.
-const findAuthor = (id: string) =>
-  parentProfilesMock.find((parent) => String(parent.id) === id) ??
-  parentProfilesMock[0];
+/**
+ * Кто дал задание: имя из участников семьи (без фото — буква), не знаем —
+ * просто «Родитель».
+ */
+const authorOf = (task: Task, parentLabel: string) => ({
+  name: task.authorName ?? parentLabel,
+  avatar: null,
+});
 
 /**
- * Кто дал задание: у задания с сервера — имя из участников семьи (без фото,
- * буква), а если ребёнку список закрыт — просто «Родитель»; у моковых —
- * родитель из моков.
+ * Карточка ребёнка с полем комментария: черновик живёт в сторе, чтобы его
+ * отправила и I did it! из плитки списка.
  */
-const authorOf = (task: Task, parentLabel: string) =>
-  task.serverTaskId
-    ? { name: task.authorName ?? parentLabel, avatar: null }
-    : findAuthor(task.createdBy);
+function MyTaskCard(props: Omit<ComponentProps<typeof ChildTaskCard>, 'note'>) {
+  const note = useNoteDraft(props.task.id);
+  return <ChildTaskCard {...props} note={note} />;
+}
 
 /**
  * Вкладка Tasks у ребёнка (Emma, временный режим ребёнка). Списком: сверху
@@ -178,12 +181,9 @@ export function MyTasksPage() {
               initialIndex={currentIndex}
               onIndexChange={(index) => setCurrentId(tasks[index].id)}
               renderTask={(task, style) => (
-                <ChildTaskCard
+                <MyTaskCard
                   task={task}
                   author={authorOf(task, t('member.parent'))}
-                  rejectedBy={
-                    task.rejection ? findAuthor(task.rejection.by) : undefined
-                  }
                   onTakePhoto={photoStub}
                   onPickPhoto={photoStub}
                   onToggleStep={(item) => toggleStep(task, item)}

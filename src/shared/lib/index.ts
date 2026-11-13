@@ -8,3 +8,5 @@ export * from './use-snap-carousel';
 export * from './clipboard';
 export * from './color';
 export * from './device-label';
+export * from './keep-in-view';
+export * from './installation-id';

@@ -149,6 +149,11 @@ export const styles = StyleSheet.create({
     height: 28,
     pointerEvents: 'none',
   },
+  // То же растворение под шапкой: текст уходит под неё.
+  fadeTop: {
+    top: 0,
+    bottom: undefined,
+  },
   footer: {
     flexDirection: 'row',
     gap: 10,

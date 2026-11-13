@@ -10,43 +10,33 @@ import { RecentActivity } from '@widgets/recent-activity';
 import { TaskCarousel } from '@widgets/task-carousel';
 import { WishlistPreview } from '@widgets/wishlist-preview';
 import {
+  useFamilyFeed,
   useChildTasks,
   useMyChildBalance,
   useMyWishlistOwner,
 } from '@features/family-tasks';
-import { ChildActivityItem } from '@entities/activity';
+import { FeedItem } from '@entities/activity';
 import {
   ChildTaskTile,
   countTasks,
   sortTasksByUrgency,
   type Task,
 } from '@entities/task';
-import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
+import { useMe, useMyAvatar } from '@entities/session';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import {
-  childAccountMock,
-  childActivityMock,
-  parentProfilesMock,
-} from '@shared/mocks';
 import { styles } from './child-home.styled';
 
 const NO_TASKS: Task[] = [];
 
-// Автор задания для «from Sarah»; неизвестный — первый родитель.
-const findAuthor = (id: string) =>
-  parentProfilesMock.find((parent) => String(parent.id) === id) ??
-  parentProfilesMock[0];
-
 /**
- * Кто дал задание: у задания с сервера — имя из участников семьи (без фото,
- * буква), а если ребёнку список закрыт — просто «Родитель»; у моковых —
- * родитель из моков.
+ * Кто дал задание: имя из участников семьи (без фото — буква), не знаем —
+ * просто «Родитель».
  */
-const authorOf = (task: Task, parentLabel: string) =>
-  task.serverTaskId
-    ? { name: task.authorName ?? parentLabel, avatar: null }
-    : findAuthor(task.createdBy);
+const authorOf = (task: Task, parentLabel: string) => ({
+  name: task.authorName ?? parentLabel,
+  avatar: null,
+});
 
 /** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
 function greetingKey(hour: number) {
@@ -56,7 +46,7 @@ function greetingKey(hour: number) {
 }
 
 /**
- * Главная ребёнка (Emma, временный режим ребёнка из профиля): баланс и
+ * Главная вошедшего ребёнка: баланс и
  * счётчики заданий, карусель активных заданий с I did it!, плитка
  * вишлиста (текущее желание) и лента событий. Тап по заданию открывает его карточку на
  * вкладке Tasks.
@@ -64,11 +54,11 @@ function greetingKey(hour: number) {
 export function ChildHomePage() {
   const { t } = useTranslation();
   const router = useRouter();
-  // Вошёл сам ребёнок — его имя и фото (GET /users/me); родитель в режиме
-  // ребёнка смотрит моковую Emma.
+  // Имя и фото вошедшего ребёнка (GET /users/me).
   const me = useMe();
   const myAvatar = useMyAvatar();
-  const childSession = useSessionKind() === 'child';
+  // Лента — события ребёнка с сервера.
+  const { data: feed = [] } = useFamilyFeed();
   const { data: myTasks = NO_TASKS, isPending: tasksPending } = useChildTasks();
   // Ближайшие по сроку — первыми, как в списке «To do».
   const activeTasks = useMemo(
@@ -97,8 +87,8 @@ export function ChildHomePage() {
         >
           <HomeHeader
             greeting={t(greetingKey(new Date().getHours()))}
-            name={childSession && me ? me.displayName : childAccountMock.name}
-            avatar={childSession ? myAvatar : childAccountMock.avatar}
+            name={me?.displayName ?? ''}
+            avatar={myAvatar}
           />
           {!loading && (
             <>
@@ -136,11 +126,13 @@ export function ChildHomePage() {
                 current={wishlist.current}
                 onPress={() => router.push('/wishlist')}
               />
-              <RecentActivity>
-                {childActivityMock.map(({ id, ...item }) => (
-                  <ChildActivityItem key={id} {...item} />
-                ))}
-              </RecentActivity>
+              {feed.length > 0 && (
+                <RecentActivity>
+                  {feed.map((event) => (
+                    <FeedItem key={event.id} event={event} viewer="child" />
+                  ))}
+                </RecentActivity>
+              )}
             </>
           )}
         </ScrollView>

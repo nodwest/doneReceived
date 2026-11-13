@@ -17,6 +17,7 @@ import {
   TimerPill,
 } from './task-sheet';
 import { TaskChecklist } from './task-checklist';
+import { TaskNote } from './task-note';
 
 type TaskCardProps = {
   task: Task;
@@ -28,8 +29,8 @@ type TaskCardProps = {
 /**
  * Крупная карточка задания у родителя. Активная — фиолетовая: кому задание,
  * таймер, описание с наградой, чеклист с отметками ребёнка, срок и когда
- * создано. На проверке — оранжевая: когда ребёнок закончил, его фото,
- * описание и что он отметил в чеклисте.
+ * создано. На проверке — оранжевая: когда ребёнок закончил, описание, что он
+ * отметил в чеклисте, его фото и комментарий (почему сделано не всё).
  */
 export function TaskCard({ task, footer, style }: TaskCardProps) {
   const { t } = useTranslation();
@@ -69,18 +70,25 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
         footer={footer}
         style={style}
       >
-        {task.photo && (
-          <PhotoSection
-            label={t('taskCard.childPhoto', { name: task.assignee.name })}
-            photo={task.photo}
-          />
-        )}
         <TaskBrief
           label={t('taskCard.whatToDo')}
           reward={task.reward}
           description={task.description}
         />
         {checklist}
+        {task.photo && (
+          <PhotoSection
+            label={t('taskCard.childPhoto', { name: task.assignee.name })}
+            photo={task.photo}
+          />
+        )}
+        {task.note && (
+          <TaskNote
+            label={t('taskCard.childNote', { name: task.assignee.name })}
+            note={task.note}
+            tone="review"
+          />
+        )}
       </TaskSheet>
     );
   }

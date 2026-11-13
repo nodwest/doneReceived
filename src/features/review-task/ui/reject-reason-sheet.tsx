@@ -1,9 +1,14 @@
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { formatRewardShort } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
-import { BottomSheet, PillButton } from '@shared/ui';
+import { withAlpha } from '@shared/lib';
 import { theme } from '@shared/theme';
+import { BottomSheet, Icon, SheetField, Toggle } from '@shared/ui';
 import {
+  REJECT_COMMENT_MAX_LENGTH,
+  isCommentRequired,
   rejectReasons,
   type RejectDecision,
   type RejectReasonKey,
@@ -15,23 +20,32 @@ const DEFAULT_REASON: RejectReasonKey = 'not-done-properly';
 type RejectReasonSheetProps = {
   visible: boolean;
   childName: string;
-  /** Задание с сервера: отказ его закрывает (на переделку сервер пока не умеет). */
-  closes?: boolean;
+  /** Награда задания: сколько останется в резерве или вернётся. */
+  reward: number;
+  /** Срок задания прошёл: переделать нельзя, только закрыть. */
+  deadlinePassed: boolean;
   onCancel: () => void;
   onReject: (decision: RejectDecision) => void;
 };
 
-/** Шторка отказа: причина и необязательный комментарий для ребёнка. */
+/**
+ * Шторка отказа: причина, комментарий (у Other обязателен) и тогл «Let Emma
+ * redo it». Включён (по умолчанию) — задание вернётся ребёнку, награда
+ * останется в резерве; выключен — задание закроется, награда вернётся в
+ * кошелёк. Срок прошёл — тогл выключен и не нажимается.
+ */
 export function RejectReasonSheet({
   visible,
   childName,
-  closes = false,
+  reward,
+  deadlinePassed,
   onCancel,
   onReject,
 }: RejectReasonSheetProps) {
   const { t } = useTranslation();
   const [reason, setReason] = useState<RejectReasonKey>(DEFAULT_REASON);
   const [comment, setComment] = useState('');
+  const [redo, setRedo] = useState(true);
   // Каждое открытие начинается с чистой формы.
   const [wasVisible, setWasVisible] = useState(visible);
   if (visible !== wasVisible) {
@@ -39,18 +53,57 @@ export function RejectReasonSheet({
     if (visible) {
       setReason(DEFAULT_REASON);
       setComment('');
+      setRedo(true);
     }
   }
 
+  const retry = redo && !deadlinePassed;
+  const required = isCommentRequired(reason);
+  const disabled = required && !comment.trim();
+  const amount = formatRewardShort(reward);
+  const name = childName;
+
+  const placeholder = required
+    ? t('reviewTask.commentPlaceholderOther', { name })
+    : retry
+      ? t('reviewTask.commentPlaceholderRedo')
+      : t('reviewTask.commentPlaceholderClose');
+
+  const submit = () => {
+    if (disabled) return;
+    onReject({ reason, comment: comment.trim(), retry });
+  };
+
+  const submitLabel = disabled
+    ? t(retry ? 'reviewTask.needCommentRedo' : 'reviewTask.needCommentClose')
+    : retry
+      ? t('reviewTask.sendBack', { name })
+      : t('reviewTask.closeTask');
+
   return (
-    <BottomSheet visible={visible} onClose={onCancel} maxHeightRatio={0.9}>
-      <View style={styles.body}>
+    <BottomSheet visible={visible} onClose={onCancel} maxHeightRatio={0.94}>
+      <ScrollView
+        contentContainerStyle={styles.body}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
-          <Text style={styles.title}>{t('reviewTask.title')}</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title} accessibilityRole="header">
+              {t('reviewTask.title')}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+              onPress={onCancel}
+              hitSlop={4}
+              style={styles.close}
+            >
+              <Icon name="close" size={14} color={theme.colors.ink} />
+            </Pressable>
+          </View>
           <Text style={styles.subtitle}>
-            {closes
-              ? t('reviewTask.subtitleClose')
-              : t('reviewTask.subtitle', { name: childName })}
+            {t('reviewTask.subtitle', { name })}
           </Text>
         </View>
 
@@ -81,36 +134,113 @@ export function RejectReasonSheet({
           })}
         </View>
 
-        <View style={styles.field}>
-          <View style={styles.labelRow}>
-            <Text style={styles.label}>{t('reviewTask.comment')}</Text>
-            <Text style={styles.optional}>{t('common.optional')}</Text>
+        <SheetField
+          label={
+            required ? (
+              <>
+                {t('reviewTask.comment')}
+                <Text style={styles.required}>{t('reviewTask.required')}</Text>
+              </>
+            ) : (
+              `${t('reviewTask.comment')} ${t('common.optional')}`
+            )
+          }
+          value={comment}
+          onChangeText={setComment}
+          multiline
+          maxLength={REJECT_COMMENT_MAX_LENGTH}
+          placeholder={placeholder}
+          accessibilityLabel={t('reviewTask.comment')}
+        />
+
+        <View
+          style={[
+            styles.redo,
+            deadlinePassed
+              ? styles.redoExpired
+              : retry
+                ? styles.redoOn
+                : styles.redoOff,
+          ]}
+        >
+          {retry && (
+            <LinearGradient
+              colors={[
+                withAlpha(theme.colors.violet, 0.12),
+                withAlpha(theme.colors.blue, 0.06),
+              ]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={StyleSheet.absoluteFill}
+            />
+          )}
+          <View style={styles.redoInfo}>
+            <Text
+              style={[
+                styles.redoTitle,
+                deadlinePassed && styles.redoTitleExpired,
+              ]}
+            >
+              {deadlinePassed
+                ? t('reviewTask.expiredTitle')
+                : t('reviewTask.redoTitle', { name })}
+            </Text>
+            <Text style={styles.redoHint}>
+              {deadlinePassed
+                ? t('reviewTask.expiredHint', { amount })
+                : retry
+                  ? t('reviewTask.redoOnHint', { name, amount })
+                  : t('reviewTask.redoOffHint', { amount })}
+            </Text>
           </View>
-          <TextInput
-            value={comment}
-            onChangeText={setComment}
-            multiline
-            placeholder={t('reviewTask.commentPlaceholder')}
-            placeholderTextColor={theme.colors.placeholder}
-            style={styles.comment}
+          <Toggle
+            value={retry}
+            onValueChange={setRedo}
+            disabled={deadlinePassed}
+            accessibilityLabel={t('reviewTask.redoTitle', { name })}
           />
         </View>
 
-        <View style={styles.actions}>
-          <PillButton
-            label={t('common.cancel')}
-            variant="ghost"
-            size="md"
-            onPress={onCancel}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ disabled }}
+          disabled={disabled}
+          onPress={submit}
+          style={({ pressed }) => [
+            styles.submit,
+            disabled
+              ? styles.submitDisabled
+              : retry
+                ? styles.submitRetry
+                : styles.submitClose,
+            pressed && styles.pressed,
+          ]}
+        >
+          {!disabled && (
+            <LinearGradient
+              colors={
+                retry
+                  ? [theme.colors.violet, theme.colors.blue]
+                  : [theme.colors.dangerFrom, theme.colors.danger]
+              }
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={StyleSheet.absoluteFill}
+            />
+          )}
+          <Icon
+            name={disabled ? 'pencil' : retry ? 'undo' : 'close'}
+            size={18}
+            color={disabled ? theme.colors.placeholderSoft : theme.colors.white}
           />
-          <PillButton
-            label={t('reviewTask.reject')}
-            variant="danger"
-            size="md"
-            onPress={() => onReject({ reason, comment: comment.trim() })}
-          />
-        </View>
-      </View>
+          <Text
+            style={[styles.submitLabel, disabled && styles.submitLabelDisabled]}
+            numberOfLines={1}
+          >
+            {submitLabel}
+          </Text>
+        </Pressable>
+      </ScrollView>
     </BottomSheet>
   );
 }

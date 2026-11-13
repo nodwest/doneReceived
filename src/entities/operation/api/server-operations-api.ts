@@ -1,18 +1,15 @@
 import { apiRequest } from '@shared/api';
 import type { Operation } from '../model/operation';
 
-// История наград детей с сервера. Отдельной ручки истории нет: собираем из
-// кошельков детей (начисление — заработанная награда, за какое назначение)
-// и списка заданий (название, описание, автор, срок). Упущенная награда —
-// назначение, не сданное к сроку.
+// История наград детей с сервера: заработанные — начисления из кошельков
+// детей (с названием, описанием, кто одобрил, когда сдано и комментарием),
+// упущенные — назначения, не сданные к сроку (GET …/missed-tasks).
 
 /** Кто смотрит историю. */
 export type OperationsViewer = {
   familyId: string;
   /** id аккаунта вошедшего. */
   userId: string;
-  /** Каким id пометить вошедшего родителя (экраны считают его «собой»). */
-  ownAuthor: string;
   /** Вошёл ребёнок: только его история (список детей ему закрыт). */
   child?: { id: string; name: string };
 };
@@ -23,19 +20,29 @@ type WalletDto = {
     assignmentId: string;
     points: number;
     createdAt: string;
+    /** Название и описание задания на момент запроса истории. */
+    taskTitle: string;
+    taskDescription: string | null;
+    /** userId родителя, который одобрил (он же автор задания). */
+    approvedBy: string | null;
+    /** Когда сдан одобренный отчёт. */
+    submittedAt: string | null;
+    /** Комментарий ребёнка к одобренному отчёту; null — не писал. */
+    submissionNote: string | null;
   }[];
 };
 
-type TaskItemDto = {
-  task: {
-    createdBy: string;
-    title: string;
-    description: string | null;
-    deadlineAt: string | null;
+type MissedDto = {
+  items: {
+    assignmentId: string;
+    taskTitle: string;
+    taskDescription: string | null;
     rewardPoints: number;
-    cancelledAt: string | null;
-  };
-  assignment: { id: string; childId: string; status: string };
+    /** Срок, который прошёл. */
+    deadlineAt: string;
+    /** userId родителя, создавшего задание. */
+    createdBy: string;
+  }[];
 };
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
@@ -44,81 +51,61 @@ export async function fetchServerOperations(
   viewer: OperationsViewer,
 ): Promise<Operation[]> {
   const { familyId } = viewer;
-  const [children, tasks] = await Promise.all([
-    viewer.child
-      ? [
-          {
-            id: viewer.child.id,
-            displayName: viewer.child.name,
-            avatarUrl: null,
-          },
-        ]
-      : apiRequest<ChildDto[]>(`/families/${familyId}/children`),
-    apiRequest<TaskItemDto[]>(`/families/${familyId}/tasks`),
-  ]);
-  const wallets = await Promise.all(
+  const children: ChildDto[] = viewer.child
+    ? [{ id: viewer.child.id, displayName: viewer.child.name, avatarUrl: null }]
+    : await apiRequest<ChildDto[]>(`/families/${familyId}/children`);
+  // По каждому ребёнку — кошелёк и упущенные; не ответили — у ребёнка пусто.
+  const histories = await Promise.all(
     children.map((child) =>
-      apiRequest<WalletDto>(
-        `/families/${familyId}/children/${child.id}/wallet`,
-      ).catch(() => ({ entries: [] }) as WalletDto),
+      Promise.all([
+        apiRequest<WalletDto>(
+          `/families/${familyId}/children/${child.id}/wallet`,
+        ).catch(() => ({ entries: [] }) as WalletDto),
+        apiRequest<MissedDto>(
+          `/families/${familyId}/children/${child.id}/missed-tasks`,
+        ).catch(() => ({ items: [] }) as MissedDto),
+      ]),
     ),
   );
-  const byAssignment = new Map(tasks.map((item) => [item.assignment.id, item]));
-  const author = (createdBy: string) =>
-    createdBy === viewer.userId ? viewer.ownAuthor : createdBy;
   const toChild = (child: ChildDto) => ({
     id: child.id,
     name: child.displayName,
     avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
   });
 
-  const earned = children.flatMap((child, index) =>
-    wallets[index].entries.map((entry): Operation => {
-      const item = byAssignment.get(entry.assignmentId);
-      return {
+  return children.flatMap((child, index) => {
+    const [wallet, missed] = histories[index];
+    const earned = wallet.entries.map(
+      (entry): Operation => ({
         id: entry.id,
         kind: 'earned',
-        title: item?.task.title ?? '—',
-        description: item?.task.description ?? '',
+        title: entry.taskTitle,
+        description: entry.taskDescription ?? '',
         amount: entry.points,
         child: toChild(child),
-        parentId: item ? author(item.task.createdBy) : '',
+        parentId: entry.approvedBy ?? '',
         at: entry.createdAt,
-        doneAt: null,
+        doneAt: entry.submittedAt,
         photo: null,
-      };
-    }),
-  );
-
-  // Срок прошёл, а задание так и не сдано и не отменено — награда упущена.
-  const now = Date.now();
-  const missed = tasks.flatMap(({ task, assignment }): Operation[] => {
-    const child = children.find((item) => item.id === assignment.childId);
-    const overdue =
-      task.deadlineAt !== null && new Date(task.deadlineAt).getTime() < now;
-    if (
-      !child ||
-      !overdue ||
-      task.cancelledAt !== null ||
-      (assignment.status !== 'assigned' && assignment.status !== 'rejected')
-    ) {
-      return [];
-    }
-    return [
-      {
-        id: assignment.id,
+        note: entry.submissionNote?.trim() || null,
+        assignmentId: entry.assignmentId,
+      }),
+    );
+    const lost = missed.items.map(
+      (item): Operation => ({
+        id: item.assignmentId,
         kind: 'missed',
-        title: task.title,
-        description: task.description ?? '',
-        amount: task.rewardPoints,
+        title: item.taskTitle,
+        description: item.taskDescription ?? '',
+        amount: item.rewardPoints,
         child: toChild(child),
-        parentId: author(task.createdBy),
-        at: task.deadlineAt as string,
+        parentId: item.createdBy,
+        at: item.deadlineAt,
         doneAt: null,
         photo: null,
-      },
-    ];
+        note: null,
+      }),
+    );
+    return [...earned, ...lost];
   });
-
-  return [...earned, ...missed];
 }

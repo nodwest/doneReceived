@@ -3,19 +3,21 @@ import { useOperations, type OperationsViewer } from '@entities/operation';
 import { useSession } from '@entities/session';
 import { useChildBalance, useChildWallet } from '@entities/wallet';
 import type { WishlistOwner } from '@entities/wish';
-import { childAccountMock } from '@shared/mocks';
 import { useChildTasks, useTaskViewer } from './use-family-tasks';
 
 /**
  * Чей кошелёк на экранах ребёнка. Вошёл сам ребёнок — его профиль на сервере:
  * id из сессии (сохраняется при подключении устройства), у сессий постарше —
- * из его заданий. Родитель в режиме ребёнка — моковая Emma.
+ * из его заданий. У родителя экранов ребёнка нет — null.
  */
-export function useChildAccount() {
+export function useChildAccount(): {
+  childId: string | null;
+  familyId: string | null;
+} {
   const session = useSession();
   const { data: tasks } = useChildTasks();
   if (session?.user.kind !== 'child') {
-    return { childId: String(childAccountMock.id), familyId: null };
+    return { childId: null, familyId: null };
   }
   return {
     childId:
@@ -51,8 +53,8 @@ export function useMyWishlistOwner(): WishlistOwner | null {
 }
 
 /**
- * История наград для экранов: моковая и собранная с сервера (кошельки детей
- * и задания). У вошедшего ребёнка — только его.
+ * История наград для экранов, собранная с сервера (начисления из кошельков
+ * детей и упущенные). У вошедшего ребёнка — только его.
  */
 export function useFamilyOperations() {
   const viewer = useTaskViewer();

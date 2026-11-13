@@ -74,6 +74,23 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
+  // Место справа под Change, чтобы длинная почта не уходила под неё.
+  emailInput: {
+    paddingRight: 88,
+  },
+  changeEmail: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 16,
+    justifyContent: 'center',
+  },
+  changeEmailText: {
+    fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.violet,
+  },
   card: {
     paddingVertical: 4,
     borderRadius: 24,

@@ -6,7 +6,6 @@ import { DepositSheet } from '@features/deposit-funds';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { TransactionRow, useParentFunds, useWallet } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { childProfilesMock } from '@shared/mocks';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { ChildBalance } from './child-balance';
@@ -32,9 +31,9 @@ const RECENT_TRANSACTIONS = 4;
  */
 export function WalletPage() {
   const { t } = useTranslation();
-  // Транзакции пока на моках, деньги родителя — с сервера.
-  const { data: wallet } = useWallet();
+  // Деньги и транзакции родителя — с сервера (без семьи — моки).
   const familyId = useCurrentFamily()?.id ?? null;
+  const { data: wallet } = useWallet(familyId);
   const { data: funds } = useParentFunds(familyId);
   // Балансы детей: моковые Emma и Liam и дети семьи с сервера.
   const { data: serverChildren = [] } = useFamilyChildren(familyId);
@@ -50,14 +49,6 @@ export function WalletPage() {
         <Text style={styles.title}>{t('wallet.title')}</Text>
         <BalanceCard funds={funds} onDeposit={() => setDepositOpen(true)} />
         <View style={styles.children}>
-          {childProfilesMock.map((child) => (
-            <ChildBalance
-              key={child.id}
-              childId={String(child.id)}
-              name={child.name}
-              avatar={child.avatar}
-            />
-          ))}
           {serverChildren.map((child) => (
             <ChildBalance
               key={child.id}

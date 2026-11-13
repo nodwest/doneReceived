@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { familiesKeys } from '@entities/family';
 import { deviceKeys, revokeDevice } from '@entities/device';
 
 /**
@@ -10,8 +11,14 @@ export function useRevokeDevice(familyId: string, childId: string) {
   return useMutation({
     mutationFn: (deviceId: string) => revokeDevice(familyId, deviceId),
     onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: deviceKeys.child(familyId, childId),
-      }),
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: deviceKeys.child(familyId, childId),
+        }),
+        // Число устройств на карточке ребёнка в Family.
+        queryClient.invalidateQueries({
+          queryKey: familiesKeys.details(familyId),
+        }),
+      ]),
   });
 }

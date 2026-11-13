@@ -64,6 +64,31 @@ export const ru: Dictionary = {
       new: 'Новое задание: {{task}}',
       newBy: 'от {{name}}',
     },
+    feed: {
+      you: 'вы',
+      by: '{{name}}',
+      from: 'от {{name}}',
+      parent: {
+        task_created: 'Новое задание для {{child}}: {{task}}',
+        task_submitted: '{{child}} сдаёт «{{task}}» на проверку',
+        task_withdrawn: '{{child}} забирает «{{task}}» назад',
+        task_approved: '«{{task}}» принято · {{child}}',
+        task_rejected: '«{{task}}» вернули на доработку · {{child}}',
+        task_cancelled: '«{{task}}» отменено · {{child}}',
+        wish_added: '{{child}}: новое желание «{{task}}»',
+        deposit: 'Кошелёк пополнен',
+      },
+      child: {
+        task_created: 'Новое задание: {{task}}',
+        task_submitted: '«{{task}}» на проверке',
+        task_withdrawn: 'Ты забрал(а) «{{task}}» назад',
+        task_approved: '«{{task}}» принято',
+        task_rejected: '«{{task}}» вернули на доработку',
+        task_cancelled: '«{{task}}» отменено',
+        wish_added: 'Новое желание: {{task}}',
+        deposit: 'Кошелёк пополнен',
+      },
+    },
   },
   childCard: {
     activeTasks_one: 'активное задание',
@@ -118,6 +143,7 @@ export const ru: Dictionary = {
     children_other: '{{count}} ребёнка',
     parentsSection: 'Родители',
     childrenSection: 'Дети',
+    childBalance: 'Баланс {{amount}}',
     addMember: 'Участник семьи',
     joinFamily: 'Присоединиться',
     deleteChild: 'Удалить',
@@ -149,6 +175,12 @@ export const ru: Dictionary = {
     },
     join: 'Присоединиться к семье',
     joined: 'Вы присоединились: {{family}}',
+    errors: {
+      alreadyInFamily:
+        'Вы уже в семье, где есть участники. Чтобы вступить в другую, сначала выйдите из неё.',
+      network: 'Нет связи. Попробуйте ещё раз.',
+      failed: 'Не получилось вступить в семью. Попробуйте ещё раз.',
+    },
   },
   inviteCodes: {
     title: 'Добавить в семью',
@@ -169,6 +201,19 @@ export const ru: Dictionary = {
     addChild: 'Добавить ребёнка',
     newDeviceHint:
       'Новое устройство для ребёнка, который уже здесь? Откройте Устройства внизу его карточки.',
+  },
+  resetInviteCode: {
+    question: 'Отправили не тому?',
+    action: 'Сбросить код',
+    ready: 'Новый код готов',
+    title: 'Сбросить код для родителя?',
+    subtitle:
+      'Код {{code}} сразу перестанет работать. Если кто-то ещё не вступил, отправьте ему новый.',
+    confirm: 'Сбросить код',
+    errors: {
+      network: 'Нет связи с сервером. Код остался прежним.',
+      failed: 'Не получилось сбросить код. Попробуйте ещё раз.',
+    },
   },
   devices: {
     onlineNow: 'В сети',
@@ -287,6 +332,7 @@ export const ru: Dictionary = {
     rewardFromName: 'Награда от {{name}}',
     reward: 'Награда за задание',
     card: 'Карта •• {{card}}',
+    walletTopUp: 'Пополнение кошелька',
     forTask: 'За задание',
     details: 'Подробности',
     date: 'Дата',
@@ -332,6 +378,10 @@ export const ru: Dictionary = {
     earned: 'Получено',
     missed: 'Упущено',
     noRewardsThisDay: 'В этот день наград не было',
+    noRewards: 'Наград пока нет',
+    approved: 'Принято',
+    paidAt: 'Выплачено {{time}}',
+    doneAt: 'Сдано {{time}}',
   },
   tasks: {
     allTasks: 'Все',
@@ -362,7 +412,7 @@ export const ru: Dictionary = {
     photoCount_few: '{{count}} фото',
     photoCount_many: '{{count}} фото',
     photoCount_other: '{{count}} фото',
-    checking: '{{name}} проверяет…',
+    checking: '{{name}} проверяет',
   },
   taskCard: {
     due: 'Срок',
@@ -383,10 +433,17 @@ export const ru: Dictionary = {
     optional: 'по желанию',
     yourPhoto: 'Твоё фото',
     childPhoto: 'Фото: {{name}}',
+    note: 'Комментарий',
+    notePlaceholder: 'Напиши комментарий…',
+    noteHint:
+      'Что-то не получилось — в магазине не было, сломалось? Напиши почему.',
+    yourNote: 'Твой комментарий',
+    childNote: 'Комментарий: {{name}}',
     taskFrom: 'Задание от',
     taskFor: 'Задание для',
     sentBack: '{{name}} вернул(а) на доработку',
     sentBackShort: 'Вернули на доработку',
+    quote: '«{{text}}»',
     from: 'от',
     takePhoto: 'Снять',
     gallery: 'Галерея',
@@ -476,12 +533,24 @@ export const ru: Dictionary = {
     reject: 'Отклонить',
     approve: 'Подтвердить',
     title: 'Отклонить задание',
-    subtitle:
-      'Подскажите, что исправить. {{name}} увидит причину и сможет попробовать ещё раз.',
-    subtitleClose: 'Задание закроется, награда вернётся в ваш кошелёк.',
+    subtitle: 'Объясните, что не так, — {{name}} увидит причину.',
     comment: 'Комментарий',
-    commentPlaceholder:
-      'Покажите, что нужно исправить, например «кровать не заправлена».',
+    required: ' · обязательно',
+    commentPlaceholderRedo: 'Что исправить, например «кровать не заправлена»',
+    commentPlaceholderClose:
+      'Почему закрываете, например «сделаем в воскресенье»',
+    commentPlaceholderOther: 'Объясните, что не так',
+    redoTitle: 'Пусть {{name}} переделает',
+    redoOnHint:
+      '{{name}} исправит и сдаст снова. {{amount}} остаются в резерве.',
+    redoOffHint: 'Задание закроется, {{amount}} вернутся в ваш кошелёк.',
+    expiredTitle: 'Время вышло — переделать нельзя',
+    expiredHint:
+      'Срок прошёл: задание закроется, {{amount}} вернутся в ваш кошелёк.',
+    sendBack: 'Вернуть на доработку',
+    closeTask: 'Закрыть задание',
+    needCommentRedo: 'Напишите комментарий, чтобы вернуть',
+    needCommentClose: 'Напишите комментарий, чтобы закрыть',
     reasons: {
       'not-done-properly': 'Сделано плохо',
       'not-finished': 'Не доделано',
@@ -489,6 +558,7 @@ export const ru: Dictionary = {
     },
     errors: {
       withdrawn: 'Ребёнок забрал отчёт — проверять нечего',
+      deadlinePassed: 'Срок прошёл — задание можно только закрыть',
       alreadyReviewed: 'Этот отчёт уже проверен',
       network: 'Нет связи. Попробуйте ещё раз.',
       failed: 'Не получилось сохранить решение. Попробуйте ещё раз.',
@@ -717,6 +787,43 @@ export const ru: Dictionary = {
     security: 'Безопасность',
     changePassword: 'Сменить пароль',
     save: 'Сохранить изменения',
+    changeEmail: 'Сменить',
+    emailSoon: 'Смена почты скоро появится',
+    saved: 'Имя сохранено',
+    errors: {
+      network: 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.',
+      failed: 'Не получилось сохранить имя. Попробуйте ещё раз.',
+    },
+  },
+  changePassword: {
+    title: 'Смена пароля',
+    intro:
+      'Не меньше 8 символов. Здесь вы останетесь в аккаунте, а на других устройствах он закроется.',
+    current: 'Текущий пароль',
+    currentPlaceholder: 'Введите текущий пароль',
+    currentHint: 'Пароль для входа в Kids Tasks, а не от почты',
+    new: 'Новый пароль',
+    newPlaceholder: 'Придумайте новый пароль',
+    confirm: 'Повторите новый пароль',
+    confirmPlaceholder: 'Ещё раз новый пароль',
+    strong: 'Надёжный пароль',
+    match: 'Пароли совпадают',
+    submit: 'Сменить пароль',
+    updated: 'Пароль изменён',
+    errors: {
+      wrongCurrent: 'Неверный текущий пароль',
+      sameAsCurrent: 'Новый пароль должен отличаться от текущего',
+      tooManyAttempts_one:
+        'Слишком много попыток. Попробуйте через {{count}} минуту',
+      tooManyAttempts_few:
+        'Слишком много попыток. Попробуйте через {{count}} минуты',
+      tooManyAttempts_many:
+        'Слишком много попыток. Попробуйте через {{count}} минут',
+      tooManyAttempts_other:
+        'Слишком много попыток. Попробуйте через {{count}} минуты',
+      network: 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.',
+      failed: 'Не получилось сменить пароль. Попробуйте ещё раз.',
+    },
   },
   profile: {
     title: 'Профиль',

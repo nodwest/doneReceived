@@ -15,6 +15,8 @@ interface TransactionBase {
   amount: number;
   /** ISO-время транзакции. */
   at: string;
+  /** Баланс сразу после неё, если его прислал сервер; иначе считаем сами. */
+  balanceAfter?: number;
 }
 
 /** За какое задание пришли деньги: ссылка на награду в истории. */
@@ -39,8 +41,8 @@ export type PayoutPayload = Omit<PayoutTransaction, 'id' | 'kind'>;
 /** Пополнение с карты или вывод на карту. */
 export interface CardTransaction extends TransactionBase {
   kind: 'deposit' | 'withdrawal';
-  /** Последние 4 цифры карты. */
-  card: string;
+  /** Последние 4 цифры карты; null — без карты (тестовое пополнение). */
+  card: string | null;
 }
 
 export type Transaction = PayoutTransaction | CardTransaction;
@@ -107,6 +109,7 @@ export function balanceAfter<T extends AnyTransaction>(
   balance: number,
   transaction: T,
 ) {
+  if (transaction.balanceAfter !== undefined) return transaction.balanceAfter;
   const later = transactions
     .filter((other) => other.at > transaction.at)
     .reduce((sum, other) => sum + signedAmount(other), 0);

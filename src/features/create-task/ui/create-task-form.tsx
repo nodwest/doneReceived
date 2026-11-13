@@ -10,7 +10,7 @@ import {
 } from '@entities/wallet';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { keepInViewScrollStyle, showToast, useKeepInView } from '@shared/lib';
 import { Input } from '@shared/ui';
 import { theme } from '@shared/theme';
 import {
@@ -28,6 +28,9 @@ import { FormField } from './form-field';
 import { RewardBudget } from './reward-budget';
 import { RewardInput } from './reward-input';
 import { styles } from './create-task-form.styled';
+
+/** Отступ под строкой Add step, когда форма её докручивает. */
+const KEEP_VISIBLE_GAP = 16;
 
 type CreateTaskFormProps = {
   /** Кому можно назначить: моковые дети и дети семьи с сервера. */
@@ -61,6 +64,10 @@ export function CreateTaskForm({
   const [initialTask] = useState(task);
   // Шаг чеклиста тянут за ручку: прокрутка формы не должна его перехватить.
   const [draggingStep, setDraggingStep] = useState(false);
+  // Низ чеклиста (Add step и подсказка) не уходит за низ видимой части
+  // формы (над клавиатурой): форма докручивает, шаги сдвигаются вверх.
+  const { scrollRef, viewportRef, onScroll, keepInView } =
+    useKeepInView(KEEP_VISIBLE_GAP);
 
   const title = useCreateTaskStore((state) => state.title);
   const description = useCreateTaskStore((state) => state.description);
@@ -129,81 +136,90 @@ export function CreateTaskForm({
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={[
-          styles.content,
-          {
-            paddingBottom: Math.max(insets.bottom, 24),
-          },
-        ]}
-        keyboardShouldPersistTaps="handled"
-        scrollEnabled={!draggingStep}
-        showsVerticalScrollIndicator={false}
-      >
-        <FormField label={t('createTask.taskTitle')}>
-          <Input
-            value={title}
-            onChangeText={setTitle}
-            placeholder={t('createTask.taskTitlePlaceholder')}
-            placeholderTextColor={theme.colors.placeholder}
-            style={styles.input}
-          />
-        </FormField>
+      <View ref={viewportRef} style={styles.flex}>
+        <ScrollView
+          ref={scrollRef}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          style={[styles.flex, keepInViewScrollStyle]}
+          contentContainerStyle={[
+            styles.content,
+            {
+              paddingBottom: Math.max(insets.bottom, 24),
+            },
+          ]}
+          keyboardShouldPersistTaps="handled"
+          scrollEnabled={!draggingStep}
+          showsVerticalScrollIndicator={false}
+        >
+          <FormField label={t('createTask.taskTitle')}>
+            <Input
+              value={title}
+              onChangeText={setTitle}
+              placeholder={t('createTask.taskTitlePlaceholder')}
+              placeholderTextColor={theme.colors.placeholder}
+              style={styles.input}
+            />
+          </FormField>
 
-        <DeadlineField />
+          <DeadlineField />
 
-        <RewardInput
-          presets={rewardPresets}
-          error={notEnough}
-          footer={
-            budget && (
-              <RewardBudget
-                funds={budget}
-                amount={amount}
-                onDeposit={onDeposit}
-              />
-            )
-          }
-        />
-
-        <FormField label={t('createTask.description')} optional>
-          <DescriptionInput value={description} onChangeText={setDescription} />
-        </FormField>
-
-        <ChecklistField
-          childName={childName}
-          onDragActiveChange={setDraggingStep}
-        />
-
-        <FormField label={t('createTask.assignTo')}>
-          <View style={styles.chips}>
-            {shownAssignees.map((child) => (
-              <ChildChip
-                key={child.id}
-                child={child}
-                selected={assigneeId === child.id}
-                onPress={({ id }) => setAssignee(id)}
-              />
-            ))}
-          </View>
-        </FormField>
-
-        <View style={styles.footer}>
-          <CreateTaskButton
-            label={
-              notEnough
-                ? t('createTask.shortBy', { amount: formatMoney(short) })
-                : initialTask
-                  ? t('createTask.save')
-                  : t('createTask.create')
+          <RewardInput
+            presets={rewardPresets}
+            error={notEnough}
+            footer={
+              budget && (
+                <RewardBudget
+                  funds={budget}
+                  amount={amount}
+                  onDeposit={onDeposit}
+                />
+              )
             }
-            withIcon={false}
-            disabled={!canSubmit}
-            onPress={submit}
           />
-        </View>
-      </ScrollView>
+
+          <FormField label={t('createTask.description')} optional>
+            <DescriptionInput
+              value={description}
+              onChangeText={setDescription}
+            />
+          </FormField>
+
+          <ChecklistField
+            childName={childName}
+            onDragActiveChange={setDraggingStep}
+            onKeepVisible={keepInView}
+          />
+
+          <FormField label={t('createTask.assignTo')}>
+            <View style={styles.chips}>
+              {shownAssignees.map((child) => (
+                <ChildChip
+                  key={child.id}
+                  child={child}
+                  selected={assigneeId === child.id}
+                  onPress={({ id }) => setAssignee(id)}
+                />
+              ))}
+            </View>
+          </FormField>
+
+          <View style={styles.footer}>
+            <CreateTaskButton
+              label={
+                notEnough
+                  ? t('createTask.shortBy', { amount: formatMoney(short) })
+                  : initialTask
+                    ? t('createTask.save')
+                    : t('createTask.create')
+              }
+              withIcon={false}
+              disabled={!canSubmit}
+              onPress={submit}
+            />
+          </View>
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 }

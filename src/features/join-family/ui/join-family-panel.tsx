@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import type { InviteRole } from '@entities/family';
+import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { GradientButton, RoundButton } from '@shared/ui';
@@ -10,28 +10,33 @@ import { styles } from './join-family-panel.styled';
 
 type JoinFamilyPanelProps = {
   onClose: () => void;
-  /** Кем вступаем: родитель по родительскому коду, ребёнок — по детскому. */
-  role?: InviteRole;
 };
 
+/** Сервер не пустил: уже в семье — своё сообщение, остальное — общее. */
+function joinError(error: unknown) {
+  const code =
+    isApiError(error) && error.data && typeof error.data === 'object'
+      ? (error.data as { code?: unknown }).code
+      : null;
+  if (code === 'ALREADY_IN_FAMILY') return 'alreadyInFamily' as const;
+  if (isApiError(error) && error.status === 0) return 'network' as const;
+  return 'failed' as const;
+}
+
 /**
- * Панель вступления в другую семью: поле кода, плашка найденной семьи и
- * кнопка Join family. Общая для вкладки Family (кнопка Join family) и
- * профиля (пункт Join family, у ребёнка — с ролью child); крестик и
- * успешное вступление закрывают её.
+ * Панель вступления в другую семью родителем: поле кода второго родителя,
+ * плашка найденной семьи и кнопка Join family. Общая для вкладки Family и
+ * профиля; крестик и успешное вступление закрывают её.
  */
-export function JoinFamilyPanel({
-  onClose,
-  role = 'parent',
-}: JoinFamilyPanelProps) {
+export function JoinFamilyPanel({ onClose }: JoinFamilyPanelProps) {
   const { t } = useTranslation();
-  const state = useInviteCode(role);
-  const isChild = role === 'child';
+  const state = useInviteCode();
   const { mutate, isPending } = useJoinFamily();
 
-  const join = () =>
+  const join = () => {
+    const familyName = state.invite?.familyName ?? '';
     mutate(state.code, {
-      onSuccess: ({ familyName }) => {
+      onSuccess: () => {
         showToast(
           t('joinFamily.joined', {
             family: t('joinFamily.familyName', { name: familyName }),
@@ -39,7 +44,9 @@ export function JoinFamilyPanel({
         );
         onClose();
       },
+      onError: (error) => showToast(t(`joinFamily.errors.${joinError(error)}`)),
     });
+  };
 
   return (
     <View style={styles.panel}>
@@ -52,15 +59,8 @@ export function JoinFamilyPanel({
           onPress={onClose}
         />
       </View>
-      <Text style={styles.hint}>
-        {t(isChild ? 'joinFamily.childHint' : 'joinFamily.hint')}
-      </Text>
-      <InviteCodeField
-        state={state}
-        hint={t(
-          isChild ? 'joinFamily.childCodeHint' : 'joinFamily.parentCodeHint',
-        )}
-      />
+      <Text style={styles.hint}>{t('joinFamily.hint')}</Text>
+      <InviteCodeField state={state} hint={t('joinFamily.parentCodeHint')} />
       <GradientButton
         label={t('joinFamily.join')}
         onPress={join}

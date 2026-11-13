@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Image,
   ScrollView,
@@ -10,20 +10,26 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon, type IconName } from '@shared/ui';
-import { formatCountdown, withAlpha } from '@shared/lib';
+import {
+  formatCountdown,
+  KeepInViewContext,
+  keepInViewScrollStyle,
+  useKeepInView,
+  withAlpha,
+} from '@shared/lib';
 import { theme } from '@shared/theme';
 import { formatRewardShort } from '../model';
 import { styles } from './task-sheet.styled';
 
 /**
- * parent — фиолетовая шапка, child — голубая, review — оранжевая «на
+ * parent и child — голубая шапка, review — оранжевая «на
  * проверке», paid — зелёная: награда выплачена, wallet — тёмно-синяя, как
  * карточка баланса: транзакция кошелька.
  */
 export type TaskSheetTone = 'parent' | 'child' | 'review' | 'paid' | 'wallet';
 
 const HERO_GRADIENTS = {
-  parent: [theme.colors.heroParentFrom, theme.colors.heroParentTo],
+  parent: [theme.colors.heroChildFrom, theme.colors.childDeep],
   child: [theme.colors.heroChildFrom, theme.colors.childDeep],
   review: [theme.colors.heroReviewFrom, theme.colors.heroReviewTo],
   paid: [theme.colors.heroPaidFrom, theme.colors.earnedDark],
@@ -59,6 +65,9 @@ type TaskSheetProps = {
   style?: StyleProp<ViewStyle>;
 };
 
+/** Высота растворения у кнопок (`styles.fade`). */
+const FADE_HEIGHT = 28;
+
 /**
  * Каркас крупной карточки задания (v3): цветная шапка с аватаром, именем,
  * плашкой и крупным названием; белое тело с секциями прокручивается и
@@ -78,6 +87,13 @@ export function TaskSheet({
   style,
 }: TaskSheetProps) {
   const dark = tone === 'review';
+  // Секции, которые растут (комментарий), держат низ над кнопками: выше
+  // растворения у края.
+  const { scrollRef, viewportRef, onScroll, keepInView } =
+    useKeepInView(FADE_HEIGHT);
+  // Тело прокручено: текст уходит под шапку — сверху такое же растворение,
+  // как у кнопок. В покое его нет, чтобы не глушить первую строку.
+  const [scrolled, setScrolled] = useState(false);
 
   return (
     <View style={[styles.card, SHADOWS[tone], style]}>
@@ -122,13 +138,28 @@ export function TaskSheet({
           {title}
         </Text>
       </LinearGradient>
-      <View style={styles.bodyWrap}>
+      <View ref={viewportRef} style={styles.bodyWrap}>
         <ScrollView
+          ref={scrollRef}
+          onScroll={(event) => {
+            onScroll(event);
+            setScrolled(event.nativeEvent.contentOffset.y > 0);
+          }}
+          scrollEventThrottle={16}
+          style={keepInViewScrollStyle}
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}
         >
-          {children}
+          <KeepInViewContext.Provider value={keepInView}>
+            {children}
+          </KeepInViewContext.Provider>
         </ScrollView>
+        {scrolled && (
+          <LinearGradient
+            colors={[theme.colors.white, withAlpha(theme.colors.white, 0)]}
+            style={[styles.fade, styles.fadeTop]}
+          />
+        )}
         <LinearGradient
           colors={[withAlpha(theme.colors.white, 0), theme.colors.white]}
           style={styles.fade}

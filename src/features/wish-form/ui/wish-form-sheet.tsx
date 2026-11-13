@@ -1,11 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import {
-  isServerWishlist,
-  type Wish,
-  type WishlistOwner,
-} from '@entities/wish';
+import { type Wish, type WishlistOwner } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -13,7 +9,6 @@ import { BottomSheet, Icon, SheetField, Toggle } from '@shared/ui';
 import { useCreateWish } from '../model/use-create-wish';
 import { useUpdateWish } from '../model/use-update-wish';
 import { useWishForm } from '../model/use-wish-form';
-import { PhotoPicker } from './photo-picker';
 import { styles } from './wish-form-sheet.styled';
 
 type WishFormSheetProps = {
@@ -49,11 +44,9 @@ export function WishFormSheet({
   const form = useWishForm();
   const createWish = useCreateWish(owner);
   const updateWish = useUpdateWish(owner);
-  // На сервере у желаний нет фото и своего порядка: этих полей в форме нет.
-  const server = owner !== null && isServerWishlist(owner);
   const editing = wish !== undefined;
   const pending = createWish.isPending || updateWish.isPending;
-  const { title, price, description, link, photos, top } = form.fields;
+  const { title, price, description, link, top } = form.fields;
 
   // Каждое открытие — с данными желания или с чистого листа, до отрисовки.
   useLayoutEffect(() => {
@@ -115,7 +108,7 @@ export function WishFormSheet({
           keyboardType="number-pad"
           prefix={<Text style={styles.currency}>$</Text>}
         />
-        {!server && <PhotoPicker photos={photos} onRemove={form.removePhoto} />}
+        {/* Фото желаний появятся с выбором фото (п. 22). */}
         <SheetField
           label={t('wishForm.description')}
           value={description}
@@ -134,30 +127,28 @@ export function WishFormSheet({
             <Icon name="link" size={18} color={theme.colors.placeholderSoft} />
           }
         />
-        {!server && (
-          <View style={styles.topWish}>
-            <LinearGradient
-              colors={[theme.colors.childTint, theme.colors.childTintLight]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              locations={[0, 0.7071]}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.topWishText}>
-              <Text style={styles.topWishTitle}>{t('wishForm.top')}</Text>
-              <Text style={styles.topWishHint}>
-                {editing
-                  ? t('wishForm.topNow', { position })
-                  : t('wishForm.topOtherwise', { position })}
-              </Text>
-            </View>
-            <Toggle
-              value={top}
-              onValueChange={form.setTop}
-              accessibilityLabel={t('wishForm.top')}
-            />
+        <View style={styles.topWish}>
+          <LinearGradient
+            colors={[theme.colors.childTint, theme.colors.childTintLight]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            locations={[0, 0.7071]}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.topWishText}>
+            <Text style={styles.topWishTitle}>{t('wishForm.top')}</Text>
+            <Text style={styles.topWishHint}>
+              {editing
+                ? t('wishForm.topNow', { position })
+                : t('wishForm.topOtherwise', { position })}
+            </Text>
           </View>
-        )}
+          <Toggle
+            value={top}
+            onValueChange={form.setTop}
+            accessibilityLabel={t('wishForm.top')}
+          />
+        </View>
         {editing && onDelete && (
           <Pressable
             accessibilityRole="button"

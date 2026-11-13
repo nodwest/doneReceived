@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import { CHECKLIST_ITEM_MAX_LENGTH, CHECKLIST_MAX_ITEMS } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
@@ -19,6 +19,11 @@ type ChecklistFieldProps = {
   childName: string | null;
   /** Шаг тянут за ручку: форма выключает прокрутку. */
   onDragActiveChange: (active: boolean) => void;
+  /**
+   * Добавили шаг или открыли строку нового: низ чеклиста (Add step и
+   * подсказка) не должен уйти за низ экрана — форма докручивает к нему.
+   */
+  onKeepVisible?: (node: View) => void;
 };
 
 /**
@@ -30,6 +35,7 @@ type ChecklistFieldProps = {
 export function ChecklistField({
   childName,
   onDragActiveChange,
+  onKeepVisible,
 }: ChecklistFieldProps) {
   const { t } = useTranslation();
   const steps = useCreateTaskStore((state) => state.checklist);
@@ -42,6 +48,34 @@ export function ChecklistField({
   // Строка нового шага открыта: после Add checklist, Add step или Enter.
   const [drafting, setDrafting] = useState(false);
   const draftRef = useRef<TextInput>(null);
+  // Нажимают Add step: на вебе строка нового шага теряет фокус раньше, чем
+  // сработает нажатие.
+  const pressingAddStep = useRef(false);
+  // Подсказка — самый низ чеклиста: её держим над краем экрана.
+  const bottomRef = useRef<View>(null);
+  const keepBottomVisible = () => {
+    if (bottomRef.current) onKeepVisible?.(bottomRef.current);
+  };
+
+  // Чеклист вырос (шаг добавлен или открыта строка нового) — докручиваем
+  // форму до отрисовки, чтобы ничего не моргнуло. По событию, а не по
+  // onLayout: на вебе onLayout приходит только при смене размера, а Add step
+  // лишь сдвигается.
+  const prev = useRef({ count: steps.length, drafting });
+  useLayoutEffect(() => {
+    const grew =
+      steps.length > prev.current.count || (drafting && !prev.current.drafting);
+    prev.current = { count: steps.length, drafting };
+    if (grew) keepBottomVisible();
+  });
+
+  // Клавиатура открылась под строкой нового шага — то же самое: форма стала
+  // ниже, низ чеклиста мог уйти под клавиатуру.
+  useEffect(() => {
+    if (!drafting) return;
+    const sub = Keyboard.addListener('keyboardDidShow', keepBottomVisible);
+    return () => sub.remove();
+  });
 
   const full = steps.length >= CHECKLIST_MAX_ITEMS;
   const named = childName !== null;
@@ -76,14 +110,18 @@ export function ChecklistField({
     }
   };
 
-  // Ушли из строки: набранное не теряем, пустая строка закрывается.
+  // Ушли из строки: набранное не теряем, пустая строка закрывается. Если
+  // ушли нажатием Add step — строку не закрываем: иначе она пропадает и тут же
+  // появляется снова (форма моргает и дёргается).
   const leaveDraft = () => {
     commitDraft();
-    setDrafting(false);
+    if (!pressingAddStep.current) setDrafting(false);
   };
 
-  // Строка уже открыта — фокус в неё, иначе она откроется с autoFocus.
+  // Набранный шаг добавляем, строка нового шага — открыта и в фокусе (если
+  // она уже открыта, autoFocus не сработает).
   const openDraft = () => {
+    commitDraft();
     setDrafting(true);
     draftRef.current?.focus();
   };
@@ -163,6 +201,10 @@ export function ChecklistField({
               onSubmitEditing={submitDraft}
               onBlur={leaveDraft}
               submitBehavior="submit"
+              // На вебе submitBehavior не поддерживается: без blurOnSubmit
+              // поле после Enter теряет фокус, строка закрывается и форма
+              // становится короче. На телефоне submitBehavior главнее.
+              blurOnSubmit={false}
               returnKeyType="next"
               maxLength={CHECKLIST_ITEM_MAX_LENGTH}
               placeholder={t('createTask.checklist.newStep')}
@@ -179,6 +221,15 @@ export function ChecklistField({
         {!full && (
           <Pressable
             accessibilityRole="button"
+            // Фокус кнопке не нужен: он сразу уходит в строку нового шага, а
+            // на вебе кнопка с фокусом рисует браузерную рамку.
+            focusable={false}
+            onPressIn={() => {
+              pressingAddStep.current = true;
+            }}
+            onPressOut={() => {
+              pressingAddStep.current = false;
+            }}
             onPress={openDraft}
             style={({ pressed }) => [styles.addStep, pressed && styles.pressed]}
           >
@@ -190,7 +241,7 @@ export function ChecklistField({
         )}
       </View>
 
-      <View style={styles.hint}>
+      <View ref={bottomRef} style={styles.hint}>
         <ChecklistHintIcon />
         <Text style={styles.hintText}>
           {named

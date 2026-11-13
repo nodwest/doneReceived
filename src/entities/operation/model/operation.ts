@@ -31,12 +31,19 @@ export interface Operation {
   doneAt: string | null;
   /** Фото-отчёт ребёнка; null — снимка нет. */
   photo: ImageSourcePropType | null;
+  /** Комментарий ребёнка к сдаче; null — без комментария. */
+  note: string | null;
+  /**
+   * С сервера: id назначения, за которое начислено. По нему выплата в
+   * транзакциях родителя открывает эту награду.
+   */
+  assignmentId?: string;
 }
 
 /** Что сервер записывает в историю, когда родитель подтвердил задание. */
 export type RewardPayload = Pick<
   Operation,
-  'title' | 'description' | 'amount' | 'child' | 'doneAt' | 'photo'
+  'title' | 'description' | 'amount' | 'child' | 'doneAt' | 'photo' | 'note'
 >;
 
 /** Сумма в формате истории: «$10». */

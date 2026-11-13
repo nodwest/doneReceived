@@ -7,20 +7,18 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
-import { useFamilyOperations, useFamilyTasks } from '@features/family-tasks';
+import {
+  useFamilyFeed,
+  useFamilyOperations,
+  useFamilyTasks,
+} from '@features/family-tasks';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
-import { ActivityItem } from '@entities/activity';
+import { FeedItem } from '@entities/activity';
 import { sumTotals } from '@entities/operation';
-import { useMe, useMyAvatar } from '@entities/session';
+import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
-import {
-  childProfilesMock,
-  familySummaryMock,
-  parentMock,
-  recentActivityMock,
-} from '@shared/mocks';
 import { styles } from './parent-home.styled';
 
 /** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
@@ -31,6 +29,7 @@ function greetingKey(hour: number) {
 }
 
 export function ParentHomePage() {
+  const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
   // Имя и фото — вошедшего родителя (GET /users/me).
@@ -38,52 +37,33 @@ export function ParentHomePage() {
   const myAvatar = useMyAvatar();
   // Счётчики заданий — из того же запроса, что и экран Tasks и профиль
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
-  // Пока список грузится, показываем значения из сводки.
   const { data: tasks } = useFamilyTasks();
+  // Лента — события семьи с сервера.
+  const { data: feed = [] } = useFamilyFeed();
   // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
-  const total =
-    tasks && countTasks(tasks, { createdBy: String(parentMock.id) });
+  const total = tasks && countTasks(tasks, { createdBy: myId });
   // Выплачено вошедшим родителем за всё время — из истории наград: после
   // подтверждения задания сумма растёт.
   const { data: operations } = useFamilyOperations();
   const rewardsPaid =
     operations &&
-    sumTotals(
-      operations.filter(
-        (operation) => operation.parentId === String(parentMock.id),
-      ),
-    ).earned;
-  // Дети: моковые Emma и Liam и дети семьи с сервера (созданные через
-  // Add a child). Статуса «дома» у настоящих пока нет.
+    sumTotals(operations.filter((operation) => operation.parentId === myId))
+      .earned;
+  // Дети семьи с сервера. Статуса «дома» пока нет (геолокация — п. 24).
   const { data: serverChildren } = useFamilyChildren(
     useCurrentFamily()?.id ?? null,
   );
-  const counts = (id: string) =>
-    countChildTasks(tasks ?? [], id, String(parentMock.id));
-  const children: ChildOverview[] = [
-    ...childProfilesMock.map((child) => {
-      const { active, review } = counts(String(child.id));
-      return {
-        id: String(child.id),
-        name: child.name,
-        avatar: child.avatar,
-        activeTasks: active,
-        reviewTasks: review,
-        atHome: child.presence.atHome,
-      };
-    }),
-    ...(serverChildren ?? []).map((child) => {
-      const { active, review } = counts(child.id);
-      return {
-        id: child.id,
-        name: child.displayName,
-        avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
-        activeTasks: active,
-        reviewTasks: review,
-        atHome: false,
-      };
-    }),
-  ];
+  const children: ChildOverview[] = (serverChildren ?? []).map((child) => {
+    const { active, review } = countChildTasks(tasks ?? [], child.id, myId);
+    return {
+      id: child.id,
+      name: child.displayName,
+      avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
+      activeTasks: active,
+      reviewTasks: review,
+      atHome: false,
+    };
+  });
 
   return (
     <View style={styles.screen}>
@@ -95,13 +75,13 @@ export function ParentHomePage() {
         >
           <HomeHeader
             greeting={t(greetingKey(new Date().getHours()))}
-            name={me?.displayName ?? parentMock.name}
-            avatar={me ? myAvatar : parentMock.avatar}
+            name={me?.displayName ?? ''}
+            avatar={myAvatar}
           />
           <HomeSummary
-            amount={rewardsPaid ?? familySummaryMock.rewardsPaid}
-            activeTasks={total?.active ?? familySummaryMock.activeTasks}
-            tasksToReview={total?.review ?? familySummaryMock.tasksToReview}
+            amount={rewardsPaid ?? 0}
+            activeTasks={total?.active ?? 0}
+            tasksToReview={total?.review ?? 0}
             onActiveTasksPress={() =>
               router.push({ pathname: '/tasks', params: { tab: 'all' } })
             }
@@ -125,11 +105,13 @@ export function ParentHomePage() {
             }
           />
           <CreateTaskButton onPress={() => router.push('/create-task')} />
-          <RecentActivity>
-            {recentActivityMock.map(({ id, ...item }) => (
-              <ActivityItem key={id} {...item} />
-            ))}
-          </RecentActivity>
+          {feed.length > 0 && (
+            <RecentActivity>
+              {feed.map((event) => (
+                <FeedItem key={event.id} event={event} viewer="parent" />
+              ))}
+            </RecentActivity>
+          )}
         </ScrollView>
         <BottomNav activeKey="home" />
       </SafeAreaView>

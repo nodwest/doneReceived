@@ -3,15 +3,15 @@ import {
   inviteCodeForApi,
   type Family,
   type FamilyChild,
+  type FamilyChildDetails,
+  type FamilyDetails,
   type FamilyInvitePreview,
   type FamilyMember,
   type FamilyMembership,
   type ParentInvite,
 } from '../model/family';
 
-// Настоящие эндпоинты семьи. Ошибки приходят как ApiError из @shared/api.
-// Остальное в family-api.ts (коды для ребёнка, новые профили детей) пока
-// ходит в mock-server.
+// Эндпоинты семьи. Ошибки приходят как ApiError из @shared/api.
 
 /** GET /families — семьи, где у вошедшего есть членство, и его роль в них. */
 export function fetchMyFamilies() {
@@ -51,15 +51,47 @@ export function createParentInvite(familyId: string) {
 }
 
 /**
- * POST /families/invites/preview — в какую семью ведёт код второго родителя,
- * не гася его. 400 — код неверен, истёк или использован (в теле
- * `attemptsLeft`), 429 — лимит неверных кодов (общий со вступлением).
+ * DELETE /families/:id/invites/current — погасить живой код «Add family
+ * member» (отправили не тому). Следующий POST /families/:id/invites выдаст
+ * новый. Кода нет — тоже 204. 403 — нужна роль owner или admin.
+ */
+export function revokeParentInvite(familyId: string) {
+  return apiRequest<void>(`/families/${familyId}/invites/current`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * GET /families/invites/:code — в какую семью ведёт код второго родителя и
+ * кто в ней уже есть, не гася код. 400 — код неверен, истёк или использован
+ * (в теле `attemptsLeft`), 429 — лимит неверных кодов (общий со
+ * вступлением).
  */
 export function previewFamilyInvite(code: string) {
-  return apiRequest<FamilyInvitePreview>('/families/invites/preview', {
-    method: 'POST',
-    body: { code: inviteCodeForApi(code) },
-  });
+  return apiRequest<FamilyInvitePreview>(
+    `/families/invites/${encodeURIComponent(inviteCodeForApi(code))}`,
+  );
+}
+
+type FamilyDetailsDto = Omit<FamilyDetails, 'children'> & {
+  children: (Omit<FamilyChildDetails, 'balance'> & { balancePoints: string })[];
+};
+
+/**
+ * GET /families/:id — семья целиком для экрана Family: родители с ролями,
+ * дети с балансом и числом устройств. Только родителям (ребёнку 403).
+ */
+export async function fetchFamilyDetails(
+  familyId: string,
+): Promise<FamilyDetails> {
+  const dto = await apiRequest<FamilyDetailsDto>(`/families/${familyId}`);
+  return {
+    ...dto,
+    children: dto.children.map(({ balancePoints, ...child }) => ({
+      ...child,
+      balance: Number(balancePoints),
+    })),
+  };
 }
 
 /** GET /families/:id/children — профили детей семьи. */

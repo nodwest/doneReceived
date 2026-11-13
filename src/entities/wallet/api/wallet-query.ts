@@ -5,14 +5,18 @@ import { fetchChildWallet, fetchWallet } from './wallet-api';
 /** Ключи кэша кошелька. */
 export const walletKeys = {
   all: ['wallet'] as const,
-  detail: () => [...walletKeys.all, 'detail'] as const,
+  detail: (familyId: string | null) =>
+    [...walletKeys.all, 'detail', familyId] as const,
   child: (childId: string) => [...walletKeys.all, 'child', childId] as const,
   funds: (familyId: string | null) =>
     [...walletKeys.all, 'funds', familyId] as const,
 };
 
-export const walletQueryOptions = () =>
-  queryOptions({ queryKey: walletKeys.detail(), queryFn: fetchWallet });
+export const walletQueryOptions = (familyId: string | null) =>
+  queryOptions({
+    queryKey: walletKeys.detail(familyId),
+    queryFn: () => fetchWallet(familyId),
+  });
 
 export const childWalletQueryOptions = (
   childId: string | null,
@@ -26,9 +30,12 @@ export const childWalletQueryOptions = (
     refetchInterval: familyId ? 15_000 : false,
   });
 
-/** Кошелёк вошедшего родителя: баланс и транзакции, сначала новые. */
-export function useWallet() {
-  return useQuery(walletQueryOptions());
+/**
+ * Кошелёк вошедшего родителя: баланс и транзакции, сначала новые. С семьёй —
+ * с сервера, без неё (null) — моки.
+ */
+export function useWallet(familyId: string | null) {
+  return useQuery(walletQueryOptions(familyId));
 }
 
 /**

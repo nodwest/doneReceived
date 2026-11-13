@@ -1,11 +1,14 @@
 import { apiRequest } from '@shared/api';
 import type {
+  ChangePasswordPayload,
   LoginPayload,
   MessageResponse,
   PairDevicePayload,
   PairedDevice,
   RegisterPayload,
   Session,
+  SessionUser,
+  UpdateMePayload,
   VerifyEmailPayload,
 } from '../model/session';
 
@@ -85,6 +88,31 @@ export function refreshSession(refreshToken: string) {
  */
 export function pairChildDevice(payload: PairDevicePayload) {
   return apiRequest<PairedDevice>('/child-devices/pair', {
+    method: 'POST',
+    body: payload,
+  });
+}
+
+/**
+ * PATCH /users/me — сменить своё отображаемое имя (родитель или ребёнок).
+ * Пробелы по краям сервер обрезает, почта этой ручкой не меняется. 400 —
+ * имя пустое или длиннее 100 символов.
+ */
+export function updateMe(payload: UpdateMePayload) {
+  return apiRequest<SessionUser>('/users/me', {
+    method: 'PATCH',
+    body: payload,
+  });
+}
+
+/**
+ * POST /users/me/password — сменить пароль родителя. Текущая сессия
+ * остаётся, остальные сессии аккаунта сервер отзывает. 400 —
+ * `INVALID_CURRENT_PASSWORD` или `PASSWORD_SAME_AS_CURRENT`, 403 — у
+ * ребёнка пароля нет, 429 — много попыток (`Retry-After`).
+ */
+export function changePassword(payload: ChangePasswordPayload) {
+  return apiRequest<void>('/users/me/password', {
     method: 'POST',
     body: payload,
   });

@@ -42,6 +42,35 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     gap: 6,
   },
+  // Все выплаченные задания плитками по дням.
+  paidList: {
+    gap: 10,
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    paddingBottom: 32,
+  },
+  paidDay: {
+    gap: 10,
+  },
+  paidDayHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+    paddingHorizontal: 4,
+  },
+  paidDayTitle: {
+    fontSize: 17,
+    letterSpacing: tracking(17),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.ink,
+  },
+  paidDayTotal: {
+    fontSize: 15,
+    letterSpacing: tracking(15),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.rewardText,
+  },
   // Карточки наград дня во всю высоту под шапкой.
   cards: {
     flex: 1,

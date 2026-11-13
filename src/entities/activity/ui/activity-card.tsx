@@ -1,6 +1,7 @@
-import { Image, Text, View, type ImageSourcePropType } from 'react-native';
+import { Text, View, type ImageSourcePropType } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@shared/theme';
+import { LetterAvatar } from '@shared/ui';
 import { styles } from './activity-item.styled';
 
 /** pending — на проверке (тёплая), approved — подтверждено (зелёная), new — новое (голубая). */
@@ -8,7 +9,10 @@ export type ActivityTone = 'pending' | 'approved' | 'new';
 
 type ActivityCardProps = {
   tone: ActivityTone;
-  avatar: ImageSourcePropType;
+  /** Фото; null — первая буква `name`. */
+  avatar: ImageSourcePropType | null;
+  /** Чьё фото: для буквы, когда фото нет. */
+  name?: string;
   title: string;
   subtitle: string;
   amount: string;
@@ -23,13 +27,14 @@ const GRADIENTS = {
 export function ActivityCard({
   tone,
   avatar,
+  name = '',
   title,
   subtitle,
   amount,
 }: ActivityCardProps) {
   const content = (
     <>
-      <Image source={avatar} style={styles.avatar} />
+      <LetterAvatar source={avatar} name={name} style={styles.avatar} />
       <View style={styles.middle}>
         <Text style={styles.title}>{title}</Text>
         <Text style={[styles.subtitle, SUBTITLE_STYLES[tone]]}>{subtitle}</Text>

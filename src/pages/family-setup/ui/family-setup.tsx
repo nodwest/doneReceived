@@ -31,8 +31,8 @@ type Mode = 'create' | 'join';
  * `root-layout.tsx`). Карточка Create a family раскрывается полем названия —
  * POST /families, родитель становится owner. Join a family — полем кода,
  * `XXXX-XXXX`, который второй родитель видит в Family → + Family member
- * (живёт 15 минут): введён целиком — зелёная плашка с семьёй (POST
- * /families/invites/preview), потом POST /families/join. Как только семья появилась в
+ * (живёт 15 минут): введён целиком — зелёная плашка с семьёй и её
+ * участниками (GET /families/invites/:code), потом POST /families/join. Как только семья появилась в
  * GET /families, приложение само уходит на главную.
  */
 export function FamilySetupPage() {
@@ -179,7 +179,11 @@ export function FamilySetupPage() {
             onSubmit={onSubmit}
           />
           {foundFamily && !error && (
-            <FamilyFound familyName={foundFamily.familyName} role="parent" />
+            <FamilyFound
+              familyName={foundFamily.familyName}
+              role="parent"
+              members={foundFamily.members?.map((member) => member.displayName)}
+            />
           )}
         </ChoiceCard>
       </View>

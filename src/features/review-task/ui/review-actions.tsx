@@ -3,14 +3,15 @@ import { View } from 'react-native';
 import type { Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
+import { isDeadlinePassed } from '../model/reject-reasons';
 import { useReviewTask } from '../model/use-review-task';
 import { RejectReasonSheet } from './reject-reason-sheet';
 import { styles } from './review-task.styled';
 
 /**
  * Кнопки проверки внизу карточки задания: Reject открывает шторку с причиной
- * и возвращает задание ребёнку (задание с сервера пока закрывает), Approve
- * подтверждает и выплачивает награду.
+ * — вернуть задание ребёнку на переделку или закрыть, Approve подтверждает и
+ * выплачивает награду.
  */
 export function ReviewActions({ task }: { task: Task }) {
   const { t } = useTranslation();
@@ -34,7 +35,9 @@ export function ReviewActions({ task }: { task: Task }) {
       <RejectReasonSheet
         visible={rejecting}
         childName={task.assignee.name}
-        closes={!!task.serverTaskId}
+        reward={task.reward}
+        // Срок проверяем при каждом рендере шторки: она открывается заново.
+        deadlinePassed={rejecting && isDeadlinePassed(task.expiresAt)}
         onCancel={() => setRejecting(false)}
         onReject={(decision) => {
           setRejecting(false);

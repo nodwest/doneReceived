@@ -6,16 +6,8 @@ import { TabScreen } from '@widgets/bottom-nav';
 import { useLogout } from '@features/auth';
 import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
-import { ChildModeToggle } from '@features/switch-role';
-import { useInviteCodes } from '@entities/family';
 import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
-import { useViewerRole } from '@entities/user';
 import { getLanguageLabel, useLanguage, useTranslation } from '@shared/i18n';
-import {
-  childAccountMock,
-  parentMock,
-  profileSettingsMock,
-} from '@shared/mocks';
 import { SettingsRow, Toggle, type AnchorRect } from '@shared/ui';
 import { ProfileHero } from './profile-hero';
 import { styles } from './profile.styled';
@@ -26,36 +18,25 @@ import { styles } from './profile.styled';
  * или ввода кода (как на вкладке Family), крестик возвращает меню. Edit
  * profile открывает отдельную страницу. Language раскрывает выпадающий выбор
  * языка прямо у пункта. Остальные пункты пока не работают, тогл уведомлений
- * только переключается. Временный тогл над Log out переключает роль: у
- * ребёнка (Emma) голубая карточка, нет Family codes, а Join family ждёт
- * детский код. Log out забывает сессию и ведёт на логин.
+ * только переключается. У ребёнка голубая карточка, нет Family codes и Join
+ * family. Log out забывает сессию и ведёт на логин.
  */
 export function ProfilePage() {
   const { t } = useTranslation();
-  const role = useViewerRole();
+  const role = useSessionKind() ?? 'parent';
   const isChild = role === 'child';
-  // Вошёл сам ребёнок: тогл «посмотреть как ребёнок» ему не нужен.
-  const childSession = useSessionKind() === 'child';
-  // Карточка — вошедшего (GET /users/me); родитель в режиме ребёнка видит
-  // моковую Emma.
+  // Карточка — вошедшего (GET /users/me).
   const me = useMe();
   const myAvatar = useMyAvatar();
-  const mock = isChild ? childAccountMock : parentMock;
-  const account =
-    me && (!isChild || childSession)
-      ? { fullName: me.displayName, email: me.email ?? '', avatar: myAvatar }
-      : mock;
   const language = useLanguage();
-  const { data: codes } = useInviteCodes();
   const [panel, setPanel] = useState<'codes' | 'join' | null>(null);
   const closePanel = () => setPanel(null);
   const languageRow = useRef<View>(null);
   const logout = useLogout();
   const [languageAnchor, setLanguageAnchor] = useState<AnchorRect | null>(null);
   const [languageOpen, setLanguageOpen] = useState(false);
-  const [notifications, setNotifications] = useState(
-    profileSettingsMock.notifications,
-  );
+  // Уведомлений пока нет (п. 25): тогл только переключается.
+  const [notifications, setNotifications] = useState(true);
 
   // Меню раскрывается у пункта Language — меряем, где он сейчас на экране.
   const openLanguageMenu = () => {
@@ -73,15 +54,15 @@ export function ProfilePage() {
       >
         <Text style={styles.title}>{t('profile.title')}</Text>
         <ProfileHero
-          name={account.fullName}
-          email={account.email}
-          avatar={account.avatar}
+          name={me?.displayName ?? ''}
+          email={me?.email ?? ''}
+          avatar={myAvatar}
           role={role}
         />
         {panel === 'codes' ? (
-          <InviteCodesPanel codes={codes} onClose={closePanel} />
+          <InviteCodesPanel onClose={closePanel} />
         ) : panel === 'join' ? (
-          <JoinFamilyPanel onClose={closePanel} role={role} />
+          <JoinFamilyPanel onClose={closePanel} />
         ) : (
           <>
             <View style={styles.menu}>
@@ -110,14 +91,14 @@ export function ProfilePage() {
                     label={t('profile.familyCodes')}
                     onPress={() => setPanel('codes')}
                   />
+                  <View style={styles.divider} />
+                  <SettingsRow
+                    icon="children"
+                    label={t('profile.joinFamily')}
+                    onPress={() => setPanel('join')}
+                  />
                 </>
               )}
-              <View style={styles.divider} />
-              <SettingsRow
-                icon="children"
-                label={t('profile.joinFamily')}
-                onPress={() => setPanel('join')}
-              />
               <View style={styles.divider} />
               <SettingsRow
                 ref={languageRow}
@@ -129,7 +110,6 @@ export function ProfilePage() {
               <View style={styles.divider} />
               <SettingsRow icon="help" label={t('profile.help')} />
             </View>
-            {!childSession && <ChildModeToggle />}
             <Pressable
               accessibilityRole="button"
               style={styles.logOut}

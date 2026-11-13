@@ -46,3 +46,6 @@ yarn-error.*
 
 # Obsidian plugins (local only)
 /obsidian-done/.obsidian/plugins/
+
+# Описание PR для копирования в GitHub (локальный файл, только для себя)
+/Описание PR.md

@@ -238,13 +238,20 @@ export function TransactionCard({
   }
 
   const deposit = transaction.kind === 'deposit';
-  const card = t('transactions.card', { card: transaction.card });
+  // Без карты (тестовое пополнение) — «Пополнение · кошелька».
+  const card = transaction.card
+    ? t('transactions.card', { card: transaction.card })
+    : t('transactions.walletTopUp');
   return (
     <TaskSheet
       {...common}
       icon="cards"
       caption={
-        deposit ? t('transactions.depositFrom') : t('transactions.withdrawalTo')
+        !transaction.card
+          ? t('wallet.deposit')
+          : deposit
+            ? t('transactions.depositFrom')
+            : t('transactions.withdrawalTo')
       }
       name={card}
       footer={

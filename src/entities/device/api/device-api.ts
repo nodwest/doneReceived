@@ -6,18 +6,19 @@ import {
   type Device,
   type PairingPreview,
 } from '../model/device';
-import { mockServer } from './mock-server';
 
-// Эндпоинты устройств детей. Дети с сервера (есть familyId) ходят в API,
-// моковые Emma и Liam (familyId — null) — в mockServer, пока их профили,
-// задания и кошельки на моках.
+// Эндпоинты устройств детей семьи.
 
-/** Устройства моковых детей (Emma, Liam). */
-export async function fetchMockDevices(): Promise<Device[]> {
-  return mockServer.devices();
-}
+type DeviceDto = {
+  id: string;
+  label: string;
+  createdAt: string;
+  /** Последний запрос с токеном устройства; null — ещё не было. */
+  lastSeenAt: string | null;
+};
 
-type DeviceDto = { id: string; label: string; createdAt: string };
+/** Был запрос не дольше этого назад — устройство «на связи». */
+const ONLINE_WINDOW_MS = 2 * 60_000;
 
 /** GET /families/:id/children/:childId/devices — подключённые устройства. */
 export async function fetchChildDevices(
@@ -32,19 +33,21 @@ export async function fetchChildDevices(
     childId,
     name: device.label,
     connectedAt: device.createdAt,
+    lastSeenAt: device.lastSeenAt ?? undefined,
+    online:
+      device.lastSeenAt !== null &&
+      Date.now() - new Date(device.lastSeenAt).getTime() < ONLINE_WINDOW_MS,
   }));
 }
 
 /**
  * POST /families/:id/children/:childId/device-codes — код подключения
  * (8 символов, 15 минут). Пока код жив, сервер отдаёт его же, истёк — новый.
- * Без семьи (моковый ребёнок) — код из mockServer.
  */
 export async function fetchConnectCode(
-  familyId: string | null,
+  familyId: string,
   childId: string,
 ): Promise<ConnectCode> {
-  if (!familyId) return mockServer.connectCode(childId);
   const { code, expiresAt } = await apiRequest<{
     code: string;
     expiresAt: string;

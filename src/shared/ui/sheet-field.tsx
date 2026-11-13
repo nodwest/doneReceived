@@ -13,7 +13,8 @@ import { theme, tracking } from '../theme';
 const FIELD_HEIGHT = 50;
 
 type SheetFieldProps = Omit<TextInputProps, 'style'> & {
-  label: string;
+  /** Подпись; можно с цветной припиской (`<Text>` внутри). */
+  label: ReactNode;
   /** Слева в поле: «$» у цены, иконка ссылки. */
   prefix?: ReactNode;
 };

@@ -3,28 +3,18 @@ import type { ConnectCode } from '../model/device';
 import {
   fetchChildDevices,
   fetchConnectCode,
-  fetchMockDevices,
   previewPairing,
 } from './device-api';
 
 /** Ключи кэша устройств. */
 export const deviceKeys = {
   all: ['devices'] as const,
-  mockList: () => [...deviceKeys.all, 'mock'] as const,
   child: (familyId: string | null, childId: string) =>
     [...deviceKeys.all, familyId, childId] as const,
   connectCode: (childId: string) =>
     [...deviceKeys.all, 'connect-code', childId] as const,
   preview: (code: string) => [...deviceKeys.all, 'preview', code] as const,
 };
-
-/** Устройства моковых детей (Emma, Liam). */
-export function useMockDevices() {
-  return useQuery({
-    queryKey: deviceKeys.mockList(),
-    queryFn: fetchMockDevices,
-  });
-}
 
 /** Устройства ребёнка с сервера; без семьи (null) запроса нет. */
 export function useChildDevices(familyId: string | null, childId: string) {
@@ -45,7 +35,6 @@ const codeLeft = (code: ConnectCode | undefined) =>
  * продолжается), иначе новый. Иначе после подключения устройства показали
  * бы погашенный код. Пока меню открыто, код сам не меняется: истёк —
  * «Code expired» и New code (тот же запрос, сервер выдаст новый).
- * `familyId` — null у моковых детей: код из mockServer.
  */
 export function useConnectCode(
   familyId: string | null,
@@ -54,7 +43,10 @@ export function useConnectCode(
 ) {
   return useQuery({
     queryKey: deviceKeys.connectCode(childId),
-    queryFn: enabled ? () => fetchConnectCode(familyId, childId) : skipToken,
+    queryFn:
+      enabled && familyId
+        ? () => fetchConnectCode(familyId, childId)
+        : skipToken,
     staleTime: (query) => codeLeft(query.state.data),
     // Меню закрыли — код забываем, следующее открытие спросит сервер.
     gcTime: 0,

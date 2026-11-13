@@ -16,20 +16,25 @@ import {
   type TasksView,
 } from '@widgets/tasks-header';
 import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
-import { useFamilyChildren } from '@entities/family';
-import { filterTasks, TaskCard, type Task } from '@entities/task';
+import { useFamilyChildren, useFamilyMembers } from '@entities/family';
+import { filterTasks, TaskCard, TaskRow, type Task } from '@entities/task';
+import { useMyId } from '@entities/session';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
-import { childrenMock, parentMock, parentProfilesMock } from '@shared/mocks';
 import { CARDS_PADDING_BOTTOM, styles } from './tasks.styled';
 import { ViewOnlyNote } from './view-only-note';
 
 const NO_TASKS: Task[] = [];
 
-// Имя автора чужого задания; автор с сервера не из моков — пусто.
-const findParentName = (id: string) =>
-  parentProfilesMock.find((parent) => String(parent.id) === id)?.name ?? '';
+/**
+ * Автор задания для шапки плитки: имя из участников семьи (без фото —
+ * буква), не знаем — просто «Родитель».
+ */
+const authorOf = (task: Task, parentLabel: string) => ({
+  name: task.authorName ?? parentLabel,
+  avatar: null,
+});
 
 /**
  * Чей список: all — вкладка Tasks, задачи всех детей; child — задачи ребёнка
@@ -44,6 +49,7 @@ type TasksScope = 'all' | 'child' | 'parent';
  * Family. У родителя нет вкладки Review — показываем только активные.
  */
 export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
+  const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
   // Плитка Tasks to Review открывает экран сразу на вкладке проверки.
@@ -51,26 +57,27 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
     tab?: string;
     id?: string;
   }>();
-  // Чей список ребёнка: моковые Emma и Liam или ребёнок семьи с сервера.
+  // Чей список: ребёнок семьи (id профиля) или второй родитель (userId).
   const familyId = useTaskFamilyId();
   const { data: serverChildren, isPending: childrenPending } =
-    useFamilyChildren(familyId);
+    useFamilyChildren(scope === 'child' ? familyId : null);
+  const { data: members, isPending: membersPending } = useFamilyMembers(
+    scope === 'parent' ? familyId : null,
+  );
   const owner = useMemo(() => {
-    if (scope === 'parent') {
-      return parentProfilesMock.find((parent) => String(parent.id) === ownerId);
-    }
-    if (scope !== 'child') return undefined;
-    const mock = childrenMock.find((child) => String(child.id) === ownerId);
-    if (mock) return mock;
-    const server = serverChildren?.find((child) => child.id === ownerId);
-    return (
-      server && {
-        id: server.id,
-        name: server.displayName,
-        avatar: server.avatarUrl ? { uri: server.avatarUrl } : null,
-      }
-    );
-  }, [scope, ownerId, serverChildren]);
+    const person =
+      scope === 'parent'
+        ? members?.find((member) => member.userId === ownerId)
+        : scope === 'child'
+          ? serverChildren?.find((child) => child.id === ownerId)
+          : undefined;
+    if (!person) return undefined;
+    return {
+      id: 'userId' in person ? person.userId : person.id,
+      name: person.displayName,
+      avatar: person.avatarUrl ? { uri: person.avatarUrl } : null,
+    };
+  }, [scope, ownerId, serverChildren, members]);
   // Список из кэша React Query: после создания или правки он перечитывается сам.
   const { data = NO_TASKS, isPending } = useFamilyTasks();
   // Вкладка Tasks — только задания вошедшего родителя: их он проверяет,
@@ -79,21 +86,20 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   // обоих родителей; чужие — без кнопок, чтобы знать, что уже задано, и не
   // повторять.
   const allTasks = useMemo(() => {
-    if (!owner) return filterTasks(data, { createdBy: String(parentMock.id) });
+    if (!owner) return filterTasks(data, { createdBy: myId });
     return scope === 'parent'
       ? filterTasks(data, { createdBy: String(owner.id) }).filter(
           (task) => task.status === 'active',
         )
       : filterTasks(data, { assigneeId: String(owner.id) });
-  }, [data, scope, owner]);
+  }, [data, scope, owner, myId]);
   // На проверке — только то, что может проверить вошедший родитель.
   const reviewTasks = useMemo(
     () =>
       allTasks.filter(
-        (task) =>
-          task.status === 'review' && task.createdBy === String(parentMock.id),
+        (task) => task.status === 'review' && task.createdBy === myId,
       ),
-    [allTasks],
+    [allTasks, myId],
   );
   const { bottom } = useSafeAreaInsets();
   const gutter = useIsCompact() ? 16 : 24;
@@ -120,6 +126,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   if (scope !== 'all' && !owner) {
     // Дети с сервера ещё грузятся — ждём, а не уводим на главную.
     if (scope === 'child' && familyId && childrenPending) return null;
+    if (scope === 'parent' && familyId && membersPending) return null;
     return <Redirect href="/" />;
   }
 
@@ -182,11 +189,9 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                     // Reject возвращает его ребёнку, Cancel task — отменяет.
                     // Всё это — только у автора задания; второй родитель
                     // чужое задание только видит.
-                    task.createdBy !== String(parentMock.id) ? (
+                    task.createdBy !== myId ? (
                       <ViewOnlyNote
-                        author={
-                          task.authorName ?? findParentName(task.createdBy)
-                        }
+                        author={task.authorName ?? t('member.parent')}
                         review={task.status === 'review'}
                       />
                     ) : task.status === 'review' ? (
@@ -227,6 +232,21 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                     setCurrentId(task.id);
                     setView('cards');
                   }}
+                  // Задания одного ребёнка: в шапке плитки — от кого они.
+                  renderTask={
+                    scope === 'child'
+                      ? (task) => (
+                          <TaskRow
+                            task={task}
+                            author={authorOf(task, t('member.parent'))}
+                            onPress={() => {
+                              setCurrentId(task.id);
+                              setView('cards');
+                            }}
+                          />
+                        )
+                      : undefined
+                  }
                 />
               )}
             </ScrollView>

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { CreateTaskForm } from '@features/create-task';
+import { CreateTaskForm, REWARD_PRESETS } from '@features/create-task';
 import { DepositSheet } from '@features/deposit-funds';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import type { UpdateTaskPayload } from '@entities/task';
@@ -11,7 +11,6 @@ import { useParentFunds } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
-import { childrenMock, rewardPresetsMock } from '@shared/mocks';
 import { styles } from './create-task.styled';
 
 type TaskFormScreenProps = {
@@ -34,21 +33,15 @@ export function TaskFormScreen({
   const familyId = useCurrentFamily()?.id ?? null;
   const { data: funds } = useParentFunds(familyId);
   const [depositOpen, setDepositOpen] = useState(false);
-  // Кому назначить: моковые Emma и Liam и дети семьи с сервера.
+  // Кому назначить: дети семьи с сервера.
   const { data: serverChildren } = useFamilyChildren(familyId);
   const assignees = useMemo<ChipChild[]>(
-    () => [
-      ...childrenMock.map((child) => ({
-        id: String(child.id),
-        name: child.name,
-        avatar: child.avatar,
-      })),
-      ...(serverChildren ?? []).map((child) => ({
+    () =>
+      (serverChildren ?? []).map((child) => ({
         id: child.id,
         name: child.displayName,
         avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
       })),
-    ],
     [serverChildren],
   );
 
@@ -76,7 +69,7 @@ export function TaskFormScreen({
         </View>
         <CreateTaskForm
           assignees={assignees}
-          rewardPresets={rewardPresetsMock}
+          rewardPresets={REWARD_PRESETS}
           task={task}
           funds={funds}
           onDeposit={() => setDepositOpen(true)}

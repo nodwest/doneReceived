@@ -8,7 +8,7 @@ import {
 } from '@widgets/children-filter';
 import { DaySummary } from '@widgets/day-summary';
 import { OperationsChart } from '@widgets/operations-chart';
-import { PaidTaskCard } from '@widgets/paid-task-card';
+import { PaidTaskCard, PaidTaskTile } from '@widgets/paid-task-card';
 import {
   getDayTotals,
   getHistoryDays,
@@ -23,19 +23,13 @@ import {
   useMyWishlistOwner,
   useTaskFamilyId,
 } from '@features/family-tasks';
-import { useFamilyChildren } from '@entities/family';
-import { useMe, useMyAvatar } from '@entities/session';
+import { useFamilyChildren, useFamilyMembers } from '@entities/family';
+import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { TaskIconBadge } from '@entities/task';
 import { balanceAfter } from '@entities/wallet';
 import { getRewardGoal, useWishes } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { formatMonthDay } from '@shared/lib';
-import {
-  childAccountMock,
-  childrenMock,
-  parentMock,
-  parentProfilesMock,
-} from '@shared/mocks';
+import { formatDayLabel, formatMonthDay, startOfDay } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { RoundButton, SnapCarousel } from '@shared/ui';
 import { styles } from './rewards-history.styled';
@@ -47,45 +41,46 @@ const NO_OPERATIONS: Operation[] = [];
  * заработанные и упущенные награды на графике, итоги и награды выбранного дня.
  * У родителя — только награды по его заданиям (выплаченные из его кошелька).
  * Тап по награде или кнопка карточек справа в шапке открывают карточки
- * выплаченных заданий этого дня (листаются), кнопка списка или «назад» —
- * обратно к графику на тот же день. С childId — история одного ребёнка от
+ * выплаченных заданий этого дня (листаются), «назад» — обратно к графику на
+ * тот же день. Кнопка списка в карточках открывает все выплаченные задания
+ * плитками по дням (с суммой за день); тап по плитке — её карточка, «назад»
+ * из неё — снова к списку, «назад» из списка — к графику. С childId — история одного ребёнка от
  * его лица: без фильтра по детям, в голубых тонах, в строках вместо аватара
  * значок задания, в карточке — на сколько награда приблизила желание.
  */
 export function RewardsHistoryPage({ childId }: { childId?: string }) {
+  const myId = useMyId();
   const { t } = useTranslation();
   const { data: allOperations = NO_OPERATIONS, isPending } =
     useFamilyOperations();
-  // Кто дал и подтвердил задание: вошедший родитель — из его профиля, моковые
-  // — из моков, остальные с сервера (их имён у ребёнка нет) — «Родитель».
+  // Кто дал и подтвердил задание: вошедший родитель — из его профиля,
+  // остальные — из участников семьи (их видит и ребёнок; фото нет — буква),
+  // не нашли — «Родитель».
   const me = useMe();
   const myAvatar = useMyAvatar();
+  const familyId = useTaskFamilyId();
+  const { data: members } = useFamilyMembers(familyId);
   const findApprover = (id: string) => {
-    if (me?.kind !== 'child' && id === String(parentMock.id) && me) {
+    if (me?.kind !== 'child' && id === myId && me) {
       return { name: me.displayName, avatar: myAvatar };
     }
-    return (
-      parentProfilesMock.find((parent) => String(parent.id) === id) ?? {
-        name: t('member.parent'),
-        avatar: null,
-      }
-    );
+    const member = members?.find((item) => item.userId === id);
+    return {
+      name: member?.displayName ?? t('member.parent'),
+      avatar: null,
+    };
   };
-  // Фильтр по детям: моковые Emma и Liam и дети семьи с сервера.
-  const { data: serverChildren } = useFamilyChildren(useTaskFamilyId());
+  // Фильтр по детям семьи (ребёнку список закрыт — у него фильтра нет).
+  const { data: serverChildren } = useFamilyChildren(
+    childId === undefined ? familyId : null,
+  );
   const filterChildren = useMemo(
-    () => [
-      ...childrenMock.map((child) => ({
-        id: String(child.id),
-        name: child.name,
-        avatar: child.avatar,
-      })),
-      ...(serverChildren ?? []).map((child) => ({
+    () =>
+      (serverChildren ?? []).map((child) => ({
         id: child.id,
         name: child.displayName,
         avatar: child.avatarUrl ? { uri: child.avatarUrl } : null,
       })),
-    ],
     [serverChildren],
   );
   // Родитель видит награды только по своим заданиям — те, что выплатил из
@@ -93,11 +88,9 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const operations = useMemo(
     () =>
       childId === undefined
-        ? allOperations.filter(
-            (operation) => operation.parentId === String(parentMock.id),
-          )
+        ? allOperations.filter((operation) => operation.parentId === myId)
         : allOperations,
-    [allOperations, childId],
+    [allOperations, childId, myId],
   );
   // Копилка — только в истории от лица ребёнка: его вишлист и кошелёк.
   const { data: wishes } = useWishes(useMyWishlistOwner());
@@ -117,6 +110,8 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const [selected, setSelected] = useState<number | null>(null);
   // Номер открытой карточки среди наград дня; null — показан график.
   const [card, setCard] = useState<number | null>(null);
+  // Все выплаченные задания списком по дням (открывается из карточек).
+  const [paidList, setPaidList] = useState(false);
   // Открыли по ссылке на награду: «назад» из карточки уводит туда, откуда
   // пришли, а не к графику.
   const [linked, setLinked] = useState<string | undefined>(operationParam);
@@ -141,7 +136,10 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   if (linkPending && operations.length > 0) {
     setLinkPending(false);
     const target = filtered.find(
-      (operation) => String(operation.id) === operationParam,
+      // Ссылка из транзакции: id награды или (выплата с сервера) назначения.
+      (operation) =>
+        String(operation.id) === operationParam ||
+        operation.assignmentId === operationParam,
     );
     const dayIndex = target
       ? days.findIndex((date) => isSameDay(target, date))
@@ -170,6 +168,38 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     [filtered, day.date],
   );
   const cards = card !== null && dayOperations.length > 0;
+  const list = paidList && !cards;
+
+  // Список: выплаченные задания по дням, новые сверху, с суммой за день.
+  const paidDays = useMemo(() => {
+    const groups: { date: Date; items: Operation[]; total: number }[] = [];
+    const earned = filtered
+      .filter((operation) => operation.kind === 'earned')
+      .sort((a, b) => b.at.localeCompare(a.at));
+    for (const operation of earned) {
+      const date = startOfDay(new Date(operation.at));
+      const last = groups[groups.length - 1];
+      if (last && last.date.getTime() === date.getTime()) {
+        last.items.push(operation);
+        last.total += operation.amount;
+      } else {
+        groups.push({ date, items: [operation], total: operation.amount });
+      }
+    }
+    return groups;
+  }, [filtered]);
+
+  // Карточка награды: встаём на её день и открываем её среди наград дня (в
+  // том же порядке, что и dayOperations).
+  const openCard = (operation: Operation) => {
+    const dayIndex = days.findIndex((date) => isSameDay(operation, date));
+    if (dayIndex < 0) return;
+    const sameDay = filtered.filter(
+      (item) => item.kind === 'earned' && isSameDay(item, days[dayIndex]),
+    );
+    setSelected(dayIndex);
+    setCard(Math.max(sameDay.indexOf(operation), 0));
+  };
 
   // Копилка ребёнка после награды: баланс сразу после неё по его
   // транзакциям (награды и выводы на карту).
@@ -192,19 +222,26 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     // ссылке) — в Wallet.
     router.canGoBack() ? router.back() : router.replace('/wallet');
 
-  const title = cards
-    ? childId === undefined
-      ? t('rewardsHistory.paidTasks')
-      : t('rewardsHistory.myRewards')
-    : t('rewardsHistory.title');
+  const title =
+    cards || list
+      ? childId === undefined
+        ? t('rewardsHistory.paidTasks')
+        : t('rewardsHistory.myRewards')
+      : t('rewardsHistory.title');
 
   return (
-    <TabScreen activeKey="wallet" navHidden={cards}>
+    <TabScreen activeKey="wallet" navHidden={cards || list}>
       <View style={styles.header}>
         <RoundButton
           icon="arrow-left"
           accessibilityLabel={t('common.back')}
-          onPress={cards && !linked ? () => setCard(null) : leave}
+          onPress={
+            cards && !linked
+              ? () => setCard(null)
+              : list
+                ? () => setPaidList(false)
+                : leave
+          }
         />
         <Text style={styles.title} numberOfLines={1}>
           {title}
@@ -216,8 +253,19 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
             onPress={() => {
               setLinked(undefined);
               setCard(null);
+              setPaidList(true);
             }}
           />
+        ) : list ? (
+          paidDays.length > 0 ? (
+            <RoundButton
+              icon="cards"
+              accessibilityLabel={t('tasks.showAsCards')}
+              onPress={() => openCard(paidDays[0].items[0])}
+            />
+          ) : (
+            <View style={styles.headerSpacer} />
+          )
         ) : dayOperations.length > 0 ? (
           <RoundButton
             icon="cards"
@@ -251,6 +299,42 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
             )}
           />
         </View>
+      ) : list ? (
+        <ScrollView
+          contentContainerStyle={styles.paidList}
+          showsVerticalScrollIndicator={false}
+        >
+          {childId === undefined && (
+            <ChildrenFilter
+              items={filterChildren}
+              value={filter}
+              onChange={setFilter}
+            />
+          )}
+          {paidDays.length === 0 ? (
+            <Text style={styles.empty}>{t('rewardsHistory.noRewards')}</Text>
+          ) : (
+            paidDays.map((group) => (
+              <View key={group.date.getTime()} style={styles.paidDay}>
+                <View style={styles.paidDayHead}>
+                  <Text style={styles.paidDayTitle}>
+                    {formatDayLabel(group.date, today)}
+                  </Text>
+                  <Text style={styles.paidDayTotal}>+${group.total}</Text>
+                </View>
+                {group.items.map((operation) => (
+                  <PaidTaskTile
+                    key={operation.id}
+                    operation={operation}
+                    viewer={childId === undefined ? 'parent' : 'child'}
+                    approver={findApprover(operation.parentId)}
+                    onPress={openCard}
+                  />
+                ))}
+              </View>
+            ))
+          )}
+        </ScrollView>
       ) : (
         <ScrollView
           contentContainerStyle={styles.body}
@@ -316,13 +400,8 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   );
 }
 
-/**
- * История наград ребёнка от его лица: вошедший ребёнок — его профиль с
- * сервера, родитель в режиме ребёнка — Emma.
- */
+/** История наград вошедшего ребёнка от его лица. */
 export function ChildRewardsHistoryPage() {
   const { childId } = useChildAccount();
-  return (
-    <RewardsHistoryPage childId={childId ?? String(childAccountMock.id)} />
-  );
+  return <RewardsHistoryPage childId={childId ?? ''} />;
 }

@@ -6,6 +6,8 @@ type ToggleProps = {
   value: boolean;
   onValueChange: (value: boolean) => void;
   accessibilityLabel?: string;
+  /** Нельзя переключить: бледнее, нажатия не работают. */
+  disabled?: boolean;
 };
 
 /** Переключатель 44×26: включён — фиолетово-синий градиент, выключен — серый. */
@@ -13,14 +15,17 @@ export function Toggle({
   value,
   onValueChange,
   accessibilityLabel,
+  disabled = false,
 }: ToggleProps) {
   return (
     <Pressable
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ checked: value }}
+      accessibilityState={{ checked: value, disabled }}
       hitSlop={6}
+      disabled={disabled}
       onPress={() => onValueChange(!value)}
+      style={disabled && styles.disabled}
     >
       {value ? (
         <LinearGradient
@@ -41,6 +46,9 @@ export function Toggle({
 }
 
 const styles = StyleSheet.create({
+  disabled: {
+    opacity: 0.5,
+  },
   track: {
     width: 44,
     height: 26,

@@ -55,12 +55,28 @@ export type VerifyEmailPayload = {
   code: string;
 };
 
+/** Смена своего имени: PATCH /users/me. */
+export type UpdateMePayload = {
+  displayName: string;
+};
+
+/** Смена пароля родителя: POST /users/me/password. */
+export type ChangePasswordPayload = {
+  currentPassword: string;
+  newPassword: string;
+};
+
 /** Подключение устройства ребёнка: код от родителя и название устройства. */
 export type PairDevicePayload = {
   /** 8 символов без дефиса. */
   code: string;
   /** Как устройство увидит родитель в списке, например «Chrome · macOS». */
   label: string;
+  /**
+   * UUID этой установки приложения: повторное подключение с ним заменяет
+   * прежнее устройство ребёнка, а не добавляет дубль.
+   */
+  installationId: string;
 };
 
 /** Ответ POST /child-devices/pair: сессия ребёнка и его устройство. */
