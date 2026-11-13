@@ -1,4 +1,9 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  type SharedValue,
+} from 'react-native-reanimated';
 import { useTranslation } from '../i18n';
 import { copyText, showToast } from '../lib';
 import { theme } from '../theme';
@@ -8,11 +13,29 @@ type CopyableCodeProps = {
   code: string;
   /** Тост после копирования; по умолчанию «Code copied» на языке интерфейса. */
   copiedMessage?: string;
+  /**
+   * Подсветка кода зелёным: 1 — зелёный, 0 — обычный. Только что выданный
+   * код горит и гаснет в обычный цвет (на UI-потоке).
+   */
+  highlight?: SharedValue<number>;
 };
 
 /** Белая плашка с кодом: тап копирует код в буфер обмена. */
-export function CopyableCode({ code, copiedMessage }: CopyableCodeProps) {
+export function CopyableCode({
+  code,
+  copiedMessage,
+  highlight,
+}: CopyableCodeProps) {
   const { t } = useTranslation();
+  const tint = useAnimatedStyle(() => ({
+    color: highlight
+      ? interpolateColor(
+          highlight.get(),
+          [0, 1],
+          [theme.colors.ink, theme.colors.readyText],
+        )
+      : theme.colors.ink,
+  }));
   const copy = async () => {
     await copyText(code);
     showToast(copiedMessage ?? t('copyableCode.copied'));
@@ -25,9 +48,9 @@ export function CopyableCode({ code, copiedMessage }: CopyableCodeProps) {
       onPress={copy}
       style={({ pressed }) => [styles.field, pressed && styles.pressed]}
     >
-      <Text style={styles.code} numberOfLines={1}>
+      <Animated.Text style={[styles.code, tint]} numberOfLines={1}>
         {code}
-      </Text>
+      </Animated.Text>
       <Icon name="copy" size={16} color={theme.colors.grey} />
     </Pressable>
   );

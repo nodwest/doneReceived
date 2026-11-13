@@ -2,6 +2,9 @@ import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
+  container: {
+    gap: 12,
+  },
   placeholder: {
     paddingHorizontal: 8,
     paddingVertical: 6,

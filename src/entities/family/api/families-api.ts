@@ -51,6 +51,17 @@ export function createParentInvite(familyId: string) {
 }
 
 /**
+ * DELETE /families/:id/invites/current — погасить живой код «Add family
+ * member» (отправили не тому). Следующий POST /families/:id/invites выдаст
+ * новый. Кода нет — тоже 204. 403 — нужна роль owner или admin.
+ */
+export function revokeParentInvite(familyId: string) {
+  return apiRequest<void>(`/families/${familyId}/invites/current`, {
+    method: 'DELETE',
+  });
+}
+
+/**
  * GET /families/invites/:code — в какую семью ведёт код второго родителя и
  * кто в ней уже есть, не гася код. 400 — код неверен, истёк или использован
  * (в теле `attemptsLeft`), 429 — лимит неверных кодов (общий со

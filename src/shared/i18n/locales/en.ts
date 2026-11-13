@@ -196,6 +196,19 @@ export const en = {
     newDeviceHint:
       'New device for a child who is already here? Open Devices at the bottom of their card.',
   },
+  resetInviteCode: {
+    question: 'Sent it to the wrong person?',
+    action: 'Reset code',
+    ready: 'New code is ready',
+    title: 'Reset the parent code?',
+    subtitle:
+      "The code {{code}} stops working right away. If someone hasn't joined yet, send them the new one.",
+    confirm: 'Reset code',
+    errors: {
+      network: "Can't reach the server. The code is still the same.",
+      failed: "Couldn't reset the code. Try again.",
+    },
+  },
   devices: {
     onlineNow: 'Online now',
     lastSeen: 'Last seen {{time}}',
