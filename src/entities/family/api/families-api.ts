@@ -51,15 +51,15 @@ export function createParentInvite(familyId: string) {
 }
 
 /**
- * POST /families/invites/preview — в какую семью ведёт код второго родителя,
- * не гася его. 400 — код неверен, истёк или использован (в теле
- * `attemptsLeft`), 429 — лимит неверных кодов (общий со вступлением).
+ * GET /families/invites/:code — в какую семью ведёт код второго родителя и
+ * кто в ней уже есть, не гася код. 400 — код неверен, истёк или использован
+ * (в теле `attemptsLeft`), 429 — лимит неверных кодов (общий со
+ * вступлением).
  */
 export function previewFamilyInvite(code: string) {
-  return apiRequest<FamilyInvitePreview>('/families/invites/preview', {
-    method: 'POST',
-    body: { code: inviteCodeForApi(code) },
-  });
+  return apiRequest<FamilyInvitePreview>(
+    `/families/invites/${encodeURIComponent(inviteCodeForApi(code))}`,
+  );
 }
 
 /** GET /families/:id/children — профили детей семьи. */

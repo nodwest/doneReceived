@@ -29,6 +29,13 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: theme.colors.rewardText,
   },
+  members: {
+    fontSize: theme.fontSize.xs,
+    lineHeight: 16,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.inkSoft,
+  },
   check: {
     width: 24,
     height: 24,

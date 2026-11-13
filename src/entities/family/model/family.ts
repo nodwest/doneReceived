@@ -36,12 +36,14 @@ export interface ParentInvite {
   childUsed: boolean;
 }
 
-/** Семья по коду приглашения до вступления: POST /families/invites/preview. */
+/** Семья по коду приглашения до вступления: GET /families/invites/:code. */
 export interface FamilyInvitePreview {
   familyId: string;
   familyName: string;
   role: 'admin';
   expiresAt: string;
+  /** Кто уже в семье: имена без почты и id. */
+  members: { displayName: string; kind: 'parent' | 'child' }[];
 }
 
 /** Профиль ребёнка в семье: GET /families/:id/children. */
