@@ -79,6 +79,8 @@ export interface Task {
    * участников недоступен (ребёнку) — нет, имя берут из моков.
    */
   authorName?: string;
+  /** Фото автора из участников семьи; нет — буква имени. */
+  authorAvatar?: ImageSourcePropType | null;
   /** ISO-время создания. */
   createdAt: string;
   /** ISO-время, когда задача перестаёт быть активной; null — без срока. */

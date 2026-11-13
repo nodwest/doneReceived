@@ -652,6 +652,9 @@ export const en = {
     saveFailed: 'Could not save the wish. Try again.',
   },
   photos: {
+    open: 'Open photo {{current}} of {{count}}',
+    counter: 'Photo {{current}} of {{count}}',
+    closeHint: 'Swipe up or down to close',
     cameraDenied: 'No access to the camera. Allow it in Settings.',
     pickFailed: "Couldn't open the photo. Try another one.",
     uploadFailed: "Couldn't upload the photos. Try again.",
@@ -770,6 +773,15 @@ export const en = {
     pairFailed: "Couldn't sign in. Ask a parent for a new code.",
     greeting: 'Hi, {{name}}!',
     account: '{{family}} family · your account',
+  },
+  avatarCrop: {
+    title: 'Move and scale',
+    hint: 'Pinch to zoom, drag to move',
+    zoom: 'Zoom',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    usePhoto: 'Use photo',
+    saving: 'Saving…',
   },
   editProfile: {
     title: 'Edit profile',

@@ -75,7 +75,11 @@ export const REJECT_REASON_CODES: Record<RejectReasonKey, RejectReasonCode> = {
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
 
-type MemberDto = { userId: string; displayName: string };
+type MemberDto = {
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
 
 /** Статус назначения → статус задачи в приложении. */
 const STATES: Record<AssignmentDto['status'], TaskState> = {
@@ -107,6 +111,7 @@ function toTask(
   attachments: readonly AttachmentDto[],
 ): Task {
   const child = children.find((item) => item.id === assignment.childId);
+  const author = members.find((member) => member.userId === task.createdBy);
   const pending = assignment.pendingSubmission ?? null;
   const rejected = assignment.lastRejection ?? null;
   return {
@@ -122,8 +127,8 @@ function toTask(
       avatar: child?.avatarUrl ? authorizedImage(child.avatarUrl) : null,
     },
     createdBy: task.createdBy,
-    authorName: members.find((member) => member.userId === task.createdBy)
-      ?.displayName,
+    authorName: author?.displayName,
+    authorAvatar: author?.avatarUrl ? authorizedImage(author.avatarUrl) : null,
     createdAt: task.createdAt,
     expiresAt: task.deadlineAt,
     // Отчёт на проверке: когда сдано, фото и комментарий ребёнка.

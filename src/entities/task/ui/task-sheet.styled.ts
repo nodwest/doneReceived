@@ -269,12 +269,4 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  photo: {
-    width: '100%',
-    borderRadius: 20,
-  },
-  photoCarousel: {
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
 });

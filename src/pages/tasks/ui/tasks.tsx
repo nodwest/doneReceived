@@ -29,12 +29,12 @@ import { authorizedImage } from '@shared/api';
 const NO_TASKS: Task[] = [];
 
 /**
- * Автор задания для шапки плитки: имя из участников семьи (без фото —
+ * Автор задания для шапки плитки: имя и фото из участников семьи (без фото —
  * буква), не знаем — просто «Родитель».
  */
 const authorOf = (task: Task, parentLabel: string) => ({
   name: task.authorName ?? parentLabel,
-  avatar: null,
+  avatar: task.authorAvatar ?? null,
 });
 
 /**

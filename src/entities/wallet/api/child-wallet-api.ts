@@ -1,4 +1,4 @@
-import { apiRequest } from '@shared/api';
+import { apiRequest, authorizedImage } from '@shared/api';
 import type { ChildWallet, RewardTransaction } from '../model/wallet';
 
 /**
@@ -22,8 +22,12 @@ type ChildWalletDto = {
   }[];
 };
 
-/** Участники семьи — только чтобы подписать, от кого награда. */
-type MemberDto = { userId: string; displayName: string };
+/** Участники семьи — чтобы подписать, от кого награда, и показать фото. */
+type MemberDto = {
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
 
 /**
  * GET /families/:id/children/:childId/wallet — родитель видит кошелёк
@@ -44,9 +48,7 @@ export async function fetchServerChildWallet(
       () => [] as MemberDto[],
     ),
   ]);
-  const names = new Map(
-    members.map((member) => [member.userId, member.displayName]),
-  );
+  const byId = new Map(members.map((member) => [member.userId, member]));
   const transactions: RewardTransaction[] = wallet.entries
     .map((entry, index) => ({
       // Экраны ключуют транзакции числом: номер по порядку в ответе.
@@ -58,11 +60,14 @@ export async function fetchServerChildWallet(
       // Та же награда в истории (Rewards history) — с тем же id.
       operationId: entry.id,
       taskDoneAt: entry.submittedAt,
-      from: {
-        id: entry.approvedBy ?? '',
-        name: (entry.approvedBy && names.get(entry.approvedBy)) || '',
-        avatar: null,
-      },
+      from: (() => {
+        const member = entry.approvedBy ? byId.get(entry.approvedBy) : null;
+        return {
+          id: entry.approvedBy ?? '',
+          name: member?.displayName ?? '',
+          avatar: member?.avatarUrl ? authorizedImage(member.avatarUrl) : null,
+        };
+      })(),
     }))
     .sort((a, b) => b.at.localeCompare(a.at));
   return { balance: Number(wallet.balancePoints), transactions };

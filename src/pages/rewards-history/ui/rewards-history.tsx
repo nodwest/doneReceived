@@ -55,7 +55,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const { data: allOperations = NO_OPERATIONS, isPending } =
     useFamilyOperations();
   // Кто дал и подтвердил задание: вошедший родитель — из его профиля,
-  // остальные — из участников семьи (их видит и ребёнок; фото нет — буква),
+  // остальные — из участников семьи (их видит и ребёнок; без фото — буква),
   // не нашли — «Родитель».
   const me = useMe();
   const myAvatar = useMyAvatar();
@@ -68,7 +68,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     const member = members?.find((item) => item.userId === id);
     return {
       name: member?.displayName ?? t('member.parent'),
-      avatar: null,
+      avatar: member?.avatarUrl ? authorizedImage(member.avatarUrl) : null,
     };
   };
   // Фильтр по детям семьи (ребёнку список закрыт — у него фильтра нет).

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useOperations, type OperationsViewer } from '@entities/operation';
-import { useSession } from '@entities/session';
+import { useMe, useSession } from '@entities/session';
 import { useChildBalance, useChildWallet } from '@entities/wallet';
 import type { WishlistOwner } from '@entities/wish';
 import { useChildTasks, useTaskViewer } from './use-family-tasks';
@@ -59,6 +59,7 @@ export function useMyWishlistOwner(): WishlistOwner | null {
 export function useFamilyOperations() {
   const viewer = useTaskViewer();
   const session = useSession();
+  const me = useMe();
   const { childId } = useChildAccount();
   const childSession = session?.user.kind === 'child';
   const operationsViewer = useMemo<OperationsViewer | null>(() => {
@@ -68,8 +69,13 @@ export function useFamilyOperations() {
     if (!childId || !session) return null;
     return {
       ...viewer,
-      child: { id: childId, name: session.user.displayName },
+      child: {
+        id: childId,
+        name: session.user.displayName,
+        // Своё фото ребёнок видит из профиля: список детей ему закрыт.
+        avatarUrl: me?.avatarUrl ?? session.user.avatarUrl,
+      },
     };
-  }, [viewer, childSession, childId, session]);
+  }, [viewer, childSession, childId, session, me?.avatarUrl]);
   return useOperations(operationsViewer);
 }

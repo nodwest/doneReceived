@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Pressable,
   Text,
@@ -10,7 +10,7 @@ import {
 import { useTranslation } from '@shared/i18n';
 import { formatClock, formatDayInPhrase, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { ApiImage, Icon, type IconName } from '@shared/ui';
+import { ApiImage, Icon, PhotoViewer, type IconName } from '@shared/ui';
 import {
   TASK_PHOTOS_MAX,
   type ChecklistItem,
@@ -85,6 +85,8 @@ export function ChildTaskCard({
   const review = task.status === 'review';
   const expires = task.expiresAt ? new Date(task.expiresAt) : null;
   const created = new Date(task.createdAt);
+  // Выбранное фото отчёта открыто на весь экран.
+  const [viewing, setViewing] = useState<number | null>(null);
 
   return (
     <TaskSheet
@@ -203,7 +205,17 @@ export function ChildTaskCard({
                   {photos.items.map((photo, index) => (
                     // Фото не переставляются, только убираются: индекс — ключ.
                     <View key={index} style={styles.pickedItem}>
-                      <ApiImage source={photo} style={styles.pickedPhoto} />
+                      <Pressable
+                        accessibilityRole="imagebutton"
+                        accessibilityLabel={t('photos.open', {
+                          current: index + 1,
+                          count: photos.items.length,
+                        })}
+                        onPress={() => setViewing(index)}
+                        style={styles.pickedPhoto}
+                      >
+                        <ApiImage source={photo} style={styles.pickedPhoto} />
+                      </Pressable>
                       <Pressable
                         accessibilityRole="button"
                         accessibilityLabel={t('wishForm.removePhoto')}
@@ -219,6 +231,11 @@ export function ChildTaskCard({
                       </Pressable>
                     </View>
                   ))}
+                  <PhotoViewer
+                    photos={photos.items}
+                    index={viewing}
+                    onClose={() => setViewing(null)}
+                  />
                 </View>
               )}
               {(!photos || photos.canAdd) && (

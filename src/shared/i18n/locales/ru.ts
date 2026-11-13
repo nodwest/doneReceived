@@ -671,6 +671,9 @@ export const ru: Dictionary = {
     saveFailed: 'Не удалось сохранить желание. Попробуй ещё раз.',
   },
   photos: {
+    open: 'Открыть фото {{current}} из {{count}}',
+    counter: 'Фото {{current}} из {{count}}',
+    closeHint: 'Смахни вверх или вниз, чтобы закрыть',
     cameraDenied: 'Нет доступа к камере. Разреши его в настройках.',
     pickFailed: 'Не получилось открыть фото. Попробуй другое.',
     uploadFailed: 'Не получилось загрузить фото. Попробуй ещё раз.',
@@ -794,6 +797,15 @@ export const ru: Dictionary = {
     pairFailed: 'Не получилось войти. Попросите у родителя новый код.',
     greeting: 'Привет, {{name}}!',
     account: 'Семья {{family}} · ваш аккаунт',
+  },
+  avatarCrop: {
+    title: 'Выберите область',
+    hint: 'Двумя пальцами — масштаб, одним — сдвиг',
+    zoom: 'Масштаб',
+    zoomIn: 'Увеличить',
+    zoomOut: 'Уменьшить',
+    usePhoto: 'Готово',
+    saving: 'Сохраняем…',
   },
   editProfile: {
     title: 'Редактировать профиль',
