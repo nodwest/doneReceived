@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { WISH_PHOTOS_MAX, type WishPhotoDraft } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { choosePhotos, type PickedPhoto, type PhotoSource } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { ApiImage, Icon, SourceTile } from '@shared/ui';
+import { ApiImage, Icon, PhotoViewer, SourceTile } from '@shared/ui';
 import { styles } from './wish-form-sheet.styled';
 
 type PhotoPickerProps = {
@@ -19,6 +20,8 @@ type PhotoPickerProps = {
 export function PhotoPicker({ photos, onAdd, onRemove }: PhotoPickerProps) {
   const { t } = useTranslation();
   const left = WISH_PHOTOS_MAX - photos.length;
+  // Выбранное фото открыто на весь экран.
+  const [viewing, setViewing] = useState<number | null>(null);
   const pick = async (source: PhotoSource) =>
     onAdd(await choosePhotos(source, left));
 
@@ -35,7 +38,16 @@ export function PhotoPicker({ photos, onAdd, onRemove }: PhotoPickerProps) {
         {photos.map((photo, index) => (
           // Фото не переставляются, только убираются: индекс годится в ключ.
           <View key={index}>
-            <ApiImage source={photo.source} style={styles.photo} />
+            <Pressable
+              accessibilityRole="imagebutton"
+              accessibilityLabel={t('photos.open', {
+                current: index + 1,
+                count: photos.length,
+              })}
+              onPress={() => setViewing(index)}
+            >
+              <ApiImage source={photo.source} style={styles.photo} />
+            </Pressable>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t('wishForm.removePhoto')}
@@ -62,6 +74,11 @@ export function PhotoPicker({ photos, onAdd, onRemove }: PhotoPickerProps) {
           </>
         )}
       </ScrollView>
+      <PhotoViewer
+        photos={photos.map((photo) => photo.source)}
+        index={viewing}
+        onClose={() => setViewing(null)}
+      />
       <Text style={styles.hint}>
         {photos.length === 0
           ? t('wishForm.photoHint')

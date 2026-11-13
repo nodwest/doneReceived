@@ -652,6 +652,9 @@ export const en = {
     saveFailed: 'Could not save the wish. Try again.',
   },
   photos: {
+    open: 'Open photo {{current}} of {{count}}',
+    counter: 'Photo {{current}} of {{count}}',
+    closeHint: 'Swipe up or down to close',
     cameraDenied: 'No access to the camera. Allow it in Settings.',
     pickFailed: "Couldn't open the photo. Try another one.",
     uploadFailed: "Couldn't upload the photos. Try again.",

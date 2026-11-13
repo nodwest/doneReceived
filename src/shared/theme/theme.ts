@@ -6,6 +6,9 @@ export const theme = {
     yellow: '#FFB930',
     grey: '#8A8FA3',
     ink: '#1A1A2E',
+    // Просмотр фото на весь экран: почти чёрный фон и полупрозрачные кнопки на нём.
+    viewerBg: '#0B0C12',
+    viewerChrome: 'rgba(255, 255, 255, 0.14)',
     success: '#2ECC71',
     white: '#FFFFFF',
     line: '#ECEDF3',

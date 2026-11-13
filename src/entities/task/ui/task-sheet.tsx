@@ -304,7 +304,10 @@ type PhotoSectionProps = {
   height?: number;
 };
 
-/** Фото-отчёт: заголовок и снимок (или листаемые снимки) на всю ширину. */
+/**
+ * Фото-отчёт: заголовок и снимок (или листаемые снимки) на всю ширину; тап —
+ * просмотр на весь экран.
+ */
 export function PhotoSection({
   label,
   photos,
@@ -315,17 +318,7 @@ export function PhotoSection({
       <View style={styles.photoHead}>
         <SectionLabel>{label}</SectionLabel>
       </View>
-      {photos.length > 1 ? (
-        <View style={styles.photoCarousel}>
-          <PhotoCarousel photos={photos} height={height} />
-        </View>
-      ) : (
-        <ApiImage
-          source={photos[0]}
-          style={[styles.photo, { height }]}
-          resizeMode="cover"
-        />
-      )}
+      <PhotoCarousel photos={photos} height={height} radius={20} />
     </View>
   );
 }
