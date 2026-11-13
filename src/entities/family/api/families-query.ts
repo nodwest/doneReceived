@@ -3,6 +3,7 @@ import type { ParentInvite } from '../model/family';
 import {
   createParentInvite,
   fetchFamilyChildren,
+  fetchFamilyDetails,
   fetchFamilyMembers,
   fetchMyFamilies,
   previewFamilyInvite,
@@ -18,6 +19,10 @@ export const familiesKeys = {
     [...familiesKeys.all, familyId, 'children'] as const,
   members: (familyId: string | null) =>
     [...familiesKeys.all, familyId, 'members'] as const,
+  /** Всё о семье: дети, участники, детали — сбрасывать после изменений. */
+  family: (familyId: string | null) => [...familiesKeys.all, familyId] as const,
+  details: (familyId: string | null) =>
+    [...familiesKeys.all, familyId, 'details'] as const,
   invitePreview: (code: string) =>
     [...familiesKeys.all, 'invite-preview', code] as const,
 };
@@ -80,6 +85,17 @@ export function useFamilyMembers(familyId: string | null) {
   return useQuery({
     queryKey: familiesKeys.members(familyId),
     queryFn: familyId ? () => fetchFamilyMembers(familyId) : skipToken,
+  });
+}
+
+/**
+ * Семья целиком для экрана Family (только родителям); без семьи (null)
+ * запроса нет.
+ */
+export function useFamilyDetails(familyId: string | null) {
+  return useQuery({
+    queryKey: familiesKeys.details(familyId),
+    queryFn: familyId ? () => fetchFamilyDetails(familyId) : skipToken,
   });
 }
 

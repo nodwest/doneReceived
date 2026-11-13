@@ -3,6 +3,8 @@ import {
   inviteCodeForApi,
   type Family,
   type FamilyChild,
+  type FamilyChildDetails,
+  type FamilyDetails,
   type FamilyInvitePreview,
   type FamilyMember,
   type FamilyMembership,
@@ -60,6 +62,27 @@ export function previewFamilyInvite(code: string) {
   return apiRequest<FamilyInvitePreview>(
     `/families/invites/${encodeURIComponent(inviteCodeForApi(code))}`,
   );
+}
+
+type FamilyDetailsDto = Omit<FamilyDetails, 'children'> & {
+  children: (Omit<FamilyChildDetails, 'balance'> & { balancePoints: string })[];
+};
+
+/**
+ * GET /families/:id — семья целиком для экрана Family: родители с ролями,
+ * дети с балансом и числом устройств. Только родителям (ребёнку 403).
+ */
+export async function fetchFamilyDetails(
+  familyId: string,
+): Promise<FamilyDetails> {
+  const dto = await apiRequest<FamilyDetailsDto>(`/families/${familyId}`);
+  return {
+    ...dto,
+    children: dto.children.map(({ balancePoints, ...child }) => ({
+      ...child,
+      balance: Number(balancePoints),
+    })),
+  };
 }
 
 /** GET /families/:id/children — профили детей семьи. */

@@ -138,6 +138,7 @@ export const en = {
     children_other: '{{count}} children',
     parentsSection: 'Parents',
     childrenSection: 'Children',
+    childBalance: 'Balance {{amount}}',
     addMember: 'Family member',
     joinFamily: 'Join family',
     deleteChild: 'Delete',

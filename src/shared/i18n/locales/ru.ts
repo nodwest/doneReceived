@@ -143,6 +143,7 @@ export const ru: Dictionary = {
     children_other: '{{count}} ребёнка',
     parentsSection: 'Родители',
     childrenSection: 'Дети',
+    childBalance: 'Баланс {{amount}}',
     addMember: 'Участник семьи',
     joinFamily: 'Присоединиться',
     deleteChild: 'Удалить',

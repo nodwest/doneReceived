@@ -15,7 +15,8 @@ export function useCreateChild() {
     },
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: familiesKeys.children(familyId),
+        // Дети, участники и Family (баланс, устройства) — всё о семье.
+        queryKey: familiesKeys.family(familyId),
       }),
   });
 }

@@ -67,6 +67,36 @@ export interface FamilyMember {
   kind: 'parent' | 'child';
 }
 
+/** Родитель на экране Family: GET /families/:id. */
+export interface FamilyParent {
+  /** id членства — для передачи владения и удаления из семьи. */
+  memberId: string;
+  /** id аккаунта — автор заданий. */
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  role: 'owner' | 'admin';
+}
+
+/** Ребёнок на экране Family: баланс и сколько устройств подключено. */
+export interface FamilyChildDetails {
+  childId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  /** Баланс в долларах (1 балл = $1). */
+  balance: number;
+  devicesCount: number;
+}
+
+/** Семья целиком одним запросом (GET /families/:id, только родителям). */
+export interface FamilyDetails {
+  id: string;
+  name: string;
+  myRole: MemberRole;
+  parents: FamilyParent[];
+  children: FamilyChildDetails[];
+}
+
 /** Сколько символов можно в имени ребёнка (на сервере до 100). */
 export const CHILD_NAME_MAX_LENGTH = 40;
 
