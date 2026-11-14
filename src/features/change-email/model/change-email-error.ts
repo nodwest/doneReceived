@@ -16,16 +16,13 @@ export type ChangeEmailError =
 /**
  * Что показать: ключ ошибки и где — под полем новой почты, пароля или кода,
  * иначе тостом. `count` — минуты до новой попытки (429) или сколько неверных
- * кодов ещё можно (`wrongCode`, null — не говорим).
+ * кодов ещё можно (`wrongCode`, null — сервер не прислал).
  */
 export type ChangeEmailErrorInfo = {
   error: ChangeEmailError;
   field: 'newEmail' | 'password' | 'code' | null;
   count: number | null;
 };
-
-/** С какого остатка предупреждаем «Осталось N попыток». */
-const WARN_ATTEMPTS_LEFT = 3;
 
 const info = (
   error: ChangeEmailError,
@@ -73,7 +70,7 @@ function attemptsLeft(data: unknown): number | null {
 
 /**
  * Что показать по ошибке POST /users/me/email/confirm и …/resend. Неверный
- * код — сколько попыток осталось, но только когда их мало.
+ * код — сколько попыток осталось (`attemptsLeft`), всегда.
  */
 export function confirmEmailChangeError(error: unknown): ChangeEmailErrorInfo {
   const common = commonError(error);
@@ -83,11 +80,7 @@ export function confirmEmailChangeError(error: unknown): ChangeEmailErrorInfo {
     return info('codeExpired', 'code');
   if (error.status === 400) {
     const left = attemptsLeft(error.data);
-    return info(
-      'wrongCode',
-      'code',
-      left !== null && left <= WARN_ATTEMPTS_LEFT ? left : null,
-    );
+    return info('wrongCode', 'code', left);
   }
   return info('failed');
 }

@@ -128,7 +128,7 @@ export function RequestStep({ currentEmail, onSent }: Props) {
               text={t('changeEmail.errors.wrongPassword')}
             />
           ) : (
-            <FieldHint tone="muted" text={t('changePassword.currentHint')} />
+            <FieldHint tone="muted" text={t('changeEmail.passwordHint')} />
           )}
         </View>
       </View>

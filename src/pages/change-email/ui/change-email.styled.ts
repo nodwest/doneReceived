@@ -26,6 +26,40 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 24,
   },
+  // Ввод кода: шапка ближе к иконке, как в макете «Confirm Email».
+  bodyHero: {
+    paddingTop: 4,
+  },
+  hero: {
+    width: '100%',
+    maxWidth: 320,
+    alignSelf: 'center',
+    alignItems: 'center',
+    gap: 12,
+  },
+  heroIcon: {
+    width: 88,
+    height: 88,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0px 8px 16px rgba(108, 92, 231, 0.25)',
+  },
+  heroTitle: {
+    textAlign: 'center',
+    fontSize: theme.fontSize.h1,
+    letterSpacing: tracking(theme.fontSize.h1),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.ink,
+  },
+  heroSubtitle: {
+    textAlign: 'center',
+    fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
+    lineHeight: 18,
+    fontFamily: theme.fonts.regular,
+    color: theme.colors.grey,
+  },
   intro: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
@@ -49,12 +83,6 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
-  },
-  error: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.danger,
   },
   resendRow: {
     flexDirection: 'row',
@@ -97,9 +125,26 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     gap: 16,
   },
-  another: {
-    alignSelf: 'center',
-    minHeight: 44,
+  // «Wrong address? Change email» внизу экрана кода.
+  footnote: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
+  },
+  footnoteText: {
+    fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
+    lineHeight: 18,
+    fontFamily: theme.fonts.regular,
+    color: theme.colors.grey,
+  },
+  footnoteLink: {
+    fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
+    lineHeight: 18,
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.violet,
   },
 });

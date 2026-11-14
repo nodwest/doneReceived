@@ -53,24 +53,29 @@ export function ChangeEmailPage() {
 
   if (isChild) return <Redirect href="/edit-profile" />;
 
+  const confirming = !!pending && !editing;
+
   return (
-    <TabScreen activeKey="profile">
+    // Ввод кода — как экраны входа, без навбара (макет «Confirm Email»).
+    <TabScreen activeKey="profile" navHidden={confirming}>
       <View style={styles.header}>
         <RoundButton
           icon="arrow-left"
           accessibilityLabel={t('common.back')}
           onPress={goBack}
         />
-        <Text style={styles.title}>{t('changeEmail.title')}</Text>
+        <Text style={styles.title}>
+          {t(confirming ? 'changeEmail.confirmTitle' : 'changeEmail.title')}
+        </Text>
         {/* Пустое место справа держит заголовок по центру. */}
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView
-        contentContainerStyle={styles.body}
+        contentContainerStyle={[styles.body, confirming && styles.bodyHero]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {pending && !editing ? (
+        {pending && confirming ? (
           <ConfirmStep
             key={pending}
             email={pending}

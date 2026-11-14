@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { VERIFICATION_CODE_LENGTH } from '@entities/session';
-import { useCooldown } from '@features/auth';
+import { FieldHint, useCooldown } from '@features/auth';
 import {
   confirmEmailChangeError,
   useConfirmEmailChange,
@@ -11,7 +12,8 @@ import {
 } from '@features/change-email';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { CodeInput } from '@shared/ui';
+import { theme } from '@shared/theme';
+import { CodeInput, Icon } from '@shared/ui';
 import { styles } from './change-email.styled';
 
 // Сервер шлёт письмо не чаще раза в 60 секунд.
@@ -87,20 +89,36 @@ export function ConfirmStep({ email, onUseAnother }: Props) {
     });
   };
 
-  const message = error
-    ? error.error === 'wrongCode' && error.count !== null
-      ? t('changeEmail.errors.wrongCodeLeft', { count: error.count })
-      : t(`changeEmail.errors.${error.error}`, { count: error.count ?? 0 })
-    : null;
+  // Неверный код — всегда со счётчиком попыток; 0 — нужен новый код.
+  const message = !error
+    ? null
+    : error.error === 'wrongCode' && error.count !== null
+      ? error.count > 0
+        ? t('changeEmail.errors.wrongCodeLeft', { count: error.count })
+        : t('changeEmail.errors.noAttemptsLeft')
+      : t(`changeEmail.errors.${error.error}`, { count: error.count ?? 0 });
   const canResend = cooldown.left === 0 && !resend.isPending;
 
   return (
     <>
-      <Text style={styles.intro}>
-        {t('auth.verifySubtitleStart')}{' '}
-        <Text style={styles.email}>{email}</Text>
-        {t('auth.verifySubtitleEnd')} {t('changeEmail.confirmNote')}
-      </Text>
+      <View style={styles.hero}>
+        <LinearGradient
+          style={styles.heroIcon}
+          colors={[theme.colors.violet, theme.colors.blue]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <Icon name="message" size={44} color={theme.colors.white} />
+        </LinearGradient>
+        <Text style={styles.heroTitle} accessibilityRole="header">
+          {t('changeEmail.heroTitle')}
+        </Text>
+        <Text style={styles.heroSubtitle}>
+          {t('auth.verifySubtitleStart')}{' '}
+          <Text style={styles.email}>{email}</Text>
+          {t('auth.verifySubtitleEnd')}
+        </Text>
+      </View>
 
       <View style={styles.field}>
         <Text style={styles.label}>{t('auth.codeLabel')}</Text>
@@ -113,7 +131,7 @@ export function ConfirmStep({ email, onUseAnother }: Props) {
           autoFocus
           accessibilityLabel={t('auth.codeLabel')}
         />
-        {message && <Text style={styles.error}>{message}</Text>}
+        {message && <FieldHint tone="error" text={message} />}
         <View style={styles.resendRow}>
           <Text style={styles.hint}>{t('auth.noCode')}</Text>
           <Pressable
@@ -142,15 +160,22 @@ export function ConfirmStep({ email, onUseAnother }: Props) {
       </View>
 
       <View style={styles.footer}>
-        <Pressable
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={onUseAnother}
-          disabled={confirm.isPending}
-          style={({ pressed }) => [styles.another, pressed && styles.pressed]}
-        >
-          <Text style={styles.resendLink}>{t('changeEmail.useAnother')}</Text>
-        </Pressable>
+        <View style={styles.footnote}>
+          <Text style={styles.footnoteText}>
+            {t('changeEmail.wrongAddress')}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={12}
+            onPress={onUseAnother}
+            disabled={confirm.isPending}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <Text style={styles.footnoteLink}>
+              {t('changeEmail.changeEmailLink')}
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </>
   );
