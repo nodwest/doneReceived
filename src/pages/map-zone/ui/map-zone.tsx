@@ -24,6 +24,9 @@ import { useTranslation } from '@shared/i18n';
 import { theme, tracking } from '@shared/theme';
 import { GradientButton, Input, PillButton, ScreenHeader } from '@shared/ui';
 
+/** Больше 12 вершин на телефоне рисовать неудобно; сервер разрешает до 64. */
+const MAX_ZONE_POINTS = 12;
+
 /** Центр контура — среднее вершин: туда наводим карту при правке. */
 function zoneCenter(points: readonly ZonePoint[]): ZonePoint | undefined {
   if (points.length === 0) return undefined;
@@ -90,12 +93,21 @@ export function MapZonePage() {
       showToast(t(editing ? 'mapZone.updateError' : 'mapZone.saveError')),
   });
 
-  const addPoint = (point: ZonePoint) =>
-    setDraft((current) => ({
-      points: [...current.points, point],
-      // Новая вершина сразу выбрана — её можно удалить одной кнопкой.
-      selected: current.points.length,
-    }));
+  const addPoint = (point: ZonePoint) => {
+    if (draft.points.length >= MAX_ZONE_POINTS) {
+      showToast(t('mapZone.pointsLimit', { max: MAX_ZONE_POINTS }));
+      return;
+    }
+    setDraft((current) => {
+      // Повторная проверка на случай быстрых тапов до перерисовки.
+      if (current.points.length >= MAX_ZONE_POINTS) return current;
+      return {
+        points: [...current.points, point],
+        // Новая вершина сразу выбрана — её можно удалить одной кнопкой.
+        selected: current.points.length,
+      };
+    });
+  };
 
   const selectPoint = (index: number) =>
     setDraft((current) => ({ ...current, selected: index }));
@@ -154,7 +166,10 @@ export function MapZonePage() {
         >
           <Text style={styles.hint}>{t('mapZone.hint')}</Text>
           <Text style={styles.points}>
-            {t('mapZone.points', { value: draft.points.length })}
+            {t('mapZone.points', {
+              value: draft.points.length,
+              max: MAX_ZONE_POINTS,
+            })}
           </Text>
           <Input
             value={name}

@@ -18,11 +18,5 @@ export function createVehiclesLayer(vehicles: Bus[]) {
     sizeMinPixels: 20,
     sizeMaxPixels: 40,
     pickable: true,
-
-    onClick: (info) => {
-      if (!info.object) return;
-
-      console.log('Vehicle clicked:', info.object);
-    },
   });
 }
