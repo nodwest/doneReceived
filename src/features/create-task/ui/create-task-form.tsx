@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChildChip, type ChipChild } from '@entities/user';
@@ -130,6 +130,16 @@ export function CreateTaskForm({
     : assignees;
   const childName =
     assignees.find((child) => child.id === assigneeId)?.name ?? null;
+
+  // Ребёнок в семье один — он и исполнитель: выбран сразу, выбирать некого.
+  // Дети с сервера приходят после открытия формы, поэтому — эффектом.
+  const onlyChildId =
+    !initialTask && assignees.length === 1 ? assignees[0].id : null;
+  useEffect(() => {
+    if (onlyChildId && useCreateTaskStore.getState().assigneeId === null) {
+      setAssignee(onlyChildId);
+    }
+  }, [onlyChildId, setAssignee]);
 
   return (
     <KeyboardAvoidingView
