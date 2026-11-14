@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   confirmEmailChange,
   fetchMe,
@@ -51,15 +51,21 @@ export function useResendEmailChange() {
   return useMutation({ mutationFn: resendEmailChange, retry: false });
 }
 
+/** Как часто проверять профиль, пока ждём подтверждения новой почты. */
+export const EMAIL_CHANGE_CHECK_MS = 5_000;
+
 /**
- * «I confirmed via the link»: ссылка подтверждает почту в браузере, без
- * приложения, — перечитываем профиль (GET /users/me) и кладём в кэш.
- * Страница по ответу решает, сменилась ли почта.
+ * Пока ждём подтверждения: ссылка из письма подтверждает почту в браузере,
+ * без приложения, и, возможно, на другом устройстве, — поэтому профиль
+ * (GET /users/me) перечитывается каждые 5 с и при возврате в приложение.
+ * Страница видит в кэше, что `pendingEmail` пропал, и сама решает, сменилась
+ * ли почта. `refetch` — проверить сразу.
  */
-export function useCheckEmailChange() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: fetchMe,
-    onSuccess: (user) => queryClient.setQueryData(meKeys.all, user),
+export function useEmailChangeWatch() {
+  return useQuery({
+    queryKey: meKeys.all,
+    queryFn: fetchMe,
+    refetchInterval: EMAIL_CHANGE_CHECK_MS,
+    staleTime: 0,
   });
 }

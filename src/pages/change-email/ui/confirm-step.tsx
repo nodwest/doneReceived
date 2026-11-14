@@ -4,14 +4,14 @@ import { VERIFICATION_CODE_LENGTH } from '@entities/session';
 import { useCooldown } from '@features/auth';
 import {
   confirmEmailChangeError,
-  useCheckEmailChange,
   useConfirmEmailChange,
+  useEmailChangeWatch,
   useResendEmailChange,
   type ChangeEmailErrorInfo,
 } from '@features/change-email';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { CodeInput, GradientButton } from '@shared/ui';
+import { CodeInput } from '@shared/ui';
 import { styles } from './change-email.styled';
 
 // Сервер шлёт письмо не чаще раза в 60 секунд.
@@ -23,56 +23,49 @@ const formatSeconds = (seconds: number) =>
 type Props = {
   /** Новая почта, которая ждёт подтверждения. */
   email: string;
-  /** Почта сменилась. */
-  onDone: () => void;
   /** Ввести другой адрес: назад к первой ступени. */
   onUseAnother: () => void;
 };
 
 /**
  * Вторая ступень смены почты: код из письма на новый адрес уходит сам после
- * шестого символа, «Отправить ещё раз» с отсчётом. Кнопка «I confirmed via
- * the link» перечитывает профиль: подтверждали ссылкой в браузере. Смены
- * больше нет (истекла) — страница сама вернётся к первой ступени, адрес
- * успели занять — тоже.
+ * шестого символа, «Отправить ещё раз» с отсчётом. Подтвердили ссылкой (в
+ * браузере, хоть на другом устройстве) — профиль перечитывается сам, кнопки
+ * для этого нет. Чем кончилось (почта сменилась или смена пропала), решает
+ * страница по `pendingEmail` профиля; адрес успели занять — назад к вводу
+ * почты.
  */
-export function ConfirmStep({ email, onDone, onUseAnother }: Props) {
+export function ConfirmStep({ email, onUseAnother }: Props) {
   const { t } = useTranslation();
   const [code, setCode] = useState('');
   const [error, setError] = useState<ChangeEmailErrorInfo | null>(null);
-  const [notConfirmed, setNotConfirmed] = useState(false);
   const confirm = useConfirmEmailChange();
   const resend = useResendEmailChange();
-  const check = useCheckEmailChange();
+  const watch = useEmailChangeWatch();
   const cooldown = useCooldown(RESEND_COOLDOWN);
-  const busy = confirm.isPending || check.isPending;
 
   const fail = (info: ChangeEmailErrorInfo) => {
     if (info.field === 'code') {
       setError(info);
       return;
     }
+    // Смены нет: перечитываем профиль, страница скажет об этом сама.
+    if (info.error === 'noPending') {
+      watch.refetch();
+      return;
+    }
     showToast(
       t(`changeEmail.errors.${info.error}`, { count: info.count ?? 0 }),
     );
-    // Смены нет или адрес заняли — перечитываем профиль: без
-    // `pendingEmail` страница вернётся к вводу почты.
-    if (info.error === 'noPending') check.mutate();
     if (info.error === 'emailTaken') onUseAnother();
-  };
-
-  const success = () => {
-    showToast(t('changeEmail.updated'));
-    onDone();
   };
 
   const changeCode = (value: string) => {
     setCode(value);
     setError(null);
-    setNotConfirmed(false);
-    if (value.length < VERIFICATION_CODE_LENGTH || busy) return;
+    if (value.length < VERIFICATION_CODE_LENGTH || confirm.isPending) return;
+    // Успех: профиль с новой почтой уходит в кэш, страница закрывается сама.
     confirm.mutate(value, {
-      onSuccess: success,
       onError: (err) => fail(confirmEmailChangeError(err)),
     });
   };
@@ -94,27 +87,11 @@ export function ConfirmStep({ email, onDone, onUseAnother }: Props) {
     });
   };
 
-  const confirmedViaLink = () => {
-    if (busy) return;
-    setNotConfirmed(false);
-    check.mutate(undefined, {
-      onSuccess: (user) => {
-        if (user.pendingEmail) setNotConfirmed(true);
-        else if (user.email?.toLowerCase() === email.toLowerCase()) success();
-        // Смены уже нет, а почта прежняя: страница вернётся к вводу почты.
-        else showToast(t('changeEmail.errors.noPending'));
-      },
-      onError: () => showToast(t('changeEmail.errors.network')),
-    });
-  };
-
   const message = error
     ? error.error === 'wrongCode' && error.count !== null
       ? t('changeEmail.errors.wrongCodeLeft', { count: error.count })
       : t(`changeEmail.errors.${error.error}`, { count: error.count ?? 0 })
-    : notConfirmed
-      ? t('changeEmail.notConfirmed')
-      : null;
+    : null;
   const canResend = cooldown.left === 0 && !resend.isPending;
 
   return (
@@ -132,7 +109,7 @@ export function ConfirmStep({ email, onDone, onUseAnother }: Props) {
           onChangeText={changeCode}
           length={VERIFICATION_CODE_LENGTH}
           error={!!error}
-          editable={!busy}
+          editable={!confirm.isPending}
           autoFocus
           accessibilityLabel={t('auth.codeLabel')}
         />
@@ -161,20 +138,15 @@ export function ConfirmStep({ email, onDone, onUseAnother }: Props) {
             )}
           </Pressable>
         </View>
+        <Text style={styles.hint}>{t('changeEmail.linkHint')}</Text>
       </View>
 
       <View style={styles.footer}>
-        <GradientButton
-          label={t('auth.confirmedViaLink')}
-          onPress={confirmedViaLink}
-          loading={check.isPending}
-          disabled={confirm.isPending}
-        />
         <Pressable
           accessibilityRole="button"
           hitSlop={8}
           onPress={onUseAnother}
-          disabled={busy}
+          disabled={confirm.isPending}
           style={({ pressed }) => [styles.another, pressed && styles.pressed]}
         >
           <Text style={styles.resendLink}>{t('changeEmail.useAnother')}</Text>

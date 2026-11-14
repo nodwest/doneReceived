@@ -840,8 +840,7 @@ export const en = {
       "You'll stay signed in here — other devices will be signed out.",
     useAnother: 'Use a different email',
     updated: 'Email updated',
-    notConfirmed:
-      "The new email isn't confirmed yet. Open the link in the email or enter the code.",
+    linkHint: 'Confirmed via the link? This screen will update by itself.',
     errors: {
       emailInvalid: 'Enter a valid email',
       wrongPassword: 'Password is incorrect',
