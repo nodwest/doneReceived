@@ -12,8 +12,11 @@ export function useMap(containerRef: React.RefObject<HTMLDivElement | null>) {
     if (!containerRef.current) return;
 
     const map = createMap(containerRef.current, {
-      center: [43.84461, 46.93785],
-      zoom: 5,
+      center: [39.7152, 47.23325],
+      zoom: 12,
+      // Подпись источников рисует MapAttribution: плашка MapLibre в углу
+      // с брендом библиотеки не нужна (BSD-3-Clause этого не требует).
+      attributionControl: false,
     });
 
     map.addControl(new maplibregl.NavigationControl(), 'top-right');

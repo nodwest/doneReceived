@@ -52,6 +52,9 @@ import { ClockIcon } from './clock';
 import { CalendarIcon } from './calendar';
 import { SparkleIcon } from './sparkle';
 import { UndoIcon } from './undo';
+import { BusIcon } from './bus';
+import { ZoneIcon } from './zone';
+import { LayersIcon } from './layers';
 
 export const icons = {
   price: PriceIcon,
@@ -108,4 +111,7 @@ export const icons = {
   calendar: CalendarIcon,
   sparkle: SparkleIcon,
   undo: UndoIcon,
+  bus: BusIcon,
+  zone: ZoneIcon,
+  layers: LayersIcon,
 };

@@ -11,7 +11,8 @@ export function createVehiclesLayer(vehicles: Bus[]) {
 
     getPosition: (vehicle) => [vehicle.longitude, vehicle.latitude],
 
-    getAngle: (vehicle) => vehicle.bearing,
+    billboard: false,
+    getAngle: (vehicle) => -vehicle.bearing,
     getSize: 32,
     sizeUnits: 'pixels',
     sizeMinPixels: 20,

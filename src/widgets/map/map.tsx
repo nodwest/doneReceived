@@ -1,12 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from '@shared/i18n';
 import { theme, tracking } from '@shared/theme';
+import type { MapLayerSettings } from './model/layer-preferences';
 
 /**
  * Нативная заглушка большой карты. Сама карта — ./map.web.tsx на DOM-версии
  * MapLibre: на iOS и Android её нет, а импорт этой библиотеки там бы упал.
  */
-export function MapWeb() {
+export function MapWeb(_props: MapLayerSettings) {
   const { t } = useTranslation();
   return (
     <View style={styles.placeholder}>

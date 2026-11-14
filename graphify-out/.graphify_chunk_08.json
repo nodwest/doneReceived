@@ -1,0 +1,77 @@
+{
+  "nodes": [
+    {
+      "id": "assets_favicon_application_favicon",
+      "label": "Application Favicon",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\favicon.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "assets_favicon_blue_chevron_mark",
+      "label": "Blue Chevron Brand Mark",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\favicon.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "A thick blue upward chevron is the dominant identifying symbol and remains legible at favicon scale."
+    },
+    {
+      "id": "assets_favicon_rounded_square_tile",
+      "label": "Rounded Square Icon Tile",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\favicon.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "The pale rounded-square field provides contrast, padding, and a compact application-icon silhouette around the central mark."
+    }
+  ],
+  "edges": [
+    {
+      "source": "assets_favicon_application_favicon",
+      "target": "assets_favicon_blue_chevron_mark",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\favicon.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "assets_favicon_application_favicon",
+      "target": "assets_favicon_rounded_square_tile",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\favicon.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "assets_favicon_blue_chevron_mark",
+      "target": "assets_favicon_rounded_square_tile",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\favicon.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\favicon.png": 0
+  }
+}
