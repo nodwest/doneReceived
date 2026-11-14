@@ -40,6 +40,8 @@ const APP_SCREENS = [
   'edit-profile',
   'change-password',
   'map',
+  'map-layers',
+  'map-zone',
   'rewards-history',
   'transactions',
   'child/[id]/index',

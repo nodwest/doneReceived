@@ -1,0 +1,15 @@
+C:\Users\Vishnya\Documents\IT\doneReceived\.claude\skills\vercel-react-native-skills\rules\ui-menus.md
+C:\Users\Vishnya\Documents\IT\doneReceived\.claude\skills\vercel-react-native-skills\rules\ui-native-modals.md
+C:\Users\Vishnya\Documents\IT\doneReceived\.claude\skills\vercel-react-native-skills\rules\ui-pressable.md
+C:\Users\Vishnya\Documents\IT\doneReceived\.claude\skills\vercel-react-native-skills\rules\ui-safe-area-scroll.md
+C:\Users\Vishnya\Documents\IT\doneReceived\.claude\skills\vercel-react-native-skills\rules\ui-scrollview-content-inset.md
+C:\Users\Vishnya\Documents\IT\doneReceived\.claude\skills\vercel-react-native-skills\rules\ui-styling.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\C4.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Features\DR-Registration.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Features\DR-TaskCreator.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Features\DR-User.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Сделал-получил\MVP.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Сделал-получил\Идеи.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Сделал-получил\Навыки Codex для DoneReceived.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Сделал-получил\СТЕК.md
+C:\Users\Vishnya\Documents\IT\doneReceived\obsidian-done\Сделал-получил\Соглашения.md

@@ -1,0 +1,77 @@
+{
+  "nodes": [
+    {
+      "id": "assets_android_icon_background_android_icon_background_template",
+      "label": "Android Icon Background Template",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\android-icon-background.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "assets_android_icon_background_circular_safe_zones",
+      "label": "Circular Icon Safe Zones",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\android-icon-background.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Two concentric circles visually define nested placement and crop-safe regions for centered Android icon artwork."
+    },
+    {
+      "id": "assets_android_icon_background_center_alignment_guides",
+      "label": "Center Alignment Guides",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\android-icon-background.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Vertical, horizontal, triangular, and center-point guides establish the visual center and symmetry axes for foreground artwork."
+    }
+  ],
+  "edges": [
+    {
+      "source": "assets_android_icon_background_android_icon_background_template",
+      "target": "assets_android_icon_background_circular_safe_zones",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\android-icon-background.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "assets_android_icon_background_android_icon_background_template",
+      "target": "assets_android_icon_background_center_alignment_guides",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\android-icon-background.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "assets_android_icon_background_center_alignment_guides",
+      "target": "assets_android_icon_background_circular_safe_zones",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\android-icon-background.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\android-icon-background.png": 0
+  }
+}

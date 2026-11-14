@@ -1,0 +1,45 @@
+{
+  "nodes": [
+    {
+      "id": "assets_splash_icon_splash_icon_template",
+      "label": "Splash Icon Template",
+      "file_type": "image",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\splash-icon.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "assets_splash_icon_centered_proportion_guides",
+      "label": "Centered Proportion Guides",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\splash-icon.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "A square grid and three concentric circles provide center, scale, and proportion guides for splash artwork placement."
+    }
+  ],
+  "edges": [
+    {
+      "source": "assets_splash_icon_splash_icon_template",
+      "target": "assets_splash_icon_centered_proportion_guides",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\splash-icon.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "coverage": {
+    "C:\\Users\\Vishnya\\Documents\\IT\\doneReceived\\assets\\splash-icon.png": 1
+  }
+}
