@@ -47,6 +47,11 @@ type RouteOption = {
   route: string;
 };
 
+/** В раскрытом разделе видно не больше пяти строк, дальше — внутренний скролл. */
+const SECTION_VISIBLE_ROWS = 5;
+const SECTION_ROW_HEIGHT = 64;
+const SECTION_LIST_MAX_HEIGHT = SECTION_VISIBLE_ROWS * SECTION_ROW_HEIGHT;
+
 /** Новые маршруты добавляем, исчезнувшие оставляем в списке. */
 function collectRoutes(prev: RouteOption[], vehicles: readonly Bus[]) {
   const known = new Set(prev.map((item) => item.route));
@@ -196,27 +201,51 @@ function AddRow({
 function Section({
   icon,
   title,
+  expanded,
+  onToggle,
   children,
 }: {
   icon: IconName;
   title: string;
+  expanded: boolean;
+  onToggle: () => void;
   children: ReactNode;
 }) {
   return (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={title}
+        accessibilityState={{ expanded }}
+        aria-expanded={expanded}
+        onPress={onToggle}
+        style={({ pressed }) => [styles.cardHeader, pressed && styles.pressed]}
+      >
         <View style={styles.cardIcon}>
           <Icon name={icon} size={20} color={theme.colors.violet} />
         </View>
         <Text style={styles.cardTitle}>{title}</Text>
-      </View>
-      {children}
+      </Pressable>
+      {expanded ? children : null}
     </View>
   );
 }
 
 function EmptyRow({ text }: { text: string }) {
   return <Text style={styles.empty}>{text}</Text>;
+}
+
+/** Список строк раздела: максимум пять, остальное — скроллом. */
+function SectionList({ children }: { children: ReactNode }) {
+  return (
+    <ScrollView
+      style={[styles.sectionList, { maxHeight: SECTION_LIST_MAX_HEIGHT }]}
+      nestedScrollEnabled
+      showsVerticalScrollIndicator
+    >
+      {children}
+    </ScrollView>
+  );
 }
 
 /**
@@ -277,6 +306,8 @@ export function MapLayersPage() {
   const setLayer = useMapLayerStore((state) => state.setLayer);
   const setHidden = useMapLayerStore((state) => state.setHidden);
   const setPinnedRoutes = useMapLayerStore((state) => state.setPinnedRoutes);
+  const openSections = useMapLayerStore((state) => state.openSections);
+  const toggleSection = useMapLayerStore((state) => state.toggleSection);
   const showAll = useMapLayerStore((state) => state.showAll);
 
   const queryClient = useQueryClient();
@@ -387,113 +418,134 @@ export function MapLayersPage() {
           showsVerticalScrollIndicator={false}
         >
           {parent && (
-            <Section icon="children" title={t('mapLayers.family')}>
-              {children.map((child, index) => (
-                <CheckRow
-                  key={child.id}
-                  title={child.displayName}
-                  subtitle={t('mapLayers.childRole')}
-                  avatar={{
-                    name: child.displayName,
-                    source: child.avatarUrl
-                      ? authorizedImage(child.avatarUrl)
-                      : null,
-                  }}
-                  checked={family && !hiddenChildren.includes(child.id)}
-                  onPress={() =>
-                    toggleItem(
-                      'family',
-                      'children',
-                      family,
-                      hiddenChildren,
-                      childIds,
-                      child.id,
-                    )
-                  }
-                  last={index === children.length - 1}
-                />
-              ))}
-              {children.length === 0 && !childrenQuery.isPending && (
-                <EmptyRow text={t('mapLayers.emptyChildren')} />
-              )}
+            <Section
+              icon="children"
+              title={t('mapLayers.family')}
+              expanded={openSections.family}
+              onToggle={() => toggleSection('family')}
+            >
+              <SectionList>
+                {children.map((child, index) => (
+                  <CheckRow
+                    key={child.id}
+                    title={child.displayName}
+                    subtitle={t('mapLayers.childRole')}
+                    avatar={{
+                      name: child.displayName,
+                      source: child.avatarUrl
+                        ? authorizedImage(child.avatarUrl)
+                        : null,
+                    }}
+                    checked={family && !hiddenChildren.includes(child.id)}
+                    onPress={() =>
+                      toggleItem(
+                        'family',
+                        'children',
+                        family,
+                        hiddenChildren,
+                        childIds,
+                        child.id,
+                      )
+                    }
+                    last={index === children.length - 1}
+                  />
+                ))}
+                {children.length === 0 && !childrenQuery.isPending && (
+                  <EmptyRow text={t('mapLayers.emptyChildren')} />
+                )}
+              </SectionList>
             </Section>
           )}
 
-          <Section icon="bus" title={t('mapLayers.transportSection')}>
-            {pinned.map((route, index) => (
-              <CheckRow
-                key={route}
-                title={t('mapLayers.routeTitle', { route })}
-                icon="bus"
-                checked={transport && !hiddenRoutes.includes(route)}
-                onPress={() =>
-                  toggleItem(
-                    'transport',
-                    'routes',
-                    transport,
-                    hiddenRoutes,
-                    pinned,
-                    route,
-                  )
-                }
-                last={index === pinned.length - 1}
-              />
-            ))}
-            {pinned.length === 0 && (
-              <EmptyRow text={t('mapLayers.emptyRoutes')} />
-            )}
+          <Section
+            icon="bus"
+            title={t('mapLayers.transportSection')}
+            expanded={openSections.transport}
+            onToggle={() => toggleSection('transport')}
+          >
+            <SectionList>
+              {pinned.map((route, index) => (
+                <CheckRow
+                  key={route}
+                  title={t('mapLayers.routeTitle', { route })}
+                  icon="bus"
+                  checked={transport && !hiddenRoutes.includes(route)}
+                  onPress={() =>
+                    toggleItem(
+                      'transport',
+                      'routes',
+                      transport,
+                      hiddenRoutes,
+                      pinned,
+                      route,
+                    )
+                  }
+                  last={index === pinned.length - 1}
+                />
+              ))}
+              {pinned.length === 0 && (
+                <EmptyRow text={t('mapLayers.emptyRoutes')} />
+              )}
+            </SectionList>
             <AddRow
               label={t('mapLayers.addTransport')}
               onPress={() => setPickerOpen(true)}
             />
           </Section>
 
-          <Section icon="zone" title={t('mapLayers.areas')}>
-            {zones.map((zone, index) => (
-              <CheckRow
-                key={zone.id}
-                title={zone.name}
-                subtitle={
-                  occupiedZones.has(zone.id)
-                    ? t('mapLayers.zoneInside')
-                    : t('mapLayers.zoneOutside')
-                }
-                icon="zone"
-                actions={
-                  parent ? (
-                    <>
-                      <IconButton
-                        icon="pencil"
-                        tone="violet"
-                        label={t('mapLayers.editZone', { name: zone.name })}
-                        onPress={() => editZone(zone.id)}
-                      />
-                      <IconButton
-                        icon="trash"
-                        tone="danger"
-                        label={t('mapLayers.deleteZone', { name: zone.name })}
-                        onPress={() => setZoneToDelete(zone)}
-                      />
-                    </>
-                  ) : undefined
-                }
-                checked={areas && !hiddenZones.includes(zone.id)}
-                onPress={() =>
-                  toggleItem(
-                    'areas',
-                    'zones',
-                    areas,
-                    hiddenZones,
-                    zoneIds,
-                    zone.id,
-                  )
-                }
-                last={index === zones.length - 1}
-              />
-            ))}
-            {zones.length === 0 && !zonesQuery.isPending && (
-              <EmptyRow text={t('mapLayers.emptyAreas')} />
-            )}
+          <Section
+            icon="zone"
+            title={t('mapLayers.areas')}
+            expanded={openSections.areas}
+            onToggle={() => toggleSection('areas')}
+          >
+            <SectionList>
+              {zones.map((zone, index) => (
+                <CheckRow
+                  key={zone.id}
+                  title={zone.name}
+                  subtitle={
+                    occupiedZones.has(zone.id)
+                      ? t('mapLayers.zoneInside')
+                      : t('mapLayers.zoneOutside')
+                  }
+                  icon="zone"
+                  actions={
+                    parent ? (
+                      <>
+                        <IconButton
+                          icon="pencil"
+                          tone="violet"
+                          label={t('mapLayers.editZone', { name: zone.name })}
+                          onPress={() => editZone(zone.id)}
+                        />
+                        <IconButton
+                          icon="trash"
+                          tone="danger"
+                          label={t('mapLayers.deleteZone', { name: zone.name })}
+                          onPress={() => setZoneToDelete(zone)}
+                        />
+                      </>
+                    ) : undefined
+                  }
+                  checked={areas && !hiddenZones.includes(zone.id)}
+                  onPress={() =>
+                    toggleItem(
+                      'areas',
+                      'zones',
+                      areas,
+                      hiddenZones,
+                      zoneIds,
+                      zone.id,
+                    )
+                  }
+                  last={index === zones.length - 1}
+                />
+              ))}
+              {zones.length === 0 && !zonesQuery.isPending && (
+                <EmptyRow text={t('mapLayers.emptyAreas')} />
+              )}
+            </SectionList>
             <AddRow
               label={t('mapLayers.addArea')}
               onPress={() => router.push('/map-zone')}

@@ -31,6 +31,10 @@ export const styles = StyleSheet.create({
     paddingBottom: 8,
     paddingHorizontal: 14,
   },
+  // Список раздела: высоту ограничивает SECTION_LIST_MAX_HEIGHT, дальше скролл.
+  sectionList: {
+    flexGrow: 0,
+  },
   cardIcon: {
     width: 36,
     height: 36,

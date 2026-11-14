@@ -23,6 +23,9 @@ export type MapLayerSettings = MapLayerVisibility & {
   pinnedRoutes: string[];
 };
 
+/** Какие разделы «Слоёв карты» раскрыты. По умолчанию все свёрнуты. */
+export type MapLayerSections = Record<MapLayerKey, boolean>;
+
 const storage = createMMKV({ id: 'settings' });
 const STORAGE_KEY = 'map-layer-preferences';
 // Старый формат: только три переключателя слоёв целиком.
@@ -38,6 +41,16 @@ const DEFAULT_SETTINGS: MapLayerSettings = {
   pinnedRoutes: [],
 };
 
+const DEFAULT_SECTIONS: MapLayerSections = {
+  family: false,
+  transport: false,
+  areas: false,
+};
+
+type LoadedSettings = MapLayerSettings & {
+  openSections: MapLayerSections;
+};
+
 const asBoolean = (value: unknown, fallback: boolean) =>
   typeof value === 'boolean' ? value : fallback;
 
@@ -46,13 +59,14 @@ const asIds = (value: unknown): string[] =>
     ? value.filter((item): item is string => typeof item === 'string')
     : [];
 
-function loadSettings(): MapLayerSettings {
+function loadSettings(): LoadedSettings {
   const value =
     storage.getString(STORAGE_KEY) ?? storage.getString(LEGACY_STORAGE_KEY);
-  if (!value) return DEFAULT_SETTINGS;
+  if (!value) return { ...DEFAULT_SETTINGS, openSections: DEFAULT_SECTIONS };
 
   try {
-    const parsed = JSON.parse(value) as Partial<MapLayerSettings>;
+    const parsed = JSON.parse(value) as Partial<LoadedSettings>;
+    const sections = parsed.openSections;
     return {
       family: asBoolean(parsed.family, DEFAULT_SETTINGS.family),
       transport: asBoolean(parsed.transport, DEFAULT_SETTINGS.transport),
@@ -61,14 +75,19 @@ function loadSettings(): MapLayerSettings {
       hiddenRoutes: asIds(parsed.hiddenRoutes),
       hiddenZones: asIds(parsed.hiddenZones),
       pinnedRoutes: asIds(parsed.pinnedRoutes),
+      openSections: {
+        family: asBoolean(sections?.family, DEFAULT_SECTIONS.family),
+        transport: asBoolean(sections?.transport, DEFAULT_SECTIONS.transport),
+        areas: asBoolean(sections?.areas, DEFAULT_SECTIONS.areas),
+      },
     };
   } catch {
-    return DEFAULT_SETTINGS;
+    return { ...DEFAULT_SETTINGS, openSections: DEFAULT_SECTIONS };
   }
 }
 
-function persist(state: MapLayerSettings) {
-  const value: MapLayerSettings = {
+function persist(state: LoadedSettings) {
+  const value: LoadedSettings = {
     family: state.family,
     transport: state.transport,
     areas: state.areas,
@@ -76,6 +95,7 @@ function persist(state: MapLayerSettings) {
     hiddenRoutes: state.hiddenRoutes,
     hiddenZones: state.hiddenZones,
     pinnedRoutes: state.pinnedRoutes,
+    openSections: state.openSections,
   };
   storage.set(STORAGE_KEY, JSON.stringify(value));
 }
@@ -86,7 +106,7 @@ const HIDDEN_FIELD: Record<HiddenLayerKey, keyof MapLayerSettings> = {
   zones: 'hiddenZones',
 };
 
-type MapLayerState = MapLayerSettings & {
+type MapLayerState = LoadedSettings & {
   /** Включить или выключить слой целиком. */
   setLayer: (key: MapLayerKey, value: boolean) => void;
   /** Переключить слой целиком (панель на карте). */
@@ -95,6 +115,8 @@ type MapLayerState = MapLayerSettings & {
   setHidden: (key: HiddenLayerKey, ids: string[]) => void;
   /** Заменить список маршрутов, добавленных в «Транспорт». */
   setPinnedRoutes: (routes: string[]) => void;
+  /** Раскрыть или свернуть раздел; больше никто его не трогает. */
+  toggleSection: (key: MapLayerKey) => void;
   /** Показать всё: слои целиком и все пункты. */
   showAll: () => void;
 };
@@ -125,16 +147,24 @@ export const useMapLayerStore = create<MapLayerState>((set) => ({
       persist(next);
       return next;
     }),
+  toggleSection: (key) =>
+    set((state) => {
+      const next = {
+        ...state,
+        openSections: {
+          ...state.openSections,
+          [key]: !state.openSections[key],
+        },
+      };
+      persist(next);
+      return next;
+    }),
   showAll: () =>
     set((state) => {
-      const next: MapLayerSettings = {
-        family: true,
-        transport: true,
-        areas: true,
-        hiddenChildren: [],
-        hiddenRoutes: [],
-        hiddenZones: [],
+      const next: LoadedSettings = {
+        ...DEFAULT_SETTINGS,
         pinnedRoutes: state.pinnedRoutes,
+        openSections: state.openSections,
       };
       persist(next);
       return next;
