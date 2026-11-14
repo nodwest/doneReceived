@@ -81,6 +81,15 @@ export function PhotoCarousel({
       style={[styles.root, { height, borderRadius: radius }]}
       onLayout={({ nativeEvent }) => setWidth(nativeEvent.layout.width)}
     >
+      {/* Ширина ещё не замерена: первое фото — сразу во весь блок, чтобы
+          в первом кадре не было пусто. */}
+      {width === 0 && photos.length > 0 && (
+        <ApiImage
+          source={photos[0]}
+          style={[styles.photo, styles.fill]}
+          resizeMode="cover"
+        />
+      )}
       {width > 0 && (
         <ScrollView
           ref={scroll}
@@ -156,6 +165,10 @@ const styles = StyleSheet.create({
   },
   photo: {
     backgroundColor: theme.colors.line,
+  },
+  fill: {
+    width: '100%',
+    height: '100%',
   },
   counter: {
     position: 'absolute',

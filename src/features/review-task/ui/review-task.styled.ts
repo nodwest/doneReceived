@@ -150,13 +150,13 @@ export const styles = StyleSheet.create({
   },
 
   submit: {
-    height: 54,
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     paddingHorizontal: 16,
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   submitRetry: {

@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   updateWish,
-  wishKeys,
   type UpdateWishPayload,
   type WishlistOwner,
 } from '@entities/wish';
+import { syncData } from '@shared/api';
 
 export function useUpdateWish(owner: WishlistOwner | null) {
   const queryClient = useQueryClient();
@@ -14,6 +14,6 @@ export function useUpdateWish(owner: WishlistOwner | null) {
       return updateWish(owner, payload);
     },
     // И после ошибки: желание могло сохраниться без фото.
-    onSettled: () => queryClient.invalidateQueries({ queryKey: wishKeys.all }),
+    onSettled: () => syncData(queryClient, 'wish-changed'),
   });
 }

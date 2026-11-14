@@ -41,13 +41,11 @@ export function ResetInviteCodeSheet({
           <PillButton
             label={t('common.cancel')}
             variant="ghost"
-            size="md"
             onPress={onCancel}
           />
           <PillButton
             label={t('resetInviteCode.confirm')}
             variant="danger"
-            size="md"
             onPress={onConfirm}
           />
         </View>

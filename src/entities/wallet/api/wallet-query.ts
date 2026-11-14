@@ -1,10 +1,11 @@
 import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
 import { fetchParentFunds } from './parent-funds-api';
 import { fetchChildWallet, fetchWallet } from './wallet-api';
+import { queryRoots, SYNC_POLL_MS } from '@shared/api';
 
 /** Ключи кэша кошелька. */
 export const walletKeys = {
-  all: ['wallet'] as const,
+  all: queryRoots.wallet,
   detail: (familyId: string | null) =>
     [...walletKeys.all, 'detail', familyId] as const,
   child: (childId: string) => [...walletKeys.all, 'child', childId] as const,
@@ -27,7 +28,7 @@ export const childWalletQueryOptions = (
     queryFn: childId ? () => fetchChildWallet(childId, familyId) : skipToken,
     // Кошелёк с сервера пополняет родитель с другого устройства: перечитываем,
     // как и список заданий.
-    refetchInterval: familyId ? 15_000 : false,
+    refetchInterval: familyId ? SYNC_POLL_MS : false,
   });
 
 /**

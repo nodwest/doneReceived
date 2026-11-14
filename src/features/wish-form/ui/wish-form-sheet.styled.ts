@@ -110,12 +110,12 @@ export const styles = StyleSheet.create({
     color: theme.colors.inkSoft,
   },
   button: {
-    height: 54,
+    height: 48,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   buttonDisabled: {
@@ -124,7 +124,7 @@ export const styles = StyleSheet.create({
   buttonLabel: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
-    fontFamily: theme.fonts.semibold,
+    fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },
   delete: {

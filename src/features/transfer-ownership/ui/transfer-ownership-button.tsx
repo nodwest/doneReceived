@@ -59,12 +59,10 @@ export function TransferOwnershipButton({
             <PillButton
               label={t('common.cancel')}
               variant="ghost"
-              size="md"
               onPress={() => setOpen(false)}
             />
             <PillButton
               label={t('transferOwnership.confirm')}
-              size="md"
               onPress={confirm}
             />
           </View>

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteWish, wishKeys, type WishlistOwner } from '@entities/wish';
+import { deleteWish, type WishlistOwner } from '@entities/wish';
+import { syncData } from '@shared/api';
 
 export function useDeleteWish(owner: WishlistOwner | null) {
   const queryClient = useQueryClient();
@@ -8,6 +9,6 @@ export function useDeleteWish(owner: WishlistOwner | null) {
       if (!owner) throw new Error('No wishlist owner');
       return deleteWish(owner, id);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: wishKeys.all }),
+    onSuccess: () => syncData(queryClient, 'wish-changed'),
   });
 }

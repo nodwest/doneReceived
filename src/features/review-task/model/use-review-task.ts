@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentFamily } from '@entities/family';
-import { operationKeys } from '@entities/operation';
-import { approveTask, rejectTask, taskKeys, type Task } from '@entities/task';
-import { walletKeys } from '@entities/wallet';
-import { isApiError } from '@shared/api';
+import { approveTask, rejectTask, type Task } from '@entities/task';
+import { isApiError, syncData } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import type { RejectDecision } from './reject-reasons';
@@ -33,15 +31,11 @@ export function useReviewTask() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const familyId = useCurrentFamily()?.id ?? null;
-  const refresh = () =>
-    Promise.all(
-      [taskKeys.all, operationKeys.all, walletKeys.all].map((queryKey) =>
-        queryClient.invalidateQueries({ queryKey }),
-      ),
-    );
+  // Ошибка — карточка могла устареть (отчёт отозвали, уже проверили):
+  // перечитываем как после проверки.
   const onError = (error: unknown) => {
     showToast(t(`reviewTask.errors.${reviewError(error)}`));
-    return refresh();
+    return syncData(queryClient, 'task-approved');
   };
 
   const approve = useMutation({
@@ -53,7 +47,7 @@ export function useReviewTask() {
           name: task.assignee.name,
         }),
       );
-      return refresh();
+      return syncData(queryClient, 'task-approved');
     },
     onError,
   });
@@ -81,7 +75,7 @@ export function useReviewTask() {
           name: task.assignee.name,
         }),
       );
-      return refresh();
+      return syncData(queryClient, 'task-rejected');
     },
     onError,
   });

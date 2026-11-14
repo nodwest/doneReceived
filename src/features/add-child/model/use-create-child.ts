@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createChild,
-  familiesKeys,
   setChildAvatar,
   useCurrentFamily,
 } from '@entities/family';
 import type { PickedPhoto } from '@shared/lib';
+import { syncData } from '@shared/api';
 
 type NewChild = { name: string; photo: PickedPhoto | null };
 
@@ -29,10 +29,6 @@ export function useCreateChild() {
       }
       return { child, avatarError };
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        // Дети, участники и Family (баланс, устройства) — всё о семье.
-        queryKey: familiesKeys.family(familyId),
-      }),
+    onSuccess: () => syncData(queryClient, 'child-changed'),
   });
 }

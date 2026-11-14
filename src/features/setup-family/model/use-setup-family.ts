@@ -5,6 +5,7 @@ import {
   joinFamilyByCode,
   type FamilyMembership,
 } from '@entities/family';
+import { syncData } from '@shared/api';
 
 /**
  * Создать семью: вошедший становится owner. Семья сразу кладётся в кэш
@@ -18,7 +19,7 @@ export function useCreateFamily() {
       queryClient.setQueryData<FamilyMembership[]>(familiesKeys.mine(), [
         { ...family, role: 'owner' },
       ]);
-      await queryClient.invalidateQueries({ queryKey: familiesKeys.all });
+      await syncData(queryClient, 'family-changed');
     },
     // 409 — семья уже есть (например, создали с другого устройства):
     // перечитываем список, и приложение пускает дальше.
@@ -35,7 +36,6 @@ export function useJoinFamilyByCode() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: joinFamilyByCode,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: familiesKeys.all }),
+    onSuccess: () => syncData(queryClient, 'family-changed'),
   });
 }

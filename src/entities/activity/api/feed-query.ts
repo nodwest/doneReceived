@@ -1,12 +1,13 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 import type { FeedViewer } from '../model/feed';
 import { fetchFeed } from './feed-api';
+import { queryRoots, SYNC_POLL_MS } from '@shared/api';
 
 /** Сколько последних событий показывает лента на главной. */
 export const FEED_LIMIT = 5;
 
 export const feedKeys = {
-  all: ['activity'] as const,
+  all: queryRoots.activity,
   list: (familyId: string | null, userId: string | null) =>
     [...feedKeys.all, familyId, userId] as const,
 };
@@ -19,6 +20,6 @@ export function useFeed(viewer: FeedViewer | null) {
   return useQuery({
     queryKey: feedKeys.list(viewer?.familyId ?? null, viewer?.userId ?? null),
     queryFn: viewer ? () => fetchFeed(viewer, FEED_LIMIT) : skipToken,
-    refetchInterval: viewer ? 15_000 : false,
+    refetchInterval: viewer ? SYNC_POLL_MS : false,
   });
 }

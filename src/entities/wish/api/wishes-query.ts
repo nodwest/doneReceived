@@ -1,10 +1,11 @@
 import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
 import type { WishlistOwner } from '../model/wish';
 import { fetchWishes } from './wishes-api';
+import { queryRoots } from '@shared/api';
 
 /** Ключи кэша вишлистов: мутации инвалидируют wishKeys.all. */
 export const wishKeys = {
-  all: ['wishes'] as const,
+  all: queryRoots.wishes,
   list: (childId: string) => [...wishKeys.all, 'list', childId] as const,
 };
 

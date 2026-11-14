@@ -8,10 +8,11 @@ import {
   fetchMyFamilies,
   previewFamilyInvite,
 } from './families-api';
+import { queryRoots } from '@shared/api';
 
 /** Ключи кэша семей с сервера (не путать с моковыми `familyKeys`). */
 export const familiesKeys = {
-  all: ['families'] as const,
+  all: queryRoots.families,
   mine: () => [...familiesKeys.all, 'mine'] as const,
   parentInvite: (familyId: string | null) =>
     [...familiesKeys.all, familyId, 'parent-invite'] as const,
@@ -66,6 +67,8 @@ export function useParentInvite(familyId: string | null, enabled: boolean) {
     queryKey: familiesKeys.parentInvite(familyId),
     queryFn: active ? () => createParentInvite(familyId) : skipToken,
     staleTime: (query) => inviteLeft(query.state.data),
+    // Выдача кода (POST): синхронизация данных его не перезапрашивает.
+    meta: { sync: false },
     // Перезапрос ровно в момент истечения (с запасом в секунду на часы).
     refetchInterval: (query) =>
       active ? Math.max(inviteLeft(query.state.data) + 1000, 1000) : false,

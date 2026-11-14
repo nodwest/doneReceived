@@ -5,6 +5,10 @@ import { Image, type ImageProps } from 'react-native';
 // картинку с токеном скачиваем fetch'ем и показываем через blob-ссылку.
 // Загруженные держим в памяти вкладки по адресу, чтобы не качать заново.
 const loaded = new Map<string, Promise<string>>();
+// Уже готовые blob-ссылки: новая картинка с тем же адресом (экран
+// перерисовал список, переключили вкладку) берёт её сразу, в первом же
+// кадре, и не мигает пустой, пока ждёт промис.
+const ready = new Map<string, string>();
 const MAX_CACHED = 200;
 
 function load(uri: string, headers: Record<string, string>) {
@@ -15,7 +19,11 @@ function load(uri: string, headers: Record<string, string>) {
         if (!response.ok) throw new Error(String(response.status));
         return response.blob();
       })
-      .then((blob) => URL.createObjectURL(blob));
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        ready.set(uri, url);
+        return url;
+      });
     // Ошибка не запоминается: при следующем показе (например, с новым
     // токеном) попробуем снова.
     pending.catch(() => loaded.delete(uri));
@@ -27,6 +35,7 @@ function load(uri: string, headers: Record<string, string>) {
         ?.then((url) => URL.revokeObjectURL(url))
         .catch(() => {});
       loaded.delete(oldest);
+      ready.delete(oldest);
     }
   }
   return pending;
@@ -50,9 +59,10 @@ export function ApiImage({ source, ...props }: ImageProps) {
   const uri = remote?.uri;
   const auth = remote?.headers.Authorization;
   const [blob, setBlob] = useState<{ uri: string; url: string } | null>(null);
+  const cached = uri ? ready.get(uri) : undefined;
 
   useEffect(() => {
-    if (!uri) return;
+    if (!uri || ready.has(uri)) return;
     let alive = true;
     load(uri, auth ? { Authorization: auth } : {})
       .then((url) => {
@@ -65,10 +75,6 @@ export function ApiImage({ source, ...props }: ImageProps) {
   }, [uri, auth]);
 
   if (!remote) return <Image source={source} {...props} />;
-  return (
-    <Image
-      source={blob && blob.uri === uri ? { uri: blob.url } : undefined}
-      {...props}
-    />
-  );
+  const url = cached ?? (blob && blob.uri === uri ? blob.url : undefined);
+  return <Image source={url ? { uri: url } : undefined} {...props} />;
 }
