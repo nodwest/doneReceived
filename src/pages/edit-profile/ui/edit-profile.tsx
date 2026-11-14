@@ -38,7 +38,8 @@ import { styles } from './edit-profile.styled';
  * Редактирование профиля вошедшего пользователя (из меню Profile). Здесь
  * меняется только имя: Save changes активна, когда имя изменили хотя бы на
  * символ, и сохраняет его (PATCH /users/me). Почта только показывается,
- * Change — тост «скоро» (на сервере смены почты нет, Идеи.md п. 29). Change
+ * Change — экран `/change-email` (только у родителя); новая почта, которая
+ * ждёт подтверждения, — подсказкой под полем. Change
  * password — отдельный экран `/change-password` (только у родителя: у
  * ребёнка пароля нет). Фото: тап по аватару или Change photo — меню «снять,
  * из галереи, убрать»; снятое или выбранное открывается в `AvatarCropper`,
@@ -229,20 +230,30 @@ export function EditProfilePage() {
                 value={account.email}
                 editable={false}
                 iconName="message"
-                style={styles.emailInput}
+                style={!isChild && styles.emailInput}
               />
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t('editProfile.changeEmail')}
-                hitSlop={8}
-                onPress={() => showToast(t('editProfile.emailSoon'))}
-                style={styles.changeEmail}
-              >
-                <Text style={styles.changeEmailText}>
-                  {t('editProfile.changeEmail')}
-                </Text>
-              </Pressable>
+              {!isChild && (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('editProfile.changeEmail')}
+                  hitSlop={8}
+                  onPress={() => router.push('/change-email')}
+                  style={styles.changeEmail}
+                >
+                  <Text style={styles.changeEmailText}>
+                    {t('editProfile.changeEmail')}
+                  </Text>
+                </Pressable>
+              )}
             </View>
+            {!isChild && me?.pendingEmail && (
+              <FieldHint
+                tone="hint"
+                text={t('editProfile.emailPending', {
+                  email: me.pendingEmail,
+                })}
+              />
+            )}
           </View>
           {!isChild && (
             <View style={styles.field}>

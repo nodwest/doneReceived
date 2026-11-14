@@ -39,6 +39,7 @@ const APP_SCREENS = [
   'profile',
   'edit-profile',
   'change-password',
+  'change-email',
   'map',
   'rewards-history',
   'transactions',

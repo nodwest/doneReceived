@@ -36,7 +36,8 @@ export type DataChange =
   | 'child-changed'
   | 'device-changed'
   | 'family-changed'
-  | 'profile-changed';
+  | 'profile-changed'
+  | 'email-changed';
 
 /**
  * Какие данные задевает изменение. Одно место для всех связей: новая
@@ -69,6 +70,8 @@ const AFFECTS: Record<DataChange, readonly DataArea[]> = {
     'operations',
     'activity',
   ],
+  // Почта видна только в своём профиле; ожидающая смена — там же.
+  'email-changed': ['me'],
 };
 
 /**

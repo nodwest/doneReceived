@@ -794,7 +794,7 @@ export const en = {
     changePassword: 'Change password',
     save: 'Save changes',
     changeEmail: 'Change',
-    emailSoon: 'Changing your email is coming soon',
+    emailPending: 'Waiting for confirmation: {{email}}',
     saved: 'Name saved',
     errors: {
       network: "Can't reach the server. Check your connection and try again.",
@@ -824,6 +824,39 @@ export const en = {
         'Too many attempts. Try again in {{count}} minutes',
       network: "Can't reach the server. Check your connection and try again.",
       failed: "Couldn't change the password. Try again.",
+    },
+  },
+  changeEmail: {
+    title: 'Change email',
+    intro:
+      "We'll send a code to the new address. Until you confirm it, you keep signing in with",
+    newEmail: 'New email',
+    newEmailPlaceholder: 'Enter your new email',
+    password: 'Password',
+    passwordPlaceholder: 'Enter your password',
+    send: 'Send code',
+    sent: 'We sent a code to the new email',
+    confirmNote:
+      "You'll stay signed in here — other devices will be signed out.",
+    useAnother: 'Use a different email',
+    updated: 'Email updated',
+    notConfirmed:
+      "The new email isn't confirmed yet. Open the link in the email or enter the code.",
+    errors: {
+      emailInvalid: 'Enter a valid email',
+      wrongPassword: 'Password is incorrect',
+      sameAsCurrent: 'This is already your email',
+      emailTaken: 'This email is already used by another account',
+      wrongCode: 'Wrong code. Check the email and try again',
+      wrongCodeLeft_one: 'Wrong code. {{count}} attempt left',
+      wrongCodeLeft_other: 'Wrong code. {{count}} attempts left',
+      codeExpired: 'The code has expired. Send a new one',
+      noPending: 'The request has expired. Enter the new email again',
+      tooManyAttempts_one: 'Too many attempts. Try again in {{count}} minute',
+      tooManyAttempts_other:
+        'Too many attempts. Try again in {{count}} minutes',
+      network: "Can't reach the server. Check your connection and try again.",
+      failed: "Couldn't change the email. Try again.",
     },
   },
   profile: {

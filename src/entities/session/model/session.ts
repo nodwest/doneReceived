@@ -16,6 +16,12 @@ export type SessionUser = {
   id: string;
   /** У детского аккаунта почты нет. */
   email: string | null;
+  /**
+   * Новая почта, которая ждёт подтверждения кодом или ссылкой; до него вход
+   * и письма — по `email`. null — смены нет или код истёк. Старые сессии
+   * поля не содержат.
+   */
+  pendingEmail?: string | null;
   displayName: string;
   avatarUrl: string | null;
   /** Статус аккаунта, например `active`. */
@@ -64,6 +70,13 @@ export type UpdateMePayload = {
 export type ChangePasswordPayload = {
   currentPassword: string;
   newPassword: string;
+};
+
+/** Запрос смены почты родителя: POST /users/me/email. */
+export type RequestEmailChangePayload = {
+  newEmail: string;
+  /** Пароль от приложения: без него с чужой сессии почту не сменить. */
+  currentPassword: string;
 };
 
 /** Подключение устройства ребёнка: код от родителя и название устройства. */
