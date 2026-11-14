@@ -1,5 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { useMemo } from 'react';
 import { useCurrentFamily } from '@entities/family';
 import { useSessionUser } from '@entities/session';
 import { useTasks, type TaskViewer } from '@entities/task';
@@ -27,21 +26,11 @@ export function useTaskViewer(): TaskViewer | null {
 }
 
 /**
- * Задания для экранов: моковые и настоящие (с сервера) одним списком. Экран
- * открыли или вернулись на него — список перечитывается (первый показ
- * загружает его и так).
+ * Задания для экранов. Вернулись на экран — список перечитывается, как и всё
+ * устаревшее (`useRefreshOnNavigate` в `app/providers`).
  */
 export function useFamilyTasks() {
-  const query = useTasks(useTaskViewer());
-  const { refetch } = query;
-  const shown = useRef(false);
-  useFocusEffect(
-    useCallback(() => {
-      if (shown.current) refetch();
-      shown.current = true;
-    }, [refetch]),
-  );
-  return query;
+  return useTasks(useTaskViewer());
 }
 
 /** Семья для запросов заданий (создание, правка, отмена). */

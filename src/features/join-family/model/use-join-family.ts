@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { familiesKeys, joinFamilyByCode } from '@entities/family';
+import { joinFamilyByCode } from '@entities/family';
+import { syncData } from '@shared/api';
 
 /**
  * Вступление в семью по коду второго родителя (POST /families/join, роль
@@ -10,7 +11,6 @@ export function useJoinFamily() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: joinFamilyByCode,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: familiesKeys.all }),
+    onSuccess: () => syncData(queryClient, 'family-changed'),
   });
 }

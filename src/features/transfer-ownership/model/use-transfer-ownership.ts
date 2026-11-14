@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { familiesKeys, transferOwnership } from '@entities/family';
+import { transferOwnership } from '@entities/family';
+import { syncData } from '@shared/api';
 
 /**
  * Владелец передаёт семью другому родителю (`memberId` — id членства). После
@@ -12,7 +13,6 @@ export function useTransferOwnership(familyId: string | null) {
       if (!familyId) throw new Error('No family');
       return transferOwnership(familyId, memberId);
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: familiesKeys.all }),
+    onSuccess: () => syncData(queryClient, 'family-changed'),
   });
 }

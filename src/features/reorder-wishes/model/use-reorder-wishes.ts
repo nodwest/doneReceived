@@ -5,6 +5,7 @@ import {
   type Wish,
   type WishlistOwner,
 } from '@entities/wish';
+import { syncData } from '@shared/api';
 
 /** Переставить желание: from и to — места в списке сверху вниз. */
 type Move = { from: number; to: number };
@@ -44,6 +45,6 @@ export function useReorderWishes(owner: WishlistOwner | null) {
       if (context?.previous)
         queryClient.setQueryData(listKey, context.previous);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: wishKeys.all }),
+    onSettled: () => syncData(queryClient, 'wish-changed'),
   });
 }

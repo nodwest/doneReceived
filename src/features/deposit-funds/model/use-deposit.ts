@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { depositFunds, walletKeys } from '@entities/wallet';
+import { syncData } from '@shared/api';
 
 /**
  * Пополнить кошелёк вошедшего родителя (временное тестовое пополнение):
@@ -15,10 +16,8 @@ export function useDeposit(familyId: string | null) {
     },
     onSuccess: (funds) => {
       queryClient.setQueryData(walletKeys.funds(familyId), funds);
-      // Пополнение — новая строка в истории транзакций.
-      return queryClient.invalidateQueries({
-        queryKey: walletKeys.detail(familyId),
-      });
+      // Пополнение — новая строка в истории транзакций и в ленте.
+      return syncData(queryClient, 'funds-deposited');
     },
   });
 }

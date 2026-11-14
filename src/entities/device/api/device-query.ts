@@ -5,10 +5,11 @@ import {
   fetchConnectCode,
   previewPairing,
 } from './device-api';
+import { queryRoots } from '@shared/api';
 
 /** Ключи кэша устройств. */
 export const deviceKeys = {
-  all: ['devices'] as const,
+  all: queryRoots.devices,
   child: (familyId: string | null, childId: string) =>
     [...deviceKeys.all, familyId, childId] as const,
   connectCode: (childId: string) =>
@@ -48,6 +49,8 @@ export function useConnectCode(
         ? () => fetchConnectCode(familyId, childId)
         : skipToken,
     staleTime: (query) => codeLeft(query.state.data),
+    // Выдача кода (POST): синхронизация данных его не перезапрашивает.
+    meta: { sync: false },
     // Меню закрыли — код забываем, следующее открытие спросит сервер.
     gcTime: 0,
     // Не вышло — сразу показываем ошибку и «Try again», а не ждём повторов.

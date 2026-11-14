@@ -1,11 +1,11 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 import type { ImageSourcePropType } from 'react-native';
-import { apiRequest } from '@shared/api';
+import { apiRequest, queryRoots } from '@shared/api';
 import type { SessionUser } from '../model/session';
 import { useSessionStore } from '../model/session-store';
 
 export const meKeys = {
-  all: ['me'] as const,
+  all: queryRoots.me,
 };
 
 /** GET /users/me — профиль вошедшего (родителя или ребёнка). */

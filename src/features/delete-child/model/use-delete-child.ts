@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteChild, familiesKeys, useCurrentFamily } from '@entities/family';
+import { deleteChild, useCurrentFamily } from '@entities/family';
+import { syncData } from '@shared/api';
 
 /**
  * Удалить профиль ребёнка (DELETE /families/:id/children/:childId). Сервер
@@ -13,10 +14,6 @@ export function useDeleteChild() {
       if (!familyId) throw new Error('No family');
       return deleteChild(familyId, childId);
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        // Дети, участники и Family (баланс, устройства) — всё о семье.
-        queryKey: familiesKeys.family(familyId),
-      }),
+    onSuccess: () => syncData(queryClient, 'child-changed'),
   });
 }

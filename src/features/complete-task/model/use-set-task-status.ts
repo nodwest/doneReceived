@@ -1,11 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentFamily } from '@entities/family';
 import { useSessionUser } from '@entities/session';
-import {
-  setTaskStatus,
-  taskKeys,
-  type TaskStatusPayload,
-} from '@entities/task';
+import { setTaskStatus, type TaskStatusPayload } from '@entities/task';
+import { syncData } from '@shared/api';
 
 /**
  * Ребёнок меняет статус задания: на проверку или обратно (Redo). Семья у
@@ -20,7 +17,10 @@ export function useSetTaskStatus() {
   return useMutation({
     mutationFn: (payload: TaskStatusPayload) =>
       setTaskStatus(payload, familyId),
-    // Статус сменился: перечитываем список.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: taskKeys.all }),
+    onSuccess: (_, { status }) =>
+      syncData(
+        queryClient,
+        status === 'review' ? 'task-submitted' : 'task-withdrawn',
+      ),
   });
 }

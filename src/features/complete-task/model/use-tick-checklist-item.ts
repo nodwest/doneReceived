@@ -7,6 +7,7 @@ import {
   type ChecklistTickPayload,
   type Task,
 } from '@entities/task';
+import { syncData } from '@shared/api';
 
 type TasksSnapshot = [readonly unknown[], Task[] | undefined][];
 
@@ -55,6 +56,6 @@ export function useTickChecklistItem() {
         queryClient.setQueryData(key, tasks),
       );
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: taskKeys.all }),
+    onSettled: () => syncData(queryClient, 'checklist-ticked'),
   });
 }

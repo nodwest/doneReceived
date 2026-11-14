@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentFamily } from '@entities/family';
-import { cancelTask, taskKeys, type Task } from '@entities/task';
-import { walletKeys } from '@entities/wallet';
+import { cancelTask, type Task } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
+import { syncData } from '@shared/api';
 
 /**
  * Родитель отменяет задание: оно пропадает из списков без награды. С
@@ -17,11 +17,7 @@ export function useCancelTask() {
     mutationFn: (task: Task) => cancelTask(task, familyId),
     onSuccess: () => {
       showToast(t('tasks.cancelledToast'));
-      return Promise.all(
-        [taskKeys.all, walletKeys.all].map((queryKey) =>
-          queryClient.invalidateQueries({ queryKey }),
-        ),
-      );
+      return syncData(queryClient, 'task-cancelled');
     },
     onError: () => showToast(t('tasks.cancelFailed')),
   });

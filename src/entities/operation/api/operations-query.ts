@@ -2,12 +2,13 @@ import { queryOptions, useQuery } from '@tanstack/react-query';
 import { sortByNewest } from '../model/operation';
 import { fetchOperations } from './operations-api';
 import type { OperationsViewer } from './server-operations-api';
+import { queryRoots } from '@shared/api';
 
 export type { OperationsViewer };
 
 /** Ключи кэша истории операций. */
 export const operationKeys = {
-  all: ['operations'] as const,
+  all: queryRoots.operations,
   list: (familyId: string | null, childId?: string) =>
     [...operationKeys.all, 'list', familyId, childId ?? null] as const,
 };
