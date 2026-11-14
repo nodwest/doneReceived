@@ -32,18 +32,18 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.line,
   },
   logOut: {
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 20,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: theme.colors.line,
     backgroundColor: theme.colors.white,
   },
   logOutText: {
-    fontSize: 15,
+    fontSize: theme.fontSize.md,
     fontFamily: theme.fonts.semibold,
-    letterSpacing: tracking(15),
+    letterSpacing: tracking(theme.fontSize.md),
     color: theme.colors.grey,
   },
 });

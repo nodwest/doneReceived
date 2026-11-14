@@ -1,5 +1,6 @@
 import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { withAlpha } from '../lib';
 import { theme, tracking } from '../theme';
 import { Button } from './button';
 import { Icon, type IconName } from './icons';
@@ -17,7 +18,7 @@ type GradientButtonProps = {
   loading?: boolean;
 };
 
-/** Широкая фиолетово-синяя кнопка высотой 56: Create Task, + Family member. */
+/** Широкая фиолетово-синяя кнопка высотой 48: Create Task, + Family member. */
 export function GradientButton({
   label,
   icon,
@@ -79,9 +80,9 @@ export function GradientButton({
 const styles = StyleSheet.create({
   gradient: {
     width: '100%',
-    height: 56,
-    borderRadius: 28,
-    boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.1)',
+    height: 48,
+    borderRadius: 14,
+    boxShadow: `0px 4px 12px ${withAlpha(theme.colors.violet, 0.25)}`,
   },
   small: {
     height: 40,
@@ -94,10 +95,10 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   button: {
-    height: 56,
+    height: 48,
     // Button красит фон при нажатии со своим скруглением 6:
     // повторяем радиус градиента, иначе углы становятся прямоугольными.
-    borderRadius: 28,
+    borderRadius: 14,
     overflow: 'hidden',
     width: '100%',
     flexDirection: 'row',
@@ -116,8 +117,8 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   title: {
-    fontSize: 17,
-    letterSpacing: tracking(17),
+    fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
     color: theme.colors.white,
   },

@@ -72,8 +72,8 @@ export const styles = StyleSheet.create({
   },
   cancel: {
     flex: 1,
-    height: 52,
-    borderRadius: 26,
+    height: 48,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: theme.colors.line,
     alignItems: 'center',
@@ -88,8 +88,8 @@ export const styles = StyleSheet.create({
   },
   confirmWrap: {
     flex: 1,
-    height: 52,
-    borderRadius: 26,
+    height: 48,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   confirm: {

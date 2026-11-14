@@ -6,6 +6,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { withAlpha } from '../lib';
 import { theme, tracking } from '../theme';
 
 type PillButtonVariant =
@@ -20,8 +21,6 @@ type PillButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: PillButtonVariant;
-  /** lg — 56pt (футер экрана), md — 52pt (кнопки в шторке). */
-  size?: 'lg' | 'md';
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -38,7 +37,6 @@ export function PillButton({
   label,
   onPress,
   variant = 'primary',
-  size = 'lg',
   disabled,
   style,
 }: PillButtonProps) {
@@ -54,7 +52,6 @@ export function PillButton({
       disabled={disabled}
       style={({ pressed }) => [
         styles.button,
-        size === 'md' && styles.buttonMd,
         styles[variant],
         (pressed || disabled) && styles.dimmed,
         style,
@@ -72,7 +69,6 @@ export function PillButton({
       <Text
         style={[
           styles.label,
-          size === 'md' && styles.labelMd,
           variant === 'outline' && styles.labelInk,
           variant === 'ghost' && styles.labelGrey,
         ]}
@@ -86,21 +82,17 @@ export function PillButton({
 const styles = StyleSheet.create({
   button: {
     flex: 1,
-    height: 56,
-    borderRadius: 28,
+    height: 48,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  buttonMd: {
-    height: 52,
-    borderRadius: 26,
-  },
   primary: {
-    boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.1)',
+    boxShadow: `0px 4px 12px ${withAlpha(theme.colors.violet, 0.25)}`,
   },
   child: {
-    boxShadow: '0px 8px 9px rgba(30, 95, 184, 0.25)',
+    boxShadow: '0px 4px 12px rgba(30, 95, 184, 0.22)',
   },
   danger: {},
   dark: {
@@ -121,14 +113,10 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   label: {
-    fontSize: 17,
-    letterSpacing: tracking(17),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
-  },
-  labelMd: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.white,
   },
   labelInk: {
     color: theme.colors.ink,

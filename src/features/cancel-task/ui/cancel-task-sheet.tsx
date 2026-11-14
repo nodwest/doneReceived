@@ -36,13 +36,11 @@ export function CancelTaskSheet({
           <PillButton
             label={t('cancelTask.keep')}
             variant="ghost"
-            size="md"
             onPress={onKeep}
           />
           <PillButton
             label={t('cancelTask.confirm')}
             variant="danger"
-            size="md"
             onPress={onConfirm}
           />
         </View>
