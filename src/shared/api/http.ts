@@ -32,6 +32,24 @@ export class ApiError extends Error {
 export const isApiError = (error: unknown): error is ApiError =>
   error instanceof ApiError;
 
+/** Код ошибки сервера из поля `code` тела ответа; нет — null. */
+export const apiErrorCode = (error: ApiError): string | null => {
+  const { data } = error;
+  if (!data || typeof data !== 'object' || !('code' in data)) return null;
+  const { code } = data as { code: unknown };
+  return typeof code === 'string' ? code : null;
+};
+
+/**
+ * Сервер ответил этим кодом ошибки: в поле `code` или в начале текста
+ * `message` («EMAIL_TAKEN» или «EMAIL_TAKEN. Адрес уже занят…»).
+ */
+export const hasApiErrorCode = (error: ApiError, code: string) =>
+  apiErrorCode(error) === code ||
+  error.messages.some(
+    (message) => message === code || new RegExp(`^${code}\\b`).test(message),
+  );
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   /** JSON-тело; FormData — multipart с файлами. */

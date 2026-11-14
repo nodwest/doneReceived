@@ -43,8 +43,8 @@ type PendingSubmissionDto = {
   submittedAt: string;
   /** Комментарий ребёнка к сдаче; null — не писал. */
   note: string | null;
-  /** Фото отчёта — когда бек добавит их сюда (Идеи.md п. 30). */
-  attachments?: AttachmentDto[];
+  /** Фото отчёта в порядке загрузки; `[]` — без фото. */
+  attachments: AttachmentDto[];
 };
 
 type AttachmentDto = { id: string; contentType: string };
@@ -108,11 +108,11 @@ function toTask(
   children: readonly ChildDto[],
   members: readonly MemberDto[],
   viewer: TaskViewer,
-  attachments: readonly AttachmentDto[],
 ): Task {
   const child = children.find((item) => item.id === assignment.childId);
   const author = members.find((member) => member.userId === task.createdBy);
   const pending = assignment.pendingSubmission ?? null;
+  const attachments = pending?.attachments ?? [];
   const rejected = assignment.lastRejection ?? null;
   return {
     id: assignment.id,
@@ -185,31 +185,8 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
       assignment.status !== 'approved' &&
       !(assignment.status === 'rejected' && !assignment.retryableRejection),
   );
-  const photos = await Promise.all(
-    visible.map(({ assignment }) => pendingAttachments(familyId, assignment)),
-  );
-  return visible.map(({ task, assignment }, index) =>
-    toTask(task, assignment, children, members, viewer, photos[index]),
-  );
-}
-
-/**
- * Фото отчёта на проверке. Пока бек не отдаёт их в `pendingSubmission`
- * (Идеи.md п. 30), берём из отчётов назначения — запрос на каждое задание на
- * проверке; не ответили — без фото.
- */
-async function pendingAttachments(
-  familyId: string,
-  { id, pendingSubmission }: AssignmentDto,
-): Promise<AttachmentDto[]> {
-  if (!pendingSubmission) return [];
-  if (pendingSubmission.attachments) return pendingSubmission.attachments;
-  const submissions = await apiRequest<SubmissionDto[]>(
-    `/families/${familyId}/task-assignments/${id}/submissions`,
-  ).catch(() => [] as SubmissionDto[]);
-  return (
-    submissions.find(({ submission }) => submission.id === pendingSubmission.id)
-      ?.attachments ?? []
+  return visible.map(({ task, assignment }) =>
+    toTask(task, assignment, children, members, viewer),
   );
 }
 
@@ -324,7 +301,6 @@ export function tickServerChecklist(
 type SubmissionDto = {
   submission: { id: string; withdrawnAt: string | null };
   review: unknown | null;
-  attachments?: AttachmentDto[];
 };
 
 /**

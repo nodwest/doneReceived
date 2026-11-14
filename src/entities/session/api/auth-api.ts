@@ -7,6 +7,7 @@ import type {
   PairDevicePayload,
   PairedDevice,
   RegisterPayload,
+  RequestEmailChangePayload,
   Session,
   SessionUser,
   UpdateMePayload,
@@ -116,6 +117,48 @@ export function changePassword(payload: ChangePasswordPayload) {
   return apiRequest<void>('/users/me/password', {
     method: 'POST',
     body: payload,
+  });
+}
+
+/**
+ * POST /users/me/email — сменить почту родителя: новый адрес становится
+ * ожидающим (`pendingEmail` в GET /users/me), на него уходит письмо с кодом
+ * и ссылкой. До подтверждения вход и письма — по старой почте. Повторный
+ * запрос заменяет ожидающий адрес, прежние код и ссылка гаснут. 400 —
+ * неверный адрес, `INVALID_CURRENT_PASSWORD`, `EMAIL_SAME_AS_CURRENT`;
+ * 409 `EMAIL_TAKEN`; 403 — у ребёнка почты нет; 429 — много попыток
+ * (`Retry-After`, общий лимит со сменой пароля).
+ */
+export function requestEmailChange(payload: RequestEmailChangePayload) {
+  return apiRequest<MessageResponse>('/users/me/email', {
+    method: 'POST',
+    body: payload,
+  });
+}
+
+/**
+ * POST /users/me/email/confirm — подтвердить новую почту кодом из письма.
+ * Ответ — профиль с новой почтой и `pendingEmail: null`. Текущая сессия
+ * остаётся, остальные сессии аккаунта сервер отзывает, на старую почту
+ * уходит письмо «Это был не я». 400 — `INVALID_CODE` (`attemptsLeft` в
+ * теле) или `CODE_EXPIRED`; 404 — смены нет; 409 `EMAIL_TAKEN` — адрес
+ * успели занять.
+ */
+export function confirmEmailChange(code: string) {
+  return apiRequest<SessionUser>('/users/me/email/confirm', {
+    method: 'POST',
+    body: { code },
+  });
+}
+
+/**
+ * POST /users/me/email/resend — письмо на ожидающий адрес ещё раз (прежние
+ * код и ссылка гаснут). Не чаще раза в 60 с: иначе 429 с `Retry-After`.
+ * 404 — смены нет.
+ */
+export function resendEmailChange() {
+  return apiRequest<MessageResponse>('/users/me/email/resend', {
+    method: 'POST',
   });
 }
 
