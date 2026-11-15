@@ -29,6 +29,19 @@ export function useMe() {
 }
 
 /**
+ * id семьи из профиля: у родителя его также даёт GET /families, но ребёнку
+ * этот запрос недоступен. `/users/me` нужен, если в сохранённой сессии поля
+ * `family` ещё нет — иначе карта ребёнка не знает, что загружать.
+ */
+export function useSessionFamilyId() {
+  const fromSession = useSessionStore(
+    (state) => state.session?.user.family?.id ?? null,
+  );
+  const me = useMe();
+  return fromSession ?? me?.family?.id ?? null;
+}
+
+/**
  * Аватар вошедшего для `<Image>`: сервер отдаёт его только с токеном. null —
  * фото нет (рисуем букву).
  */

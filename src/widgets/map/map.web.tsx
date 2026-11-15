@@ -1,15 +1,11 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { GeoJSONSource } from 'maplibre-gl';
-import { useCurrentFamily } from '@entities/family';
-import type { Location } from '@entities/user';
+import { useCurrentFamily, useFamilyMembers } from '@entities/family';
+import { useSessionFamilyId } from '@entities/session';
 import type { Bus, VehicleSnapshot } from '@entities/vehicle';
 import { useLocationZones } from '@entities/zone';
 import { useMap } from './model/use-map';
-import {
-  setUserLocations,
-  type UserLocation,
-} from './layers/dynamic/user-update';
 import { createVehiclesLayer } from './layers/dynamic/vehicles';
 import {
   ZONE_LAYERS,
@@ -17,10 +13,28 @@ import {
   ZONE_SOURCE,
   zonesToGeoJson,
 } from './layers/dynamic/zones';
-import { useLocationSocket } from '@features/location';
+import {
+  useFamilyLocations,
+  useLiveHiddenAccess,
+  useLiveLocations,
+  type LiveLocation,
+} from '@features/location';
 import { busRouteKey, BusPlayback, useBusesSocket } from '@features/buses';
 import { RoadPath } from './model/road-path';
-import type { MapLayerSettings } from './model/layer-preferences';
+import {
+  defaultMapColor,
+  type MapLayerSettings,
+} from './model/layer-preferences';
+import { useUserAvatarUrls } from './model/use-user-avatar-urls';
+import { UserMarker } from './ui/user-marker.web';
+
+type MarkerLocation = LiveLocation;
+
+const later = (a: string | undefined, b: string | undefined) => {
+  if (!a) return b;
+  if (!b) return a;
+  return Date.parse(b) > Date.parse(a) ? b : a;
+};
 
 export function MapWeb({
   family,
@@ -33,40 +47,72 @@ export function MapWeb({
 }: MapLayerSettings) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { mapRef, deckOverlayRef } = useMap(containerRef);
+  const { mapRef, deckOverlayRef, map } = useMap(containerRef);
   const playback = useMemo(() => new BusPlayback(), []);
   const roadPath = useMemo(() => new RoadPath(), []);
   const requestDraw = useRef<() => void>(() => {});
-  const locations = useRef(new Map<string, UserLocation>());
+  const liveLocations = useLiveLocations();
+  const hiddenAccess = useLiveHiddenAccess();
 
-  const familyId = useCurrentFamily()?.id ?? null;
+  const cachedFamilyId = useCurrentFamily()?.id ?? null;
+  const sessionFamilyId = useSessionFamilyId();
+  const familyId = cachedFamilyId ?? sessionFamilyId;
+  const { data: members = [] } = useFamilyMembers(familyId);
+  const { data: savedLocations = [] } = useFamilyLocations(familyId);
   const { data: zones = [] } = useLocationZones(familyId);
+
+  const peopleById = useMemo(
+    () => new Map(members.map((member) => [member.userId, member] as const)),
+    [members],
+  );
+  const zoneNames = useMemo(
+    () => new Map(zones.map((zone) => [zone.id, zone.name] as const)),
+    [zones],
+  );
+  const avatarUsers = useMemo(
+    () =>
+      members.map((member) => ({
+        id: member.userId,
+        avatarUrl: member.avatarUrl,
+      })),
+    [members],
+  );
+  const avatarUrls = useUserAvatarUrls(avatarUsers);
 
   // Скрытые пункты нужны внутри циклов отрисовки и обработчиков без
   // пересоздания сокетов и эффектов на каждое переключение.
-  const hiddenChildrenRef = useRef(hiddenChildren);
   const hiddenRoutesRef = useRef(hiddenRoutes);
   const pinnedRoutesRef = useRef(pinnedRoutes);
 
-  const drawLocations = useCallback(() => {
-    const source = mapRef.current?.getSource('users');
-    if (!source || source.type !== 'geojson') return;
-
-    const hidden = new Set(hiddenChildrenRef.current);
-    setUserLocations(
-      source as GeoJSONSource,
-      [...locations.current.values()].filter(({ id }) => !hidden.has(id)),
+  const markers = useMemo(() => {
+    const points = new Map<string, MarkerLocation>();
+    for (const location of savedLocations) {
+      points.set(location.userId, {
+        userId: location.userId,
+        childId: location.childId,
+        lat: location.lat,
+        lng: location.lng,
+        zoneId: location.zoneId,
+        deviceId: location.deviceId,
+        deviceLabel: location.deviceLabel || 'Устройство',
+        updatedAt: location.updatedAt,
+      });
+    }
+    for (const [userId, location] of Object.entries(liveLocations)) {
+      const previous = points.get(userId);
+      points.set(userId, {
+        ...location,
+        userId,
+        updatedAt: later(previous?.updatedAt, location.updatedAt),
+      });
+    }
+    return [...points.values()].filter(
+      (location) =>
+        !hiddenChildren.includes(location.userId) &&
+        !hiddenAccess[location.userId] &&
+        peopleById.has(location.userId),
     );
-  }, [mapRef]);
-
-  const handleLocation = useCallback(
-    ({ childId, userId, lat, lng }: Location) => {
-      const id = childId ?? userId;
-      locations.current.set(id, { id, lat, lng });
-      drawLocations();
-    },
-    [drawLocations],
-  );
+  }, [hiddenAccess, hiddenChildren, liveLocations, peopleById, savedLocations]);
 
   const handleVehicles = useCallback(
     (vehicles: Bus[], serverTime?: number, history?: VehicleSnapshot[]) => {
@@ -77,11 +123,6 @@ export function MapWeb({
     },
     [playback],
   );
-
-  useEffect(() => {
-    hiddenChildrenRef.current = hiddenChildren;
-    drawLocations();
-  }, [drawLocations, hiddenChildren]);
 
   useEffect(() => {
     hiddenRoutesRef.current = hiddenRoutes;
@@ -217,10 +258,9 @@ export function MapWeb({
       }
 
       // Зоны под точками детей, но над подложкой карты.
-      const before = map.getLayer('users') ? 'users' : undefined;
       for (const layer of ZONE_LAYERS) {
         if (map.getLayer(layer.id)) continue;
-        map.addLayer(layer, before);
+        map.addLayer(layer);
         // Слой добавили уже после переключения «Областей»: применяем
         // текущую видимость сразу, иначе он мигнёт поверх выключенного слоя.
         map.setLayoutProperty(
@@ -245,9 +285,6 @@ export function MapWeb({
     if (!map) return;
 
     const applyVisibility = () => {
-      const visibility = family ? 'visible' : 'none';
-      if (map.getLayer('users'))
-        map.setLayoutProperty('users', 'visibility', visibility);
       const areasVisibility = areas ? 'visible' : 'none';
       for (const layerId of ZONE_LAYER_IDS) {
         if (map.getLayer(layerId))
@@ -262,9 +299,8 @@ export function MapWeb({
       map.off('load', applyVisibility);
       map.off('styledata', applyVisibility);
     };
-  }, [areas, family, mapRef]);
+  }, [areas, mapRef]);
 
-  useLocationSocket(handleLocation);
   useBusesSocket(handleVehicles);
 
   return (
@@ -274,6 +310,32 @@ export function MapWeb({
         width: '100%',
         height: '100%',
       }}
-    />
+    >
+      {map && family
+        ? markers.map((location) => {
+            const member = peopleById.get(location.userId)!;
+            return (
+              <UserMarker
+                key={location.userId}
+                map={map}
+                user={{
+                  id: location.userId,
+                  lat: location.lat,
+                  lng: location.lng,
+                  name: member.displayName,
+                  avatarUrl: avatarUrls[location.userId] ?? null,
+                  color: member.mapColor ?? defaultMapColor(member.kind),
+                  inZone: !!location.zoneId,
+                  zoneName: location.zoneId
+                    ? (zoneNames.get(location.zoneId) ?? null)
+                    : null,
+                  deviceLabel: location.deviceLabel,
+                  updatedAt: location.updatedAt,
+                }}
+              />
+            );
+          })
+        : null}
+    </div>
   );
 }

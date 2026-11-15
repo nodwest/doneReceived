@@ -1,0 +1,72 @@
+import { create } from 'zustand';
+import type { Location, ZonePresence } from '@entities/user';
+
+export type LiveLocation = {
+  userId: string;
+  childId: string | null;
+  lat: number;
+  lng: number;
+  accuracy?: number | null;
+  zoneId: string | null;
+  zones?: ZonePresence[];
+  deviceId: string | null;
+  deviceLabel: string;
+  updatedAt?: string;
+};
+
+type LocationStore = {
+  locations: Record<string, LiveLocation>;
+  hiddenAccess: Record<string, boolean>;
+  setLocation: (location: Location) => void;
+  setAccess: (userId: string, visible: boolean) => void;
+  reset: () => void;
+};
+
+const deviceLabel = (value: unknown) =>
+  typeof value === 'string' && value.trim() ? value : 'Устройство';
+
+/** Более свежее время: запоздавшее событие не должно откатить точку назад. */
+const later = (a: string | undefined, b: string | undefined) => {
+  if (!a) return b;
+  if (!b) return a;
+  return Date.parse(b) > Date.parse(a) ? b : a;
+};
+
+export const useLocationStore = create<LocationStore>((set) => ({
+  locations: {},
+  hiddenAccess: {},
+  setLocation: (location) =>
+    set((state) => {
+      const previous = state.locations[location.userId];
+      return {
+        locations: {
+          ...state.locations,
+          [location.userId]: {
+            userId: location.userId,
+            childId: location.childId,
+            lat: location.lat,
+            lng: location.lng,
+            accuracy: location.accuracy,
+            zoneId: location.zoneId ?? null,
+            zones: location.zones ?? previous?.zones,
+            deviceId: location.deviceId ?? null,
+            deviceLabel: deviceLabel(location.deviceLabel),
+            updatedAt: later(previous?.updatedAt, location.updatedAt),
+          },
+        },
+      };
+    }),
+  setAccess: (userId, visible) =>
+    set((state) => ({
+      hiddenAccess: {
+        ...state.hiddenAccess,
+        [userId]: !visible,
+      },
+    })),
+  reset: () => set({ locations: {}, hiddenAccess: {} }),
+}));
+
+export const useLiveLocations = () =>
+  useLocationStore((state) => state.locations);
+export const useLiveHiddenAccess = () =>
+  useLocationStore((state) => state.hiddenAccess);

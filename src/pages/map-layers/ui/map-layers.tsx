@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCurrentFamily, useFamilyChildren } from '@entities/family';
-import { useSessionKind } from '@entities/session';
+import { useCurrentFamily, useFamilyMembers } from '@entities/family';
+import type { FamilyMember } from '@entities/family';
+import { useMyId, useSessionFamilyId, useSessionKind } from '@entities/session';
 import type { Bus } from '@entities/vehicle';
 import {
   deleteLocationZone,
@@ -20,10 +21,8 @@ import {
 } from '@entities/zone';
 import { busRouteKey, useBusesSocket } from '@features/buses';
 import {
-  applyLocationPresence,
   presenceKeys,
   useLocationPresence,
-  useLocationSocket,
   type LocationPresence,
 } from '@features/location';
 import { TabScreen } from '@widgets/bottom-nav';
@@ -47,6 +46,7 @@ import {
   type IconName,
 } from '@shared/ui';
 import { styles } from './map-layers.styled';
+import { MemberMapSettingsSheet } from './member-map-settings-sheet';
 
 /** Маршрут из живого потока: список маршрутов сервер отдельно не отдаёт. */
 type RouteOption = {
@@ -361,20 +361,23 @@ function SectionList({ children }: { children: ReactNode }) {
 }
 
 /**
- * «Слои карты» — что показывать на вкладке Map: детей, маршруты транспорта и
- * геозоны. Выбор хранится на устройстве (`useMapLayerStore`), карта читает
- * его при отрисовке. Маршруты добавляются из живого потока: REST-списка
- * маршрутов на сервере нет.
+ * «Слои карты» — что показывать на вкладке Map: членов семьи, маршруты
+ * транспорта и геозоны. Выбор хранится на устройстве (`useMapLayerStore`),
+ * карта читает его при отрисовке. Маршруты добавляются из живого потока:
+ * REST-списка маршрутов на сервере нет.
  */
 export function MapLayersPage() {
   const { t } = useTranslation();
   const { height: windowHeight } = useWindowDimensions();
   const now = useNow(60_000);
+  const myId = useMyId();
   const kind = useSessionKind();
-  const familyId = useCurrentFamily()?.id ?? null;
+  const cachedFamilyId = useCurrentFamily()?.id ?? null;
+  const sessionFamilyId = useSessionFamilyId();
+  const familyId = cachedFamilyId ?? sessionFamilyId;
 
-  const childrenQuery = useFamilyChildren(kind === 'parent' ? familyId : null);
-  const children = childrenQuery.data ?? [];
+  const membersQuery = useFamilyMembers(familyId);
+  const members = membersQuery.data ?? [];
   const zonesQuery = useLocationZones(familyId);
   const zones = zonesQuery.data ?? [];
 
@@ -386,21 +389,11 @@ export function MapLayersPage() {
     }, []),
   );
 
-  // Подтверждённые состояния зон: последние с сервера + live-события сокета.
-  // «Нет данных» — это отсутствие состояния, а не «вне области».
+  // Подтверждённые состояния зон: последние с сервера + live-события общего
+  // сокета приложения. «Нет данных» — это отсутствие состояния, а не «вне
+  // области».
   const queryClient = useQueryClient();
   const { data: presence } = useLocationPresence(familyId);
-  useLocationSocket(
-    useCallback(
-      (location) => {
-        queryClient.setQueryData<LocationPresence>(
-          presenceKeys.list(familyId),
-          (current) => applyLocationPresence(current, location),
-        );
-      },
-      [familyId, queryClient],
-    ),
-  );
 
   const family = useMapLayerStore((state) => state.family);
   const transport = useMapLayerStore((state) => state.transport);
@@ -415,6 +408,9 @@ export function MapLayersPage() {
   const openSections = useMapLayerStore((state) => state.openSections);
   const toggleSection = useMapLayerStore((state) => state.toggleSection);
   const showAll = useMapLayerStore((state) => state.showAll);
+  const [settingsTarget, setSettingsTarget] = useState<FamilyMember | null>(
+    null,
+  );
 
   const [zoneToDelete, setZoneToDelete] = useState<MapZone | null>(null);
   const removeZone = useMutation({
@@ -495,7 +491,7 @@ export function MapLayersPage() {
   const back = () =>
     router.canGoBack() ? router.back() : router.replace('/map');
 
-  const childIds = children.map((child) => child.id);
+  const memberIds = members.map((member) => member.userId);
   const zoneIds = zones.map((zone) => zone.id);
   const zoneStatusFor = buildZoneStatuses(presence);
   const pinned = sortRoutes(pinnedRoutes);
@@ -526,45 +522,64 @@ export function MapLayersPage() {
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}
         >
-          {parent && (
-            <Section
-              icon="children"
-              title={t('mapLayers.family')}
-              expanded={openSections.family}
-              onToggle={() => toggleSection('family')}
-            >
-              <SectionList>
-                {children.map((child, index) => (
-                  <CheckRow
-                    key={child.id}
-                    title={child.displayName}
-                    subtitle={t('mapLayers.childRole')}
-                    avatar={{
-                      name: child.displayName,
-                      source: child.avatarUrl
-                        ? authorizedImage(child.avatarUrl)
-                        : null,
-                    }}
-                    checked={family && !hiddenChildren.includes(child.id)}
-                    onPress={() =>
-                      toggleItem(
-                        'family',
-                        'children',
-                        family,
-                        hiddenChildren,
-                        childIds,
-                        child.id,
-                      )
-                    }
-                    last={index === children.length - 1}
-                  />
-                ))}
-                {children.length === 0 && !childrenQuery.isPending && (
-                  <EmptyRow text={t('mapLayers.emptyChildren')} />
-                )}
-              </SectionList>
-            </Section>
-          )}
+          <Section
+            icon="children"
+            title={t('mapLayers.family')}
+            expanded={openSections.family}
+            onToggle={() => toggleSection('family')}
+          >
+            <SectionList>
+              {members.map((member, index) => (
+                <CheckRow
+                  key={member.userId}
+                  title={member.displayName}
+                  subtitle={
+                    member.userId === myId
+                      ? member.kind === 'child'
+                        ? t('mapLayers.youChildRole')
+                        : t('mapLayers.youRole')
+                      : member.kind === 'child'
+                        ? t('mapLayers.childRole')
+                        : t('mapLayers.parentRole')
+                  }
+                  avatar={{
+                    name: member.displayName,
+                    source: member.avatarUrl
+                      ? authorizedImage(member.avatarUrl)
+                      : null,
+                  }}
+                  checked={family && !hiddenChildren.includes(member.userId)}
+                  actions={
+                    parent &&
+                    (member.kind === 'child' || member.userId === myId) ? (
+                      <IconButton
+                        icon="pencil"
+                        tone="violet"
+                        label={t('mapLayers.memberSettings', {
+                          name: member.displayName,
+                        })}
+                        onPress={() => setSettingsTarget(member)}
+                      />
+                    ) : undefined
+                  }
+                  onPress={() =>
+                    toggleItem(
+                      'family',
+                      'children',
+                      family,
+                      hiddenChildren,
+                      memberIds,
+                      member.userId,
+                    )
+                  }
+                  last={index === members.length - 1}
+                />
+              ))}
+              {members.length === 0 && !membersQuery.isPending && (
+                <EmptyRow text={t('mapLayers.emptyChildren')} />
+              )}
+            </SectionList>
+          </Section>
 
           <Section
             icon="bus"
@@ -737,6 +752,13 @@ export function MapLayersPage() {
           </View>
         </View>
       </BottomSheet>
+      {familyId ? (
+        <MemberMapSettingsSheet
+          familyId={familyId}
+          member={settingsTarget}
+          onClose={() => setSettingsTarget(null)}
+        />
+      ) : null}
     </TabScreen>
   );
 }

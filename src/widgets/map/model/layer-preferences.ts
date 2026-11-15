@@ -1,5 +1,6 @@
 import { createMMKV } from 'react-native-mmkv';
 import { create } from 'zustand';
+import { useSessionStore } from '@entities/session';
 
 export type MapLayerKey = 'family' | 'transport' | 'areas';
 
@@ -10,7 +11,7 @@ export type MapLayerVisibility = Record<MapLayerKey, boolean>;
 
 /** Что показывать на карте: слой целиком и отдельные скрытые пункты. */
 export type MapLayerSettings = MapLayerVisibility & {
-  /** id профилей детей, которых скрыли. */
+  /** id аккаунтов участников, которых скрыли. */
   hiddenChildren: string[];
   /** Ключи маршрутов (`busRouteKey`), которые скрыли. */
   hiddenRoutes: string[];
@@ -25,6 +26,13 @@ export type MapLayerSettings = MapLayerVisibility & {
 
 /** Какие разделы «Слоёв карты» раскрыты. По умолчанию все свёрнуты. */
 export type MapLayerSections = Record<MapLayerKey, boolean>;
+
+/** Цвета по умолчанию: родитель — фиолетовый, ребёнок — зелёный. */
+export const DEFAULT_PARENT_MARKER_COLOR = '#6C5CE7';
+export const DEFAULT_CHILD_MARKER_COLOR = '#2EB873';
+
+export const defaultMapColor = (kind: 'parent' | 'child') =>
+  kind === 'child' ? DEFAULT_CHILD_MARKER_COLOR : DEFAULT_PARENT_MARKER_COLOR;
 
 const storage = createMMKV({ id: 'settings' });
 const STORAGE_KEY = 'map-layer-preferences';
@@ -49,6 +57,12 @@ const DEFAULT_SECTIONS: MapLayerSections = {
 
 type LoadedSettings = MapLayerSettings & {
   openSections: MapLayerSections;
+  /**
+   * Аккаунт, которому принадлежат скрытые пункты. Скрытие локальное, но при
+   * смене пользователя на одном устройстве старые id не должны скрывать
+   * участников новой семьи.
+   */
+  ownerUserId: string | null;
 };
 
 const asBoolean = (value: unknown, fallback: boolean) =>
@@ -62,7 +76,13 @@ const asIds = (value: unknown): string[] =>
 function loadSettings(): LoadedSettings {
   const value =
     storage.getString(STORAGE_KEY) ?? storage.getString(LEGACY_STORAGE_KEY);
-  if (!value) return { ...DEFAULT_SETTINGS, openSections: DEFAULT_SECTIONS };
+  if (!value) {
+    return {
+      ...DEFAULT_SETTINGS,
+      openSections: DEFAULT_SECTIONS,
+      ownerUserId: null,
+    };
+  }
 
   try {
     const parsed = JSON.parse(value) as Partial<LoadedSettings>;
@@ -80,9 +100,15 @@ function loadSettings(): LoadedSettings {
         transport: asBoolean(sections?.transport, DEFAULT_SECTIONS.transport),
         areas: asBoolean(sections?.areas, DEFAULT_SECTIONS.areas),
       },
+      ownerUserId:
+        typeof parsed.ownerUserId === 'string' ? parsed.ownerUserId : null,
     };
   } catch {
-    return { ...DEFAULT_SETTINGS, openSections: DEFAULT_SECTIONS };
+    return {
+      ...DEFAULT_SETTINGS,
+      openSections: DEFAULT_SECTIONS,
+      ownerUserId: null,
+    };
   }
 }
 
@@ -96,6 +122,7 @@ function persist(state: LoadedSettings) {
     hiddenZones: state.hiddenZones,
     pinnedRoutes: state.pinnedRoutes,
     openSections: state.openSections,
+    ownerUserId: state.ownerUserId,
   };
   storage.set(STORAGE_KEY, JSON.stringify(value));
 }
@@ -119,6 +146,8 @@ type MapLayerState = LoadedSettings & {
   toggleSection: (key: MapLayerKey) => void;
   /** Показать всё: слои целиком и все пункты. */
   showAll: () => void;
+  /** Сменить аккаунт: чужие локальные скрытия не переносим. */
+  syncOwner: (userId: string | null) => void;
 };
 
 export const useMapLayerStore = create<MapLayerState>((set) => ({
@@ -165,8 +194,31 @@ export const useMapLayerStore = create<MapLayerState>((set) => ({
         ...DEFAULT_SETTINGS,
         pinnedRoutes: state.pinnedRoutes,
         openSections: state.openSections,
+        ownerUserId: state.ownerUserId,
+      };
+      persist(next);
+      return next;
+    }),
+  syncOwner: (userId) =>
+    set((state) => {
+      if (!userId || state.ownerUserId === userId) return state;
+      // Другой аккаунт на этом устройстве не должен наследовать ни скрытые
+      // пункты, ни выключенные слои прошлого пользователя.
+      const next: LoadedSettings = {
+        ...DEFAULT_SETTINGS,
+        openSections: state.openSections,
+        ownerUserId: userId,
       };
       persist(next);
       return next;
     }),
 }));
+
+// На одном устройстве могут входить разные аккаунты (например, родитель
+// проверяет вид ребёнка). Локальные скрытия нельзя переносить между ними.
+useSessionStore.subscribe((state) => {
+  useMapLayerStore.getState().syncOwner(state.session?.user.id ?? null);
+});
+useMapLayerStore
+  .getState()
+  .syncOwner(useSessionStore.getState().session?.user.id ?? null);
