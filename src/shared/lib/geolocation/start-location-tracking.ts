@@ -1,11 +1,15 @@
 export function startLocationTracking(
-  onlocation: (lat: number, lng: number) => void,
+  onlocation: (lat: number, lng: number, accuracy?: number) => void,
 ) {
   const watchId = navigator.geolocation.watchPosition(
     (position) => {
-      const { latitude, longitude } = position.coords;
+      const { latitude, longitude, accuracy } = position.coords;
 
-      onlocation(latitude, longitude);
+      onlocation(
+        latitude,
+        longitude,
+        Number.isFinite(accuracy) ? accuracy : undefined,
+      );
     },
     (error) => {
       console.error('Geolocation error:', error);

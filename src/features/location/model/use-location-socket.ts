@@ -44,11 +44,14 @@ export const useLocationSocket = (onLocation: (location: Location) => void) => {
 
       if (message.event === 'authenticated' && message.data === true) {
         if (kind !== 'child') return;
-        stopLocationTracking ??= startLocationTracking((lat, lng) => {
+        stopLocationTracking ??= startLocationTracking((lat, lng, accuracy) => {
           if (socket.readyState !== WebSocket.OPEN) return;
 
           socket.send(
-            JSON.stringify({ event: 'location', data: { lat, lng } }),
+            JSON.stringify({
+              event: 'location',
+              data: { lat, lng, accuracy },
+            }),
           );
         });
         return;

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -19,7 +19,13 @@ import {
   type MapZone,
 } from '@entities/zone';
 import { busRouteKey, useBusesSocket } from '@features/buses';
-import { useLocationSocket } from '@features/location';
+import {
+  applyLocationPresence,
+  presenceKeys,
+  useLocationPresence,
+  useLocationSocket,
+  type LocationPresence,
+} from '@features/location';
 import { TabScreen } from '@widgets/bottom-nav';
 import {
   useMapLayerStore,
@@ -28,7 +34,7 @@ import {
 } from '@widgets/map';
 import { authorizedImage } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { showToast, formatTimeAgo, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
 import {
   BottomSheet,
@@ -76,7 +82,7 @@ function sortRoutes(routes: readonly string[]) {
 
 type CheckRowProps = {
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   checked: boolean;
   onPress: () => void;
   icon?: IconName;
@@ -101,7 +107,7 @@ function CheckRow({
     <Pressable
       accessibilityRole="checkbox"
       accessibilityLabel={title}
-      accessibilityHint={subtitle}
+      accessibilityHint={typeof subtitle === 'string' ? subtitle : undefined}
       accessibilityState={{ checked }}
       onPress={onPress}
       style={({ pressed }) => [
@@ -127,9 +133,13 @@ function CheckRow({
           {title}
         </Text>
         {subtitle ? (
-          <Text style={styles.rowSubtitle} numberOfLines={1}>
-            {subtitle}
-          </Text>
+          typeof subtitle === 'string' ? (
+            <Text style={styles.rowSubtitle} numberOfLines={1}>
+              {subtitle}
+            </Text>
+          ) : (
+            subtitle
+          )
         ) : null}
       </View>
       {actions ? <View style={styles.rowActions}>{actions}</View> : null}
@@ -235,6 +245,108 @@ function EmptyRow({ text }: { text: string }) {
   return <Text style={styles.empty}>{text}</Text>;
 }
 
+type ZoneStatus = {
+  state: 'inside' | 'outside' | null;
+  /** Время последнего события; null — координат ещё не было. */
+  updatedAt: string | null;
+};
+
+/** Пять минут — ещё «сейчас», дальше показываем возраст события. */
+const ZONE_FRESH_MS = 5 * 60_000;
+/** Час без координат — уже «нет данных», а не «в школе вчера». */
+const ZONE_STALE_MS = 60 * 60_000;
+const EPOCH_ISO = new Date(0).toISOString();
+
+function laterTimestamp(a: string | null, b: string | null) {
+  if (!a) return b;
+  if (!b) return a;
+  return Date.parse(b) > Date.parse(a) ? b : a;
+}
+
+/**
+ * Собрать статус зоны по всем детям: если хотя бы один подтверждённо внутри,
+ * зона считается занятой; иначе — последнее подтверждённое «снаружи».
+ */
+function buildZoneStatuses(presence: LocationPresence | undefined) {
+  const inside = new Map<string, string | null>();
+  const outside = new Map<string, string | null>();
+  let latest: string | null = null;
+
+  for (const child of presence?.children ?? []) {
+    latest = laterTimestamp(latest, child.updatedAt);
+    if (!child.updatedAt) continue;
+    for (const zone of child.zones) {
+      const map = zone.state === 'inside' ? inside : outside;
+      map.set(
+        zone.zoneId,
+        laterTimestamp(map.get(zone.zoneId) ?? null, child.updatedAt),
+      );
+    }
+  }
+
+  return (zoneId: string): ZoneStatus => {
+    if (inside.has(zoneId)) {
+      return {
+        state: 'inside',
+        updatedAt: inside.get(zoneId) ?? latest,
+      };
+    }
+    if (outside.has(zoneId)) {
+      return {
+        state: 'outside',
+        updatedAt: outside.get(zoneId) ?? latest,
+      };
+    }
+    return { state: null, updatedAt: latest };
+  };
+}
+
+function ZoneStatusText({
+  name,
+  status,
+  now,
+}: {
+  name: string;
+  status: ZoneStatus;
+  now: Date;
+}) {
+  const { t } = useTranslation();
+  const ago = formatTimeAgo(new Date(status.updatedAt ?? EPOCH_ISO), now);
+  const age = status.updatedAt
+    ? now.getTime() - Date.parse(status.updatedAt)
+    : Infinity;
+  const fresh = age <= ZONE_FRESH_MS;
+  const unknown = !status.state || age > ZONE_STALE_MS;
+
+  if (unknown) {
+    return (
+      <Text style={styles.rowSubtitle} numberOfLines={1}>
+        {status.updatedAt
+          ? t('mapLayers.zoneNoDataAgo', { ago })
+          : t('mapLayers.zoneNoData')}
+      </Text>
+    );
+  }
+
+  if (status.state === 'inside') {
+    return (
+      <Text style={styles.rowSubtitle} numberOfLines={1}>
+        {fresh
+          ? t('mapLayers.zoneInside')
+          : t('mapLayers.zoneInsideAgo', { name, ago })}
+      </Text>
+    );
+  }
+
+  return (
+    <Text style={styles.rowSubtitle} numberOfLines={1}>
+      {fresh
+        ? t('mapLayers.zoneOutside')
+        : t('mapLayers.zoneOutsideAgo', { ago })}
+    </Text>
+  );
+}
+
 /** Список строк раздела: максимум пять, остальное — скроллом. */
 function SectionList({ children }: { children: ReactNode }) {
   return (
@@ -257,6 +369,7 @@ function SectionList({ children }: { children: ReactNode }) {
 export function MapLayersPage() {
   const { t } = useTranslation();
   const { height: windowHeight } = useWindowDimensions();
+  const now = useNow(60_000);
   const kind = useSessionKind();
   const familyId = useCurrentFamily()?.id ?? null;
 
@@ -273,27 +386,20 @@ export function MapLayersPage() {
     }, []),
   );
 
-  // Последняя известная зона каждого ребёнка: подпись «Сейчас в области» /
-  // «Сейчас вне области» в списке областей. Перерисовываем только когда
-  // ребёнок перешёл из зоны в зону, а не на каждую координату.
-  const zoneByChild = useRef(new Map<string, string | null>());
-  const [occupiedZones, setOccupiedZones] = useState<ReadonlySet<string>>(
-    () => new Set(),
-  );
+  // Подтверждённые состояния зон: последние с сервера + live-события сокета.
+  // «Нет данных» — это отсутствие состояния, а не «вне области».
+  const queryClient = useQueryClient();
+  const { data: presence } = useLocationPresence(familyId);
   useLocationSocket(
-    useCallback((location) => {
-      const id = location.childId ?? location.userId;
-      const zoneId = location.zoneId ?? null;
-      if (zoneByChild.current.get(id) === zoneId) return;
-      zoneByChild.current.set(id, zoneId);
-      setOccupiedZones(
-        new Set(
-          [...zoneByChild.current.values()].filter(
-            (value): value is string => !!value,
-          ),
-        ),
-      );
-    }, []),
+    useCallback(
+      (location) => {
+        queryClient.setQueryData<LocationPresence>(
+          presenceKeys.list(familyId),
+          (current) => applyLocationPresence(current, location),
+        );
+      },
+      [familyId, queryClient],
+    ),
   );
 
   const family = useMapLayerStore((state) => state.family);
@@ -310,13 +416,15 @@ export function MapLayersPage() {
   const toggleSection = useMapLayerStore((state) => state.toggleSection);
   const showAll = useMapLayerStore((state) => state.showAll);
 
-  const queryClient = useQueryClient();
   const [zoneToDelete, setZoneToDelete] = useState<MapZone | null>(null);
   const removeZone = useMutation({
     mutationFn: (zone: MapZone) => deleteLocationZone(familyId!, zone.id),
     onSuccess: (_data, zone) => {
       void queryClient.invalidateQueries({
         queryKey: zonesKeys.list(familyId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: presenceKeys.list(familyId),
       });
       setHidden(
         'zones',
@@ -389,6 +497,7 @@ export function MapLayersPage() {
 
   const childIds = children.map((child) => child.id);
   const zoneIds = zones.map((zone) => zone.id);
+  const zoneStatusFor = buildZoneStatuses(presence);
   const pinned = sortRoutes(pinnedRoutes);
   // В шторке — и выбранные, и те, что сейчас на линии.
   const pickerRoutes = sortRoutes(
@@ -505,9 +614,11 @@ export function MapLayersPage() {
                   key={zone.id}
                   title={zone.name}
                   subtitle={
-                    occupiedZones.has(zone.id)
-                      ? t('mapLayers.zoneInside')
-                      : t('mapLayers.zoneOutside')
+                    <ZoneStatusText
+                      name={zone.name}
+                      status={zoneStatusFor(zone.id)}
+                      now={now}
+                    />
                   }
                   icon="zone"
                   actions={
