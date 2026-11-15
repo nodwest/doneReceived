@@ -1,3 +1,13 @@
+/** Подтверждённое состояние ребёнка в геозоне. */
+export type ZonePresenceState = 'inside' | 'outside';
+
+export type ZonePresence = {
+  zoneId: string;
+  state: ZonePresenceState;
+  /** Когда состояние подтвердилось (ISO). */
+  since: string;
+};
+
 /** Позиция ребёнка с сервера (событие `location` сокета геолокации). */
 export type Location = {
   /** Аккаунт ребёнка, приславшего координаты. */
@@ -10,6 +20,8 @@ export type Location = {
   accuracy?: number | null;
   /** Геозона, в которой ребёнок сейчас, если есть. */
   zoneId?: string | null;
+  /** Подтверждённые состояния по зонам с буферами и задержками. */
+  zones?: ZonePresence[];
   /** ISO-время позиции. */
   updatedAt?: string;
 };

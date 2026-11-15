@@ -50,7 +50,7 @@ export function ParentHomePage() {
     operations &&
     sumTotals(operations.filter((operation) => operation.parentId === myId))
       .earned;
-  // Дети семьи с сервера. Статуса «дома» пока нет (геолокация — п. 24).
+  // Дети семьи с сервера. Статус «дома» к геозонам пока не подключён.
   const { data: serverChildren } = useFamilyChildren(
     useCurrentFamily()?.id ?? null,
   );

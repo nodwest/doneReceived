@@ -19,6 +19,7 @@ import {
 } from '@entities/zone';
 import { MapAttribution, ZoneMap } from '@widgets/map';
 import { TabScreen } from '@widgets/bottom-nav';
+import { presenceKeys } from '@features/location';
 import { showToast } from '@shared/lib';
 import { useTranslation } from '@shared/i18n';
 import { theme, tracking } from '@shared/theme';
@@ -85,6 +86,9 @@ export function MapZonePage() {
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: zonesKeys.list(familyId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: presenceKeys.list(familyId),
       });
       showToast(t(editing ? 'mapZone.updatedToast' : 'mapZone.savedToast'));
       back();
