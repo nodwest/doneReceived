@@ -7,6 +7,10 @@ import {
   useRefreshOnNavigate,
   useServerEvents,
 } from './data-sync';
+import {
+  LocationConnection,
+  useRegisterParentDevice,
+} from '@features/location';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: FRESH_MS } },
@@ -24,13 +28,22 @@ useSessionStore.subscribe((state, prev) => {
 /**
  * Данные актуальны так: свои изменения сбрасывают всё связанное
  * (`syncData` в мутациях), переход между экранами и возврат из фона
- * перечитывают устаревшее, изменения с других устройств приходят
- * событиями сервера по WebSocket (`useServerEvents`).
+ * перечитывают устаревшее, изменения с других устройств пока приходят
+ * таймером (`SYNC_POLL_MS`).
  */
+function ParentDeviceRegistration() {
+  useRegisterParentDevice();
+  return null;
+}
+
 export function Providers({ children }: { children: ReactNode }) {
   useRefreshOnNavigate(queryClient);
   useServerEvents(queryClient);
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ParentDeviceRegistration />
+      <LocationConnection />
+      {children}
+    </QueryClientProvider>
   );
 }

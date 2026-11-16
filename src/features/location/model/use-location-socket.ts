@@ -1,33 +1,28 @@
 import { useEffect, useRef } from 'react';
 
-import { useCurrentFamily, useFamilyChildren } from '@entities/family';
-import { useSessionKind, useSessionStore } from '@entities/session';
+import { useSessionStore } from '@entities/session';
 import { LOCATION_WS_URL } from '@shared/config';
-import { startLocationTracking } from '@shared/lib';
+import { i18n } from '@shared/i18n';
+import { deviceLabel, showToast, startLocationTracking } from '@shared/lib';
 import type { Location } from '@entities/user';
 
 /**
- * Сокет геолокации. Координаты отправляет только ребёнок — у родителя
- * геолокация даже не запрашивается, он лишь получает позиции детей. На карту
- * идут только события детей: без `childId` (прислал не ребёнок) и, когда
- * дети семьи уже загружены, чужие — отбрасываются. Координаты и токен не
- * логируем.
+ * Сокет геолокации. Координаты отправляет каждый активный член семьи со
+ * своего отслеживаемого устройства; события получают те, кому разрешено
+ * видеть отправителя. Координаты и токен не логируем.
  */
-export const useLocationSocket = (onLocation: (location: Location) => void) => {
+export const useLocationSocket = (
+  onLocation: (location: Location) => void,
+  onAccessChanged?: (userId: string, visible: boolean) => void,
+  onAuthenticated?: () => void,
+  familyId?: string | null,
+) => {
   const accessToken = useSessionStore((state) => state.session?.accessToken);
-  const kind = useSessionKind();
-  const family = useCurrentFamily();
-  const { data: children } = useFamilyChildren(
-    kind === 'parent' ? (family?.id ?? null) : null,
-  );
-  // Список детей — в ref, чтобы его загрузка не переоткрывала сокет.
-  const childIds = useRef<ReadonlySet<string> | null>(null);
-  useEffect(() => {
-    childIds.current = children ? new Set(children.map((c) => c.id)) : null;
-  }, [children]);
+  const locationErrorShown = useRef(false);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!accessToken || !familyId) return;
+    locationErrorShown.current = false;
 
     const socket = new WebSocket(LOCATION_WS_URL);
 
@@ -43,26 +38,47 @@ export const useLocationSocket = (onLocation: (location: Location) => void) => {
       const message = JSON.parse(event.data);
 
       if (message.event === 'authenticated' && message.data === true) {
-        if (kind !== 'child') return;
-        stopLocationTracking ??= startLocationTracking((lat, lng, accuracy) => {
-          if (socket.readyState !== WebSocket.OPEN) return;
+        // Новое соединение: накопленные live-точки могли устареть, а события
+        // приватности за время обрыва не приходили. Очищаем store и
+        // перечитываем последние точки через REST.
+        onAuthenticated?.();
+        stopLocationTracking ??= startLocationTracking(
+          (lat, lng, accuracy) => {
+            if (socket.readyState !== WebSocket.OPEN) return;
 
-          socket.send(
-            JSON.stringify({
-              event: 'location',
-              data: { lat, lng, accuracy },
-            }),
-          );
-        });
+            socket.send(
+              JSON.stringify({
+                event: 'location',
+                data: { lat, lng, accuracy, deviceLabel: deviceLabel() },
+              }),
+            );
+          },
+          () => {
+            // Браузер не дал координаты: без этого родитель не понимает,
+            // почему его метка не появляется у семьи.
+            if (locationErrorShown.current) return;
+            locationErrorShown.current = true;
+            showToast(i18n.t('map.locationUnavailable'));
+          },
+        );
+        return;
+      }
+
+      if (message.event === 'location-access') {
+        const data = message.data as { userId?: unknown; visible?: unknown };
+        if (
+          typeof data?.userId === 'string' &&
+          typeof data.visible === 'boolean'
+        ) {
+          onAccessChanged?.(data.userId, data.visible);
+        }
         return;
       }
 
       if (message.event !== 'location') return;
 
       const location = message.data as Location;
-      if (!location.childId) return;
-      if (childIds.current && !childIds.current.has(location.childId)) return;
-
+      if (!location.userId) return;
       onLocation(location);
     };
 
@@ -81,5 +97,5 @@ export const useLocationSocket = (onLocation: (location: Location) => void) => {
       stopLocationTracking?.();
       socket.close();
     };
-  }, [accessToken, kind, onLocation]);
+  }, [accessToken, familyId, onAccessChanged, onAuthenticated, onLocation]);
 };

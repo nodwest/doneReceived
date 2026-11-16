@@ -65,6 +65,10 @@ export interface FamilyMember {
   avatarUrl: string | null;
   role: MemberRole;
   kind: 'parent' | 'child';
+  /** Профиль ребёнка; у родителя null. */
+  childId: string | null;
+  /** Цвет метки на карте, общий для семьи. */
+  mapColor: string;
 }
 
 /** Родитель на экране Family: GET /families/:id. */

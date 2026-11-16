@@ -82,7 +82,7 @@ export function useParentInvite(familyId: string | null, enabled: boolean) {
 
 /**
  * Участники семьи с сервера (родители и дети); без семьи (null) запроса нет.
- * Ребёнку ручка закрыта — у него передавайте null.
+ * Доступно активным участникам, включая ребёнка.
  */
 export function useFamilyMembers(familyId: string | null) {
   return useQuery({

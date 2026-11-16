@@ -2,8 +2,6 @@ import { layers, namedFlavor } from '@protomaps/basemaps';
 import type { StyleSpecification } from 'maplibre-gl';
 
 import { OSM_SOURCE } from './map-source';
-import { userLayer } from '../layers/dynamic/user-layer';
-import { userSource } from '../layers/dynamic/user-source';
 
 export const MAP_STYLE: StyleSpecification = {
   version: 8,
@@ -15,8 +13,7 @@ export const MAP_STYLE: StyleSpecification = {
 
   sources: {
     osm: OSM_SOURCE,
-    users: userSource,
   },
 
-  layers: [...layers('osm', namedFlavor('light'), { lang: 'ru' }), userLayer],
+  layers: [...layers('osm', namedFlavor('light'), { lang: 'ru' })],
 };
