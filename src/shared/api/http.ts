@@ -63,10 +63,15 @@ type RequestOptions = {
 
 // Токен доступа подставляет сессия: shared не знает, где он хранится.
 let getAccessToken: () => string | null = () => null;
+let getSessionScope: () => symbol | undefined = () => undefined;
 
 /** Откуда брать токен для заголовка `Authorization: Bearer …`. */
-export function setAccessTokenGetter(getter: () => string | null) {
+export function setAccessTokenGetter(
+  getter: () => string | null,
+  scope: () => symbol,
+) {
   getAccessToken = getter;
+  getSessionScope = scope;
 }
 
 /**
@@ -85,7 +90,10 @@ export function authorizedImage(url: string) {
 // Обновление токенов подставляет сессия: true — новая пара сохранена.
 let refreshTokens: (() => Promise<boolean>) | null = null;
 // Идущее обновление: несколько запросов с протухшим токеном ждут одно.
-let refreshing: Promise<boolean> | null = null;
+let refreshing: {
+  scope: symbol | undefined;
+  promise: Promise<boolean>;
+} | null = null;
 
 /**
  * Как обновить токены, когда сервер ответил 401 на запрос с токеном. Вызов
@@ -95,11 +103,16 @@ export function setTokenRefresher(refresher: () => Promise<boolean>) {
   refreshTokens = refresher;
 }
 
-function refreshOnce(refresher: () => Promise<boolean>) {
-  refreshing ??= refresher().finally(() => {
-    refreshing = null;
+function refreshOnce(
+  refresher: () => Promise<boolean>,
+  scope: symbol | undefined,
+) {
+  if (refreshing?.scope === scope && refreshing) return refreshing.promise;
+  const promise = refresher().finally(() => {
+    if (refreshing?.promise === promise) refreshing = null;
   });
-  return refreshing;
+  refreshing = { scope, promise };
+  return promise;
 }
 
 /** Текущий токен доступа или null (не вошли). */
@@ -148,20 +161,28 @@ export async function apiRequest<T>(
   };
 
   const token = getAccessToken();
+  const scope = getSessionScope();
   let response = await send(token);
-  if (response.status === 401 && token && !skipRefresh && refreshTokens) {
+  if (
+    response.status === 401 &&
+    token &&
+    !skipRefresh &&
+    refreshTokens &&
+    getSessionScope() === scope
+  ) {
     // Пока запрос шёл, токены могли уже обновить — тогда сразу повторяем.
     const fresh =
-      getAccessToken() !== token || (await refreshOnce(refreshTokens));
+      getAccessToken() !== token || (await refreshOnce(refreshTokens, scope));
     const next = getAccessToken();
-    if (fresh && next) response = await send(next);
+    if (fresh && next && getSessionScope() === scope)
+      response = await send(next);
   }
 
   const text = await response.text();
   const data: unknown = text ? safeParse(text) : null;
-  // В разработке — каждый запрос в консоль: видно, что ушло и что ответили.
+  // Тела ответов могут содержать токены, коды и персональные данные.
   if (__DEV__) {
-    console.log(`[api] ${method} ${path} → ${response.status}`, data);
+    console.log(`[api] ${method} → ${response.status}`);
   }
   if (!response.ok) {
     throw new ApiError(
@@ -171,6 +192,8 @@ export async function apiRequest<T>(
       parseRetryAfter(response.headers.get('Retry-After')),
     );
   }
+  // Ответ предыдущего аккаунта может прийти уже после очистки кэша при выходе.
+  if (token && getSessionScope() !== scope) throw new ApiError(0, []);
   return data as T;
 }
 
