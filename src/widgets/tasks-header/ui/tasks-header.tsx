@@ -33,16 +33,17 @@ type TasksHeaderProps = {
    * «George's tasks» стоит по центру шапки, а не строкой под ней.
    */
   tabs?: boolean;
-  /** Цвет выбранного All и бейджа: фиолетовый у родителя, голубой у ребёнка. */
+  /** Подпись вкладки проверки: Review Tasks у родителя, On review у ребёнка. */
   tone?: Tone;
 };
 
 type Tone = 'parent' | 'child';
 
-const TONE_GRADIENTS = {
-  parent: [theme.colors.violet, theme.colors.blue],
-  child: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+/** Выбранный All и бейдж счётчика — синие у родителя и у ребёнка. */
+const ACCENT_GRADIENT = [
+  theme.colors.childFrom,
+  theme.colors.childDeep,
+] as const;
 
 /** Чьи задания; avatar null — первая буква имени (ребёнок с сервера). */
 type Owner = { name: string; avatar: ImageSourcePropType | null };
@@ -120,7 +121,7 @@ function Segments({ tab, onTabChange, reviewCount, tone }: SegmentsProps) {
       >
         {allActive && (
           <LinearGradient
-            colors={TONE_GRADIENTS[tone]}
+            colors={ACCENT_GRADIENT}
             start={{ x: 0, y: 0.1 }}
             end={{ x: 1, y: 0.9 }}
             locations={[0, 0.7071]}
@@ -169,7 +170,7 @@ function Segments({ tab, onTabChange, reviewCount, tone }: SegmentsProps) {
         />
         {reviewCount > 0 && (
           <LinearGradient
-            colors={TONE_GRADIENTS[tone]}
+            colors={ACCENT_GRADIENT}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             locations={[0, 0.7071]}
