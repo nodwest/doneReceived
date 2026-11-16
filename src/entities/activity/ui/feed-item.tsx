@@ -33,7 +33,7 @@ export function FeedItem({ event, viewer }: FeedItemProps) {
   // Кто рядом с событием: у родителя — ребёнок (у пополнения — сам родитель),
   // у ребёнка — родитель (у своих действий — сам ребёнок).
   const person =
-    viewer === 'parent' || event.byMe
+    viewer === 'parent' || event.byMe || event.type === 'task_expired'
       ? (event.child ?? event.actor)
       : event.actor;
 
@@ -46,6 +46,7 @@ export function FeedItem({ event, viewer }: FeedItemProps) {
   } else if (
     event.type !== 'task_withdrawn' &&
     event.type !== 'wish_added' &&
+    event.type !== 'task_expired' &&
     !(viewer === 'child' && event.byMe)
   ) {
     extra = t('activity.feed.by', { name: actor });
@@ -53,7 +54,7 @@ export function FeedItem({ event, viewer }: FeedItemProps) {
 
   const { points } = event;
   const amount =
-    points === null
+    points === null || (viewer === 'child' && event.type === 'task_expired')
       ? ''
       : event.type === 'task_approved' || event.type === 'deposit'
         ? `+$${points}`

@@ -27,7 +27,7 @@ type TaskDto = {
 type AssignmentDto = {
   id: string;
   childId: string;
-  status: 'assigned' | 'submitted' | 'rejected' | 'approved';
+  status: 'assigned' | 'submitted' | 'rejected' | 'approved' | 'expired';
   /** После отказа можно переделать; false — отказ закрыл назначение. */
   retryableRejection: boolean;
   /** Шаги чеклиста, которые ребёнок отметил. */
@@ -82,12 +82,14 @@ type MemberDto = {
 };
 
 /** Статус назначения → статус задачи в приложении. */
-const STATES: Record<AssignmentDto['status'], TaskState> = {
+const STATES: Record<Exclude<AssignmentDto['status'], 'expired'>, TaskState> = {
   assigned: 'active',
   rejected: 'active',
   submitted: 'review',
   approved: 'done',
 };
+
+type ListedAssignment = AssignmentDto & { status: keyof typeof STATES };
 
 /** Кто смотрит список: чтобы его задания считались «моими» на экранах. */
 export type TaskViewer = {
@@ -104,7 +106,7 @@ const attachmentImage = (familyId: string, id: string) =>
 
 function toTask(
   task: TaskDto,
-  assignment: AssignmentDto,
+  assignment: ListedAssignment,
   children: readonly ChildDto[],
   members: readonly MemberDto[],
   viewer: TaskViewer,
@@ -157,7 +159,7 @@ function toTask(
  * GET /families/:id/tasks — назначения семьи (ребёнку — только свои), до 100
  * последних, и имена детей (GET /families/:id/children). Ребёнку список
  * детей закрыт (403), его не спрашиваем: имя — из сессии. Отменённые,
- * подтверждённые и закрытые отказом (`rejected` без `retryableRejection`)
+ * подтверждённые, истёкшие и закрытые отказом (`rejected` без `retryableRejection`)
  * в список не идут.
  */
 export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
@@ -168,7 +170,7 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
   const parent = viewer.childName === undefined;
   const [items, children, members] = await Promise.all([
     apiRequest<{ task: TaskDto; assignment: AssignmentDto }[]>(
-      `/families/${familyId}/tasks`,
+      `/families/${familyId}/tasks?status=assigned,submitted,rejected`,
     ),
     parent
       ? apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
@@ -180,10 +182,14 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
     ),
   ]);
   const visible = items.filter(
-    ({ task, assignment }) =>
-      task.cancelledAt === null &&
-      assignment.status !== 'approved' &&
-      !(assignment.status === 'rejected' && !assignment.retryableRejection),
+    (item): item is { task: TaskDto; assignment: ListedAssignment } =>
+      item.task.cancelledAt === null &&
+      item.assignment.status !== 'expired' &&
+      item.assignment.status !== 'approved' &&
+      !(
+        item.assignment.status === 'rejected' &&
+        !item.assignment.retryableRejection
+      ),
   );
   const photos = await Promise.all(
     visible.map(({ assignment }) => pendingAttachments(familyId, assignment)),
@@ -250,7 +256,7 @@ export function createServerTask(familyId: string, payload: CreateTaskPayload) {
 /**
  * PATCH /families/:id/tasks/:taskId — правка задания (только автор). Пустое
  * описание и срок отправляются как null — сервер их очищает. 409 —
- * `TASK_ON_REVIEW`, `TASK_CANCELLED` или `INSUFFICIENT_FUNDS` (не хватает на
+ * `TASK_ON_REVIEW`, `TASK_CANCELLED`, `TASK_DEADLINE_PASSED` или `INSUFFICIENT_FUNDS` (не хватает на
  * новую награду, ничего не меняется).
  */
 export function updateServerTask(familyId: string, payload: UpdateTaskPayload) {

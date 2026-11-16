@@ -169,6 +169,7 @@ export const en = {
         task_approved: '“{{task}}” approved for {{child}}',
         task_rejected: '“{{task}}” sent back to {{child}}',
         task_cancelled: '“{{task}}” cancelled for {{child}}',
+        task_expired: '{{child}} ran out of time: “{{task}}”',
         wish_added: '{{child}} added a wish: {{task}}',
         deposit: 'Wallet topped up',
       },
@@ -179,6 +180,7 @@ export const en = {
         task_approved: '“{{task}}” approved',
         task_rejected: '“{{task}}” sent back to redo',
         task_cancelled: '“{{task}}” cancelled',
+        task_expired: 'Time’s up: “{{task}}”',
         wish_added: 'New wish: {{task}}',
         deposit: 'Wallet topped up',
       },
@@ -553,6 +555,7 @@ export const en = {
     errors: {
       insufficientFunds:
         'Not enough money in your wallet for this reward. Top up or lower it.',
+      deadlinePassed: 'The task has expired and can no longer be edited.',
       onReview:
         'The child has already sent this task for review — check it first.',
       network: "Can't reach the server. Check your connection and try again.",

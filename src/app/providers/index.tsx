@@ -5,6 +5,7 @@ import {
   LocationConnection,
   useRegisterParentDevice,
 } from '@features/location';
+import { useTaskExpirationEvents } from './use-task-expiration-events';
 import { FRESH_MS, listenAppFocus, useRefreshOnNavigate } from './data-sync';
 
 const queryClient = new QueryClient({
@@ -23,8 +24,8 @@ useSessionStore.subscribe((state, prev) => {
 /**
  * Данные актуальны так: свои изменения сбрасывают всё связанное
  * (`syncData` в мутациях), переход между экранами и возврат из фона
- * перечитывают устаревшее, изменения с других устройств пока приходят
- * таймером (`SYNC_POLL_MS`).
+ * перечитывают устаревшее. Истечение заданий обновляется по WebSocket,
+ * для остальных внешних изменений используется опрос (`SYNC_POLL_MS`).
  */
 function ParentDeviceRegistration() {
   useRegisterParentDevice();
@@ -33,6 +34,7 @@ function ParentDeviceRegistration() {
 
 export function Providers({ children }: { children: ReactNode }) {
   useRefreshOnNavigate(queryClient);
+  useTaskExpirationEvents(queryClient);
   return (
     <QueryClientProvider client={queryClient}>
       <ParentDeviceRegistration />

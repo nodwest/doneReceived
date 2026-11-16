@@ -7,4 +7,5 @@ const wsBaseUrl = (
 ).replace(/\/+$/, '');
 
 export const WS_URL = `${wsBaseUrl}/`;
+export const EVENTS_WS_URL = `${wsBaseUrl}/events`;
 export const LOCATION_WS_URL = `${wsBaseUrl}/location`;

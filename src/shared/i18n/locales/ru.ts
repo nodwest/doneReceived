@@ -163,6 +163,7 @@ export const ru: Dictionary = {
         task_approved: '«{{task}}» принято · {{child}}',
         task_rejected: '«{{task}}» вернули на доработку · {{child}}',
         task_cancelled: '«{{task}}» отменено · {{child}}',
+        task_expired: '{{child}} не успел(а) выполнить «{{task}}»',
         wish_added: '{{child}}: новое желание «{{task}}»',
         deposit: 'Кошелёк пополнен',
       },
@@ -173,6 +174,7 @@ export const ru: Dictionary = {
         task_approved: '«{{task}}» принято',
         task_rejected: '«{{task}}» вернули на доработку',
         task_cancelled: '«{{task}}» отменено',
+        task_expired: 'Время вышло: «{{task}}»',
         wish_added: 'Новое желание: {{task}}',
         deposit: 'Кошелёк пополнен',
       },
@@ -563,6 +565,7 @@ export const ru: Dictionary = {
     errors: {
       insufficientFunds:
         'В кошельке не хватает денег на эту награду. Пополните кошелёк или уменьшите награду.',
+      deadlinePassed: 'Срок задания истёк, его больше нельзя изменить.',
       onReview:
         'Ребёнок уже отправил это задание на проверку — сначала проверьте его.',
       network: 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.',

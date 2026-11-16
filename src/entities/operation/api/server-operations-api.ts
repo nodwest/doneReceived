@@ -42,6 +42,7 @@ type MissedDto = {
     rewardPoints: number;
     /** Срок, который прошёл. */
     deadlineAt: string;
+    expiredAt?: string;
     /** userId родителя, создавшего задание. */
     createdBy: string;
   }[];
@@ -110,7 +111,7 @@ export async function fetchServerOperations(
         amount: item.rewardPoints,
         child: toChild(child),
         parentId: item.createdBy,
-        at: item.deadlineAt,
+        at: item.expiredAt ?? item.deadlineAt,
         doneAt: null,
         photos: [],
         note: null,
