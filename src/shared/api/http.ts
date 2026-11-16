@@ -125,7 +125,7 @@ export const currentAccessToken = () => getAccessToken();
  */
 export async function refreshAccessToken(stale: string) {
   if (getAccessToken() !== stale) return getAccessToken() !== null;
-  return refreshTokens ? refreshOnce(refreshTokens) : false;
+  return refreshTokens ? refreshOnce(refreshTokens, getSessionScope()) : false;
 }
 
 /**
