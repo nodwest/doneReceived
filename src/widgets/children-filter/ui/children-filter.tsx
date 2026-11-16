@@ -1,14 +1,6 @@
 import type { ReactNode } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type ImageSourcePropType,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Pressable, Text, View, type ImageSourcePropType } from 'react-native';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
 import { LetterAvatar } from '@shared/ui';
 import { styles } from './children-filter.styled';
 
@@ -92,15 +84,6 @@ function Segment({ label, active, onPress, children }: SegmentProps) {
       onPress={onPress}
       style={[styles.segment, active && styles.segmentActive]}
     >
-      {active && (
-        <LinearGradient
-          colors={[theme.colors.violet, theme.colors.blue]}
-          start={{ x: 0, y: 0.1 }}
-          end={{ x: 1, y: 0.9 }}
-          locations={[0, 0.7071]}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
       {children}
       <Text
         style={[styles.label, active && styles.labelActive]}

@@ -55,4 +55,10 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
     color: theme.colors.rewardText,
   },
+  rewardMissed: {
+    backgroundColor: theme.colors.missedSoft,
+  },
+  rewardTextMissed: {
+    color: theme.colors.missedDeep,
+  },
 });

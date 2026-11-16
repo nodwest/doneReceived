@@ -34,18 +34,50 @@ type WalletDto = {
   }[];
 };
 
-type MissedDto = {
-  items: {
-    assignmentId: string;
-    taskTitle: string;
-    taskDescription: string | null;
-    rewardPoints: number;
-    /** Срок, который прошёл. */
-    deadlineAt: string;
-    /** userId родителя, создавшего задание. */
-    createdBy: string;
-  }[];
+type MissedItemDto = {
+  assignmentId: string;
+  taskTitle: string;
+  taskDescription: string | null;
+  rewardPoints: number;
+  /** Срок задания; у закрытого отказом мог не быть (п. 33). */
+  deadlineAt: string | null;
+  /** Когда истекло (п. 32). */
+  expiredAt?: string | null;
+  /** userId родителя, создавшего задание. */
+  createdBy: string;
+  /** Почему упущено и когда (п. 33); нет — истекло, время — expiredAt. */
+  reason?: 'expired' | 'rejected';
+  closedAt?: string | null;
 };
+
+type MissedDto = {
+  items: MissedItemDto[];
+  /** Курсор следующей страницы; null — больше нет. */
+  next?: string | null;
+};
+
+/** Сколько страниц упущенных читаем за раз (по 100). */
+const MISSED_MAX_PAGES = 10;
+
+/** Все упущенные ребёнка, страницами по курсору; ошибка — пусто. */
+async function fetchMissed(familyId: string, childId: string) {
+  const items: MissedItemDto[] = [];
+  let before: string | null | undefined;
+  try {
+    for (let page = 0; page < MISSED_MAX_PAGES; page += 1) {
+      const query = before ? `?before=${encodeURIComponent(before)}` : '';
+      const data = await apiRequest<MissedDto>(
+        `/families/${familyId}/children/${childId}/missed-tasks${query}`,
+      );
+      items.push(...data.items);
+      before = data.next;
+      if (!before) break;
+    }
+  } catch {
+    // Что успели прочитать — показываем.
+  }
+  return items;
+}
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
 
@@ -69,9 +101,7 @@ export async function fetchServerOperations(
         apiRequest<WalletDto>(
           `/families/${familyId}/children/${child.id}/wallet`,
         ).catch(() => ({ entries: [] }) as WalletDto),
-        apiRequest<MissedDto>(
-          `/families/${familyId}/children/${child.id}/missed-tasks`,
-        ).catch(() => ({ items: [] }) as MissedDto),
+        fetchMissed(familyId, child.id),
       ]),
     ),
   );
@@ -101,7 +131,7 @@ export async function fetchServerOperations(
         assignmentId: entry.assignmentId,
       }),
     );
-    const lost = missed.items.map(
+    const lost = missed.map(
       (item): Operation => ({
         id: item.assignmentId,
         kind: 'missed',
@@ -110,10 +140,17 @@ export async function fetchServerOperations(
         amount: item.rewardPoints,
         child: toChild(child),
         parentId: item.createdBy,
-        at: item.deadlineAt,
+        at:
+          item.closedAt ??
+          item.expiredAt ??
+          item.deadlineAt ??
+          new Date(0).toISOString(),
         doneAt: null,
         photos: [],
         note: null,
+        assignmentId: item.assignmentId,
+        dueAt: item.deadlineAt,
+        missedReason: item.reason ?? 'expired',
       }),
     );
     return [...earned, ...lost];

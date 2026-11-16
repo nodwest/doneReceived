@@ -96,4 +96,16 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: theme.colors.inkSoft,
   },
+
+  // Упущенное задание: серая плашка внизу и коралловые часы.
+  noteMissed: {
+    borderColor: theme.colors.missedBorder,
+    backgroundColor: theme.colors.prime,
+  },
+  noteIconMissed: {
+    backgroundColor: theme.colors.missedClock,
+  },
+  noteTitleMissed: {
+    color: theme.colors.missedInk,
+  },
 });

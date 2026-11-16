@@ -9,8 +9,6 @@ import {
   DAY_SLOT_WIDTH,
 } from '../config/sizes';
 
-const SOFT_WHITE = 'rgba(255, 255, 255, 0.85)';
-
 export const styles = StyleSheet.create({
   column: {
     width: DAY_SLOT_WIDTH,
@@ -39,9 +37,9 @@ export const styles = StyleSheet.create({
   },
   chipSelected: {
     width: COLUMN_WIDTH_SELECTED,
-    borderWidth: 0,
-    backgroundColor: 'transparent',
-    boxShadow: '0px 4px 5px rgba(108, 92, 231, 0.28)',
+    borderWidth: 1.5,
+    borderColor: theme.colors.ink,
+    boxShadow: '0px 2px 8px rgba(26, 26, 46, 0.08)',
   },
   // Будущий день: без тени, весь текст серый.
   chipFuture: {
@@ -57,25 +55,16 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
-  weekdaySelected: {
-    color: SOFT_WHITE,
-  },
   day: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.semibold,
     color: theme.colors.ink,
   },
-  daySelected: {
-    color: theme.colors.white,
-  },
   month: {
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
-  },
-  monthSelected: {
-    color: SOFT_WHITE,
   },
 });

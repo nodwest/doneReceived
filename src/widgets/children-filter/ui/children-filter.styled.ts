@@ -26,8 +26,12 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
   },
+  // Выбранный — белый в тёмной рамке, как выбранный день на графике.
   segmentActive: {
-    boxShadow: '0px 4px 10px rgba(108, 92, 231, 0.3)',
+    borderWidth: 1.5,
+    borderColor: theme.colors.ink,
+    backgroundColor: theme.colors.white,
+    boxShadow: '0px 2px 8px rgba(26, 26, 46, 0.08)',
   },
   label: {
     flexShrink: 1,
@@ -38,7 +42,6 @@ export const styles = StyleSheet.create({
   },
   labelActive: {
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
   },
   avatar: {
     width: 24,

@@ -25,17 +25,33 @@ export function TileTimer({ expiresAt }: { expiresAt: string }) {
 
 type TilePillProps = {
   label: string;
-  /** review — белая на тёплой плитке «на проверке», paid — зелёная с галочкой. */
-  tone: 'review' | 'paid';
+  /**
+   * review — белая на тёплой плитке «на проверке», paid — зелёная с галочкой,
+   * missed — серая с часами (упущенное задание).
+   */
+  tone: 'review' | 'paid' | 'missed';
 };
 
-/** Плашка с подписью в шапке плитки: «Done 2 h ago», «Paid 6:12 PM». */
+/**
+ * Плашка с подписью в шапке плитки: «Done 2 h ago», «Paid 6:12 PM»,
+ * «Expired 5:00 PM».
+ */
 export function TilePill({ label, tone }: TilePillProps) {
-  const paid = tone === 'paid';
   return (
-    <View style={[styles.pill, paid ? styles.paid : styles.review]}>
-      {paid && <Icon name="check" size={14} color={theme.colors.rewardText} />}
-      <Text style={[styles.pillText, paid && styles.pillTextPaid]}>
+    <View style={[styles.pill, styles[tone]]}>
+      {tone === 'paid' && (
+        <Icon name="check" size={14} color={theme.colors.rewardText} />
+      )}
+      {tone === 'missed' && (
+        <Icon name="clock" size={14} color={theme.colors.missedDeep} />
+      )}
+      <Text
+        style={[
+          styles.pillText,
+          tone === 'paid' && styles.pillTextPaid,
+          tone === 'missed' && styles.pillTextMissed,
+        ]}
+      >
         {label}
       </Text>
     </View>
@@ -46,18 +62,26 @@ type RewardAmountProps = {
   reward: number;
   /** Выплачено: зелёное «+$4». */
   paid?: boolean;
+  /** Упущено: графитовое «$4». */
+  missed?: boolean;
 };
 
 /**
  * Награда внизу плитки: монета и сумма. Без рамки и фона — это сведения, а не
  * кнопка.
  */
-export function RewardAmount({ reward, paid }: RewardAmountProps) {
+export function RewardAmount({ reward, paid, missed }: RewardAmountProps) {
   const value = formatRewardShort(reward);
   return (
     <View style={styles.reward}>
       <Icon name="coin" size={24} color={theme.colors.yellow} />
-      <Text style={[styles.rewardText, paid && styles.rewardTextPaid]}>
+      <Text
+        style={[
+          styles.rewardText,
+          paid && styles.rewardTextPaid,
+          missed && styles.rewardTextMissed,
+        ]}
+      >
         {paid ? `+${value}` : value}
       </Text>
     </View>
@@ -141,6 +165,9 @@ const styles = StyleSheet.create({
   paid: {
     backgroundColor: theme.colors.approvedFrom,
   },
+  missed: {
+    backgroundColor: theme.colors.missedTile,
+  },
   timerText: {
     fontSize: 15,
     letterSpacing: tracking(15),
@@ -156,6 +183,9 @@ const styles = StyleSheet.create({
   pillTextPaid: {
     color: theme.colors.rewardText,
   },
+  pillTextMissed: {
+    color: theme.colors.missedDeep,
+  },
   reward: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -169,5 +199,8 @@ const styles = StyleSheet.create({
   },
   rewardTextPaid: {
     color: theme.colors.rewardText,
+  },
+  rewardTextMissed: {
+    color: theme.colors.missedDeep,
   },
 });
