@@ -22,16 +22,23 @@ import { styles } from './task-sheet.styled';
 
 /**
  * parent и child — голубая шапка, review — оранжевая «на
- * проверке», paid — зелёная: награда выплачена, wallet — тёмно-синяя, как
- * карточка баланса: транзакция кошелька.
+ * проверке», paid — зелёная: награда выплачена, missed — графитовая: награда
+ * упущена, wallet — тёмно-синяя, как карточка баланса: транзакция кошелька.
  */
-export type TaskSheetTone = 'parent' | 'child' | 'review' | 'paid' | 'wallet';
+export type TaskSheetTone =
+  | 'parent'
+  | 'child'
+  | 'review'
+  | 'paid'
+  | 'missed'
+  | 'wallet';
 
 const HERO_GRADIENTS = {
   parent: [theme.colors.heroChildFrom, theme.colors.childDeep],
   child: [theme.colors.heroChildFrom, theme.colors.childDeep],
   review: [theme.colors.heroReviewFrom, theme.colors.heroReviewTo],
   paid: [theme.colors.heroPaidFrom, theme.colors.earnedDark],
+  missed: [theme.colors.missed, theme.colors.missedDeep],
   wallet: [theme.colors.heroWalletFrom, theme.colors.parentFrom],
 } as const;
 
@@ -40,6 +47,7 @@ const SHADOWS = {
   child: styles.shadowChild,
   review: styles.shadowReview,
   paid: styles.shadowPaid,
+  missed: styles.shadowMissed,
   wallet: styles.shadowWallet,
 };
 
@@ -205,11 +213,26 @@ type RewardChipProps = {
   reward: number;
   /** Награда уже выплачена: зелёная плашка «+$4». */
   paid?: boolean;
+  /** Награда упущена: серая плашка «$4». */
+  missed?: boolean;
 };
 
-/** Плашка награды с монетой: золотая «$5» или зелёная выплаченная «+$4». */
-export function RewardChip({ reward, paid }: RewardChipProps) {
+/**
+ * Плашка награды с монетой: золотая «$5», зелёная выплаченная «+$4» или
+ * серая упущенная «$4».
+ */
+export function RewardChip({ reward, paid, missed }: RewardChipProps) {
   const value = formatRewardShort(reward);
+  if (missed) {
+    return (
+      <View style={[styles.rewardChip, styles.rewardChipMissed]}>
+        <Icon name="coin" size={24} color={theme.colors.yellow} />
+        <Text style={[styles.rewardChipValue, styles.rewardChipValueMissed]}>
+          {value}
+        </Text>
+      </View>
+    );
+  }
   if (paid) {
     return (
       <View style={[styles.rewardChip, styles.rewardChipPaid]}>
@@ -243,13 +266,14 @@ export function TaskBrief({
   label,
   reward,
   paid,
+  missed,
   description,
 }: TaskBriefProps) {
   return (
     <View style={styles.brief}>
       <View style={styles.briefHead}>
         <SectionLabel>{label}</SectionLabel>
-        <RewardChip reward={reward} paid={paid} />
+        <RewardChip reward={reward} paid={paid} missed={missed} />
       </View>
       {!!description && <Text style={styles.description}>{description}</Text>}
     </View>
@@ -259,7 +283,7 @@ export function TaskBrief({
 export type InfoTileProps = {
   icon: IconName;
   /** Цвет иконки; фон плитки — тот же цвет, но бледный. */
-  tone: 'warm' | 'cool' | 'green';
+  tone: 'warm' | 'cool' | 'green' | 'grey';
   label: string;
   value: string;
 };
@@ -268,6 +292,7 @@ const TILE_TONES = {
   warm: { bg: theme.colors.dueTile, ink: theme.colors.dueInk },
   cool: { bg: theme.colors.givenTile, ink: theme.colors.childDeep },
   green: { bg: theme.colors.readySoft, ink: theme.colors.readyText },
+  grey: { bg: theme.colors.missedTile, ink: theme.colors.missedDeep },
 };
 
 /** Пара плиток «когда»: срок и когда выдано / создано. */

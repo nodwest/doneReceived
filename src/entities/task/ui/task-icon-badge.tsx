@@ -8,11 +8,27 @@ type BadgeSize = 52 | 48 | 44 | 40;
 // Размер иконки в плашке: плитка главной, список, история наград, Wallet.
 const ICON_SIZE: Record<BadgeSize, number> = { 52: 24, 48: 22, 44: 20, 40: 19 };
 
-/** Голубая плашка с иконкой задания на экранах ребёнка. */
-export function TaskIconBadge({ size = 52 }: { size?: BadgeSize }) {
+// child — голубая (задания ребёнка), earned / missed — история наград:
+// зелёная выплаченная и серая упущенная.
+const GRADIENTS = {
+  child: [theme.colors.childTo, theme.colors.childFrom],
+  earned: [theme.colors.earnedLight, theme.colors.earned],
+  missed: [theme.colors.missedLight, theme.colors.missed],
+} as const;
+
+type TaskIconBadgeProps = {
+  size?: BadgeSize;
+  tone?: keyof typeof GRADIENTS;
+};
+
+/** Плашка с иконкой задания на экранах ребёнка. */
+export function TaskIconBadge({
+  size = 52,
+  tone = 'child',
+}: TaskIconBadgeProps) {
   return (
     <LinearGradient
-      colors={[theme.colors.childTo, theme.colors.childFrom]}
+      colors={GRADIENTS[tone]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       locations={[0, 0.7071]}

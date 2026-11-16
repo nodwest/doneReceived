@@ -44,7 +44,7 @@ export const theme = {
     // Заглушка фото-отчёта, когда ребёнок не приложил снимок.
     photoFrom: '#EFEAE0',
     photoTo: '#DCD3C8',
-    // История операций: заработано (зелёный) и упущено (синий). Грани
+    // История операций: заработано (зелёный) и упущено (графит). Грани
     // 3D-столбиков: лицевая, боковая (тёмная) и верхняя (светлая).
     earned: '#2EB873',
     earnedDark: '#1A854F',
@@ -54,12 +54,18 @@ export const theme = {
     earnedSoft: 'rgba(46, 184, 115, 0.16)',
     rewardText: '#1F995C',
     rewardSoft: 'rgba(46, 184, 115, 0.14)',
-    missed: '#61A3ED',
-    missedDark: '#3875C2',
-    missedLight: '#A3D1FA',
-    missedInk: '#1F52A8',
-    missedLabel: '#123380',
-    missedSoft: 'rgba(97, 163, 237, 0.16)',
+    missed: '#8A93A8',
+    missedDark: '#5B6478',
+    missedLight: '#C3C9D6',
+    missedInk: '#3A4152',
+    missedLabel: '#262B38',
+    missedSoft: 'rgba(138, 147, 168, 0.16)',
+    // Упущенное задание: конец градиента шапки карточки и выбранного Missed,
+    // текст суммы, плитка «истекло», значок часов в плашке внизу карточки.
+    missedDeep: '#4B5468',
+    missedTile: '#EEF0F4',
+    missedBorder: '#D5D9E2',
+    missedClock: '#F26B4F',
     // Будущие дни на графике: серый кубик-заглушка.
     future: '#E1E3EC',
     futureDark: '#CDD0DB',

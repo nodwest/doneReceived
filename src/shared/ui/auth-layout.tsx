@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link, type Href } from 'expo-router';
+import { Link, router, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '../i18n';
 import { theme, tracking } from '../theme';
 import { Icon, type IconName } from './icons';
+import { RoundButton } from './round-button';
 
 type AuthLayoutProps = {
   /** Жёлтая иконка в фиолетовом квадрате над заголовком. */
@@ -16,6 +18,11 @@ type AuthLayoutProps = {
   action: ReactNode;
   /** Строка под кнопкой («Нет аккаунта? Зарегистрироваться»). */
   footnote?: ReactNode;
+  /**
+   * Кнопка «назад» слева сверху: возвращает на прошлый экран, а если истории
+   * нет (открыли по ссылке) — сюда. Без пропа кнопки нет (логин).
+   */
+  backTo?: Href;
   children: ReactNode;
 };
 
@@ -32,8 +39,16 @@ export function AuthLayout({
   subtitle,
   action,
   footnote,
+  backTo,
   children,
 }: AuthLayoutProps) {
+  const { t } = useTranslation();
+  const goBack = () => {
+    if (!backTo) return;
+    if (router.canGoBack()) router.back();
+    else router.replace(backTo);
+  };
+
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView
@@ -41,6 +56,16 @@ export function AuthLayout({
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Поверх отступа: иконка и кнопка не сдвигаются, есть «назад» или нет. */}
+        {backTo && (
+          <View style={styles.back}>
+            <RoundButton
+              icon="arrow-left"
+              accessibilityLabel={t('common.back')}
+              onPress={goBack}
+            />
+          </View>
+        )}
         <View style={styles.header}>
           <LinearGradient
             style={styles.icon}
@@ -94,6 +119,12 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 24,
     paddingBottom: 24,
+  },
+  back: {
+    position: 'absolute',
+    top: 20,
+    left: 16,
+    zIndex: 1,
   },
   header: {
     width: '100%',

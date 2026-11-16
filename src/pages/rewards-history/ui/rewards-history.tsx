@@ -8,13 +8,21 @@ import {
 } from '@widgets/children-filter';
 import { DaySummary } from '@widgets/day-summary';
 import { OperationsChart } from '@widgets/operations-chart';
-import { PaidTaskCard, PaidTaskTile } from '@widgets/paid-task-card';
+import {
+  MissedTaskCard,
+  MissedTaskTile,
+  PaidTaskCard,
+  PaidTaskTile,
+  RewardKindToggle,
+} from '@widgets/paid-task-card';
 import {
   getDayTotals,
   getHistoryDays,
   isSameDay,
   OperationRow,
+  sortByNewest,
   type Operation,
+  type OperationKind,
 } from '@entities/operation';
 import {
   useChildAccount,
@@ -39,15 +47,18 @@ const NO_OPERATIONS: Operation[] = [];
 
 /**
  * История наград по дням (открывается из Wallet и «See all» в профилях):
- * заработанные и упущенные награды на графике, итоги и награды выбранного дня.
- * У родителя — только награды по его заданиям (выплаченные из его кошелька).
- * Тап по награде или кнопка карточек справа в шапке открывают карточки
- * выплаченных заданий этого дня (листаются), «назад» — обратно к графику на
- * тот же день. Кнопка списка в карточках открывает все выплаченные задания
- * плитками по дням (с суммой за день); тап по плитке — её карточка, «назад»
- * из неё — снова к списку, «назад» из списка — к графику. С childId — история одного ребёнка от
- * его лица: без фильтра по детям, в голубых тонах, в строках вместо аватара
- * значок задания, в карточке — на сколько награда приблизила желание.
+ * заработанные и упущенные награды на графике, итоги и задания выбранного
+ * дня — выплаченные и упущенные (серые) вперемешку по времени. У родителя —
+ * только награды по его заданиям. Фильтр по детям задаёт, чьи задания и в
+ * графике, и в карточках, и в списке. Тап по строке или кнопка карточек
+ * справа в шапке открывают карточки заданий этого дня (листаются); в шапке
+ * карточек и списка вместо заголовка тогл Done / Missed — выплаченные
+ * (зелёные) или упущенные (графитовые); упущенных нет — пусто. «Назад» —
+ * обратно к графику на тот же день. Кнопка списка в карточках открывает все
+ * задания этого вида плитками по дням (с суммой за день); тап по плитке — её
+ * карточка. С childId — история одного ребёнка от его лица: без фильтра по
+ * детям, в строках вместо аватара значок задания (зелёный или серый), в
+ * карточке — на сколько награда приблизила желание.
  */
 export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const myId = useMyId();
@@ -109,9 +120,11 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const filter = childId ?? selectedChild;
   // null — день не выбран, стоим на сегодняшнем (последнем).
   const [selected, setSelected] = useState<number | null>(null);
-  // Номер открытой карточки среди наград дня; null — показан график.
+  // Номер открытой карточки среди заданий дня этого вида; null — график.
   const [card, setCard] = useState<number | null>(null);
-  // Все выплаченные задания списком по дням (открывается из карточек).
+  // Что показывают карточки и список: выплаченные (Done) или упущенные.
+  const [kind, setKind] = useState<OperationKind>('earned');
+  // Все задания этого вида списком по дням (открывается из карточек).
   const [paidList, setPaidList] = useState(false);
   // Открыли по ссылке на награду: «назад» из карточки уводит туда, откуда
   // пришли, а не к графику.
@@ -125,12 +138,33 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   );
   const filtered = useMemo(
     () =>
-      filter === 'all'
-        ? operations
-        : operations.filter((operation) => operation.child.id === filter),
+      sortByNewest(
+        filter === 'all'
+          ? operations
+          : operations.filter((operation) => operation.child.id === filter),
+      ),
     [operations, filter],
   );
   const totals = useMemo(() => getDayTotals(days, filtered), [days, filtered]);
+
+  /** Задания дня одного вида — в том порядке, в каком листаются карточки. */
+  const ofDay = (date: Date, of: OperationKind) =>
+    filtered.filter(
+      (operation) => operation.kind === of && isSameDay(operation, date),
+    );
+
+  // Карточка награды: встаём на её день и вид и открываем её среди заданий
+  // дня.
+  const openCard = (operation: Operation) => {
+    const dayIndex = days.findIndex((date) => isSameDay(operation, date));
+    if (dayIndex < 0) return false;
+    setSelected(dayIndex);
+    setKind(operation.kind);
+    setCard(
+      Math.max(ofDay(days[dayIndex], operation.kind).indexOf(operation), 0),
+    );
+    return true;
+  };
 
   // Ссылка на награду: как только история пришла, встаём на её день и
   // открываем её карточку (один раз).
@@ -139,45 +173,30 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     const target = filtered.find(
       // Ссылка из транзакции: id награды или (выплата с сервера) назначения.
       (operation) =>
-        String(operation.id) === operationParam ||
-        operation.assignmentId === operationParam,
+        operation.id === operationParam ||
+        (operation.kind === 'earned' &&
+          operation.assignmentId === operationParam),
     );
-    const dayIndex = target
-      ? days.findIndex((date) => isSameDay(target, date))
-      : -1;
-    if (target && dayIndex >= 0) {
-      const sameDay = filtered.filter(
-        (operation) =>
-          operation.kind === 'earned' && isSameDay(operation, days[dayIndex]),
-      );
-      setSelected(dayIndex);
-      setCard(Math.max(sameDay.indexOf(target), 0));
-    } else {
-      setLinked(undefined);
-    }
+    if (!target || !openCard(target)) setLinked(undefined);
   }
 
   const selectedIndex = selected ?? days.length - 1;
   const day = totals[selectedIndex];
-  // В списке — начисленные награды; упущенные видны в итогах и на графике.
+  // В списке под графиком — и выплаченные, и упущенные (серые), по времени.
   const dayOperations = useMemo(
-    () =>
-      filtered.filter(
-        (operation) =>
-          operation.kind === 'earned' && isSameDay(operation, day.date),
-      ),
+    () => filtered.filter((operation) => isSameDay(operation, day.date)),
     [filtered, day.date],
   );
-  const cards = card !== null && dayOperations.length > 0;
+  const dayKind = dayOperations.filter((operation) => operation.kind === kind);
+  const cards = card !== null;
   const list = paidList && !cards;
+  const missed = kind === 'missed';
 
-  // Список: выплаченные задания по дням, новые сверху, с суммой за день.
-  const paidDays = useMemo(() => {
+  // Список: задания выбранного вида по дням, новые сверху, с суммой за день.
+  const listDays = useMemo(() => {
     const groups: { date: Date; items: Operation[]; total: number }[] = [];
-    const earned = filtered
-      .filter((operation) => operation.kind === 'earned')
-      .sort((a, b) => b.at.localeCompare(a.at));
-    for (const operation of earned) {
+    for (const operation of filtered) {
+      if (operation.kind !== kind) continue;
       const date = startOfDay(new Date(operation.at));
       const last = groups[groups.length - 1];
       if (last && last.date.getTime() === date.getTime()) {
@@ -188,19 +207,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
       }
     }
     return groups;
-  }, [filtered]);
-
-  // Карточка награды: встаём на её день и открываем её среди наград дня (в
-  // том же порядке, что и dayOperations).
-  const openCard = (operation: Operation) => {
-    const dayIndex = days.findIndex((date) => isSameDay(operation, date));
-    if (dayIndex < 0) return;
-    const sameDay = filtered.filter(
-      (item) => item.kind === 'earned' && isSameDay(item, days[dayIndex]),
-    );
-    setSelected(dayIndex);
-    setCard(Math.max(sameDay.indexOf(operation), 0));
-  };
+  }, [filtered, kind]);
 
   // Копилка ребёнка после награды: баланс сразу после неё по его
   // транзакциям (награды и выводы на карту).
@@ -218,17 +225,22 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     return getRewardGoal(wishes, after - operation.amount, after);
   };
 
+  // Тогл Done / Missed: в карточках — первая карточка дня этого вида.
+  const changeKind = (next: OperationKind) => {
+    setKind(next);
+    setLinked(undefined);
+    if (cards) setCard(0);
+  };
+
   const leave = () =>
     // Назад — туда, откуда пришли (Wallet, профиль); без истории (открыли по
     // ссылке) — в Wallet.
     router.canGoBack() ? router.back() : router.replace('/wallet');
 
-  const title =
-    cards || list
-      ? childId === undefined
-        ? t('rewardsHistory.paidTasks')
-        : t('rewardsHistory.myRewards')
-      : t('rewardsHistory.title');
+  const viewer = childId === undefined ? 'parent' : 'child';
+  const emptyKind = missed
+    ? t('rewardsHistory.noMissedTasks')
+    : t('rewardsHistory.noPaidTasks');
 
   return (
     <TabScreen activeKey="wallet" navHidden={cards || list}>
@@ -244,9 +256,15 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
                 : leave
           }
         />
-        <Text style={styles.title} numberOfLines={1}>
-          {title}
-        </Text>
+        {cards || list ? (
+          <View style={styles.toggle}>
+            <RewardKindToggle value={kind} onChange={changeKind} />
+          </View>
+        ) : (
+          <Text style={styles.title} numberOfLines={1}>
+            {t('rewardsHistory.title')}
+          </Text>
+        )}
         {cards ? (
           <RoundButton
             icon="list"
@@ -258,11 +276,11 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
             }}
           />
         ) : list ? (
-          paidDays.length > 0 ? (
+          listDays.length > 0 ? (
             <RoundButton
               icon="cards"
               accessibilityLabel={t('tasks.showAsCards')}
-              onPress={() => openCard(paidDays[0].items[0])}
+              onPress={() => openCard(listDays[0].items[0])}
             />
           ) : (
             <View style={styles.headerSpacer} />
@@ -271,7 +289,15 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
           <RoundButton
             icon="cards"
             accessibilityLabel={t('tasks.showAsCards')}
-            onPress={() => setCard(0)}
+            onPress={() => {
+              // Выплаченные дня первыми; нет их — сразу упущенные.
+              setKind(
+                dayOperations.some((operation) => operation.kind === 'earned')
+                  ? 'earned'
+                  : 'missed',
+              );
+              setCard(0);
+            }}
           />
         ) : (
           // Место кнопки держится, чтобы заголовок оставался по центру.
@@ -279,27 +305,42 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
         )}
       </View>
       {cards ? (
-        <View style={styles.cards}>
-          <SnapCarousel
-            items={dayOperations}
-            keyExtractor={(operation) => operation.id}
-            initialIndex={card}
-            onIndexChange={setCard}
-            peek={0}
-            gutter={16}
-            fill
-            dotColor={theme.colors.earned}
-            renderItem={(operation, style) => (
-              <PaidTaskCard
-                operation={operation}
-                viewer={childId === undefined ? 'parent' : 'child'}
-                approver={findApprover(operation.parentId)}
-                goal={goalFor(operation)}
-                style={style}
-              />
-            )}
-          />
-        </View>
+        dayKind.length === 0 ? (
+          <Text style={styles.emptyCards}>{emptyKind}</Text>
+        ) : (
+          <View style={styles.cards}>
+            <SnapCarousel
+              // Другой вид — другая лента: начинается со своей карточки.
+              key={kind}
+              items={dayKind}
+              keyExtractor={(operation) => operation.id}
+              initialIndex={Math.min(card, dayKind.length - 1)}
+              onIndexChange={setCard}
+              peek={0}
+              gutter={16}
+              fill
+              dotColor={missed ? theme.colors.missedDeep : theme.colors.earned}
+              renderItem={(operation, style) =>
+                missed ? (
+                  <MissedTaskCard
+                    operation={operation}
+                    viewer={viewer}
+                    author={findApprover(operation.parentId)}
+                    style={style}
+                  />
+                ) : (
+                  <PaidTaskCard
+                    operation={operation}
+                    viewer={viewer}
+                    approver={findApprover(operation.parentId)}
+                    goal={goalFor(operation)}
+                    style={style}
+                  />
+                )
+              }
+            />
+          </View>
+        )
       ) : list ? (
         <ScrollView
           contentContainerStyle={styles.paidList}
@@ -312,26 +353,45 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
               onChange={setFilter}
             />
           )}
-          {paidDays.length === 0 ? (
-            <Text style={styles.empty}>{t('rewardsHistory.noRewards')}</Text>
+          {listDays.length === 0 ? (
+            <Text style={styles.empty}>{emptyKind}</Text>
           ) : (
-            paidDays.map((group) => (
+            listDays.map((group) => (
               <View key={group.date.getTime()} style={styles.paidDay}>
                 <View style={styles.paidDayHead}>
                   <Text style={styles.paidDayTitle}>
                     {formatDayLabel(group.date, today)}
                   </Text>
-                  <Text style={styles.paidDayTotal}>+${group.total}</Text>
+                  <Text
+                    style={[
+                      styles.paidDayTotal,
+                      missed && styles.missedDayTotal,
+                    ]}
+                  >
+                    {missed
+                      ? t('rewardsHistory.missedTotal', { amount: group.total })
+                      : `+$${group.total}`}
+                  </Text>
                 </View>
-                {group.items.map((operation) => (
-                  <PaidTaskTile
-                    key={operation.id}
-                    operation={operation}
-                    viewer={childId === undefined ? 'parent' : 'child'}
-                    approver={findApprover(operation.parentId)}
-                    onPress={openCard}
-                  />
-                ))}
+                {group.items.map((operation) =>
+                  missed ? (
+                    <MissedTaskTile
+                      key={operation.id}
+                      operation={operation}
+                      viewer={viewer}
+                      author={findApprover(operation.parentId)}
+                      onPress={openCard}
+                    />
+                  ) : (
+                    <PaidTaskTile
+                      key={operation.id}
+                      operation={operation}
+                      viewer={viewer}
+                      approver={findApprover(operation.parentId)}
+                      onPress={openCard}
+                    />
+                  ),
+                )}
               </View>
             ))
           )}
@@ -358,7 +418,6 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
                 days={totals}
                 selectedIndex={selectedIndex}
                 onSelect={setSelected}
-                tone={childId === undefined ? 'parent' : 'child'}
               />
               <View style={styles.summary}>
                 <DaySummary
@@ -374,20 +433,22 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
                     {t('rewardsHistory.noRewardsThisDay')}
                   </Text>
                 ) : (
-                  dayOperations.map((operation, index) =>
+                  dayOperations.map((operation) =>
                     childId === undefined ? (
                       <OperationRow
                         key={operation.id}
                         {...operation}
-                        onPress={() => setCard(index)}
+                        onPress={() => openCard(operation)}
                       />
                     ) : (
                       <OperationRow
                         key={operation.id}
                         {...operation}
                         caption="time"
-                        leading={<TaskIconBadge size={44} />}
-                        onPress={() => setCard(index)}
+                        leading={
+                          <TaskIconBadge size={44} tone={operation.kind} />
+                        }
+                        onPress={() => openCard(operation)}
                       />
                     ),
                   )

@@ -27,7 +27,8 @@ type TaskDto = {
 type AssignmentDto = {
   id: string;
   childId: string;
-  status: 'assigned' | 'submitted' | 'rejected' | 'approved';
+  /** expired — срок прошёл, а задание не сдано (резерв вернулся автору). */
+  status: 'assigned' | 'submitted' | 'rejected' | 'approved' | 'expired';
   /** После отказа можно переделать; false — отказ закрыл назначение. */
   retryableRejection: boolean;
   /** Шаги чеклиста, которые ребёнок отметил. */
@@ -82,7 +83,11 @@ type MemberDto = {
 };
 
 /** Статус назначения → статус задачи в приложении. */
-const STATES: Record<AssignmentDto['status'], TaskState> = {
+type OpenAssignmentDto = AssignmentDto & {
+  status: Exclude<AssignmentDto['status'], 'expired'>;
+};
+
+const STATES: Record<OpenAssignmentDto['status'], TaskState> = {
   assigned: 'active',
   rejected: 'active',
   submitted: 'review',
@@ -104,7 +109,7 @@ const attachmentImage = (familyId: string, id: string) =>
 
 function toTask(
   task: TaskDto,
-  assignment: AssignmentDto,
+  assignment: OpenAssignmentDto,
   children: readonly ChildDto[],
   members: readonly MemberDto[],
   viewer: TaskViewer,
@@ -180,10 +185,15 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
     ),
   ]);
   const visible = items.filter(
-    ({ task, assignment }) =>
-      task.cancelledAt === null &&
-      assignment.status !== 'approved' &&
-      !(assignment.status === 'rejected' && !assignment.retryableRejection),
+    (item): item is { task: TaskDto; assignment: OpenAssignmentDto } =>
+      item.task.cancelledAt === null &&
+      item.assignment.status !== 'approved' &&
+      // Истёкшие — в истории наград как упущенные, не в списках заданий.
+      item.assignment.status !== 'expired' &&
+      !(
+        item.assignment.status === 'rejected' &&
+        !item.assignment.retryableRejection
+      ),
   );
   return visible.map(({ task, assignment }) =>
     toTask(task, assignment, children, members, viewer),

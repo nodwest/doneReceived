@@ -16,6 +16,11 @@ export const styles = StyleSheet.create({
   headerSpacer: {
     width: 44,
   },
+  // Тогл Done / Missed по центру шапки вместо заголовка.
+  toggle: {
+    flex: 1,
+    alignItems: 'center',
+  },
   title: {
     flex: 1,
     textAlign: 'center',
@@ -71,6 +76,9 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
     color: theme.colors.rewardText,
   },
+  missedDayTotal: {
+    color: theme.colors.missedDeep,
+  },
   // Карточки наград дня во всю высоту под шапкой.
   cards: {
     flex: 1,
@@ -78,6 +86,15 @@ export const styles = StyleSheet.create({
     paddingTop: 12,
     paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  // Карточек этого вида в выбранный день нет (тогл Missed без упущенных).
+  emptyCards: {
+    marginTop: 48,
+    textAlign: 'center',
+    fontSize: theme.fontSize.md,
+    letterSpacing: tracking(theme.fontSize.md),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
   },
   empty: {
     marginTop: 24,

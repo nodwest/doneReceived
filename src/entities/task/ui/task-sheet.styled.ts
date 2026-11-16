@@ -27,6 +27,9 @@ export const styles = StyleSheet.create({
   shadowPaid: {
     boxShadow: '0px 10px 28px rgba(26, 133, 79, 0.12)',
   },
+  shadowMissed: {
+    boxShadow: '0px 10px 28px rgba(75, 84, 104, 0.12)',
+  },
 
   hero: {
     gap: 18,
@@ -219,6 +222,13 @@ export const styles = StyleSheet.create({
   },
   rewardChipValuePaid: {
     color: theme.colors.readyText,
+  },
+  rewardChipMissed: {
+    borderColor: theme.colors.missedBorder,
+    backgroundColor: theme.colors.missedTile,
+  },
+  rewardChipValueMissed: {
+    color: theme.colors.missedDeep,
   },
   rewardChipValue: {
     fontSize: 18,

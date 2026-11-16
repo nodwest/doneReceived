@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useTranslation } from '@shared/i18n';
 import { formatClock, formatDayLabel } from '@shared/lib';
 import { formatAmount, type Operation } from '../model/operation';
 import { LetterAvatar } from '@shared/ui';
@@ -30,18 +31,44 @@ const CAPTION = {
   time: (_name: string, date: Date) => formatClock(date),
 };
 
-/** Начисленная награда в истории: аватар, задача, подпись и время, сумма. */
+/**
+ * Награда в истории: аватар, задача, подпись и время, сумма. Начисленная —
+ * зелёная «+$4»; упущенная — серая «$4», в подписи «expired 6:00 PM» (или
+ * «closed», если задание закрыли отказом).
+ */
 export function OperationRow({
   title,
   child,
   at,
   amount,
+  kind,
+  missedReason,
   caption = 'child',
   leading,
   variant = 'card',
   onPress,
 }: OperationRowProps) {
+  const { t } = useTranslation();
   const date = new Date(at);
+  const missed = kind === 'missed';
+  const closed = missedReason === 'rejected';
+  const subtitle = !missed
+    ? CAPTION[caption](child.name, date)
+    : caption === 'time'
+      ? t(
+          closed
+            ? 'rewardsHistory.closedCaption'
+            : 'rewardsHistory.expiredCaption',
+          { time: formatClock(date) },
+        )
+      : caption === 'child'
+        ? t(
+            closed
+              ? 'rewardsHistory.childClosedCaption'
+              : 'rewardsHistory.childExpiredCaption',
+            { name: child.name, time: formatClock(date) },
+          )
+        : CAPTION[caption](child.name, date);
 
   return (
     <Pressable
@@ -67,11 +94,13 @@ export function OperationRow({
           {title}
         </Text>
         <Text style={styles.subtitle} numberOfLines={1}>
-          {CAPTION[caption](child.name, date)}
+          {subtitle}
         </Text>
       </View>
-      <View style={styles.reward}>
-        <Text style={styles.rewardText}>+{formatAmount(amount)}</Text>
+      <View style={[styles.reward, missed && styles.rewardMissed]}>
+        <Text style={[styles.rewardText, missed && styles.rewardTextMissed]}>
+          {missed ? formatAmount(amount) : `+${formatAmount(amount)}`}
+        </Text>
       </View>
     </Pressable>
   );

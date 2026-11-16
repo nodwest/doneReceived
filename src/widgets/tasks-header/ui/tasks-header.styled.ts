@@ -69,7 +69,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 9,
   },
   segmentAllActive: {
-    boxShadow: '0px 3px 8px rgba(108, 92, 231, 0.3)',
+    boxShadow: '0px 3px 8px rgba(30, 95, 184, 0.3)',
   },
   segmentReviewActive: {
     boxShadow: '0px 3px 8px rgba(248, 204, 148, 0.45)',

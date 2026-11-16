@@ -12,7 +12,6 @@ type OperationsChartProps = {
   days: DayTotals[];
   selectedIndex: number;
   onSelect: (index: number) => void;
-  tone?: 'parent' | 'child';
 };
 
 /**
@@ -23,7 +22,6 @@ export function OperationsChart({
   days,
   selectedIndex,
   onSelect,
-  tone,
 }: OperationsChartProps) {
   const {
     scrollRef,
@@ -69,7 +67,6 @@ export function OperationsChart({
             scale={scale}
             selected={index === selectedIndex}
             onPress={() => select(index)}
-            tone={tone}
           />
         ))}
         <View style={[styles.future, { width: sidePadding }]}>

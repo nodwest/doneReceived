@@ -38,7 +38,16 @@ export interface Operation {
    * транзакциях родителя открывает эту награду.
    */
   assignmentId?: string;
+  /** Упущенная: срок задания; null — срока не было. */
+  dueAt?: string | null;
+  /**
+   * Почему упущена: срок прошёл (expired) или родитель закрыл задание отказом
+   * (rejected, Идеи.md п. 33 — пока сервер не отдаёт, всегда expired).
+   */
+  missedReason?: MissedReason;
 }
+
+export type MissedReason = 'expired' | 'rejected';
 
 /** Что сервер записывает в историю, когда родитель подтвердил задание. */
 export type RewardPayload = Pick<

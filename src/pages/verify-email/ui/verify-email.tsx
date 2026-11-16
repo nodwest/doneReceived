@@ -113,6 +113,7 @@ export function VerifyEmail() {
   return (
     <AuthLayout
       icon="message"
+      backTo="/registration"
       title={t('auth.verifyTitle')}
       subtitle={
         <>
