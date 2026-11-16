@@ -6,7 +6,13 @@ import {
 } from '@shared/api';
 import { refreshSession } from '../api/auth-api';
 import type { Session } from './session';
-import { loadSession, removeSession, saveSession } from './session-storage';
+import {
+  loadSession,
+  readSessionForRefresh,
+  removeSession,
+  saveSession,
+  withSessionLock,
+} from './session-storage';
 
 /**
  * restoring — читаем сохранённую сессию при запуске; signed-out — входа нет;
@@ -24,7 +30,7 @@ type SessionState = {
   /** Забыть сессию: выход из аккаунта. */
   signOut: () => Promise<void>;
   /**
-   * Обновить токены по refresh-токену. true — новая пара сохранена. Сервер
+   * Обновить токены по refresh-токену. true — новая пара доступна. Сервер
    * не принял refresh-токен (401 или 400) — сессия стирается, экраны уводят на
    * логин. Нет сети — сессия остаётся, false.
    */
@@ -35,6 +41,19 @@ const log = (message: string) => {
   if (__DEV__) console.log(`[auth] ${message}`);
 };
 
+let sessionScope = Symbol();
+let pendingSave: { previous: Session; next: Session } | undefined;
+
+async function persistRefresh(previous: Session, next: Session) {
+  pendingSave = { previous, next };
+  try {
+    await saveSession(next);
+    if (pendingSave?.next === next) pendingSave = undefined;
+  } catch {
+    log('Не удалось сохранить обновлённую сессию');
+  }
+}
+
 export const useSessionStore = create<SessionState>((set, get) => ({
   status: 'restoring',
   session: null,
@@ -44,39 +63,88 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     if (get().status !== 'restoring') return;
     set({ session, status: session ? 'signed-in' : 'signed-out' });
   },
-  signIn: async (session) => {
-    set({ session, status: 'signed-in' });
-    await saveSession(session);
-  },
-  signOut: async () => {
+  signIn: (session) =>
+    withSessionLock(async () => {
+      sessionScope = Symbol();
+      set({ session, status: 'signed-in' });
+      pendingSave = undefined;
+      try {
+        await saveSession(session);
+      } catch {
+        log('Не удалось сохранить сессию');
+      }
+    }),
+  signOut: () => {
+    const current = get().session;
+    const signedOutScope = (sessionScope = Symbol());
+    pendingSave = undefined;
     set({ session: null, status: 'signed-out' });
-    await removeSession();
+    return withSessionLock(async () => {
+      if (
+        current &&
+        (await readSessionForRefresh(current)) &&
+        sessionScope === signedOutScope
+      ) {
+        await removeSession();
+      }
+    }).catch(() => log('Не удалось удалить сохранённую сессию'));
   },
   refresh: async () => {
     const current = get().session;
     if (!current) return false;
-    try {
-      const next = await refreshSession(current.refreshToken);
-      // Пока обновляли, вышли или вошли заново — эту сессию не воскрешаем.
-      if (get().session !== current) return get().session !== null;
-      // Ответ refresh не знает id детского профиля — берём из прежней сессии.
-      await get().signIn({ ...next, childId: current.childId });
-      log('Токены обновлены');
-      return true;
-    } catch (error) {
-      // 401 — refresh-токен отозван или истёк, 400 — сохранён битым.
-      if (isApiError(error) && (error.status === 401 || error.status === 400)) {
-        if (get().session === current) await get().signOut();
-        log('Сессия истекла, нужно войти заново');
+    return withSessionLock(async () => {
+      if (get().session !== current) return false;
+      const saved = await readSessionForRefresh(current);
+      if (get().session !== current) return false;
+      if (!saved) {
+        sessionScope = Symbol();
+        set({ session: null, status: 'signed-out' });
+        return false;
       }
-      return false;
-    }
+      if (
+        pendingSave?.next === current &&
+        (saved === current ||
+          saved.refreshToken === pendingSave.previous.refreshToken)
+      ) {
+        await persistRefresh(saved, current);
+        if (get().session !== current || pendingSave?.next === current)
+          return false;
+      } else if (saved !== current) {
+        pendingSave = undefined;
+        set({ session: saved });
+        return true;
+      }
+
+      let next: Session;
+      try {
+        next = await refreshSession(current.refreshToken);
+      } catch (error) {
+        if (
+          get().session === current &&
+          isApiError(error) &&
+          (error.status === 401 || error.status === 400)
+        ) {
+          sessionScope = Symbol();
+          pendingSave = undefined;
+          set({ session: null, status: 'signed-out' });
+          await removeSession();
+          log('Сессия истекла, нужно войти заново');
+        }
+        return false;
+      }
+      if (get().session !== current) return false;
+      const session = { ...next, childId: current.childId };
+      set({ session });
+      await persistRefresh(current, session);
+      return true;
+    }).catch(() => false);
   },
 }));
 
 // Запросы к API берут токен из текущей сессии.
 setAccessTokenGetter(
   () => useSessionStore.getState().session?.accessToken ?? null,
+  () => sessionScope,
 );
 // Токен устарел — запрос сам обновит его и повторится.
 setTokenRefresher(() => useSessionStore.getState().refresh());
