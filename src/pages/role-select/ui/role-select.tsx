@@ -52,6 +52,7 @@ export function RoleSelectPage() {
   return (
     <AuthLayout
       icon="star"
+      backTo="/login"
       title={t('roleSelect.title')}
       subtitle={t('roleSelect.subtitle')}
       action={

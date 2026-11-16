@@ -112,6 +112,7 @@ export function Registration() {
   return (
     <AuthLayout
       icon="star"
+      backTo="/role-select"
       title={t('auth.registrationTitle')}
       subtitle={t('auth.registrationSubtitle')}
       action={
