@@ -8,3 +8,5 @@ const wsBaseUrl = (
 
 export const WS_URL = `${wsBaseUrl}/`;
 export const LOCATION_WS_URL = `${wsBaseUrl}/location`;
+/** События сервера «что изменилось» (Идеи.md п. 31). */
+export const EVENTS_WS_URL = `${wsBaseUrl}/events`;

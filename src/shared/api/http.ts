@@ -102,6 +102,19 @@ function refreshOnce(refresher: () => Promise<boolean>) {
   return refreshing;
 }
 
+/** Текущий токен доступа или null (не вошли). */
+export const currentAccessToken = () => getAccessToken();
+
+/**
+ * Сервер не принял токен `stale` вне `apiRequest` (сокет закрыт с 4401):
+ * обновить токены тем же единственным вызовом, что и у запросов, — иначе
+ * один refresh-токен ушёл бы дважды. Токен уже сменили — сразу true.
+ */
+export async function refreshAccessToken(stale: string) {
+  if (getAccessToken() !== stale) return getAccessToken() !== null;
+  return refreshTokens ? refreshOnce(refreshTokens) : false;
+}
+
 /**
  * Запрос к API: JSON туда и обратно, ошибки — `ApiError`. Токен устарел
  * (401 на запрос с токеном) — обновляем токены и повторяем запрос один раз;

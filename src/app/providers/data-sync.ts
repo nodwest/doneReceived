@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { AppState, Platform } from 'react-native';
 import { usePathname } from 'expo-router';
 import { focusManager, type QueryClient } from '@tanstack/react-query';
-import { syncable } from '@shared/api';
+import { useSessionStore } from '@entities/session';
+import { connectServerEvents, syncable, syncData } from '@shared/api';
 
 /**
  * Данные моложе этого считаются свежими: переход туда-обратно между
@@ -42,4 +43,22 @@ export function useRefreshOnNavigate(queryClient: QueryClient) {
       predicate: syncable,
     });
   }, [pathname, queryClient]);
+}
+
+/**
+ * Изменения с других устройств: пока кто-то вошёл, держим сокет событий
+ * сервера. Событие сбрасывает задетые данные (`syncData`), после обрыва
+ * связи перечитывается всё открытое — пропущенные события сервер не
+ * досылает. Сменился аккаунт — сокет переоткрывается с его токеном.
+ */
+export function useServerEvents(queryClient: QueryClient) {
+  const userId = useSessionStore((state) => state.session?.user.id ?? null);
+  useEffect(() => {
+    if (!userId) return;
+    return connectServerEvents({
+      onChange: (change) => void syncData(queryClient, change),
+      onReconnect: () =>
+        void queryClient.invalidateQueries({ predicate: syncable }),
+    });
+  }, [userId, queryClient]);
 }

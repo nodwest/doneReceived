@@ -19,8 +19,8 @@ export const queryRoots = {
 type DataArea = keyof typeof queryRoots;
 
 /**
- * Что изменилось. Шлют мутации после своего ответа сервера, а позже — и
- * события сервера по WebSocket (изменения с других устройств, Идеи.md п. 31).
+ * Что изменилось. Шлют мутации после своего ответа сервера и события
+ * сервера по WebSocket (`server-events.ts`) — изменения с других устройств.
  */
 export type DataChange =
   | 'task-created'
@@ -37,7 +37,8 @@ export type DataChange =
   | 'device-changed'
   | 'family-changed'
   | 'profile-changed'
-  | 'email-changed';
+  | 'email-changed'
+  | 'task-expired';
 
 /**
  * Какие данные задевает изменение. Одно место для всех связей: новая
@@ -72,6 +73,8 @@ const AFFECTS: Record<DataChange, readonly DataArea[]> = {
   ],
   // Почта видна только в своём профиле; ожидающая смена — там же.
   'email-changed': ['me'],
+  // Срок прошёл, задание не сдано: резерв возвращается, награда — в упущенные.
+  'task-expired': ['tasks', 'wallet', 'operations', 'activity'],
 };
 
 /**
@@ -95,10 +98,3 @@ export function syncData(queryClient: QueryClient, change: DataChange) {
     ),
   );
 }
-
-/**
- * Как часто перечитывать то, что может поменять другой человек (ребёнок
- * сдал задание — родитель видит). Временно: когда сервер начнёт присылать
- * события по WebSocket (Идеи.md п. 31), таймер уберём.
- */
-export const SYNC_POLL_MS = 15_000;
