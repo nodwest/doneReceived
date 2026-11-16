@@ -8,6 +8,7 @@ export type FeedEventType =
   | 'task_approved'
   | 'task_rejected'
   | 'task_cancelled'
+  | 'task_expired'
   | 'wish_added'
   | 'deposit';
 

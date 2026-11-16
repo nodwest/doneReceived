@@ -162,7 +162,7 @@ function toTask(
  * GET /families/:id/tasks — назначения семьи (ребёнку — только свои), до 100
  * последних, и имена детей (GET /families/:id/children). Ребёнку список
  * детей закрыт (403), его не спрашиваем: имя — из сессии. Отменённые,
- * подтверждённые и закрытые отказом (`rejected` без `retryableRejection`)
+ * подтверждённые, истёкшие и закрытые отказом (`rejected` без `retryableRejection`)
  * в список не идут.
  */
 export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
@@ -173,7 +173,7 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
   const parent = viewer.childName === undefined;
   const [items, children, members] = await Promise.all([
     apiRequest<{ task: TaskDto; assignment: AssignmentDto }[]>(
-      `/families/${familyId}/tasks`,
+      `/families/${familyId}/tasks?status=assigned,submitted,rejected`,
     ),
     parent
       ? apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
@@ -237,7 +237,7 @@ export function createServerTask(familyId: string, payload: CreateTaskPayload) {
 /**
  * PATCH /families/:id/tasks/:taskId — правка задания (только автор). Пустое
  * описание и срок отправляются как null — сервер их очищает. 409 —
- * `TASK_ON_REVIEW`, `TASK_CANCELLED` или `INSUFFICIENT_FUNDS` (не хватает на
+ * `TASK_ON_REVIEW`, `TASK_CANCELLED`, `TASK_DEADLINE_PASSED` или `INSUFFICIENT_FUNDS` (не хватает на
  * новую награду, ничего не меняется).
  */
 export function updateServerTask(familyId: string, payload: UpdateTaskPayload) {

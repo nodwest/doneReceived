@@ -6,7 +6,7 @@ type ActivityDto = {
     id: string;
     type: FeedEventType;
     createdAt: string;
-    actorId: string;
+    actorId: string | null;
     childId: string | null;
     taskTitle: string | null;
     points: number | null;
@@ -28,6 +28,7 @@ const KNOWN: readonly FeedEventType[] = [
   'task_approved',
   'task_rejected',
   'task_cancelled',
+  'task_expired',
   'wish_added',
   'deposit',
 ];

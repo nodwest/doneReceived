@@ -237,7 +237,7 @@ export function CreateTaskForm({
 /** Ключ ошибки создания или правки: `createTask.errors.*`. */
 function submitError(
   error: unknown,
-): 'insufficientFunds' | 'onReview' | 'network' | 'failed' {
+): 'insufficientFunds' | 'onReview' | 'deadlinePassed' | 'network' | 'failed' {
   if (!isApiError(error)) return 'failed';
   if (error.status === 0) return 'network';
   const code =
@@ -246,6 +246,7 @@ function submitError(
       : null;
   if (code === 'INSUFFICIENT_FUNDS') return 'insufficientFunds';
   if (code === 'TASK_ON_REVIEW') return 'onReview';
+  if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed';
   // Создание при нехватке денег отвечает 409 без кода.
   if (error.status === 409) return 'insufficientFunds';
   return 'failed';
