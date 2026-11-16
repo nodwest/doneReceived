@@ -10,7 +10,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: NAV_PADDING_VERTICAL,
-    paddingHorizontal: 20,
+    // Семь вкладок: на 320pt подписи должны помещаться без переносов.
+    paddingHorizontal: 12,
     backgroundColor: theme.colors.white,
   },
   item: {
@@ -18,8 +19,8 @@ export const styles = StyleSheet.create({
     gap: 4,
   },
   label: {
-    fontSize: 11,
-    letterSpacing: tracking(11),
+    fontSize: 10,
+    letterSpacing: tracking(10),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },

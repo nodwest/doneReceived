@@ -1,0 +1,221 @@
+import { StyleSheet } from 'react-native';
+import { theme, tracking } from '@shared/theme';
+
+export const styles = StyleSheet.create({
+  // Большая карточка события: фото, затемнение и текст сверху.
+  card: {
+    height: 205,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.childDeep,
+    boxShadow: '0px 12px 24px rgba(26, 26, 46, 0.18)',
+  },
+  background: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  copy: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  text: {
+    gap: 4,
+  },
+  kicker: {
+    fontSize: 9,
+    letterSpacing: tracking(9),
+    fontFamily: theme.fonts.extrabold,
+    color: 'rgba(255, 255, 255, 0.84)',
+    textTransform: 'uppercase',
+  },
+  title: {
+    maxWidth: 300,
+    fontSize: 24,
+    letterSpacing: tracking(24),
+    lineHeight: 25,
+    fontFamily: theme.fonts.extrabold,
+    color: theme.colors.white,
+  },
+  description: {
+    maxWidth: 300,
+    fontSize: 11,
+    letterSpacing: tracking(11),
+    lineHeight: 15,
+    fontFamily: theme.fonts.medium,
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  avatars: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 27,
+    height: 27,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.78)',
+  },
+  avatarOverlap: {
+    marginLeft: -8,
+  },
+  spacer: {
+    flex: 1,
+  },
+  reminder: {
+    flexShrink: 1,
+    fontSize: 9,
+    letterSpacing: tracking(9),
+    fontFamily: theme.fonts.semibold,
+    color: 'rgba(255, 255, 255, 0.82)',
+    textAlign: 'right',
+  },
+
+  // Маленькая карточка ближайшего события.
+  tile: {
+    flex: 1,
+    minWidth: 0,
+    padding: 12,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: theme.colors.line,
+    backgroundColor: theme.colors.white,
+    boxShadow: '0px 4px 12px rgba(26, 26, 46, 0.035)',
+  },
+  tileTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  iconTile: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconTileBlue: {
+    backgroundColor: theme.colors.childTint,
+  },
+  iconTileAmber: {
+    backgroundColor: theme.colors.yellowSoft,
+  },
+  dayChip: {
+    height: 21,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    justifyContent: 'center',
+    backgroundColor: theme.colors.prime,
+  },
+  dayChipAmber: {
+    backgroundColor: theme.colors.yellowSoft,
+  },
+  dayText: {
+    fontSize: 8.5,
+    letterSpacing: tracking(8.5),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.inkSoft,
+  },
+  dayTextAmber: {
+    color: theme.colors.reviewText,
+  },
+  tileTitle: {
+    marginTop: 10,
+    fontSize: 12.5,
+    letterSpacing: tracking(12.5),
+    lineHeight: 14,
+    fontFamily: theme.fonts.extrabold,
+    color: theme.colors.ink,
+  },
+  tileMeta: {
+    marginTop: 3,
+    fontSize: 9.5,
+    letterSpacing: tracking(9.5),
+    lineHeight: 13,
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
+  },
+
+  // Строка «Родительское собрание» под карточками.
+  eventRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 11,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: theme.colors.line,
+    backgroundColor: theme.colors.white,
+  },
+  dateBox: {
+    width: 37,
+    height: 37,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.childTint,
+  },
+  dateWeekday: {
+    fontSize: 8,
+    letterSpacing: tracking(8),
+    fontFamily: theme.fonts.extrabold,
+    color: theme.colors.childDeep,
+    textTransform: 'uppercase',
+  },
+  dateDay: {
+    fontSize: 13,
+    letterSpacing: tracking(13),
+    lineHeight: 14,
+    fontFamily: theme.fonts.extrabold,
+    color: theme.colors.childDeep,
+  },
+  rowBody: {
+    flex: 1,
+    minWidth: 0,
+  },
+  rowTitle: {
+    fontSize: 10.5,
+    letterSpacing: tracking(10.5),
+    fontFamily: theme.fonts.extrabold,
+    color: theme.colors.ink,
+  },
+  rowMeta: {
+    marginTop: 2,
+    fontSize: 9,
+    letterSpacing: tracking(9),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
+  },
+  rowTag: {
+    height: 21,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    justifyContent: 'center',
+    backgroundColor: theme.colors.prime,
+  },
+  rowTagText: {
+    fontSize: 8,
+    letterSpacing: tracking(8),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.inkSoft,
+  },
+});

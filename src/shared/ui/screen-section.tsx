@@ -6,6 +6,7 @@ type ScreenSectionProps = {
   title: string;
   actionLabel?: string;
   onAction?: () => void;
+  actionColor?: string;
   children: ReactNode;
 };
 
@@ -14,6 +15,7 @@ export function ScreenSection({
   title,
   actionLabel,
   onAction,
+  actionColor,
   children,
 }: ScreenSectionProps) {
   return (
@@ -22,6 +24,7 @@ export function ScreenSection({
         title={title}
         actionLabel={actionLabel}
         onAction={onAction}
+        actionColor={actionColor}
       />
       {children}
     </View>

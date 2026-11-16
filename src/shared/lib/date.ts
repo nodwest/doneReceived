@@ -95,6 +95,39 @@ export const formatWeekdayShort = (date: Date) =>
 export const formatMonthShort = (date: Date) =>
   date.toLocaleDateString(locale(), { month: 'short' });
 
+/** «October 2026» / «Октябрь 2026» — с заглавной буквы. */
+export const formatMonthYear = (date: Date) => {
+  const label = date.toLocaleDateString(locale(), {
+    month: 'long',
+    year: 'numeric',
+  });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+};
+
+/**
+ * «21–22 ноября» для диапазона в одном месяце, иначе «28 дек. – 2 янв.».
+ * `month` — длина названия месяца в коротком варианте.
+ */
+export const formatDayRange = (
+  start: Date,
+  end: Date,
+  month: 'short' | 'long' = 'long',
+) => {
+  const sameMonth =
+    start.getFullYear() === end.getFullYear() &&
+    start.getMonth() === end.getMonth();
+  if (!sameMonth) {
+    return `${formatMonthDay(start)} – ${formatMonthDay(end)}`;
+  }
+  return `${start.getDate()}–${end.getDate()} ${formatDate(start, { month })}`;
+};
+
+/** Один и тот же календарный день в местном времени. */
+export const isSameDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
 /** Полночь дня date + days (отрицательное — назад) по местному времени. */
 export const addDays = (date: Date, days: number) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);

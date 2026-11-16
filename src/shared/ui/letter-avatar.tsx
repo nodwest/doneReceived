@@ -17,6 +17,8 @@ type LetterAvatarProps = {
   style: StyleProp<ImageStyle>;
   /** Размер буквы: у крупных аватаров крупнее. */
   letterSize?: number;
+  /** blue — для календаря, где фиолетовый заменён синим. */
+  tone?: 'violet' | 'blue';
 };
 
 /** Фото человека, без фото — первая буква имени на фиолетовом. */
@@ -25,13 +27,16 @@ export function LetterAvatar({
   name,
   style,
   letterSize = theme.fontSize.sm,
+  tone = 'violet',
 }: LetterAvatarProps) {
   if (source) return <ApiImage source={source} style={style} />;
+  const blue = tone === 'blue';
   return (
-    <View style={[style, styles.initial]}>
+    <View style={[style, styles.initial, blue && styles.initialBlue]}>
       <Text
         style={[
           styles.letter,
+          blue && styles.letterBlue,
           { fontSize: letterSize, letterSpacing: tracking(letterSize) },
         ]}
       >
@@ -47,10 +52,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: theme.colors.violetSoft,
   },
+  initialBlue: {
+    backgroundColor: theme.colors.childTint,
+  },
   letter: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
     color: theme.colors.violet,
+  },
+  letterBlue: {
+    color: theme.colors.childDeep,
   },
 });

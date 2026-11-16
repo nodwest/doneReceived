@@ -9,6 +9,8 @@ type TabScreenProps = {
   wide?: boolean;
   /** Без навбара (экран карточек): отступ снизу — под жесты системы. */
   navHidden?: boolean;
+  /** Цвет активной вкладки; по умолчанию фиолетовый. */
+  activeColor?: string;
   children?: ReactNode;
 };
 
@@ -16,6 +18,7 @@ export function TabScreen({
   activeKey,
   wide,
   navHidden,
+  activeColor,
   children,
 }: TabScreenProps) {
   return (
@@ -25,7 +28,9 @@ export function TabScreen({
         edges={wide ? [] : navHidden ? ['top', 'bottom'] : ['top']}
       >
         <View style={styles.content}>{children}</View>
-        {!navHidden && <BottomNav activeKey={activeKey} />}
+        {!navHidden && (
+          <BottomNav activeKey={activeKey} activeColor={activeColor} />
+        )}
       </SafeAreaView>
     </View>
   );

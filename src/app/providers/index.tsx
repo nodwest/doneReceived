@@ -28,20 +28,19 @@ useSessionStore.subscribe((state, prev) => {
 /**
  * Данные актуальны так: свои изменения сбрасывают всё связанное
  * (`syncData` в мутациях), переход между экранами и возврат из фона
- * перечитывают устаревшее, изменения с других устройств пока приходят
- * таймером (`SYNC_POLL_MS`).
+ * перечитывают устаревшее, изменения с других устройств приходят по WebSocket.
  */
-function ParentDeviceRegistration() {
+function AppEffects() {
+  useRefreshOnNavigate(queryClient);
+  useServerEvents(queryClient);
   useRegisterParentDevice();
   return null;
 }
 
 export function Providers({ children }: { children: ReactNode }) {
-  useRefreshOnNavigate(queryClient);
-  useServerEvents(queryClient);
   return (
     <QueryClientProvider client={queryClient}>
-      <ParentDeviceRegistration />
+      <AppEffects />
       <LocationConnection />
       {children}
     </QueryClientProvider>

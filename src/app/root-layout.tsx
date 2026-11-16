@@ -35,6 +35,7 @@ const APP_SCREENS = [
   'index',
   'tasks',
   'family',
+  'calendar',
   'wallet',
   'profile',
   'edit-profile',

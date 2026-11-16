@@ -10,9 +10,15 @@ import { NAV_PADDING_VERTICAL, styles } from './bottom-nav.styled';
 type BottomNavProps = {
   activeKey: string;
   onNavigate?: (key: string) => void;
+  /** Цвет активной вкладки; по умолчанию фиолетовый. */
+  activeColor?: string;
 };
 
-export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
+export function BottomNav({
+  activeKey,
+  onNavigate,
+  activeColor,
+}: BottomNavProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
@@ -43,9 +49,19 @@ export function BottomNav({ activeKey, onNavigate }: BottomNavProps) {
             <Icon
               name={icon}
               size={24}
-              color={active ? theme.colors.violet : theme.colors.grey}
+              color={
+                active
+                  ? (activeColor ?? theme.colors.violet)
+                  : theme.colors.grey
+              }
             />
-            <Text style={[styles.label, active && styles.labelActive]}>
+            <Text
+              style={[
+                styles.label,
+                active && styles.labelActive,
+                active && activeColor ? { color: activeColor } : null,
+              ]}
+            >
               {t(`nav.${key}`)}
             </Text>
           </Pressable>
