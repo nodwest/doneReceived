@@ -6,9 +6,16 @@ export type FamilyEventKind =
   | 'cinema'
   | 'doctor'
   | 'meeting'
-  | 'homework';
+  | 'homework'
+  | 'custom';
 
-/** Человек в событии: участник или тот, кто остаётся дома. */
+/** Разовое событие или ежегодная дата. */
+export type FamilyEventRepeat = 'once' | 'annual';
+
+/** Ответ участника: еду / не еду. Хранится на сервере. */
+export type FamilyEventResponse = 'going' | 'not_going';
+
+/** Человек в событии: участник, который едет. */
 export interface FamilyEventPerson {
   id: string;
   name: string;
@@ -18,7 +25,7 @@ export interface FamilyEventPerson {
 
 /**
  * Событие семейного календаря. Даты — Date в локальной зоне.
- * Серверный слой появится отдельно: сейчас модель не знает про HTTP.
+ * Приходят из GET /families/:familyId/events; фото пока нет.
  */
 export interface FamilyEvent {
   id: string;
@@ -27,11 +34,20 @@ export interface FamilyEvent {
   description: string;
   startsAt: Date;
   endsAt: Date;
+  repeat: FamilyEventRepeat;
+  /** IANA-зона создателя: нужна для ежегодных дат и правки. */
+  timezone: string;
   participants: FamilyEventPerson[];
   /** Фото обложки; без него карточка рисует синий градиент. */
   photo?: ImageSourcePropType;
   /** Когда напомнить; null — напоминание не задано. */
   reminderAt?: Date;
+  /** Сколько минут до начала напоминать — для формы и повторного редактирования. */
+  reminderLeadMinutes?: number;
+  /** Ответ текущего пользователя. */
+  response?: FamilyEventResponse;
+  /** Родитель этой семьи может редактировать событие. */
+  canEdit: boolean;
   /** Главное событие недели: показывается большой карточкой. */
   featured?: boolean;
 }

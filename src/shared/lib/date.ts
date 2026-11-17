@@ -132,9 +132,28 @@ export const isSameDay = (a: Date, b: Date) =>
 export const addDays = (date: Date, days: number) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 
+/**
+ * Сетка месяца 6×7: понедельник перед первым числом и 42 дня подряд.
+ * Одинаково для запроса к API и для отрисовки.
+ */
+export const monthGrid = (month: Date) => {
+  const first = new Date(month.getFullYear(), month.getMonth(), 1);
+  const start = addDays(first, -((first.getDay() + 6) % 7));
+  return { start, end: addDays(start, 41) };
+};
+
 /** Время на языке интерфейса: «6:00 PM» или «18:00». */
 export const formatClock = (date: Date) =>
   date.toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
+
+/** IANA-зона устройства; UTC — если Intl её не сообщает. */
+export const deviceTimeZone = () => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+};
 
 /** «Sun, Oct 22» с временем или без — для пикера и сводок. */
 export const formatDate = (date: Date, options: Intl.DateTimeFormatOptions) =>

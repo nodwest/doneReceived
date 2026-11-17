@@ -15,6 +15,7 @@ import {
   formatMonthYear,
   formatWeekdayShort,
   isSameDay,
+  monthGrid,
   startOfDay,
 } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -32,6 +33,10 @@ type FamilyCalendarProps = {
   events: FamilyEvent[];
   expanded: boolean;
   onToggle: () => void;
+  /** Месяц, открытый в развернутом виде; по умолчанию текущий. */
+  month?: Date;
+  /** Сдвиг месяца на −1 / +1 в развернутом виде. */
+  onMonthChange?: (direction: -1 | 1) => void;
 };
 
 type DayCellProps = {
@@ -88,6 +93,8 @@ export function FamilyCalendar({
   events,
   expanded,
   onToggle,
+  month = today,
+  onMonthChange,
 }: FamilyCalendarProps) {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
@@ -112,14 +119,11 @@ export function FamilyCalendar({
   );
 
   const monthCells = useMemo(() => {
-    const first = new Date(today.getFullYear(), today.getMonth(), 1);
-    // Неделя начинается с понедельника: getDay() воскресенья — 0.
-    const offset = (first.getDay() + 6) % 7;
-    const start = addDays(first, -offset);
+    const grid = monthGrid(month);
     return Array.from({ length: MONTH_CELLS }, (_, index) =>
-      addDays(start, index),
+      addDays(grid.start, index),
     );
-  }, [today]);
+  }, [month]);
 
   const monthWeekdays = useMemo(
     () =>
@@ -145,6 +149,13 @@ export function FamilyCalendar({
     [rangeEvent],
   );
 
+  const coversDay = useCallback(
+    (event: FamilyEvent, date: Date) =>
+      date >= startOfDay(event.startsAt) &&
+      date <= endOfDay(event.endsAt),
+    [],
+  );
+
   const dayLabel = useCallback(
     (date: Date) =>
       formatDate(date, {
@@ -167,13 +178,13 @@ export function FamilyCalendar({
           width={dayWidth}
           hasBlueEvent={inFeaturedRange(item)}
           hasOtherEvent={events.some(
-            (event) => !event.featured && isSameDay(event.startsAt, item),
+            (event) => !event.featured && coversDay(event, item),
           )}
           label={label}
         />
       );
     },
-    [dayLabel, dayWidth, events, inFeaturedRange, t, today],
+    [dayLabel, dayWidth, events, inFeaturedRange, coversDay, t, today],
   );
 
   const keyExtractor = useCallback((date: Date) => date.toISOString(), []);
@@ -181,7 +192,41 @@ export function FamilyCalendar({
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.month}>{formatMonthYear(today)}</Text>
+        <View style={styles.monthNav}>
+          {expanded && onMonthChange && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('calendar.previousMonth')}
+              hitSlop={8}
+              onPress={() => onMonthChange(-1)}
+              style={styles.monthArrow}
+            >
+              <Icon
+                name="arrow-left"
+                size={13}
+                color={theme.colors.childDeep}
+              />
+            </Pressable>
+          )}
+          <Text style={styles.month} numberOfLines={1}>
+            {formatMonthYear(expanded ? month : today)}
+          </Text>
+          {expanded && onMonthChange && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('calendar.nextMonth')}
+              hitSlop={8}
+              onPress={() => onMonthChange(1)}
+              style={styles.monthArrow}
+            >
+              <Icon
+                name="arrow-right"
+                size={13}
+                color={theme.colors.childDeep}
+              />
+            </Pressable>
+          )}
+        </View>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={
@@ -218,11 +263,13 @@ export function FamilyCalendar({
             <View key={row[0].toISOString()} style={styles.monthRow}>
               {row.map((date) => {
                 const current = isSameDay(date, today);
-                const outside = date.getMonth() !== today.getMonth();
+                const outside =
+                  date.getMonth() !== month.getMonth() ||
+                  date.getFullYear() !== month.getFullYear();
                 const inRange = !current && inFeaturedRange(date);
                 const hasBlue = inFeaturedRange(date);
                 const hasOther = events.some(
-                  (event) => !event.featured && isSameDay(event.startsAt, date),
+                  (event) => !event.featured && coversDay(event, date),
                 );
                 return (
                   <View

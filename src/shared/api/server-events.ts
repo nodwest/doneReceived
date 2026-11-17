@@ -24,6 +24,7 @@ const SERVER_CHANGES: Record<string, DataChange> = {
   family_changed: 'family-changed',
   profile_changed: 'profile-changed',
   email_changed: 'email-changed',
+  calendar_changed: 'calendar-changed',
 };
 
 /** Мобильная сеть рвёт сокет молча: проверяем связь ping / pong. */

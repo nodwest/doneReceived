@@ -14,6 +14,7 @@ export const queryRoots = {
   wishes: ['wishes'],
   devices: ['devices'],
   me: ['me'],
+  calendar: ['calendar'],
 } as const;
 
 type DataArea = keyof typeof queryRoots;
@@ -38,6 +39,7 @@ export type DataChange =
   | 'family-changed'
   | 'profile-changed'
   | 'email-changed'
+  | 'calendar-changed'
   | 'task-expired';
 
 /**
@@ -73,6 +75,8 @@ const AFFECTS: Record<DataChange, readonly DataArea[]> = {
   ],
   // Почта видна только в своём профиле; ожидающая смена — там же.
   'email-changed': ['me'],
+  // События календаря семьи.
+  'calendar-changed': ['calendar'],
   // Срок прошёл, задание не сдано: резерв возвращается, награда — в упущенные.
   'task-expired': ['tasks', 'wallet', 'operations', 'activity'],
 };

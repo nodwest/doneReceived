@@ -44,6 +44,10 @@ type DateTimePickerSheetProps = {
   value: Date;
   minimumDate: Date;
   maximumDate: Date;
+  /** Заголовок шторки; по умолчанию — срок задания. */
+  title?: string;
+  /** Цвет кнопки подтверждения: синий — для календаря, фиолетовый — по умолчанию. */
+  tone?: 'violet' | 'blue';
   onConfirm: (date: Date) => void;
   onCancel: () => void;
 };
@@ -66,6 +70,8 @@ function PickerBody({
   value,
   minimumDate,
   maximumDate,
+  title,
+  tone = 'violet',
   onConfirm,
   onCancel,
 }: PickerBodyProps) {
@@ -154,7 +160,9 @@ function PickerBody({
   return (
     <View style={styles.body}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('createTask.timeToComplete')}</Text>
+        <Text style={styles.title}>
+          {title ?? t('createTask.timeToComplete')}
+        </Text>
         <Text style={styles.summary}>{summary}</Text>
       </View>
 
@@ -210,7 +218,11 @@ function PickerBody({
           <Text style={styles.cancelText}>{t('common.cancel')}</Text>
         </Pressable>
         <LinearGradient
-          colors={[theme.colors.violet, theme.colors.blue]}
+          colors={
+            tone === 'blue'
+              ? [theme.colors.childFrom, theme.colors.blue]
+              : [theme.colors.violet, theme.colors.blue]
+          }
           start={{ x: 0, y: 0.2 }}
           end={{ x: 1, y: 0.8 }}
           locations={[0, 0.7071]}
