@@ -308,6 +308,9 @@ export const en = {
     addMember: 'Family member',
     joinFamily: 'Join family',
     deleteChild: 'Delete',
+    deleteChildConfirmTitle: 'Remove {{name}}?',
+    deleteChildConfirmMessage:
+      'Their profile, devices and unfinished data will be removed from this family.',
     childDeleted: '{{name}} is removed from the family',
     deleteHasBalance:
       "Can't remove {{name}}: there is money on the balance. Withdraw it first.",
@@ -382,6 +385,9 @@ export const en = {
     removed: '{{name}} is disconnected',
     removeFailed: "Couldn't disconnect the device. Please try again.",
     remove: 'Remove {{name}}',
+    removeAction: 'Disconnect',
+    removeConfirmTitle: 'Disconnect {{name}}?',
+    removeConfirmMessage: 'The child will be signed out on this device.',
     removeSoon: 'Removing devices is coming soon',
     count_one: '{{count}} device',
     count_other: '{{count}} devices',

@@ -131,28 +131,28 @@ export async function fetchServerOperations(
         assignmentId: entry.assignmentId,
       }),
     );
-    const lost = missed.map(
-      (item): Operation => ({
-        id: item.assignmentId,
-        kind: 'missed',
-        title: item.taskTitle,
-        description: item.taskDescription ?? '',
-        amount: item.rewardPoints,
-        child: toChild(child),
-        parentId: item.createdBy,
-        at:
-          item.closedAt ??
-          item.expiredAt ??
-          item.deadlineAt ??
-          new Date(0).toISOString(),
-        doneAt: null,
-        photos: [],
-        note: null,
-        assignmentId: item.assignmentId,
-        dueAt: item.deadlineAt,
-        missedReason: item.reason ?? 'expired',
-      }),
-    );
+    const lost = missed.flatMap((item): Operation[] => {
+      const at = item.closedAt ?? item.expiredAt ?? item.deadlineAt;
+      if (!at) return [];
+      return [
+        {
+          id: item.assignmentId,
+          kind: 'missed',
+          title: item.taskTitle,
+          description: item.taskDescription ?? '',
+          amount: item.rewardPoints,
+          child: toChild(child),
+          parentId: item.createdBy,
+          at,
+          doneAt: null,
+          photos: [],
+          note: null,
+          assignmentId: item.assignmentId,
+          dueAt: item.deadlineAt,
+          missedReason: item.reason ?? 'expired',
+        },
+      ];
+    });
     return [...earned, ...lost];
   });
 }

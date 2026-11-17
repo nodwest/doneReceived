@@ -87,7 +87,9 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   // обоих родителей; чужие — без кнопок, чтобы знать, что уже задано, и не
   // повторять.
   const allTasks = useMemo(() => {
-    if (!owner) return filterTasks(data, { createdBy: myId });
+    if (!owner) {
+      return data.filter((task) => task.canManage ?? task.createdBy === myId);
+    }
     return scope === 'parent'
       ? filterTasks(data, { createdBy: String(owner.id) }).filter(
           (task) => task.status === 'active',
@@ -98,7 +100,9 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   const reviewTasks = useMemo(
     () =>
       allTasks.filter(
-        (task) => task.status === 'review' && task.createdBy === myId,
+        (task) =>
+          task.status === 'review' &&
+          (task.canManage ?? task.createdBy === myId),
       ),
     [allTasks, myId],
   );
@@ -190,7 +194,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                     // Reject возвращает его ребёнку, Cancel task — отменяет.
                     // Всё это — только у автора задания; второй родитель
                     // чужое задание только видит.
-                    task.createdBy !== myId ? (
+                    !(task.canManage ?? task.createdBy === myId) ? (
                       <ViewOnlyNote
                         author={task.authorName ?? t('member.parent')}
                         review={task.status === 'review'}

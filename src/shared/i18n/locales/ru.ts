@@ -31,7 +31,8 @@ export const ru: Dictionary = {
     upcoming: 'Ближайшие',
     remindOn: 'Напомним {{date}}',
     remindTag: 'Напомним',
-    refreshError: 'Не удалось обновить календарь. Показаны сохранённые события.',
+    refreshError:
+      'Не удалось обновить календарь. Показаны сохранённые события.',
     retry: 'Повторить',
     loadError: 'Не удалось загрузить событие',
     saveError: 'Не удалось сохранить событие',
@@ -314,6 +315,9 @@ export const ru: Dictionary = {
     addMember: 'Участник семьи',
     joinFamily: 'Присоединиться',
     deleteChild: 'Удалить',
+    deleteChildConfirmTitle: 'Удалить профиль {{name}}?',
+    deleteChildConfirmMessage:
+      'Профиль, устройства и незавершённые данные будут удалены из этой семьи.',
     childDeleted: 'Профиль удалён: {{name}}',
     deleteHasBalance:
       'Нельзя удалить {{name}}: на счету есть деньги. Сначала выведите их.',
@@ -389,6 +393,10 @@ export const ru: Dictionary = {
     removed: '{{name}} отключено',
     removeFailed: 'Не получилось отключить устройство. Попробуйте ещё раз.',
     remove: 'Удалить {{name}}',
+    removeAction: 'Отключить',
+    removeConfirmTitle: 'Отключить {{name}}?',
+    removeConfirmMessage:
+      'На этом устройстве будет выполнен выход из аккаунта ребёнка.',
     removeSoon: 'Удаление устройств скоро появится',
     count_one: '{{count}} устройство',
     count_few: '{{count}} устройства',

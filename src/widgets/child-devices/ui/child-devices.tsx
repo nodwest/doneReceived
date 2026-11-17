@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { ConnectDevicePanel } from '@features/connect-device';
 import { useRevokeDevice } from '@features/revoke-device';
 import { DeviceRow, useChildDevices, type Device } from '@entities/device';
@@ -55,10 +55,23 @@ export function ChildDevices({
 
   // Корзина: устройство отключается — на нём ребёнок выйдет.
   const remove = (device: Device) => {
-    revoke.mutate(device.id, {
-      onSuccess: () => showToast(t('devices.removed', { name: device.name })),
-      onError: () => showToast(t('devices.removeFailed')),
-    });
+    Alert.alert(
+      t('devices.removeConfirmTitle', { name: device.name }),
+      t('devices.removeConfirmMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('devices.removeAction'),
+          style: 'destructive',
+          onPress: () =>
+            revoke.mutate(device.id, {
+              onSuccess: () =>
+                showToast(t('devices.removed', { name: device.name })),
+              onError: () => showToast(t('devices.removeFailed')),
+            }),
+        },
+      ],
+    );
   };
 
   // Каждое открытие явно выбирает, что показать: блок мог свернуться

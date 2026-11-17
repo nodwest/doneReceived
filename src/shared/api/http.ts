@@ -81,9 +81,19 @@ export function setAccessTokenGetter(
  */
 export function authorizedImage(url: string) {
   const token = getAccessToken();
+  const absolute = /^https?:\/\//i.test(url) ? url : `${API_URL}${url}`;
+  let trustedApiUrl = !/^https?:\/\//i.test(url);
+  if (!trustedApiUrl) {
+    try {
+      trustedApiUrl = new URL(absolute).origin === new URL(API_URL).origin;
+    } catch {
+      trustedApiUrl = false;
+    }
+  }
   return {
-    uri: /^https?:\/\//i.test(url) ? url : `${API_URL}${url}`,
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    uri: absolute,
+    headers:
+      token && trustedApiUrl ? { Authorization: `Bearer ${token}` } : undefined,
   };
 }
 

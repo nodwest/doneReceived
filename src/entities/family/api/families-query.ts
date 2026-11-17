@@ -71,7 +71,9 @@ export function useParentInvite(familyId: string | null, enabled: boolean) {
     meta: { sync: false },
     // Перезапрос ровно в момент истечения (с запасом в секунду на часы).
     refetchInterval: (query) =>
-      active ? Math.max(inviteLeft(query.state.data) + 1000, 1000) : false,
+      active && query.state.status !== 'error'
+        ? Math.max(inviteLeft(query.state.data) + 1000, 1000)
+        : false,
     // Панель закрыли — код забываем, следующее открытие спросит сервер.
     gcTime: 0,
     refetchOnWindowFocus: false,

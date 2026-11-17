@@ -15,13 +15,21 @@ export interface DayTotals {
  */
 export function getHistoryDays(operations: Operation[], today: Date): Date[] {
   const last = startOfDay(today);
+  const earliest = addDays(last, -364);
   const first = operations.reduce((min, operation) => {
     const day = startOfDay(new Date(operation.at));
+    if (!Number.isFinite(day.getTime())) return min;
     return day < min ? day : min;
   }, last);
 
   const days: Date[] = [];
-  for (let day = first; day <= last; day = addDays(day, 1)) days.push(day);
+  for (
+    let day = first < earliest ? earliest : first;
+    day <= last;
+    day = addDays(day, 1)
+  ) {
+    days.push(day);
+  }
   return days;
 }
 
