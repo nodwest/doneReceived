@@ -32,6 +32,9 @@ import { styles } from './create-task-form.styled';
 /** Отступ под строкой Add step, когда форма её докручивает. */
 const KEEP_VISIBLE_GAP = 16;
 
+const createRequestId = () =>
+  `task-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
 type CreateTaskFormProps = {
   /** Кому можно назначить: моковые дети и дети семьи с сервера. */
   assignees: readonly ChipChild[];
@@ -57,6 +60,7 @@ export function CreateTaskForm({
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const createTask = useCreateTask();
+  const [clientRequestId] = useState(createRequestId);
   const updateTask = useUpdateTask();
   const isPending = createTask.isPending || updateTask.isPending;
   // Снимок задачи на момент открытия: фоновое перечитывание списка не должно
@@ -116,11 +120,18 @@ export function CreateTaskForm({
           serverTaskId: initialTask.serverTaskId,
         });
       } else {
-        await createTask.mutateAsync(payload);
+        await createTask.mutateAsync({ ...payload, clientRequestId });
       }
       onSubmitted();
     } catch (error) {
-      showToast(t(`createTask.errors.${submitError(error)}`));
+      const reason = submitError(error);
+      if (reason === 'alreadyCreated') {
+        // Сервер уже создал задание, но ответ потерялся: список обновится,
+        // форму закрываем, чтобы повтор не выглядел ошибкой.
+        onSubmitted();
+        return;
+      }
+      showToast(t(`createTask.errors.${reason}`));
     }
   };
 
@@ -237,7 +248,7 @@ export function CreateTaskForm({
 /** Ключ ошибки создания или правки: `createTask.errors.*`. */
 function submitError(
   error: unknown,
-): 'insufficientFunds' | 'onReview' | 'deadlinePassed' | 'network' | 'failed' {
+): 'insufficientFunds' | 'onReview' | 'deadlinePassed' | 'alreadyCreated' | 'network' | 'failed' {
   if (!isApiError(error)) return 'failed';
   if (error.status === 0) return 'network';
   const code =
@@ -247,6 +258,7 @@ function submitError(
   if (code === 'INSUFFICIENT_FUNDS') return 'insufficientFunds';
   if (code === 'TASK_ON_REVIEW') return 'onReview';
   if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed';
+  if (code === 'TASK_ALREADY_CREATED') return 'alreadyCreated';
   // Создание при нехватке денег отвечает 409 без кода.
   if (error.status === 409) return 'insufficientFunds';
   return 'failed';

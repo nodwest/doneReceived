@@ -7,7 +7,11 @@ import {
 import type { PickedPhoto } from '@shared/lib';
 import { syncData } from '@shared/api';
 
-type NewChild = { name: string; photo: PickedPhoto | null };
+type NewChild = {
+  name: string;
+  photo: PickedPhoto | null;
+  clientRequestId?: string;
+};
 
 /**
  * Создать профиль ребёнка в семье вошедшего родителя (POST
@@ -18,9 +22,9 @@ export function useCreateChild() {
   const queryClient = useQueryClient();
   const familyId = useCurrentFamily()?.id ?? null;
   return useMutation({
-    mutationFn: async ({ name, photo }: NewChild) => {
+    mutationFn: async ({ name, photo, clientRequestId }: NewChild) => {
       if (!familyId) throw new Error('No family');
-      const child = await createChild(familyId, name);
+      const child = await createChild(familyId, name, clientRequestId);
       let avatarError: unknown = null;
       if (photo) {
         await setChildAvatar(familyId, child.id, photo).catch((error) => {
@@ -29,6 +33,7 @@ export function useCreateChild() {
       }
       return { child, avatarError };
     },
-    onSuccess: () => syncData(queryClient, 'child-changed'),
+    // Ответ мог потеряться после создания: перечитываем и при ошибке.
+    onSettled: () => syncData(queryClient, 'child-changed'),
   });
 }

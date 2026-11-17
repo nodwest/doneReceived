@@ -10,7 +10,10 @@ export type FeedEventType =
   | 'task_cancelled'
   | 'task_expired'
   | 'wish_added'
-  | 'deposit';
+  | 'deposit'
+  | 'event_created'
+  | 'event_updated'
+  | 'event_cancelled';
 
 /** Человек в событии: имя и фото (null — буква имени). */
 export interface FeedPerson {

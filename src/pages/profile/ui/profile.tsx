@@ -8,7 +8,7 @@ import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
 import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
 import { getLanguageLabel, useLanguage, useTranslation } from '@shared/i18n';
-import { SettingsRow, Toggle, type AnchorRect } from '@shared/ui';
+import { SettingsRow, type AnchorRect } from '@shared/ui';
 import { ProfileHero } from './profile-hero';
 import { styles } from './profile.styled';
 
@@ -35,8 +35,6 @@ export function ProfilePage() {
   const logout = useLogout();
   const [languageAnchor, setLanguageAnchor] = useState<AnchorRect | null>(null);
   const [languageOpen, setLanguageOpen] = useState(false);
-  // Уведомлений пока нет (п. 25): тогл только переключается.
-  const [notifications, setNotifications] = useState(true);
 
   // Меню раскрывается у пункта Language — меряем, где он сейчас на экране.
   const openLanguageMenu = () => {
@@ -72,17 +70,6 @@ export function ProfilePage() {
                 onPress={() => router.push('/edit-profile')}
               />
               <View style={styles.divider} />
-              <SettingsRow
-                icon="bell"
-                label={t('profile.notifications')}
-                right={
-                  <Toggle
-                    value={notifications}
-                    onValueChange={setNotifications}
-                    accessibilityLabel={t('profile.notifications')}
-                  />
-                }
-              />
               {!isChild && (
                 <>
                   <View style={styles.divider} />

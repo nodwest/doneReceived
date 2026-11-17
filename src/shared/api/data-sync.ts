@@ -76,7 +76,7 @@ const AFFECTS: Record<DataChange, readonly DataArea[]> = {
   // Почта видна только в своём профиле; ожидающая смена — там же.
   'email-changed': ['me'],
   // События календаря семьи.
-  'calendar-changed': ['calendar'],
+  'calendar-changed': ['calendar', 'activity'],
   // Срок прошёл, задание не сдано: резерв возвращается, награда — в упущенные.
   'task-expired': ['tasks', 'wallet', 'operations', 'activity'],
 };

@@ -10,13 +10,20 @@ import { syncData } from '@shared/api';
 export function useDeposit(familyId: string | null) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (amount: number) => {
+    mutationFn: ({
+      amount,
+      clientRequestId,
+    }: {
+      amount: number;
+      clientRequestId?: string;
+    }) => {
       if (!familyId) throw new Error('No family');
-      return depositFunds(familyId, amount);
+      return depositFunds(familyId, amount, clientRequestId);
     },
-    onSuccess: (funds) => {
-      queryClient.setQueryData(walletKeys.funds(familyId), funds);
-      // Пополнение — новая строка в истории транзакций и в ленте.
+    onSettled: (funds) => {
+      if (funds) queryClient.setQueryData(walletKeys.funds(familyId), funds);
+      // Пополнение — новая строка в истории транзакций и в ленте. Перечитываем
+      // и при ошибке: ответ мог потеряться после успешного коммита.
       return syncData(queryClient, 'funds-deposited');
     },
   });

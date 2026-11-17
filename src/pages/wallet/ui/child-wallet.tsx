@@ -25,10 +25,10 @@ import { styles } from './wallet.styled';
 
 const NO_OPERATIONS: Operation[] = [];
 // Тап по транзакции — её карточка в истории транзакций.
-const openTransaction = (id: number) =>
+const openTransaction = (id: string) =>
   router.push({
     pathname: '/transactions',
-    params: { transaction: String(id) },
+    params: { transaction: id },
   });
 
 // Сколько последних транзакций показываем; остальные — по «See all».

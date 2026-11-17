@@ -25,6 +25,8 @@ export interface CreateTaskPayload {
   /** ISO-время, когда задача перестаёт быть активной; null — без срока. */
   expiresAt: string | null;
   assigneeId: string;
+  /** Ключ одного создания: retry после потерянного ответа не создаёт дубль. */
+  clientRequestId?: string;
   /** Шаги чеклиста по порядку; пустой — без чеклиста. */
   checklist: ChecklistStepPayload[];
 }

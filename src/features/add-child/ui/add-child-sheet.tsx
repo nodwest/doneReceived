@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CHILD_NAME_MAX_LENGTH } from '@entities/family';
+import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import {
   choosePhotos,
@@ -19,6 +20,9 @@ import {
 } from '@shared/ui';
 import { useCreateChild } from '../model/use-create-child';
 import { styles } from './add-child-sheet.styled';
+
+const createRequestId = () =>
+  `child-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
 type AddChildSheetProps = {
   visible: boolean;
@@ -42,6 +46,10 @@ export function AddChildSheet({
   const [photo, setPhoto] = useState<PickedPhoto | null>(null);
   const createChild = useCreateChild();
   const trimmed = name.trim();
+  const requestId = useMemo(
+    () => `${createRequestId()}-${name.length}-${visible ? 1 : 0}`,
+    [name, visible],
+  );
   const disabled = !trimmed || createChild.isPending;
 
   // Шторку закрыли (крестиком, мимо или профиль создан) — следующее
@@ -60,7 +68,7 @@ export function AddChildSheet({
   const submit = () => {
     if (disabled) return;
     createChild.mutate(
-      { name: trimmed, photo },
+      { name: trimmed, photo, clientRequestId: requestId },
       {
         onSuccess: ({ child, avatarError }) => {
           showToast(
@@ -72,7 +80,18 @@ export function AddChildSheet({
           setPhoto(null);
           onCreated();
         },
-        onError: () => showToast(t('newChild.failed')),
+        onError: (error) => {
+          const code = isApiError(error)
+            ? (error.data as { code?: unknown } | undefined)?.code
+            : null;
+          if (code === 'CHILD_ALREADY_CREATED') {
+            setName('');
+            setPhoto(null);
+            onCreated();
+            return;
+          }
+          showToast(t('newChild.failed'));
+        },
       },
     );
   };

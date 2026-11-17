@@ -12,7 +12,8 @@ export function useCreateTask() {
   const familyId = useCurrentFamily()?.id ?? null;
   return useMutation({
     mutationFn: (payload: CreateTaskPayload) => createTask(payload, familyId),
-    // Мутация ждёт перечитывания: после закрытия формы задача уже на экране.
-    onSuccess: () => syncData(queryClient, 'task-created'),
+    // onSettled, а не onSuccess: если ответ потерян, но сервер уже создал
+    // задание, список всё равно перечитается и покажет его.
+    onSettled: () => syncData(queryClient, 'task-created'),
   });
 }

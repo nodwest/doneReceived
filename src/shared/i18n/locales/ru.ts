@@ -93,6 +93,11 @@ export const ru: Dictionary = {
     formInvalid: 'Добавьте название и хотя бы одного участника',
     eventSaved: 'Событие сохранено',
     eventNotFound: 'Событие не найдено',
+    cancelEvent: 'Отменить событие',
+    cancelEventTitle: 'Отменить это событие?',
+    cancelEventMessage: 'Оно исчезнет из семейного календаря.',
+    eventCancelled: 'Событие отменено',
+    cancelError: 'Не удалось отменить событие',
     backToCalendar: 'Вернуться в календарь',
   },
   mapLayers: {
@@ -244,6 +249,9 @@ export const ru: Dictionary = {
         task_expired: '{{child}} не успел(а) выполнить «{{task}}»',
         wish_added: '{{child}}: новое желание «{{task}}»',
         deposit: 'Кошелёк пополнен',
+        event_created: 'Новое событие семьи: {{task}}',
+        event_updated: 'Событие семьи изменено: {{task}}',
+        event_cancelled: 'Событие семьи отменено: {{task}}',
       },
       child: {
         task_created: 'Новое задание: {{task}}',
@@ -255,6 +263,9 @@ export const ru: Dictionary = {
         task_expired: 'Время вышло: «{{task}}»',
         wish_added: 'Новое желание: {{task}}',
         deposit: 'Кошелёк пополнен',
+        event_created: 'Новое событие семьи: {{task}}',
+        event_updated: 'Событие семьи изменено: {{task}}',
+        event_cancelled: 'Событие семьи отменено: {{task}}',
       },
     },
   },
@@ -677,6 +688,8 @@ export const ru: Dictionary = {
       deadlinePassed: 'Срок задания истёк, его больше нельзя изменить.',
       onReview:
         'Ребёнок уже отправил это задание на проверку — сначала проверьте его.',
+      alreadyCreated:
+        'Это задание уже создано. Список сейчас обновится.',
       network: 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.',
       failed: 'Не получилось сохранить задание. Попробуйте ещё раз.',
     },

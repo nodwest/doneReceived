@@ -22,7 +22,10 @@ export function useRespondFamilyEvent() {
   const queryClient = useQueryClient();
   const currentFamily = useCurrentFamily();
   const sessionUser = useSessionUser();
-  const familyId = currentFamily?.id ?? sessionUser?.family?.id ?? null;
+  const familyId =
+    currentFamily?.id ??
+    (sessionUser?.kind === 'child' ? sessionUser.family?.id : undefined) ??
+    null;
 
   return useMutation({
     mutationFn: ({ eventId, response }: RespondInput) => {

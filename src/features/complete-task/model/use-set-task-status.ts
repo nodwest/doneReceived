@@ -17,7 +17,7 @@ export function useSetTaskStatus() {
   return useMutation({
     mutationFn: (payload: TaskStatusPayload) =>
       setTaskStatus(payload, familyId),
-    onSuccess: (_, { status }) =>
+    onSettled: (_, __, { status }) =>
       syncData(
         queryClient,
         status === 'review' ? 'task-submitted' : 'task-withdrawn',

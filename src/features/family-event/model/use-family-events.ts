@@ -32,7 +32,13 @@ export function useFamilyEvents(monthOffset = 0, includeMonth = true) {
   // иначе порядок хуков меняется, когда семья появляется из GET /families.
   const currentFamily = useCurrentFamily();
   const sessionUser = useSessionUser();
-  const familyId = currentFamily?.id ?? sessionUser?.family?.id ?? null;
+  // Список семей грузится только родителю; ребёнку семья приходит из сессии.
+  // Родителю fallback не нужен: после удаления из семьи старый session.family
+  // не должен открывать кэш чужого календаря.
+  const familyId =
+    currentFamily?.id ??
+    (sessionUser?.kind === 'child' ? sessionUser.family?.id : undefined) ??
+    null;
   const rolling = useFamilyEventsQuery(familyId, rollingFrom, rollingTo);
   const monthQuery = useFamilyEventsQuery(
     familyId,
@@ -114,7 +120,10 @@ export function useFamilyEvent(eventId: string | null, year?: number | null) {
   // иначе порядок хуков меняется, когда семья появляется из GET /families.
   const currentFamily = useCurrentFamily();
   const sessionUser = useSessionUser();
-  const familyId = currentFamily?.id ?? sessionUser?.family?.id ?? null;
+  const familyId =
+    currentFamily?.id ??
+    (sessionUser?.kind === 'child' ? sessionUser.family?.id : undefined) ??
+    null;
   const query = useFamilyEventQuery(familyId, eventId, year);
   return {
     event: query.data ?? null,

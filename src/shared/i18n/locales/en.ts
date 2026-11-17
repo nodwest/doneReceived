@@ -95,6 +95,11 @@ export const en = {
     formInvalid: 'Add a name and at least one participant',
     eventSaved: 'Event saved',
     eventNotFound: 'Event not found',
+    cancelEvent: 'Cancel event',
+    cancelEventTitle: 'Cancel this event?',
+    cancelEventMessage: 'It will disappear from the family calendar.',
+    eventCancelled: 'Event cancelled',
+    cancelError: 'Could not cancel the event',
     backToCalendar: 'Back to calendar',
   },
   mapLayers: {
@@ -247,6 +252,9 @@ export const en = {
         task_expired: '{{child}} ran out of time: “{{task}}”',
         wish_added: '{{child}} added a wish: {{task}}',
         deposit: 'Wallet topped up',
+        event_created: 'New family event: {{task}}',
+        event_updated: 'Family event updated: {{task}}',
+        event_cancelled: 'Family event cancelled: {{task}}',
       },
       child: {
         task_created: 'New task: {{task}}',
@@ -258,6 +266,9 @@ export const en = {
         task_expired: 'Time’s up: “{{task}}”',
         wish_added: 'New wish: {{task}}',
         deposit: 'Wallet topped up',
+        event_created: 'New family event: {{task}}',
+        event_updated: 'Family event updated: {{task}}',
+        event_cancelled: 'Family event cancelled: {{task}}',
       },
     },
   },
@@ -663,6 +674,8 @@ export const en = {
       deadlinePassed: 'The task has expired and can no longer be edited.',
       onReview:
         'The child has already sent this task for review — check it first.',
+      alreadyCreated:
+        'This task has already been created. The list will refresh.',
       network: "Can't reach the server. Check your connection and try again.",
       failed: "Couldn't save the task. Please try again.",
     },

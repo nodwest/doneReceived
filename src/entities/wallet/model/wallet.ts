@@ -11,7 +11,7 @@ export interface TransactionPerson {
 }
 
 interface TransactionBase {
-  id: number;
+  id: string;
   amount: number;
   /** ISO-время транзакции. */
   at: string;
@@ -116,14 +116,10 @@ export function balanceAfter<T extends AnyTransaction>(
   return balance - later;
 }
 
-/** Номер транзакции для поддержки: «TX-4F8K-2Q7M». */
-export function transactionCode(id: number) {
-  const raw = ((id * 2654435761) % 4294967296)
-    .toString(36)
-    .toUpperCase()
-    .padStart(8, '0')
-    .slice(-8);
-  return `TX-${raw.slice(0, 4)}-${raw.slice(4)}`;
+/** Код транзакции для поддержки: «TX-4F8K-2Q7M». Стабилен для UUID. */
+export function transactionCode(id: string) {
+  const raw = id.replace(/[^0-9a-z]/gi, '').toUpperCase().padStart(8, '0');
+  return `TX-${raw.slice(-8, -4)}-${raw.slice(-4)}`;
 }
 
 /** Транзакции одного дня и его итоги: сколько пришло и сколько ушло. */

@@ -51,6 +51,10 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     zIndex: 2,
   },
+  heroActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
   round: {
     width: 36,
     height: 36,

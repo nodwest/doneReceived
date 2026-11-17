@@ -233,6 +233,7 @@ export function createServerTask(familyId: string, payload: CreateTaskPayload) {
       // Пустые необязательные поля не отправляем: сервер ждёт их отсутствия.
       ...(description ? { description } : {}),
       ...(deadlineAt ? { deadlineAt } : {}),
+      ...(payload.clientRequestId ? { clientRequestId: payload.clientRequestId } : {}),
       checklist: checklistBody(payload.checklist),
       childIds: [payload.assigneeId],
     },

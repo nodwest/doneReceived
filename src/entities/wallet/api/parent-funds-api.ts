@@ -35,11 +35,12 @@ export async function fetchParentFunds(familyId: string): Promise<ParentFunds> {
 export async function depositFunds(
   familyId: string,
   amount: number,
+  clientRequestId?: string,
 ): Promise<ParentFunds> {
   return toFunds(
     await apiRequest<ParentWalletDto>(`/families/${familyId}/wallet/deposit`, {
       method: 'POST',
-      body: { amount },
+      body: clientRequestId ? { amount, clientRequestId } : { amount },
     }),
   );
 }

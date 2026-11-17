@@ -126,10 +126,12 @@ export function FamilyEventForm({
   );
   const [picker, setPicker] = useState<'start' | 'end' | null>(null);
 
+  // Год вперёд достаточно и для разового, и для ежегодного события: годовщина
+  // повторяется сама. Пять лет давали ~1 800 строк в колесе и фриз на Android.
   const maxDate = useMemo(
     () =>
       new Date(
-        now.getFullYear() + 5,
+        now.getFullYear() + 1,
         now.getMonth(),
         now.getDate(),
         23,

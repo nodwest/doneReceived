@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   ImageBackground,
   Pressable,
   ScrollView,
@@ -15,7 +16,7 @@ import {
   type FamilyEvent,
   type FamilyEventResponse,
 } from '@entities/family-event';
-import { useFamilyEvent, useRespondFamilyEvent } from '@features/family-event';
+import { useFamilyEvent, useRespondFamilyEvent, useCancelFamilyEvent } from '@features/family-event';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import {
@@ -95,6 +96,7 @@ export function FamilyEventPage() {
     eventYear,
   );
   const respondEvent = useRespondFamilyEvent();
+  const cancelEvent = useCancelFamilyEvent();
   const [responding, setResponding] = useState(false);
 
   const back = () => {
@@ -192,6 +194,28 @@ export function FamilyEventPage() {
     );
   };
 
+  const confirmCancel = () => {
+    Alert.alert(
+      t('calendar.cancelEventTitle'),
+      t('calendar.cancelEventMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('calendar.cancelEvent'),
+          style: 'destructive',
+          onPress: () =>
+            cancelEvent.mutate(event.id, {
+              onSuccess: () => {
+                showToast(t('calendar.eventCancelled'));
+                router.replace('/calendar');
+              },
+              onError: () => showToast(t('calendar.cancelError')),
+            }),
+        },
+      ],
+    );
+  };
+
   return (
     <View style={styles.screen}>
       <StatusBar style="light" />
@@ -237,24 +261,36 @@ export function FamilyEventPage() {
               <Icon name="arrow-left" size={20} color={theme.colors.white} />
             </Pressable>
             {event.canEdit && (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t('calendar.editTitle')}
-                onPress={() =>
-                  router.push({
-                    pathname: '/edit-family-event',
-                    params: {
-                      id: event.id,
-                      ...(event.repeat === 'annual'
-                        ? { year: String(event.startsAt.getFullYear()) }
-                        : {}),
-                    },
-                  })
-                }
-                style={styles.round}
-              >
-                <Icon name="pencil" size={17} color={theme.colors.white} />
-              </Pressable>
+              <View style={styles.heroActions}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('calendar.editTitle')}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/edit-family-event',
+                      params: {
+                        id: event.id,
+                        ...(event.repeat === 'annual'
+                          ? { year: String(event.startsAt.getFullYear()) }
+                          : {}),
+                      },
+                    })
+                  }
+                  style={styles.round}
+                >
+                  <Icon name="pencil" size={17} color={theme.colors.white} />
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('calendar.cancelEvent')}
+                  accessibilityState={{ disabled: cancelEvent.isPending }}
+                  disabled={cancelEvent.isPending}
+                  onPress={confirmCancel}
+                  style={styles.round}
+                >
+                  <Icon name="trash" size={17} color={theme.colors.white} />
+                </Pressable>
+              </View>
             )}
           </View>
 

@@ -18,6 +18,7 @@ type TransactionsDto = {
     childId: string | null;
     taskTitle: string | null;
   }[];
+  next?: string | null;
 };
 
 /** Дети семьи — только чтобы подписать выплаты именем. */
@@ -28,18 +29,44 @@ type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
  * /families/:id/wallet. Выплата ведёт в историю наград по id назначения
  * (`operationId`), у пополнений и выводов карты нет.
  */
+/** Все страницы истории родителя; ограничение защищает от бесконечного цикла. */
+async function fetchAllTransactions(familyId: string): Promise<TransactionsDto['items']> {
+  const items: TransactionsDto['items'] = [];
+  let before: string | null | undefined;
+  for (let page = 0; page < 20; page += 1) {
+    const query = new URLSearchParams({ limit: '100' });
+    if (before) query.set('before', before);
+    const data = await apiRequest<TransactionsDto>(
+      `/families/${familyId}/wallet/transactions?${query.toString()}`,
+    );
+    items.push(...data.items);
+    before = data.next;
+    if (!before) break;
+  }
+  return items;
+}
+
+/** Сумма выплат родителю за всё время — серверный агрегат, не страница истории. */
+export function fetchParentPaidTotal(familyId: string, parentId?: string) {
+  const query = parentId
+    ? `?${new URLSearchParams({ parentId }).toString()}`
+    : '';
+  return apiRequest<{ points: string }>(
+    `/families/${familyId}/wallet/paid-total${query}`,
+  );
+}
+
 export async function fetchServerWallet(familyId: string): Promise<Wallet> {
-  const [history, funds, children] = await Promise.all([
-    apiRequest<TransactionsDto>(`/families/${familyId}/wallet/transactions`),
+  const [historyItems, funds, children] = await Promise.all([
+    fetchAllTransactions(familyId),
     apiRequest<{ balancePoints: string }>(`/families/${familyId}/wallet`),
     apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
       () => [] as ChildDto[],
     ),
   ]);
-  const transactions = history.items.map((item, index): Transaction => {
+  const transactions = historyItems.map((item): Transaction => {
     const base = {
-      // Экраны ключуют транзакции числом: номер по порядку в ответе.
-      id: index + 1,
+      id: item.id,
       amount: item.points,
       at: item.createdAt,
       balanceAfter: item.balanceAfter,
