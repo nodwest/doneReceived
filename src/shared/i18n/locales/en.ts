@@ -100,6 +100,7 @@ export const en = {
     zoneYouHere: 'You are here now',
     zoneYouLeft: 'You left · {{ago}}',
     deleteRoute: 'Remove route {{route}}',
+    swipeRouteHint: 'Swipe a route left to remove it',
     swipeHint: 'Swipe an area left to edit or delete it',
     edit: 'Edit',
     emptyChildren: 'No family members yet',

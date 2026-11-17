@@ -100,6 +100,7 @@ export const ru: Dictionary = {
     zoneYouHere: 'Ты сейчас здесь',
     zoneYouLeft: 'Не здесь · {{ago}}',
     deleteRoute: 'Убрать маршрут {{route}}',
+    swipeRouteHint: 'Смахни маршрут влево, чтобы убрать его',
     swipeHint: 'Смахни область влево, чтобы изменить или удалить',
     edit: 'Изменить',
     emptyChildren: 'В семье пока нет участников',

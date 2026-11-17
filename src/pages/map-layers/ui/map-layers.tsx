@@ -836,6 +836,15 @@ export function MapLayersPage() {
             />
           </Section>
 
+          {pinned.length > 0 && openSections.transport ? (
+            <View style={styles.swipeHint}>
+              <Icon name="arrow-left" size={16} color={theme.colors.grey} />
+              <Text style={styles.swipeHintText}>
+                {t('mapLayers.swipeRouteHint')}
+              </Text>
+            </View>
+          ) : null}
+
           <Section
             title={t('mapLayers.areas')}
             count={
