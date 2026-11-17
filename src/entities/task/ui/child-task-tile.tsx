@@ -13,6 +13,7 @@ import { AssigneeAvatar } from './assignee-avatar';
 import {
   RewardAmount,
   TILE_DESCRIPTION_LINES,
+  TilePaper,
   TileTimer,
   tileStyles,
 } from './task-tile-parts';
@@ -47,7 +48,8 @@ export function ChildTaskTile({
   // Нажимается верх плитки, а не вся она: кнопка action — соседняя, не
   // вложенная (на вебе кнопка внутри кнопки — невалидный HTML).
   return (
-    <View style={[styles.tile, style]}>
+    <View style={[styles.tile, tileStyles.surface, style]}>
+      <TilePaper />
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={task.title}

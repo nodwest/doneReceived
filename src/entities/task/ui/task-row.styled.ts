@@ -7,16 +7,12 @@ export const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
-    overflow: 'hidden',
   },
   rowActive: {
     borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
-    boxShadow: '0px 6px 14px rgba(0, 0, 0, 0.06)',
   },
   rowReview: {
     borderColor: theme.colors.reviewBorder,
-    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
   pressed: {
     opacity: 0.85,
@@ -31,7 +27,7 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.violetChip,
   },
   chipReview: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: theme.colors.reviewChipBg,
   },
   chipText: {
     fontSize: 11,

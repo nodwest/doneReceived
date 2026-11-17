@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { TILE_GAP } from '@entities/task';
 import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
@@ -49,13 +50,13 @@ export const styles = StyleSheet.create({
   },
   // Все выплаченные задания плитками по дням.
   paidList: {
-    gap: 10,
+    gap: TILE_GAP,
     paddingTop: 12,
     paddingHorizontal: 12,
     paddingBottom: 32,
   },
   paidDay: {
-    gap: 10,
+    gap: TILE_GAP,
   },
   paidDayHead: {
     flexDirection: 'row',

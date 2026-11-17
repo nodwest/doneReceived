@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { TILE_GAP } from '@entities/task';
 import { theme, tracking } from '@shared/theme';
 
 // Отступ под точками карусели, когда снизу нет навбара.
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   section: {
-    gap: 10,
+    gap: TILE_GAP,
   },
   // Карусель занимает всю высоту под шапкой; карточки — 16pt от краёв.
   cards: {
