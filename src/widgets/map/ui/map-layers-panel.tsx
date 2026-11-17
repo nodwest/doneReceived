@@ -8,7 +8,7 @@ import {
   type PanResponderCallbacks,
 } from 'react-native';
 import { useLayoutEffect, useRef, useState } from 'react';
-import { GradientButton, Icon, type IconName } from '@shared/ui';
+import { GradientButton, Icon, Toggle, type IconName } from '@shared/ui';
 import { theme, tracking } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { type MapLayerKey, useMapLayerStore } from '../model/layer-preferences';
@@ -32,29 +32,37 @@ function LayerRow({ layerKey, icon, title, subtitle, last }: LayerRowProps) {
   const toggle = useMapLayerStore((state) => state.toggle);
 
   return (
-    <Pressable
-      accessibilityRole="checkbox"
-      accessibilityLabel={title}
-      accessibilityHint={subtitle}
-      accessibilityState={{ checked: enabled }}
-      onPress={() => toggle(layerKey)}
-      style={({ pressed }) => [
-        styles.row,
-        !last && styles.rowDivider,
-        pressed && styles.pressed,
-      ]}
-    >
-      <View style={styles.iconTile}>
-        <Icon name={icon} size={22} color={theme.colors.violet} />
-      </View>
-      <View style={styles.copy}>
-        <Text style={styles.rowTitle}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
-      </View>
-      <View style={[styles.checkbox, !enabled && styles.checkboxOff]}>
-        {enabled && <Icon name="check" size={18} color={theme.colors.white} />}
-      </View>
-    </Pressable>
+    <>
+      <Pressable
+        accessibilityRole="switch"
+        accessibilityLabel={title}
+        accessibilityHint={subtitle}
+        accessibilityState={{ checked: enabled }}
+        onPress={() => toggle(layerKey)}
+        style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      >
+        <View style={styles.iconTile}>
+          <Icon name={icon} size={20} color={theme.colors.mapAccent} />
+        </View>
+        <View style={styles.copy}>
+          <Text style={styles.rowTitle} numberOfLines={1}>
+            {title}
+          </Text>
+          <Text style={styles.subtitle} numberOfLines={1}>
+            {subtitle}
+          </Text>
+        </View>
+        {/* Переключатель только показывает состояние: нажимается вся строка. */}
+        <View
+          pointerEvents="none"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Toggle value={enabled} onValueChange={() => {}} tone="blue" />
+        </View>
+      </Pressable>
+      {!last && <View style={styles.divider} />}
+    </>
   );
 }
 
@@ -108,7 +116,7 @@ export function MapLayersPanel({ onClose, onConfigure }: MapLayersPanelProps) {
     >
       <View style={styles.handle} />
       <Text style={styles.title}>{t('mapLayers.title')}</Text>
-      <View style={styles.list}>
+      <View style={styles.group}>
         <LayerRow
           layerKey="family"
           icon="children"
@@ -129,7 +137,11 @@ export function MapLayersPanel({ onClose, onConfigure }: MapLayersPanelProps) {
           last
         />
       </View>
-      <GradientButton label={t('mapLayers.configure')} onPress={onConfigure} />
+      <GradientButton
+        label={t('mapLayers.configure')}
+        tone="blue"
+        onPress={onConfigure}
+      />
     </Animated.View>
   );
 }
@@ -140,53 +152,61 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     alignSelf: 'center',
     paddingTop: 10,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 28,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     backgroundColor: theme.colors.white,
-    boxShadow: '0px -8px 24px rgba(26, 26, 46, 0.12)',
   },
   handle: {
-    width: 42,
+    width: 40,
     height: 5,
     alignSelf: 'center',
     marginBottom: 16,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.dragHandle,
+    borderRadius: 3,
+    backgroundColor: theme.colors.sheetGrabber,
   },
   title: {
     marginBottom: 12,
-    fontSize: 24,
-    letterSpacing: tracking(24),
+    fontSize: theme.fontSize.xl,
+    letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
     color: theme.colors.ink,
   },
-  list: {
-    marginBottom: 14,
+  // Слои одной карточкой с рамкой, строки разделены чертой от текста.
+  group: {
+    marginBottom: 16,
+    paddingVertical: 4,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.line,
+    backgroundColor: theme.colors.white,
+    overflow: 'hidden',
   },
   row: {
-    minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
+    paddingLeft: 12,
+    paddingRight: 14,
   },
-  rowDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.line,
+  divider: {
+    height: 1,
+    marginLeft: 60,
+    backgroundColor: theme.colors.line,
   },
   pressed: {
     opacity: 0.72,
   },
   iconTile: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    backgroundColor: theme.colors.violetIcon,
+    borderRadius: 12,
+    backgroundColor: theme.colors.mapAccentTint,
   },
   copy: {
     flex: 1,
@@ -196,7 +216,7 @@ const styles = StyleSheet.create({
   rowTitle: {
     fontSize: 15,
     letterSpacing: tracking(15),
-    fontFamily: theme.fonts.bold,
+    fontFamily: theme.fonts.semibold,
     color: theme.colors.ink,
   },
   subtitle: {
@@ -204,19 +224,5 @@ const styles = StyleSheet.create({
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
-  },
-  checkbox: {
-    width: 34,
-    height: 34,
-    flexShrink: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-    backgroundColor: theme.colors.violet,
-  },
-  checkboxOff: {
-    borderWidth: 1.5,
-    borderColor: theme.colors.placeholder,
-    backgroundColor: theme.colors.white,
   },
 });

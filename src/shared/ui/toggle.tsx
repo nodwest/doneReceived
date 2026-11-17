@@ -8,15 +8,19 @@ type ToggleProps = {
   accessibilityLabel?: string;
   /** Нельзя переключить: бледнее, нажатия не работают. */
   disabled?: boolean;
+  /** Цвет включённого: фиолетово-синий (по умолчанию) или голубой (карта). */
+  tone?: 'violet' | 'blue';
 };
 
-/** Переключатель 44×26: включён — фиолетово-синий градиент, выключен — серый. */
+/** Переключатель 44×26: включён — градиент (`tone`), выключен — серый. */
 export function Toggle({
   value,
   onValueChange,
   accessibilityLabel,
   disabled = false,
+  tone = 'violet',
 }: ToggleProps) {
+  const blue = tone === 'blue';
   return (
     <Pressable
       accessibilityRole="switch"
@@ -29,7 +33,11 @@ export function Toggle({
     >
       {value ? (
         <LinearGradient
-          colors={[theme.colors.violet, theme.colors.blue]}
+          colors={
+            blue
+              ? [theme.colors.childFrom, theme.colors.childDeep]
+              : [theme.colors.violet, theme.colors.blue]
+          }
           start={{ x: 0, y: 0 }}
           end={{ x: 0.37, y: 1 }}
           style={[styles.track, styles.trackOn]}
@@ -37,7 +45,9 @@ export function Toggle({
           <View style={styles.knob} />
         </LinearGradient>
       ) : (
-        <View style={[styles.track, styles.trackOff]}>
+        <View
+          style={[styles.track, styles.trackOff, blue && styles.trackOffBlue]}
+        >
           <View style={styles.knob} />
         </View>
       )}
@@ -62,6 +72,9 @@ const styles = StyleSheet.create({
   trackOff: {
     justifyContent: 'flex-start',
     backgroundColor: theme.colors.placeholder,
+  },
+  trackOffBlue: {
+    backgroundColor: theme.colors.toggleOff,
   },
   knob: {
     width: 20,

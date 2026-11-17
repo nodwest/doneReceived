@@ -30,6 +30,53 @@ import { UserMarker } from './ui/user-marker.web';
 
 type MarkerLocation = LiveLocation;
 
+/** Класс контейнера большой карты: под ним перекрашены кнопки MapLibre. */
+const MAP_CLASS = 'dr-map';
+
+const svgIcon = (path: string) =>
+  `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'><path d='${path}' stroke='#1A1A2E' stroke-width='2.2' stroke-linecap='round'/></svg>`,
+  )}")`;
+
+/**
+ * Кнопки масштаба как в макете: белая капсула 44 с мягкой тенью, «+» и «−»
+ * цвета текста, между ними короткая черта. Стили MapLibre задаются классами
+ * в DOM, поэтому правим их CSS-правилами, только внутри большой карты.
+ */
+const ZOOM_CONTROL_CSS = `
+.${MAP_CLASS} .maplibregl-ctrl-top-right .maplibregl-ctrl {
+  margin: 12px 16px 0 0;
+}
+.${MAP_CLASS} .maplibregl-ctrl-group:not(:empty) {
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.${MAP_CLASS} .maplibregl-ctrl-group button {
+  width: 44px;
+  height: 44px;
+}
+.${MAP_CLASS} .maplibregl-ctrl-group button + button {
+  border-top: 0;
+  background-image: linear-gradient(#ECEDF3, #ECEDF3);
+  background-size: 24px 1px;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+.${MAP_CLASS} .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+  background-image: ${svgIcon('M10 3.64V16.36M3.64 10H16.36')};
+}
+.${MAP_CLASS} .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-image: ${svgIcon('M3.64 10H16.36')};
+}
+`;
+
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = ZOOM_CONTROL_CSS;
+  document.head.appendChild(style);
+}
+
 const later = (a: string | undefined, b: string | undefined) => {
   if (!a) return b;
   if (!b) return a;
@@ -306,6 +353,7 @@ export function MapWeb({
   return (
     <div
       ref={containerRef}
+      className={MAP_CLASS}
       style={{
         width: '100%',
         height: '100%',
