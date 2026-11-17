@@ -17,5 +17,10 @@ export function useWishlistProgress(
     () => allocateBalance(query.data ?? [], balance),
     [query.data, balance],
   );
-  return { ...query, isPending: !!owner && query.isPending, progress, ...summarizeWishlist(progress) };
+  return {
+    ...query,
+    isPending: !!owner && query.isPending,
+    progress,
+    ...summarizeWishlist(progress),
+  };
 }

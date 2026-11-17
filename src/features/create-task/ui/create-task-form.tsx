@@ -248,7 +248,13 @@ export function CreateTaskForm({
 /** Ключ ошибки создания или правки: `createTask.errors.*`. */
 function submitError(
   error: unknown,
-): 'insufficientFunds' | 'onReview' | 'deadlinePassed' | 'alreadyCreated' | 'network' | 'failed' {
+):
+  | 'insufficientFunds'
+  | 'onReview'
+  | 'deadlinePassed'
+  | 'alreadyCreated'
+  | 'network'
+  | 'failed' {
   if (!isApiError(error)) return 'failed';
   if (error.status === 0) return 'network';
   const code =

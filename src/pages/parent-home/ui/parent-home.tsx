@@ -7,10 +7,7 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
-import {
-  useFamilyFeed,
-  useFamilyTasks,
-} from '@features/family-tasks';
+import { useFamilyFeed, useFamilyTasks } from '@features/family-tasks';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { FeedItem } from '@entities/activity';
 import { useMe, useMyAvatar, useMyId } from '@entities/session';

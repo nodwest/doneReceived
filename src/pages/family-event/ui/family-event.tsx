@@ -16,7 +16,11 @@ import {
   type FamilyEvent,
   type FamilyEventResponse,
 } from '@entities/family-event';
-import { useFamilyEvent, useRespondFamilyEvent, useCancelFamilyEvent } from '@features/family-event';
+import {
+  useFamilyEvent,
+  useRespondFamilyEvent,
+  useCancelFamilyEvent,
+} from '@features/family-event';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import {

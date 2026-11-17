@@ -151,8 +151,7 @@ export function FamilyCalendar({
 
   const coversDay = useCallback(
     (event: FamilyEvent, date: Date) =>
-      date >= startOfDay(event.startsAt) &&
-      date <= endOfDay(event.endsAt),
+      date >= startOfDay(event.startsAt) && date <= endOfDay(event.endsAt),
     [],
   );
 

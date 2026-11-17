@@ -30,7 +30,9 @@ type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
  * (`operationId`), у пополнений и выводов карты нет.
  */
 /** Все страницы истории родителя; ограничение защищает от бесконечного цикла. */
-async function fetchAllTransactions(familyId: string): Promise<TransactionsDto['items']> {
+async function fetchAllTransactions(
+  familyId: string,
+): Promise<TransactionsDto['items']> {
   const items: TransactionsDto['items'] = [];
   let before: string | null | undefined;
   for (let page = 0; page < 20; page += 1) {
