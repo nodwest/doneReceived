@@ -48,13 +48,17 @@ export function zonesToGeoJson(
   };
 }
 
+/** Области на карте и в редакторе — голубые, как акцент вкладки Map. */
+const ZONE_COLOR = '#2F80DD';
+const ZONE_LABEL_COLOR = '#1E5FB8';
+
 const zoneFillLayer: FillLayerSpecification = {
   id: ZONE_LAYER_IDS[0],
   type: 'fill',
   source: ZONE_SOURCE,
   paint: {
-    'fill-color': '#6C5CE7',
-    'fill-opacity': 0.12,
+    'fill-color': ZONE_COLOR,
+    'fill-opacity': 0.14,
   },
 };
 
@@ -63,9 +67,8 @@ const zoneOutlineLayer: LineLayerSpecification = {
   type: 'line',
   source: ZONE_SOURCE,
   paint: {
-    'line-color': '#6C5CE7',
-    'line-width': 1.5,
-    'line-opacity': 0.7,
+    'line-color': ZONE_COLOR,
+    'line-width': 2,
   },
 };
 
@@ -81,7 +84,7 @@ const zoneLabelsLayer: SymbolLayerSpecification = {
     'text-padding': 4,
   },
   paint: {
-    'text-color': '#1A1A2E',
+    'text-color': ZONE_LABEL_COLOR,
     'text-halo-color': '#FFFFFF',
     'text-halo-width': 1.5,
   },
@@ -141,7 +144,7 @@ const draftFillLayer: FillLayerSpecification = {
   source: ZONE_DRAFT_SOURCE,
   filter: ['==', ['geometry-type'], 'Polygon'],
   paint: {
-    'fill-color': '#6C5CE7',
+    'fill-color': ZONE_COLOR,
     'fill-opacity': 0.14,
   },
 };
@@ -152,7 +155,7 @@ const draftLineLayer: LineLayerSpecification = {
   source: ZONE_DRAFT_SOURCE,
   filter: ['==', ['geometry-type'], 'LineString'],
   paint: {
-    'line-color': '#6C5CE7',
+    'line-color': ZONE_COLOR,
     'line-width': 2,
     'line-dasharray': [2, 1],
   },
@@ -164,7 +167,7 @@ const draftPointsLayer: CircleLayerSpecification = {
   source: ZONE_DRAFT_SOURCE,
   paint: {
     'circle-radius': 5,
-    'circle-color': '#6C5CE7',
+    'circle-color': ZONE_COLOR,
     // Выбранная вершина — красная обводка, остальные белые.
     'circle-stroke-color': ['case', ['get', 'selected'], '#E5484D', '#FFFFFF'],
     'circle-stroke-width': ['case', ['get', 'selected'], 3, 2],

@@ -9,6 +9,7 @@ import {
 import {
   Animated,
   PanResponder,
+  Platform,
   StyleSheet,
   View,
   type PanResponderCallbacks,
@@ -69,6 +70,32 @@ export function SwipeableRow({
   });
   // Где была строка, когда палец её взял.
   const startX = useRef(0);
+  // Жест был свайпом или закрывал открытую строку: тап по содержимому
+  // (переключатель, переход) не должен сработать. На нативе нажатие
+  // отменяет сам перехват жеста, а в вебе клик всё равно доходит до
+  // Pressable — его гасим ниже.
+  const blockClick = useRef(false);
+  const releaseBlock = () => {
+    // Клик приходит сразу после отпускания; если его не было (палец ушёл
+    // далеко), снимаем блок чуть позже, чтобы не съесть следующий тап.
+    setTimeout(() => {
+      blockClick.current = false;
+    }, 300);
+  };
+  const contentRef = useRef<View>(null);
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const node = contentRef.current as unknown as HTMLElement | null;
+    if (!node) return;
+    const onClick = (event: MouseEvent) => {
+      if (!blockClick.current) return;
+      blockClick.current = false;
+      event.stopPropagation();
+      event.preventDefault();
+    };
+    node.addEventListener('click', onClick, true);
+    return () => node.removeEventListener('click', onClick, true);
+  }, []);
 
   // После жеста строка доезжает пружиной: из растянутой резинки — мягко.
   const animateTo = (toOpen: boolean) =>
@@ -93,11 +120,16 @@ export function SwipeableRow({
 
   const [handlers] = useState<PanResponderCallbacks>(() => ({
     // Тап по открытой строке перехватываем, чтобы закрыть её, а не нажать.
-    onStartShouldSetPanResponderCapture: () => latest.current.open,
+    onStartShouldSetPanResponderCapture: () => {
+      if (!latest.current.open) return false;
+      blockClick.current = true;
+      return true;
+    },
     onMoveShouldSetPanResponder: (_, { dx, dy }) =>
       Math.abs(dx) > SWIPE_SLOP && Math.abs(dx) > Math.abs(dy) * 1.5,
     onPanResponderTerminationRequest: () => false,
     onPanResponderGrant: () => {
+      blockClick.current = true;
       setRevealed(true);
       if (!latest.current.open) latest.current.onSwipeStart?.();
       offset.stopAnimation((value) => {
@@ -117,8 +149,12 @@ export function SwipeableRow({
       if (vx > FLING_VELOCITY) next = false;
       animateTo(next);
       if (next !== wasOpen) latest.current.onOpenChange(next);
+      releaseBlock();
     },
-    onPanResponderTerminate: () => animateTo(latest.current.open),
+    onPanResponderTerminate: () => {
+      animateTo(latest.current.open);
+      releaseBlock();
+    },
   }));
   const [responder] = useState(() => PanResponder.create(handlers));
 
@@ -169,7 +205,7 @@ export function SwipeableRow({
         {...responder.panHandlers}
         style={{ transform: [{ translateX: offset }] }}
       >
-        {children}
+        <View ref={contentRef}>{children}</View>
       </Animated.View>
     </View>
   );

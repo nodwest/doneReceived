@@ -170,6 +170,23 @@ export const theme = {
     childCount: '#DCEBFC',
     goalTrack: '#FFE08A',
     goalDot: '#FFC94D',
+    // Вкладка Map и «Слои карты»: голубой акцент (иконки, ссылки, области
+    // на карте), подложка иконок, пунктирная кнопка «Добавить…», выключенный
+    // переключатель, плитка автобуса, «кто внутри» и пустые подписи.
+    mapAccent: '#2F80DD',
+    mapAccentTint: '#EAF3FE',
+    mapAccentSoft: '#F2F8FF',
+    mapAccentBorder: 'rgba(47, 128, 221, 0.4)',
+    mapAccentActive: '#1E5FB8',
+    toggleOff: '#E4E6EE',
+    busTile: '#FFF3D6',
+    busIcon: '#B07A00',
+    presenceInside: '#1F9D55',
+    mutedSoft: '#A3A7B7',
+    sheetGrabber: '#D9DBE3',
+    dangerIconBg: '#FFECEC',
+    mapDim: 'rgba(11, 16, 48, 0.45)',
+    swipeBack: '#F2F4F8',
 
     background: '#0b1120',
     surface: '#111827',

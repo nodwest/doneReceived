@@ -33,7 +33,7 @@ import {
 } from '@widgets/map';
 import { authorizedImage } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { showToast, formatTimeAgo, useNow } from '@shared/lib';
+import { formatClock, formatTimeAgo, showToast, useNow } from '@shared/lib';
 import { theme } from '@shared/theme';
 import {
   BottomSheet,
@@ -43,10 +43,15 @@ import {
   PillButton,
   RoundButton,
   ScreenHeader,
+  SwipeableRow,
+  Toggle,
   type IconName,
 } from '@shared/ui';
-import { styles } from './map-layers.styled';
-import { MemberMapSettingsSheet } from './member-map-settings-sheet';
+import {
+  styles,
+  SWIPE_ACTION_GAP,
+  swipeActionsWidth,
+} from './map-layers.styled';
 
 /** Маршрут из живого потока: список маршрутов сервер отдельно не отдаёт. */
 type RouteOption = {
@@ -55,7 +60,7 @@ type RouteOption = {
 
 /** В раскрытом разделе видно не больше пяти строк, дальше — внутренний скролл. */
 const SECTION_VISIBLE_ROWS = 5;
-const SECTION_ROW_HEIGHT = 64;
+const SECTION_ROW_HEIGHT = 66;
 const SECTION_LIST_MAX_HEIGHT = SECTION_VISIBLE_ROWS * SECTION_ROW_HEIGHT;
 
 /** Новые маршруты добавляем, исчезнувшие оставляем в списке. */
@@ -80,111 +85,133 @@ function sortRoutes(routes: readonly string[]) {
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
 
-type CheckRowProps = {
+type LayerRowProps = {
   title: string;
   subtitle?: ReactNode;
   checked: boolean;
   onPress: () => void;
   icon?: IconName;
+  /** Плитка автобуса — жёлтая, остальные — голубые. */
+  iconTone?: 'blue' | 'bus';
   avatar?: { name: string; source: ImageSourcePropType | null };
-  /** Кнопки действий (правка/удаление) перед галочкой. */
-  actions?: ReactNode;
-  last?: boolean;
+  /** Перед переключателем: кто внутри области, кнопка настроек. */
+  aside?: ReactNode;
+  /** Зелёная полоса слева: в области кто-то есть. */
+  accent?: boolean;
+  /** Строки областей чуть выше и с полосой слева. */
+  tall?: boolean;
 };
 
-/** Строка слоя с галочкой: аватар ребёнка или иконка категории. */
-function CheckRow({
+/** Строка слоя: аватар или иконка, подписи и переключатель. */
+function LayerRow({
   title,
   subtitle,
   checked,
   onPress,
   icon,
+  iconTone = 'blue',
   avatar,
-  actions,
-  last,
-}: CheckRowProps) {
+  aside,
+  accent,
+  tall,
+}: LayerRowProps) {
+  const bus = iconTone === 'bus';
   return (
     <Pressable
-      accessibilityRole="checkbox"
+      accessibilityRole="switch"
       accessibilityLabel={title}
       accessibilityHint={typeof subtitle === 'string' ? subtitle : undefined}
       accessibilityState={{ checked }}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.row,
-        !last && styles.rowDivider,
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.rowWrap, pressed && styles.pressed]}
     >
-      {avatar ? (
-        <LetterAvatar
-          source={avatar.source}
-          name={avatar.name}
-          style={styles.avatar}
-          letterSize={17}
-        />
-      ) : (
-        <View style={styles.rowIcon}>
-          <Icon name={icon ?? 'layers'} size={22} color={theme.colors.violet} />
+      {tall ? (
+        <View style={styles.accentWrap}>
+          <View style={[styles.accent, accent && styles.accentOn]} />
         </View>
-      )}
-      <View style={styles.rowText}>
-        <Text style={styles.rowTitle} numberOfLines={1}>
-          {title}
-        </Text>
-        {subtitle ? (
-          typeof subtitle === 'string' ? (
-            <Text style={styles.rowSubtitle} numberOfLines={1}>
-              {subtitle}
-            </Text>
-          ) : (
-            subtitle
-          )
-        ) : null}
-      </View>
-      {actions ? <View style={styles.rowActions}>{actions}</View> : null}
-      <View style={[styles.checkbox, !checked && styles.checkboxOff]}>
-        {checked && <Icon name="check" size={18} color={theme.colors.white} />}
+      ) : null}
+      <View style={[styles.row, tall && styles.rowTall]}>
+        {avatar ? (
+          <LetterAvatar
+            source={avatar.source}
+            name={avatar.name}
+            style={styles.avatar}
+            letterSize={16}
+          />
+        ) : (
+          <View style={[styles.rowIcon, bus && styles.rowIconBus]}>
+            <Icon
+              name={icon ?? 'layers'}
+              size={20}
+              color={bus ? theme.colors.busIcon : theme.colors.mapAccent}
+            />
+          </View>
+        )}
+        <View style={styles.rowText}>
+          <Text style={styles.rowTitle} numberOfLines={1}>
+            {title}
+          </Text>
+          {subtitle ? (
+            typeof subtitle === 'string' ? (
+              <Text style={styles.rowSubtitle} numberOfLines={1}>
+                {subtitle}
+              </Text>
+            ) : (
+              subtitle
+            )
+          ) : null}
+        </View>
+        {aside ? <View style={styles.rowAside}>{aside}</View> : null}
+        {/* Переключатель только показывает состояние: нажимается вся строка. */}
+        <View
+          pointerEvents="none"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Toggle value={checked} onValueChange={() => {}} tone="blue" />
+        </View>
       </View>
     </Pressable>
   );
 }
 
-type IconButtonProps = {
+/** Кнопка под смахнутой строкой: Edit (голубая) или Delete (красная). */
+function SwipeAction({
+  icon,
+  label,
+  accessibilityLabel,
+  tone,
+  onPress,
+}: {
   icon: IconName;
   label: string;
-  tone: 'violet' | 'danger';
+  accessibilityLabel: string;
+  tone: 'edit' | 'delete';
   onPress: () => void;
-};
-
-/** Маленькая круглая кнопка действия в строке: правка или удаление. */
-function IconButton({ icon, label, tone, onPress }: IconButtonProps) {
-  const danger = tone === 'danger';
+}) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={label}
-      hitSlop={6}
-      onPress={(event) => {
-        // Тап по действию не должен заодно переключать слой.
-        event.stopPropagation();
-        onPress();
-      }}
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
       style={({ pressed }) => [
-        styles.action,
-        danger ? styles.actionDanger : styles.actionEdit,
+        styles.swipeAction,
+        tone === 'edit' ? styles.swipeEdit : styles.swipeDelete,
         pressed && styles.pressed,
       ]}
     >
-      <Icon
-        name={icon}
-        size={17}
-        color={danger ? theme.colors.dangerText : theme.colors.violet}
-      />
+      <Icon name={icon} size={18} color={theme.colors.white} />
+      <Text style={styles.swipeLabel}>{label}</Text>
     </Pressable>
   );
 }
 
+/** Черта между строками: у участников и маршрутов — от текста. */
+function Divider({ inset }: { inset?: boolean }) {
+  return <View style={[styles.divider, inset && styles.dividerInset]} />;
+}
+
+/** Пунктирная кнопка «Добавить…» внизу карточки. */
 function AddRow({
   label,
   onPress,
@@ -196,27 +223,33 @@ function AddRow({
 }) {
   if (hidden) return null;
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={({ pressed }) => [styles.add, pressed && styles.pressed]}
-    >
-      <Icon name="plus" size={18} color={theme.colors.violet} />
-      <Text style={styles.addText}>{label}</Text>
-    </Pressable>
+    <View style={styles.addWrap}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        onPress={onPress}
+        style={({ pressed }) => [styles.add, pressed && styles.pressed]}
+      >
+        <Icon name="plus" size={18} color={theme.colors.mapAccent} />
+        <Text style={styles.addText}>{label}</Text>
+      </Pressable>
+    </View>
   );
 }
 
+/**
+ * Карточка раздела: заголовок капсом и счётчик справа. Тап по заголовку
+ * сворачивает раздел.
+ */
 function Section({
-  icon,
   title,
+  count,
   expanded,
   onToggle,
   children,
 }: {
-  icon: IconName;
   title: string;
+  count?: string;
   expanded: boolean;
   onToggle: () => void;
   children: ReactNode;
@@ -231,10 +264,10 @@ function Section({
         onPress={onToggle}
         style={({ pressed }) => [styles.cardHeader, pressed && styles.pressed]}
       >
-        <View style={styles.cardIcon}>
-          <Icon name={icon} size={20} color={theme.colors.violet} />
-        </View>
-        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardTitle} numberOfLines={1}>
+          {title}
+        </Text>
+        {count ? <Text style={styles.cardCount}>{count}</Text> : null}
       </Pressable>
       {expanded ? children : null}
     </View>
@@ -245,17 +278,19 @@ function EmptyRow({ text }: { text: string }) {
   return <Text style={styles.empty}>{text}</Text>;
 }
 
-type ZoneStatus = {
-  state: 'inside' | 'outside' | null;
-  /** Время последнего события; null — координат ещё не было. */
-  updatedAt: string | null;
-};
-
-/** Пять минут — ещё «сейчас», дальше показываем возраст события. */
-const ZONE_FRESH_MS = 5 * 60_000;
 /** Час без координат — уже «нет данных», а не «в школе вчера». */
 const ZONE_STALE_MS = 60 * 60_000;
-const EPOCH_ISO = new Date(0).toISOString();
+
+type ZoneInside = { childId: string; since: string };
+
+type ZoneStatus = {
+  /** Кто подтверждённо внутри, последний пришедший — первым. */
+  inside: ZoneInside[];
+  /** Когда последний ребёнок вышел; null — выходов не было. */
+  leftAt: string | null;
+  /** Последнее событие геолокации; null — координат ещё не было. */
+  updatedAt: string | null;
+};
 
 function laterTimestamp(a: string | null, b: string | null) {
   if (!a) return b;
@@ -264,85 +299,165 @@ function laterTimestamp(a: string | null, b: string | null) {
 }
 
 /**
- * Собрать статус зоны по всем детям: если хотя бы один подтверждённо внутри,
- * зона считается занятой; иначе — последнее подтверждённое «снаружи».
+ * Статусы зон по детям. Ребёнок, от которого больше часа нет координат,
+ * в зонах не учитывается: его последнее «внутри» могло давно устареть.
+ * `onlyChildId` — экран ребёнка: только его собственные состояния.
  */
-function buildZoneStatuses(presence: LocationPresence | undefined) {
-  const inside = new Map<string, string | null>();
-  const outside = new Map<string, string | null>();
+function buildZoneStatuses(
+  presence: LocationPresence | undefined,
+  now: Date,
+  onlyChildId: string | null,
+) {
+  const inside = new Map<string, ZoneInside[]>();
+  const leftAt = new Map<string, string | null>();
   let latest: string | null = null;
 
   for (const child of presence?.children ?? []) {
+    if (onlyChildId && child.childId !== onlyChildId) continue;
     latest = laterTimestamp(latest, child.updatedAt);
     if (!child.updatedAt) continue;
+    if (now.getTime() - Date.parse(child.updatedAt) > ZONE_STALE_MS) continue;
     for (const zone of child.zones) {
-      const map = zone.state === 'inside' ? inside : outside;
-      map.set(
-        zone.zoneId,
-        laterTimestamp(map.get(zone.zoneId) ?? null, child.updatedAt),
-      );
+      if (zone.state === 'inside') {
+        const list = inside.get(zone.zoneId) ?? [];
+        list.push({ childId: child.childId, since: zone.since });
+        inside.set(zone.zoneId, list);
+      } else {
+        leftAt.set(
+          zone.zoneId,
+          laterTimestamp(leftAt.get(zone.zoneId) ?? null, zone.since),
+        );
+      }
     }
   }
 
-  return (zoneId: string): ZoneStatus => {
-    if (inside.has(zoneId)) {
-      return {
-        state: 'inside',
-        updatedAt: inside.get(zoneId) ?? latest,
-      };
-    }
-    if (outside.has(zoneId)) {
-      return {
-        state: 'outside',
-        updatedAt: outside.get(zoneId) ?? latest,
-      };
-    }
-    return { state: null, updatedAt: latest };
-  };
+  return (zoneId: string): ZoneStatus => ({
+    inside: (inside.get(zoneId) ?? [])
+      .slice()
+      .sort((a, b) => Date.parse(b.since) - Date.parse(a.since)),
+    leftAt: leftAt.get(zoneId) ?? null,
+    updatedAt: latest,
+  });
 }
 
+/** Подпись области: кто внутри, когда вышли или что данных нет. */
 function ZoneStatusText({
-  name,
   status,
   now,
+  self,
+  nameOf,
+  selfAvatar,
 }: {
-  name: string;
   status: ZoneStatus;
   now: Date;
+  /** Экран ребёнка: «Ты сейчас здесь» вместо имён. */
+  self: boolean;
+  nameOf: (childId: string) => string;
+  selfAvatar?: { name: string; source: ImageSourcePropType | null };
 }) {
   const { t } = useTranslation();
-  const ago = formatTimeAgo(new Date(status.updatedAt ?? EPOCH_ISO), now);
-  const age = status.updatedAt
-    ? now.getTime() - Date.parse(status.updatedAt)
-    : Infinity;
-  const fresh = age <= ZONE_FRESH_MS;
-  const unknown = !status.state || age > ZONE_STALE_MS;
+  const ago = (iso: string) => formatTimeAgo(new Date(iso), now);
 
-  if (unknown) {
+  if (status.inside.length > 0) {
+    if (self) {
+      return (
+        <View style={styles.statusLine}>
+          {selfAvatar ? (
+            <LetterAvatar
+              source={selfAvatar.source}
+              name={selfAvatar.name}
+              style={styles.statusAvatar}
+              letterSize={9}
+            />
+          ) : null}
+          <Text style={styles.statusInside} numberOfLines={1}>
+            {t('mapLayers.zoneYouHere')}
+          </Text>
+        </View>
+      );
+    }
+    const [first] = status.inside;
     return (
-      <Text style={styles.rowSubtitle} numberOfLines={1}>
-        {status.updatedAt
-          ? t('mapLayers.zoneNoDataAgo', { ago })
-          : t('mapLayers.zoneNoData')}
+      <Text style={styles.statusInside} numberOfLines={1}>
+        {t('mapLayers.zoneArrived', {
+          name: status.inside.map((item) => nameOf(item.childId)).join(', '),
+          time: formatClock(new Date(first.since)),
+        })}
       </Text>
     );
   }
 
-  if (status.state === 'inside') {
+  if (status.leftAt) {
+    const text = self
+      ? t('mapLayers.zoneYouLeft', { ago: ago(status.leftAt) })
+      : t('mapLayers.zoneNobody', { ago: ago(status.leftAt) });
     return (
-      <Text style={styles.rowSubtitle} numberOfLines={1}>
-        {fresh
-          ? t('mapLayers.zoneInside')
-          : t('mapLayers.zoneInsideAgo', { name, ago })}
-      </Text>
+      <View style={styles.statusLine}>
+        {self ? <View style={styles.statusDot} /> : null}
+        <Text
+          style={self ? styles.rowSubtitle : styles.statusMuted}
+          numberOfLines={1}
+        >
+          {text}
+        </Text>
+      </View>
     );
   }
 
   return (
+    <View style={styles.statusLine}>
+      {self ? <View style={[styles.statusDot, styles.statusDotSoft]} /> : null}
+      <Text style={styles.statusMuted} numberOfLines={1}>
+        {status.updatedAt
+          ? t('mapLayers.zoneNoDataAgo', { ago: ago(status.updatedAt) })
+          : t('mapLayers.zoneNoDataYet')}
+      </Text>
+    </View>
+  );
+}
+
+/** Где ребёнок: в какой области или вне их, и как давно были координаты. */
+function MemberPresenceText({
+  child,
+  zoneName,
+  now,
+  fallback,
+}: {
+  child: LocationPresence['children'][number] | undefined;
+  zoneName: (zoneId: string) => string | null;
+  now: Date;
+  fallback: string;
+}) {
+  const { t } = useTranslation();
+  const updatedAt = child?.updatedAt ?? null;
+  if (!child || !updatedAt) {
+    return (
+      <Text style={styles.rowSubtitle} numberOfLines={1}>
+        {fallback}
+      </Text>
+    );
+  }
+  const age = now.getTime() - Date.parse(updatedAt);
+  const ago = formatTimeAgo(new Date(updatedAt), now);
+  const insideZone =
+    age <= ZONE_STALE_MS
+      ? child.zones.find((zone) => zone.state === 'inside')
+      : undefined;
+  const zone = insideZone ? zoneName(insideZone.zoneId) : null;
+
+  if (zone) {
+    return (
+      <View style={styles.statusLine}>
+        <Icon name="home" size={14} color={theme.colors.homeBrown} />
+        <Text style={styles.presenceAt} numberOfLines={1}>
+          {t('mapLayers.memberAt', { zone, ago })}
+        </Text>
+      </View>
+    );
+  }
+  return (
     <Text style={styles.rowSubtitle} numberOfLines={1}>
-      {fresh
-        ? t('mapLayers.zoneOutside')
-        : t('mapLayers.zoneOutsideAgo', { ago })}
+      {t('mapLayers.memberAway', { ago })}
     </Text>
   );
 }
@@ -405,14 +520,23 @@ export function MapLayersPage() {
   const setLayer = useMapLayerStore((state) => state.setLayer);
   const setHidden = useMapLayerStore((state) => state.setHidden);
   const setPinnedRoutes = useMapLayerStore((state) => state.setPinnedRoutes);
-  const openSections = useMapLayerStore((state) => state.openSections);
-  const toggleSection = useMapLayerStore((state) => state.toggleSection);
+  // Разделы при каждом входе на экран раскрыты, даже пустые; тап по
+  // заголовку сворачивает раздел только до ухода с экрана.
+  const [openSections, setOpenSections] = useState<
+    Record<MapLayerKey, boolean>
+  >({ family: true, transport: true, areas: true });
+  const toggleSection = (key: MapLayerKey) =>
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   const showAll = useMapLayerStore((state) => state.showAll);
-  const [settingsTarget, setSettingsTarget] = useState<FamilyMember | null>(
-    null,
-  );
 
   const [zoneToDelete, setZoneToDelete] = useState<MapZone | null>(null);
+  // Смахнутая строка (область или маршрут): открытой остаётся только одна.
+  const [openSwipeId, setOpenSwipeId] = useState<string | null>(null);
+  const swipeProps = (id: string) => ({
+    open: openSwipeId === id,
+    onOpenChange: (open: boolean) => setOpenSwipeId(open ? id : null),
+    onSwipeStart: () => setOpenSwipeId(null),
+  });
   const removeZone = useMutation({
     mutationFn: (zone: MapZone) => deleteLocationZone(familyId!, zone.id),
     onSuccess: (_data, zone) => {
@@ -491,16 +615,78 @@ export function MapLayersPage() {
   const back = () =>
     router.canGoBack() ? router.back() : router.replace('/map');
 
+  const parent = kind === 'parent';
   const memberIds = members.map((member) => member.userId);
   const zoneIds = zones.map((zone) => zone.id);
-  const zoneStatusFor = buildZoneStatuses(presence);
+  const me = members.find((member) => member.userId === myId);
+  // Ребёнок видит в областях только себя: «Ты сейчас здесь» / «Не здесь».
+  const selfChildId = parent ? null : (me?.childId ?? null);
+  const zoneStatusFor = buildZoneStatuses(presence, now, selfChildId);
+  const childNames = new Map(
+    members
+      .filter((member) => member.childId)
+      .map((member) => [member.childId!, member] as const),
+  );
+  const zoneNames = new Map(zones.map((zone) => [zone.id, zone.name]));
+  const presenceByChild = new Map(
+    (presence?.children ?? []).map((child) => [child.childId, child]),
+  );
+  const avatarOf = (member: FamilyMember | undefined) =>
+    member
+      ? {
+          name: member.displayName,
+          source: member.avatarUrl ? authorizedImage(member.avatarUrl) : null,
+        }
+      : undefined;
   const pinned = sortRoutes(pinnedRoutes);
   // В шторке — и выбранные, и те, что сейчас на линии.
   const pickerRoutes = sortRoutes(
     Array.from(new Set([...pinnedRoutes, ...routes.map((item) => item.route)])),
   );
 
-  const parent = kind === 'parent';
+  const zoneRow = (zone: MapZone) => {
+    const status = zoneStatusFor(zone.id);
+    const insideMembers = status.inside
+      .map((item) => childNames.get(item.childId))
+      .filter((member): member is FamilyMember => !!member)
+      .slice(0, 2);
+    return (
+      <LayerRow
+        title={zone.name}
+        subtitle={
+          <ZoneStatusText
+            status={status}
+            now={now}
+            self={!parent}
+            nameOf={(childId) => childNames.get(childId)?.displayName ?? ''}
+            selfAvatar={avatarOf(me)}
+          />
+        }
+        icon="zone"
+        tall
+        accent={parent && status.inside.length > 0}
+        aside={
+          parent && insideMembers.length > 0 ? (
+            <View style={styles.who}>
+              {insideMembers.map((member, index) => (
+                <LetterAvatar
+                  key={member.userId}
+                  source={avatarOf(member)!.source}
+                  name={member.displayName}
+                  style={[styles.whoAvatar, index > 0 && styles.whoOverlap]}
+                  letterSize={13}
+                />
+              ))}
+            </View>
+          ) : undefined
+        }
+        checked={areas && !hiddenZones.includes(zone.id)}
+        onPress={() =>
+          toggleItem('areas', 'zones', areas, hiddenZones, zoneIds, zone.id)
+        }
+      />
+    );
+  };
 
   return (
     <TabScreen activeKey="map">
@@ -511,7 +697,7 @@ export function MapLayersPage() {
             onBack={back}
             right={
               <RoundButton
-                icon="list"
+                icon="eye"
                 accessibilityLabel={t('mapLayers.showAll')}
                 onPress={showAll}
               />
@@ -523,58 +709,60 @@ export function MapLayersPage() {
           showsVerticalScrollIndicator={false}
         >
           <Section
-            icon="children"
             title={t('mapLayers.family')}
+            count={
+              members.length > 0
+                ? t('mapLayers.membersCount', { count: members.length })
+                : undefined
+            }
             expanded={openSections.family}
             onToggle={() => toggleSection('family')}
           >
             <SectionList>
-              {members.map((member, index) => (
-                <CheckRow
-                  key={member.userId}
-                  title={member.displayName}
-                  subtitle={
-                    member.userId === myId
-                      ? member.kind === 'child'
-                        ? t('mapLayers.youChildRole')
-                        : t('mapLayers.youRole')
-                      : member.kind === 'child'
-                        ? t('mapLayers.childRole')
-                        : t('mapLayers.parentRole')
-                  }
-                  avatar={{
-                    name: member.displayName,
-                    source: member.avatarUrl
-                      ? authorizedImage(member.avatarUrl)
-                      : null,
-                  }}
-                  checked={family && !hiddenChildren.includes(member.userId)}
-                  actions={
-                    parent &&
-                    (member.kind === 'child' || member.userId === myId) ? (
-                      <IconButton
-                        icon="pencil"
-                        tone="violet"
-                        label={t('mapLayers.memberSettings', {
-                          name: member.displayName,
-                        })}
-                        onPress={() => setSettingsTarget(member)}
-                      />
-                    ) : undefined
-                  }
-                  onPress={() =>
-                    toggleItem(
-                      'family',
-                      'children',
-                      family,
-                      hiddenChildren,
-                      memberIds,
-                      member.userId,
-                    )
-                  }
-                  last={index === members.length - 1}
-                />
-              ))}
+              {members.map((member, index) => {
+                const role =
+                  member.userId === myId
+                    ? member.kind === 'child'
+                      ? t('mapLayers.youChildRole')
+                      : t('mapLayers.youRole')
+                    : member.kind === 'child'
+                      ? t('mapLayers.childRole')
+                      : t('mapLayers.parentRole');
+                return (
+                  <View key={member.userId}>
+                    {index > 0 && <Divider inset />}
+                    <LayerRow
+                      title={member.displayName}
+                      subtitle={
+                        member.childId ? (
+                          <MemberPresenceText
+                            child={presenceByChild.get(member.childId)}
+                            zoneName={(id) => zoneNames.get(id) ?? null}
+                            now={now}
+                            fallback={role}
+                          />
+                        ) : (
+                          role
+                        )
+                      }
+                      avatar={avatarOf(member)}
+                      checked={
+                        family && !hiddenChildren.includes(member.userId)
+                      }
+                      onPress={() =>
+                        toggleItem(
+                          'family',
+                          'children',
+                          family,
+                          hiddenChildren,
+                          memberIds,
+                          member.userId,
+                        )
+                      }
+                    />
+                  </View>
+                );
+              })}
               {members.length === 0 && !membersQuery.isPending && (
                 <EmptyRow text={t('mapLayers.emptyChildren')} />
               )}
@@ -582,30 +770,61 @@ export function MapLayersPage() {
           </Section>
 
           <Section
-            icon="bus"
             title={t('mapLayers.transportSection')}
+            count={
+              pinned.length > 0
+                ? t('mapLayers.routesCount', { count: pinned.length })
+                : undefined
+            }
             expanded={openSections.transport}
             onToggle={() => toggleSection('transport')}
           >
             <SectionList>
               {pinned.map((route, index) => (
-                <CheckRow
-                  key={route}
-                  title={t('mapLayers.routeTitle', { route })}
-                  icon="bus"
-                  checked={transport && !hiddenRoutes.includes(route)}
-                  onPress={() =>
-                    toggleItem(
-                      'transport',
-                      'routes',
-                      transport,
-                      hiddenRoutes,
-                      pinned,
-                      route,
-                    )
-                  }
-                  last={index === pinned.length - 1}
-                />
+                <View key={route}>
+                  {index > 0 && <Divider inset />}
+                  <View style={styles.swipeBack}>
+                    <SwipeableRow
+                      {...swipeProps(`route:${route}`)}
+                      actionsWidth={swipeActionsWidth(1)}
+                      actionsGap={SWIPE_ACTION_GAP}
+                      actions={[
+                        <SwipeAction
+                          key="delete"
+                          icon="trash"
+                          label={t('mapLayers.deleteZoneConfirm')}
+                          accessibilityLabel={t('mapLayers.deleteRoute', {
+                            route,
+                          })}
+                          tone="delete"
+                          onPress={() => {
+                            setOpenSwipeId(null);
+                            togglePinnedRoute(route);
+                          }}
+                        />,
+                      ]}
+                    >
+                      <View style={styles.swipeFront}>
+                        <LayerRow
+                          title={t('mapLayers.routeTitle', { route })}
+                          icon="bus"
+                          iconTone="bus"
+                          checked={transport && !hiddenRoutes.includes(route)}
+                          onPress={() =>
+                            toggleItem(
+                              'transport',
+                              'routes',
+                              transport,
+                              hiddenRoutes,
+                              pinned,
+                              route,
+                            )
+                          }
+                        />
+                      </View>
+                    </SwipeableRow>
+                  </View>
+                </View>
               ))}
               {pinned.length === 0 && (
                 <EmptyRow text={t('mapLayers.emptyRoutes')} />
@@ -617,56 +836,71 @@ export function MapLayersPage() {
             />
           </Section>
 
+          {pinned.length > 0 && openSections.transport ? (
+            <View style={styles.swipeHint}>
+              <Icon name="arrow-left" size={16} color={theme.colors.grey} />
+              <Text style={styles.swipeHintText}>
+                {t('mapLayers.swipeRouteHint')}
+              </Text>
+            </View>
+          ) : null}
+
           <Section
-            icon="zone"
             title={t('mapLayers.areas')}
+            count={
+              zones.length > 0
+                ? t('mapLayers.areasCount', { count: zones.length })
+                : undefined
+            }
             expanded={openSections.areas}
             onToggle={() => toggleSection('areas')}
           >
             <SectionList>
               {zones.map((zone, index) => (
-                <CheckRow
-                  key={zone.id}
-                  title={zone.name}
-                  subtitle={
-                    <ZoneStatusText
-                      name={zone.name}
-                      status={zoneStatusFor(zone.id)}
-                      now={now}
-                    />
-                  }
-                  icon="zone"
-                  actions={
-                    parent ? (
-                      <>
-                        <IconButton
-                          icon="pencil"
-                          tone="violet"
-                          label={t('mapLayers.editZone', { name: zone.name })}
-                          onPress={() => editZone(zone.id)}
-                        />
-                        <IconButton
-                          icon="trash"
-                          tone="danger"
-                          label={t('mapLayers.deleteZone', { name: zone.name })}
-                          onPress={() => setZoneToDelete(zone)}
-                        />
-                      </>
-                    ) : undefined
-                  }
-                  checked={areas && !hiddenZones.includes(zone.id)}
-                  onPress={() =>
-                    toggleItem(
-                      'areas',
-                      'zones',
-                      areas,
-                      hiddenZones,
-                      zoneIds,
-                      zone.id,
-                    )
-                  }
-                  last={index === zones.length - 1}
-                />
+                <View key={zone.id}>
+                  {index > 0 && <Divider />}
+                  {parent ? (
+                    <View style={styles.swipeBack}>
+                      <SwipeableRow
+                        {...swipeProps(`zone:${zone.id}`)}
+                        actionsWidth={swipeActionsWidth(2)}
+                        actionsGap={SWIPE_ACTION_GAP}
+                        actions={[
+                          <SwipeAction
+                            key="edit"
+                            icon="pencil"
+                            label={t('mapLayers.edit')}
+                            accessibilityLabel={t('mapLayers.editZone', {
+                              name: zone.name,
+                            })}
+                            tone="edit"
+                            onPress={() => {
+                              setOpenSwipeId(null);
+                              editZone(zone.id);
+                            }}
+                          />,
+                          <SwipeAction
+                            key="delete"
+                            icon="trash"
+                            label={t('mapLayers.deleteZoneConfirm')}
+                            accessibilityLabel={t('mapLayers.deleteZone', {
+                              name: zone.name,
+                            })}
+                            tone="delete"
+                            onPress={() => {
+                              setOpenSwipeId(null);
+                              setZoneToDelete(zone);
+                            }}
+                          />,
+                        ]}
+                      >
+                        <View style={styles.swipeFront}>{zoneRow(zone)}</View>
+                      </SwipeableRow>
+                    </View>
+                  ) : (
+                    zoneRow(zone)
+                  )}
+                </View>
               ))}
               {zones.length === 0 && !zonesQuery.isPending && (
                 <EmptyRow text={t('mapLayers.emptyAreas')} />
@@ -678,6 +912,15 @@ export function MapLayersPage() {
               hidden={!parent}
             />
           </Section>
+
+          {parent && zones.length > 0 && openSections.areas ? (
+            <View style={styles.swipeHint}>
+              <Icon name="arrow-left" size={16} color={theme.colors.grey} />
+              <Text style={styles.swipeHintText}>
+                {t('mapLayers.swipeHint')}
+              </Text>
+            </View>
+          ) : null}
         </ScrollView>
       </View>
 
@@ -688,29 +931,40 @@ export function MapLayersPage() {
       >
         <View style={styles.sheet}>
           <Text style={styles.sheetTitle}>{t('mapLayers.addTransport')}</Text>
-          <ScrollView
-            style={[
-              styles.sheetList,
-              { maxHeight: Math.max(140, windowHeight * 0.7 - 180) },
-            ]}
-            showsVerticalScrollIndicator={false}
-          >
-            {pickerRoutes.map((route) => (
-              <CheckRow
-                key={route}
-                title={t('mapLayers.routeTitle', { route })}
-                icon="bus"
-                checked={pinnedRoutes.includes(route)}
-                onPress={() => togglePinnedRoute(route)}
-                last={route === pickerRoutes[pickerRoutes.length - 1]}
-              />
-            ))}
-            {pickerRoutes.length === 0 && (
-              <EmptyRow text={t('mapLayers.emptyTransport')} />
-            )}
-          </ScrollView>
+          {pickerRoutes.length > 0 ? (
+            <ScrollView
+              style={[
+                styles.sheetList,
+                { maxHeight: Math.max(140, windowHeight * 0.7 - 180) },
+              ]}
+              showsVerticalScrollIndicator={false}
+            >
+              {pickerRoutes.map((route, index) => (
+                <View key={route}>
+                  {index > 0 && <Divider inset />}
+                  <LayerRow
+                    title={t('mapLayers.routeTitle', { route })}
+                    icon="bus"
+                    iconTone="bus"
+                    checked={pinnedRoutes.includes(route)}
+                    onPress={() => togglePinnedRoute(route)}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.sheetEmpty}>
+              <View style={styles.sheetEmptyIcon}>
+                <Icon name="bus" size={26} color={theme.colors.busIcon} />
+              </View>
+              <Text style={styles.sheetEmptyText}>
+                {t('mapLayers.emptyTransport')}
+              </Text>
+            </View>
+          )}
           <GradientButton
             label={t('common.done')}
+            tone="blue"
             onPress={() => setPickerOpen(false)}
           />
         </View>
@@ -722,7 +976,7 @@ export function MapLayersPage() {
       >
         <View style={styles.confirmBody}>
           <View style={styles.confirmIcon}>
-            <Icon name="trash" size={24} color={theme.colors.dangerText} />
+            <Icon name="trash" size={26} color={theme.colors.dangerText} />
           </View>
           <View style={styles.confirmHeader}>
             <Text style={styles.confirmTitle}>
@@ -737,28 +991,30 @@ export function MapLayersPage() {
           <View style={styles.confirmActions}>
             <PillButton
               label={t('common.cancel')}
-              variant="ghost"
+              variant="outline"
               disabled={removeZone.isPending}
               onPress={() => setZoneToDelete(null)}
             />
-            <PillButton
-              label={t('mapLayers.deleteZoneConfirm')}
-              variant="danger"
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('mapLayers.deleteZoneConfirm')}
+              accessibilityState={{ disabled: removeZone.isPending }}
               disabled={removeZone.isPending}
               onPress={() => {
                 if (zoneToDelete) removeZone.mutate(zoneToDelete);
               }}
-            />
+              style={({ pressed }) => [
+                styles.confirmDelete,
+                (pressed || removeZone.isPending) && styles.pressed,
+              ]}
+            >
+              <Text style={styles.confirmDeleteText}>
+                {t('mapLayers.deleteZoneConfirm')}
+              </Text>
+            </Pressable>
           </View>
         </View>
       </BottomSheet>
-      {familyId ? (
-        <MemberMapSettingsSheet
-          familyId={familyId}
-          member={settingsTarget}
-          onClose={() => setSettingsTarget(null)}
-        />
-      ) : null}
     </TabScreen>
   );
 }

@@ -55,6 +55,9 @@ import { UndoIcon } from './undo';
 import { BusIcon } from './bus';
 import { ZoneIcon } from './zone';
 import { LayersIcon } from './layers';
+import { CodeIcon } from './code';
+import { GlobeOutlineIcon } from './globe-outline';
+import { MapFoldIcon } from './map-fold';
 
 export const icons = {
   price: PriceIcon,
@@ -114,4 +117,7 @@ export const icons = {
   bus: BusIcon,
   zone: ZoneIcon,
   layers: LayersIcon,
+  code: CodeIcon,
+  'globe-outline': GlobeOutlineIcon,
+  'map-fold': MapFoldIcon,
 };

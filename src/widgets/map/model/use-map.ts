@@ -20,7 +20,11 @@ export function useMap(containerRef: React.RefObject<HTMLDivElement | null>) {
       attributionControl: false,
     });
 
-    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    // Только масштаб, как в макете: без компаса.
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      'top-right',
+    );
 
     const deckOverlay = new MapboxOverlay({
       layers: [],
