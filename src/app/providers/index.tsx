@@ -8,6 +8,7 @@ import {
   useServerEvents,
 } from './data-sync';
 import {
+  ChildLocationSharingSync,
   LocationConnection,
   useRegisterParentDevice,
 } from '@features/location';
@@ -18,11 +19,16 @@ const queryClient = new QueryClient({
 
 listenAppFocus();
 
-// Сессия кончилась — вышли (Log out) или сервер не принял refresh-токен:
-// забываем данные прошлого аккаунта, чтобы следующий вошедший их не увидел.
-// Обновление токенов сессию не обрывает, кэш при нём остаётся.
+// Сессия кончилась — вышли (Log out), сервер не принял refresh-токен или
+// сменился аккаунт/семья: забываем приватные данные прошлого входа, чтобы
+// следующий вошедший их не увидел. Обновление токенов кэш не сбрасывает.
 useSessionStore.subscribe((state, prev) => {
-  if (prev.session && !state.session) queryClient.clear();
+  if (!prev.session) return;
+  const identityChanged =
+    !state.session ||
+    state.session.user.id !== prev.session.user.id ||
+    state.session.user.family?.id !== prev.session.user.family?.id;
+  if (identityChanged) queryClient.clear();
 });
 
 /**
@@ -42,6 +48,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AppEffects />
       <LocationConnection />
+      <ChildLocationSharingSync />
       {children}
     </QueryClientProvider>
   );

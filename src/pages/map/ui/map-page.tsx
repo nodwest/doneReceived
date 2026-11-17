@@ -8,6 +8,7 @@ import {
   useMapLayerStore,
 } from '@widgets/map';
 import { TabScreen } from '@widgets/bottom-nav';
+import { LocationSharingCard } from '@features/location';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
@@ -36,6 +37,7 @@ export function MapPage() {
           pinnedRoutes={pinnedRoutes}
         />
         <MapAttribution />
+        <LocationSharingCard />
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('mapLayers.open')}

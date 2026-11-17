@@ -6,6 +6,8 @@ export type ChildPresence = {
   childId: string;
   /** Время последнего события геолокации; null — координат ещё не было. */
   updatedAt: string | null;
+  /** Время измерения на устройстве; старые ответы его не содержат. */
+  recordedAt?: string | null;
   accuracy: number | null;
   zones: ZonePresence[];
 };
@@ -65,6 +67,7 @@ export function applyLocationPresence(
   const next: ChildPresence = {
     childId,
     updatedAt: location.updatedAt ?? new Date().toISOString(),
+    recordedAt: location.recordedAt ?? previous?.recordedAt ?? null,
     accuracy: location.accuracy ?? previous?.accuracy ?? null,
     zones: nextZones,
   };

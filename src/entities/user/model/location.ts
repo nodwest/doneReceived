@@ -25,6 +25,8 @@ export type Location = {
   /** Устройство, с которого получена точка. */
   deviceId?: string | null;
   deviceLabel?: string | null;
-  /** ISO-время позиции. */
+  /** ISO-время получения точки сервером. */
   updatedAt?: string;
+  /** ISO-время измерения на устройстве. */
+  recordedAt?: string;
 };

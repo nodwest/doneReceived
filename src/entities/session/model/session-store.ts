@@ -6,11 +6,14 @@ import {
 } from '@shared/api';
 import { refreshSession } from '../api/auth-api';
 import type { Session } from './session';
+import { withRefreshLock } from './session-refresh-lock';
 import {
+  bumpSessionEpoch,
   loadSession,
   readSessionForRefresh,
   removeSession,
   saveSession,
+  sessionEpoch,
   withSessionLock,
 } from './session-storage';
 
@@ -49,6 +52,15 @@ let pendingSave: { previous: Session; next: Session } | undefined;
 async function persistRefresh(previous: Session, next: Session) {
   pendingSave = { previous, next };
   try {
+    // Logout/switch could have happened while refresh was in flight. A late
+    // write carries the old storageEpoch and is ignored by loadSession.
+    if (
+      useSessionStore.getState().session !== next ||
+      sessionEpoch() !== next.storageEpoch
+    ) {
+      if (pendingSave?.next === next) pendingSave = undefined;
+      return;
+    }
     await saveSession(next);
     if (pendingSave?.next === next) pendingSave = undefined;
   } catch {
@@ -68,10 +80,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   signIn: (session) =>
     withSessionLock(async () => {
       sessionScope = Symbol();
-      set({ session, status: 'signed-in' });
+      const epoch = bumpSessionEpoch();
+      const next = { ...session, storageEpoch: epoch };
+      set({ session: next, status: 'signed-in' });
       pendingSave = undefined;
       try {
-        await saveSession(session);
+        await saveSession(next);
       } catch {
         log('Не удалось сохранить сессию');
       }
@@ -79,14 +93,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   signOut: () => {
     const current = get().session;
     const signedOutScope = (sessionScope = Symbol());
+    // Блокируем поздний refresh из другого runtime до удаления сессии.
+    bumpSessionEpoch();
     pendingSave = undefined;
     set({ session: null, status: 'signed-out' });
     return withSessionLock(async () => {
-      if (
-        current &&
-        (await readSessionForRefresh(current)) &&
-        sessionScope === signedOutScope
-      ) {
+      if (current && sessionScope === signedOutScope) {
         await removeSession();
       }
     }).catch(() => log('Не удалось удалить сохранённую сессию'));
@@ -109,51 +121,74 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   refresh: async () => {
     const current = get().session;
     if (!current) return false;
+    const epoch = current.storageEpoch ?? sessionEpoch();
+
+    const expire = async () => {
+      sessionScope = Symbol();
+      bumpSessionEpoch();
+      pendingSave = undefined;
+      set({ session: null, status: 'signed-out' });
+      await removeSession();
+      log('Сессия истекла, нужно войти заново');
+    };
+
     return withSessionLock(async () => {
       if (get().session !== current) return false;
-      const saved = await readSessionForRefresh(current);
-      if (get().session !== current) return false;
-      if (!saved) {
-        sessionScope = Symbol();
-        set({ session: null, status: 'signed-out' });
-        return false;
-      }
-      if (
-        pendingSave?.next === current &&
-        (saved === current ||
-          saved.refreshToken === pendingSave.previous.refreshToken)
-      ) {
-        await persistRefresh(saved, current);
-        if (get().session !== current || pendingSave?.next === current)
-          return false;
-      } else if (saved !== current) {
-        pendingSave = undefined;
-        set({ session: saved });
-        return true;
-      }
 
-      let next: Session;
-      try {
-        next = await refreshSession(current.refreshToken);
-      } catch (error) {
-        if (
-          get().session === current &&
-          isApiError(error) &&
-          (error.status === 401 || error.status === 400)
-        ) {
-          sessionScope = Symbol();
-          pendingSave = undefined;
-          set({ session: null, status: 'signed-out' });
-          await removeSession();
-          log('Сессия истекла, нужно войти заново');
+      const refreshed = await withRefreshLock(async () => {
+        if (get().session !== current || sessionEpoch() !== epoch) return false;
+        const saved = await readSessionForRefresh(current);
+        if (get().session !== current || sessionEpoch() !== epoch) return false;
+        if (!saved) {
+          await expire();
+          return false;
         }
-        return false;
-      }
-      if (get().session !== current) return false;
-      const session = { ...next, childId: current.childId };
-      set({ session });
-      await persistRefresh(current, session);
-      return true;
+        if (saved !== current) {
+          // Другой runtime уже обновил сессию: используем его пару.
+          pendingSave = undefined;
+          set({ session: saved });
+          return true;
+        }
+
+        let next: Session;
+        try {
+          next = await refreshSession(current.refreshToken);
+        } catch (error) {
+          // Перед logout сверяемся с хранилищем: конкурентный refresh мог
+          // успеть записать новую пару, а наш старый токен — отозвать.
+          const after = await readSessionForRefresh(current);
+          if (after && after.refreshToken !== current.refreshToken) {
+            if (get().session === current && sessionEpoch() === epoch) {
+              pendingSave = undefined;
+              set({ session: after });
+              return true;
+            }
+            return false;
+          }
+          if (
+            get().session === current &&
+            sessionEpoch() === epoch &&
+            isApiError(error) &&
+            (error.status === 401 || error.status === 400)
+          ) {
+            await expire();
+          }
+          return false;
+        }
+
+        if (get().session !== current || sessionEpoch() !== epoch) return false;
+        const session = {
+          ...next,
+          childId: current.childId,
+          storageEpoch: epoch,
+        };
+        set({ session });
+        await persistRefresh(current, session);
+        return true;
+      });
+
+      // Lock занят другим runtime: не отзываем сессию и не повторяем refresh.
+      return refreshed ?? false;
     }).catch(() => false);
   },
 }));

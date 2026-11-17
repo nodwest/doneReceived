@@ -24,8 +24,10 @@ export const useBusesSocket = (
     serverTime?: number,
     history?: VehicleSnapshot[],
   ) => void,
+  enabled = true,
 ) => {
   useEffect(() => {
+    if (!enabled) return;
     let socket: WebSocket;
     let retry: ReturnType<typeof setTimeout> | undefined;
     let delay = 1_000;
@@ -66,5 +68,5 @@ export const useBusesSocket = (
       socket.onclose = null;
       socket.close();
     };
-  }, [onVehicles]);
+  }, [enabled, onVehicles]);
 };

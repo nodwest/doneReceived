@@ -108,9 +108,14 @@ export function MapWeb({
   const { data: savedLocations = [] } = useFamilyLocations(familyId);
   const { data: zones = [] } = useLocationZones(familyId);
 
-  const peopleById = useMemo(
-    () => new Map(members.map((member) => [member.userId, member] as const)),
+  const childMembers = useMemo(
+    () => members.filter((member) => member.kind === 'child' && member.childId),
     [members],
+  );
+  const peopleById = useMemo(
+    () =>
+      new Map(childMembers.map((member) => [member.userId, member] as const)),
+    [childMembers],
   );
   const zoneNames = useMemo(
     () => new Map(zones.map((zone) => [zone.id, zone.name] as const)),
@@ -118,11 +123,11 @@ export function MapWeb({
   );
   const avatarUsers = useMemo(
     () =>
-      members.map((member) => ({
+      childMembers.map((member) => ({
         id: member.userId,
         avatarUrl: member.avatarUrl,
       })),
-    [members],
+    [childMembers],
   );
   const avatarUrls = useUserAvatarUrls(avatarUsers);
 
@@ -134,6 +139,7 @@ export function MapWeb({
   const markers = useMemo(() => {
     const points = new Map<string, MarkerLocation>();
     for (const location of savedLocations) {
+      if (!location.childId) continue;
       points.set(location.userId, {
         userId: location.userId,
         childId: location.childId,
@@ -142,15 +148,19 @@ export function MapWeb({
         zoneId: location.zoneId,
         deviceId: location.deviceId,
         deviceLabel: location.deviceLabel || 'Устройство',
-        updatedAt: location.updatedAt,
+        updatedAt: location.recordedAt ?? location.updatedAt,
       });
     }
     for (const [userId, location] of Object.entries(liveLocations)) {
+      if (!location.childId) continue;
       const previous = points.get(userId);
       points.set(userId, {
         ...location,
         userId,
-        updatedAt: later(previous?.updatedAt, location.updatedAt),
+        updatedAt: later(
+          previous?.updatedAt,
+          location.recordedAt ?? location.updatedAt,
+        ),
       });
     }
     return [...points.values()].filter(

@@ -8,6 +8,8 @@ export type FamilyLocation = {
   lng: number;
   accuracy: number | null;
   updatedAt: string;
+  /** Время измерения на устройстве; старые ответы его не содержат. */
+  recordedAt?: string | null;
   zoneId: string | null;
   deviceId: string | null;
   deviceLabel: string;

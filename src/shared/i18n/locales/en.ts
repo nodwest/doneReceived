@@ -473,15 +473,54 @@ export const en = {
     all: 'All time',
   },
   map: {
-    webOnly: 'The map is available in the web version',
     markerInside: 'In “{{name}}”',
     markerInsideUnknown: 'Inside an area',
     markerOutside: 'Outside areas',
     markerNoData: 'No data',
-    locationUnavailable:
-      'Could not get your location. Allow location access in the browser.',
+    deviceFallback: 'Device',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    loadError: 'Could not load the map. Check your connection.',
     deviceNotTracked:
       'This device is not tracked. Select it in the map settings.',
+  },
+  locationSharing: {
+    title: 'Location sharing',
+    intro:
+      'Share this child device location with the family. Parents can see the last point on the map.',
+    onlyFamily: 'Only parents in your family can see it.',
+    backgroundNotice:
+      'While sharing is on, Android shows a visible location-service notification and iOS shows the background location indicator.',
+    osLimits:
+      'iOS and Android may delay or stop updates: after force-quit the system does not guarantee background delivery.',
+    status: 'Sharing',
+    lastPointLabel: 'Last location',
+    osPermission: 'System permission',
+    precision: 'Accuracy',
+    limitedAccuracy: 'Approximate only',
+    enabled: 'On',
+    disabled: 'Off',
+    permissionShort: 'Needs permission',
+    permissionOk: 'Allowed',
+    waiting: 'Waiting for the first point',
+    lastPoint: 'Updated {{ago}}',
+    on: 'Location sharing is on',
+    off: 'Share location',
+    offHint: 'Show your family where you are',
+    openOn: 'Open location sharing settings',
+    openOff: 'Turn on location sharing',
+    turnOn: 'Turn on sharing',
+    turnOff: 'Turn off sharing',
+    openSettings: 'Open settings',
+    enabledToast: 'Location sharing is on',
+    permissionDenied:
+      'Location permission was not granted. Open settings and allow it.',
+    notificationsDenied:
+      'Notifications are off. Android needs them to show the location-service notification.',
+    servicesOff: 'Location services are off on this device.',
+    startFailed: 'Could not start background location. Try again.',
+    notificationTitle: 'Kids Tasks location',
+    notificationBody: 'Sharing this child device location with the family',
   },
   wallet: {
     title: 'Wallet',

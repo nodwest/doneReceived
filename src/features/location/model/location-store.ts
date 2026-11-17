@@ -12,6 +12,7 @@ export type LiveLocation = {
   deviceId: string | null;
   deviceLabel: string;
   updatedAt?: string;
+  recordedAt?: string;
 };
 
 type LocationStore = {
@@ -52,6 +53,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
             deviceId: location.deviceId ?? null,
             deviceLabel: deviceLabel(location.deviceLabel),
             updatedAt: later(previous?.updatedAt, location.updatedAt),
+            recordedAt: later(previous?.recordedAt, location.recordedAt),
           },
         },
       };

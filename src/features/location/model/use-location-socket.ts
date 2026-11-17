@@ -1,15 +1,33 @@
 import { useEffect, useRef } from 'react';
 
-import { useSessionStore } from '@entities/session';
+import { useFamilyChildren } from '@entities/family';
+import { useSessionKind, useSessionStore } from '@entities/session';
+import { currentAccessToken, refreshAccessToken } from '@shared/api';
 import { LOCATION_WS_URL } from '@shared/config';
-import { i18n } from '@shared/i18n';
-import { deviceLabel, showToast, startLocationTracking } from '@shared/lib';
 import type { Location } from '@entities/user';
 
+const RECONNECT_MS = [1_000, 2_000, 5_000, 10_000, 30_000];
+const CLOSE_TOKEN_EXPIRED = 4401;
+const CLOSE_SESSION_INVALID = 4403;
+/** Сервер закрывает так истёкший/непринятый токен или таймаут входа. */
+const CLOSE_POLICY_VIOLATION = 1008;
+
+type Message = { event?: unknown; data?: unknown };
+
+const parse = (raw: unknown): Message | null => {
+  if (typeof raw !== 'string') return null;
+  try {
+    const message: unknown = JSON.parse(raw);
+    return message && typeof message === 'object' ? message : null;
+  } catch {
+    return null;
+  }
+};
+
 /**
- * Сокет геолокации. Координаты отправляет каждый активный член семьи со
- * своего отслеживаемого устройства; события получают те, кому разрешено
- * видеть отправителя. Координаты и токен не логируем.
+ * Сокет геолокации только для приёма. Координаты ребёнок отправляет через
+ * POST в фоновой задаче; этот сокет нужен родителю и карте для live-событий.
+ * События без childId, чужих детей и от скрытых участников не принимаем.
  */
 export const useLocationSocket = (
   onLocation: (location: Location) => void,
@@ -18,84 +36,128 @@ export const useLocationSocket = (
   familyId?: string | null,
 ) => {
   const accessToken = useSessionStore((state) => state.session?.accessToken);
-  const locationErrorShown = useRef(false);
+  const kind = useSessionKind();
+  const myUserId = useSessionStore((state) => state.session?.user.id ?? null);
+  const myChildId = useSessionStore((state) => state.session?.childId ?? null);
+  const { data: children } = useFamilyChildren(
+    kind === 'parent' ? (familyId ?? null) : null,
+  );
+  // Список детей — в ref, чтобы его загрузка не переоткрывала сокет.
+  const childIds = useRef<ReadonlySet<string> | null>(null);
+
+  useEffect(() => {
+    childIds.current = children
+      ? new Set(children.map((child) => child.id))
+      : null;
+  }, [children]);
 
   useEffect(() => {
     if (!accessToken || !familyId) return;
-    locationErrorShown.current = false;
 
-    const socket = new WebSocket(LOCATION_WS_URL);
+    let stopped = false;
+    let attempt = 0;
+    let socket: WebSocket | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
 
-    let stopLocationTracking: (() => void) | undefined;
-
-    socket.onopen = () => {
-      socket.send(
-        JSON.stringify({ event: 'authenticate', data: { accessToken } }),
-      );
+    const scheduleReconnect = () => {
+      if (stopped) return;
+      const delay = RECONNECT_MS[Math.min(attempt, RECONNECT_MS.length - 1)];
+      attempt += 1;
+      reconnectTimer = setTimeout(connect, delay);
     };
 
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
+    function connect() {
+      if (stopped) return;
+      const token = currentAccessToken();
+      if (!token) return;
 
-      if (message.event === 'authenticated' && message.data === true) {
-        // Новое соединение: накопленные live-точки могли устареть, а события
-        // приватности за время обрыва не приходили. Очищаем store и
-        // перечитываем последние точки через REST.
-        onAuthenticated?.();
-        stopLocationTracking ??= startLocationTracking(
-          (lat, lng, accuracy) => {
-            if (socket.readyState !== WebSocket.OPEN) return;
+      const ws = new WebSocket(LOCATION_WS_URL);
+      socket = ws;
 
-            socket.send(
-              JSON.stringify({
-                event: 'location',
-                data: { lat, lng, accuracy, deviceLabel: deviceLabel() },
-              }),
-            );
-          },
-          () => {
-            // Браузер не дал координаты: без этого родитель не понимает,
-            // почему его метка не появляется у семьи.
-            if (locationErrorShown.current) return;
-            locationErrorShown.current = true;
-            showToast(i18n.t('map.locationUnavailable'));
-          },
+      ws.onopen = () => {
+        ws.send(
+          JSON.stringify({
+            event: 'authenticate',
+            data: { accessToken: token },
+          }),
         );
-        return;
-      }
+      };
 
-      if (message.event === 'location-access') {
-        const data = message.data as { userId?: unknown; visible?: unknown };
-        if (
-          typeof data?.userId === 'string' &&
-          typeof data.visible === 'boolean'
-        ) {
-          onAccessChanged?.(data.userId, data.visible);
+      ws.onmessage = (event) => {
+        const message = parse(event.data);
+        if (!message) return;
+
+        if (message.event === 'authenticated') {
+          if (message.data !== true) return;
+          attempt = 0;
+          onAuthenticated?.();
+          return;
         }
-        return;
-      }
 
-      if (message.event !== 'location') return;
+        if (message.event === 'location-access') {
+          const data = message.data as { userId?: unknown; visible?: unknown };
+          if (
+            typeof data?.userId === 'string' &&
+            typeof data.visible === 'boolean'
+          ) {
+            onAccessChanged?.(data.userId, data.visible);
+          }
+          return;
+        }
 
-      const location = message.data as Location;
-      if (!location.userId) return;
-      onLocation(location);
-    };
+        if (message.event !== 'location') return;
+        const location = message.data as Location;
+        if (!location.userId || !location.childId) return;
+        if (
+          kind === 'child' &&
+          location.userId !== myUserId &&
+          location.childId !== myChildId
+        )
+          return;
+        if (
+          kind === 'parent' &&
+          childIds.current &&
+          !childIds.current.has(location.childId)
+        )
+          return;
+        onLocation(location);
+      };
 
-    socket.onclose = ({ code }) => {
-      stopLocationTracking?.();
-      stopLocationTracking = undefined;
-      if (code === 1006) {
-        console.warn('Location WebSocket connection lost');
-      }
-    };
+      ws.onclose = async ({ code }) => {
+        socket = null;
+        if (stopped) return;
+        if (
+          code === CLOSE_TOKEN_EXPIRED ||
+          code === CLOSE_SESSION_INVALID ||
+          code === CLOSE_POLICY_VIOLATION
+        ) {
+          await refreshAccessToken(token);
+          if (stopped) return;
+        }
+        scheduleReconnect();
+      };
+    }
+
+    connect();
 
     return () => {
+      stopped = true;
+      clearTimeout(reconnectTimer);
+      if (!socket) return;
       socket.onopen = null;
       socket.onmessage = null;
       socket.onclose = null;
-      stopLocationTracking?.();
-      socket.close();
+      socket.close(1000);
+      socket = null;
     };
-  }, [accessToken, familyId, onAccessChanged, onAuthenticated, onLocation]);
+  }, [
+    accessToken,
+    familyId,
+    kind,
+    myChildId,
+    myUserId,
+    onAccessChanged,
+    onAuthenticated,
+    onLocation,
+  ]);
 };

@@ -18,7 +18,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.doneReceived"
+      "package": "com.anonymous.doneReceived",
+      "permissions": ["android.permission.POST_NOTIFICATIONS"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,7 +40,20 @@
           "cameraPermission": "Kids Tasks uses the camera to take photos for task reports, wishes and profile pictures.",
           "microphonePermission": false
         }
-      ]
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Kids Tasks uses your location to show your family where you are.",
+          "locationAlwaysAndWhenInUsePermission": "Kids Tasks shares your child's location with their family, including while the app is in the background.",
+          "locationAlwaysPermission": "Kids Tasks shares your child's location with their family, including while the app is in the background.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true,
+          "androidForegroundServiceIcon": "./assets/notification-icon.png"
+        }
+      ],
+      "@maplibre/maplibre-react-native"
     ]
   }
 }
