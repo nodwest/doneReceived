@@ -80,6 +80,7 @@ type MemberDto = {
   userId: string;
   displayName: string;
   avatarUrl: string | null;
+  role: 'owner' | 'admin' | 'member';
 };
 
 /** Статус назначения → статус задачи в приложении. */
@@ -101,6 +102,7 @@ export type TaskViewer = {
   userId: string;
   /** Ребёнок не видит список детей семьи (403): имя — его собственное. */
   childName?: string;
+  familyRole?: 'owner' | 'admin' | 'member';
 };
 
 /** Фото отчёта для `<Image>`: читается с токеном. */
@@ -132,6 +134,9 @@ function toTask(
       avatar: child?.avatarUrl ? authorizedImage(child.avatarUrl) : null,
     },
     createdBy: task.createdBy,
+    canManage:
+      task.createdBy === viewer.userId ||
+      (viewer.familyRole === 'owner' && author === undefined),
     authorName: author?.displayName,
     authorAvatar: author?.avatarUrl ? authorizedImage(author.avatarUrl) : null,
     createdAt: task.createdAt,
@@ -228,6 +233,9 @@ export function createServerTask(familyId: string, payload: CreateTaskPayload) {
       // Пустые необязательные поля не отправляем: сервер ждёт их отсутствия.
       ...(description ? { description } : {}),
       ...(deadlineAt ? { deadlineAt } : {}),
+      ...(payload.clientRequestId
+        ? { clientRequestId: payload.clientRequestId }
+        : {}),
       checklist: checklistBody(payload.checklist),
       childIds: [payload.assigneeId],
     },

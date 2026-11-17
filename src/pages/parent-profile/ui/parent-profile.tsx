@@ -27,6 +27,7 @@ import {
 } from '@entities/operation';
 import { useMyId } from '@entities/session';
 import { countTasks, type Task } from '@entities/task';
+import { useParentPaidTotal } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './parent-profile.styled';
@@ -54,7 +55,8 @@ export function ParentProfilePage() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const myId = useMyId();
-  const { data: members, isPending } = useFamilyMembers(useTaskFamilyId());
+  const familyId = useTaskFamilyId();
+  const { data: members, isPending } = useFamilyMembers(familyId);
   const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: operations = NO_OPERATIONS } = useFamilyOperations();
   // Сегодня фиксируем на время жизни экрана: от него считаются периоды.
@@ -63,6 +65,10 @@ export function ParentProfilePage() {
 
   const parent = members?.find(
     (member) => member.userId === id && member.kind === 'parent',
+  );
+  const { data: paidTotal } = useParentPaidTotal(
+    familyId,
+    parent?.userId ?? null,
   );
   if (isPending) return null;
   if (!parent) return <Redirect href="/" />;
@@ -88,8 +94,8 @@ export function ParentProfilePage() {
           }
         />
         <HomeSummary
-          // Выплачено за всё время: награды по его заданиям из истории.
-          amount={sumTotals(parentOperations).earned}
+          // Выплачено за всё время: серверный агрегат по журналу.
+          amount={paidTotal ? Number(paidTotal.points) : 0}
           activeTasks={counts.active}
           onActiveTasksPress={() =>
             router.push({

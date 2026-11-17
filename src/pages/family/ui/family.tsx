@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AddMember } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
@@ -18,7 +18,7 @@ import { useMyId, useSessionUser } from '@entities/session';
 import { countChildTasks, countTasks, type Task } from '@entities/task';
 import { MemberCard } from '@entities/user';
 import { formatMoney } from '@entities/wallet';
-import { isApiError } from '@shared/api';
+import { authorizedImage, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -29,7 +29,7 @@ const NO_TASKS: Task[] = [];
 const NO_MEMBERS: FamilyMember[] = [];
 
 /** Фото с сервера; без него — буква имени в карточке. */
-const photo = (url: string | null) => (url ? { uri: url } : undefined);
+const photo = (url: string | null) => (url ? authorizedImage(url) : undefined);
 
 /**
  * Вкладка Family. Родитель видит семью целиком (GET /families/:id): кнопки
@@ -101,14 +101,30 @@ export function FamilyPage() {
             ? (error.data as { code?: unknown }).code
             : null;
         showToast(
-          code === 'CHILD_BALANCE_NOT_ZERO'
+          code === 'CHILD_HAS_BALANCE'
             ? t('family.deleteHasBalance', { name: child.displayName })
-            : code === 'CHILD_HAS_TASKS'
+            : code === 'CHILD_HAS_PENDING_REVIEW'
               ? t('family.deleteHasTasks', { name: child.displayName })
               : t('family.deleteFailed'),
         );
       },
     });
+  };
+
+  const confirmRemoveChild = (child: FamilyChildDetails) => {
+    setSwipedId(null);
+    Alert.alert(
+      t('family.deleteChildConfirmTitle', { name: child.displayName }),
+      t('family.deleteChildConfirmMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('family.deleteChild'),
+          style: 'destructive',
+          onPress: () => removeChild(child),
+        },
+      ],
+    );
   };
 
   const parentCards = isParent
@@ -196,7 +212,7 @@ export function FamilyPage() {
                 accessibilityLabel={t('devices.remove', {
                   name: child.displayName,
                 })}
-                onPress={() => removeChild(child)}
+                onPress={() => confirmRemoveChild(child)}
                 style={({ pressed }) => [
                   styles.delete,
                   pressed && styles.pressed,

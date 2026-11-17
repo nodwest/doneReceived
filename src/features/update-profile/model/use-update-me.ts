@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { meKeys, updateMe } from '@entities/session';
+import { meKeys, updateMe, useSessionStore } from '@entities/session';
 import { syncData } from '@shared/api';
 
 /**
@@ -12,6 +12,7 @@ export function useUpdateMe() {
   return useMutation({
     mutationFn: updateMe,
     onSuccess: (user) => {
+      void useSessionStore.getState().updateUser(user);
       queryClient.setQueryData(meKeys.all, user);
       syncData(queryClient, 'profile-changed');
     },

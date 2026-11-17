@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { styles } from './calendar-event.styled';
 
 type EventRowProps = {
@@ -9,15 +9,28 @@ type EventRowProps = {
   meta: string;
   /** Необязательная плашка справа, например «Напомним». */
   tag?: string;
+  onPress?: () => void;
 };
 
 /** Строка события под карточками: дата, название, время и плашка. */
-export function EventRow({ weekday, day, title, meta, tag }: EventRowProps) {
+export function EventRow({
+  weekday,
+  day,
+  title,
+  meta,
+  tag,
+  onPress,
+}: EventRowProps) {
   return (
-    <View
+    <Pressable
       accessible
+      accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={`${weekday} ${day}. ${title}. ${meta}`}
-      style={styles.eventRow}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.eventRow,
+        pressed && onPress ? styles.pressed : null,
+      ]}
     >
       <View style={styles.dateBox}>
         <Text style={styles.dateWeekday}>{weekday}</Text>
@@ -36,6 +49,6 @@ export function EventRow({ weekday, day, title, meta, tag }: EventRowProps) {
           <Text style={styles.rowTagText}>{tag}</Text>
         </View>
       )}
-    </View>
+    </Pressable>
   );
 }

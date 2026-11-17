@@ -104,10 +104,19 @@ export function fetchFamilyChildren(familyId: string) {
  * POST /families/:id/children — профиль ребёнка без почты и пароля;
  * устройство подключают потом кодом. 409 — в семье нет мест.
  */
-export function createChild(familyId: string, displayName: string) {
+export function createChild(
+  familyId: string,
+  displayName: string,
+  clientRequestId?: string,
+) {
   return apiRequest<{ id: string; displayName: string }>(
     `/families/${familyId}/children`,
-    { method: 'POST', body: { displayName } },
+    {
+      method: 'POST',
+      body: clientRequestId
+        ? { displayName, clientRequestId }
+        : { displayName },
+    },
   );
 }
 

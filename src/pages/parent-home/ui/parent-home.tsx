@@ -7,17 +7,13 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
-import {
-  useFamilyFeed,
-  useFamilyOperations,
-  useFamilyTasks,
-} from '@features/family-tasks';
+import { useFamilyFeed, useFamilyTasks } from '@features/family-tasks';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { FeedItem } from '@entities/activity';
-import { sumTotals } from '@entities/operation';
 import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
+import { useParentPaidTotal } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { styles } from './parent-home.styled';
 import { authorizedImage } from '@shared/api';
@@ -43,17 +39,13 @@ export function ParentHomePage() {
   const { data: feed = [] } = useFamilyFeed();
   // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
   const total = tasks && countTasks(tasks, { createdBy: myId });
-  // Выплачено вошедшим родителем за всё время — из истории наград: после
-  // подтверждения задания сумма растёт.
-  const { data: operations } = useFamilyOperations();
-  const rewardsPaid =
-    operations &&
-    sumTotals(operations.filter((operation) => operation.parentId === myId))
-      .earned;
+  // Выплачено вошедшим родителем за всё время — серверный агрегат, а не
+  // обрезанная страница истории.
+  const familyId = useCurrentFamily()?.id ?? null;
+  const { data: paidTotal } = useParentPaidTotal(familyId, myId);
+  const rewardsPaid = paidTotal ? Number(paidTotal.points) : 0;
   // Дети семьи с сервера. Статус «дома» к геозонам пока не подключён.
-  const { data: serverChildren } = useFamilyChildren(
-    useCurrentFamily()?.id ?? null,
-  );
+  const { data: serverChildren } = useFamilyChildren(familyId);
   const children: ChildOverview[] = (serverChildren ?? []).map((child) => {
     const { active, review } = countChildTasks(tasks ?? [], child.id, myId);
     return {
@@ -80,7 +72,7 @@ export function ParentHomePage() {
             avatar={myAvatar}
           />
           <HomeSummary
-            amount={rewardsPaid ?? 0}
+            amount={rewardsPaid}
             activeTasks={total?.active ?? 0}
             tasksToReview={total?.review ?? 0}
             onActiveTasksPress={() =>

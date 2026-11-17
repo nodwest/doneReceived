@@ -1,7 +1,12 @@
-import { ImageBackground, Text, View } from 'react-native';
+import { ImageBackground, Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
-import { formatDayRange, formatMonthDay } from '@shared/lib';
+import {
+  formatDate,
+  formatDayRange,
+  formatMonthDay,
+  isSameDay,
+} from '@shared/lib';
 import { theme } from '@shared/theme';
 import { LetterAvatar } from '@shared/ui';
 import type { FamilyEvent } from '../model/family-event';
@@ -9,23 +14,41 @@ import { styles } from './calendar-event.styled';
 
 type FeaturedEventCardProps = {
   event: FamilyEvent;
+  /** Тап по карточке — открыть событие. */
+  onPress?: () => void;
 };
 
 /**
  * Большая карточка события: фото на всю карточку, тёмный градиент,
  * текст сверху, участники и напоминание снизу. Без фото — синий градиент.
  */
-export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
+export function FeaturedEventCard({ event, onPress }: FeaturedEventCardProps) {
   const { t } = useTranslation();
   const participants = event.participants.slice(0, 3);
-  const range = formatDayRange(event.startsAt, event.endsAt);
+  const range = isSameDay(event.startsAt, event.endsAt)
+    ? formatDate(event.startsAt, {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+      })
+    : formatDayRange(event.startsAt, event.endsAt);
+  const kicker =
+    event.repeat === 'annual'
+      ? t('calendar.annualKicker', {
+          date: formatMonthDay(event.startsAt),
+        })
+      : t('calendar.eventKicker', { range });
 
   return (
-    <View
+    <Pressable
       accessible
-      accessibilityRole="summary"
+      accessibilityRole={onPress ? 'button' : 'summary'}
       accessibilityLabel={`${event.title}. ${event.description}`}
-      style={styles.card}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.card,
+        pressed && onPress ? styles.pressed : null,
+      ]}
     >
       {event.photo ? (
         <ImageBackground
@@ -55,9 +78,7 @@ export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
 
       <View style={styles.copy}>
         <View style={styles.text}>
-          <Text style={styles.kicker}>
-            {t('calendar.featured.kicker', { range })}
-          </Text>
+          <Text style={styles.kicker}>{kicker}</Text>
           <Text style={styles.title} numberOfLines={2}>
             {event.title}
           </Text>
@@ -74,7 +95,7 @@ export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
                   key={person.id}
                   source={person.avatar}
                   name={person.name}
-                  tone="blue"
+                  tone="onDark"
                   letterSize={11}
                   style={[
                     styles.avatar,
@@ -94,6 +115,6 @@ export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
           )}
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }

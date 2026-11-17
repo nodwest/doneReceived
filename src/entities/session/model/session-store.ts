@@ -29,6 +29,8 @@ type SessionState = {
   signIn: (session: Session) => Promise<void>;
   /** Забыть сессию: выход из аккаунта. */
   signOut: () => Promise<void>;
+  /** Обновить профиль текущего аккаунта, не меняя токены сессии. */
+  updateUser: (user: Session['user']) => Promise<void>;
   /**
    * Обновить токены по refresh-токену. true — новая пара доступна. Сервер
    * не принял refresh-токен (401 или 400) — сессия стирается, экраны уводят на
@@ -88,6 +90,21 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         await removeSession();
       }
     }).catch(() => log('Не удалось удалить сохранённую сессию'));
+  },
+  updateUser: (user) => {
+    const current = get().session;
+    if (!current || current.user.id !== user.id) return Promise.resolve();
+    const scope = sessionScope;
+    const next = { ...current, user };
+    set({ session: next });
+    return withSessionLock(async () => {
+      if (sessionScope !== scope || get().session !== next) return;
+      try {
+        await saveSession(next);
+      } catch {
+        log('Не удалось сохранить обновлённый профиль');
+      }
+    });
   },
   refresh: async () => {
     const current = get().session;

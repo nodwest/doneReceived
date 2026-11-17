@@ -10,6 +10,9 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.childDeep,
     boxShadow: '0px 12px 24px rgba(26, 26, 46, 0.18)',
   },
+  pressed: {
+    opacity: 0.9,
+  },
   background: {
     position: 'absolute',
     top: 0,

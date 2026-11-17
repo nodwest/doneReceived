@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { formatMoney } from '@entities/wallet';
@@ -15,6 +15,9 @@ const PRESETS = [50, 100, 500, 1000] as const;
 
 /** Сколько можно пополнить за раз (правило сервера). */
 const MAX_AMOUNT = 1_000_000;
+
+const createRequestId = () =>
+  `deposit-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
 type DepositSheetProps = {
   visible: boolean;
@@ -35,6 +38,12 @@ export function DepositSheet({
 }: DepositSheetProps) {
   const { t } = useTranslation();
   const [value, setValue] = useState('');
+  // Новый ключ на каждое открытие/изменение суммы; при ошибке и повторе
+  // значение и видимость не меняются, поэтому ключ остаётся тем же.
+  const requestId = useMemo(
+    () => `${createRequestId()}-${value.length}-${visible ? 1 : 0}`,
+    [value, visible],
+  );
   const deposit = useDeposit(familyId);
   const amount = Number(value) || 0;
   const valid = amount >= 1 && amount <= MAX_AMOUNT;
@@ -48,18 +57,21 @@ export function DepositSheet({
 
   const submit = () => {
     if (disabled) return;
-    deposit.mutate(amount, {
-      onSuccess: () => {
-        showToast(t('deposit.done', { amount: formatMoney(amount) }));
-        close();
+    deposit.mutate(
+      { amount, clientRequestId: requestId },
+      {
+        onSuccess: () => {
+          showToast(t('deposit.done', { amount: formatMoney(amount) }));
+          close();
+        },
+        onError: (error) =>
+          showToast(
+            isApiError(error) && error.status === 404
+              ? t('deposit.disabled')
+              : t('deposit.failed'),
+          ),
       },
-      onError: (error) =>
-        showToast(
-          isApiError(error) && error.status === 404
-            ? t('deposit.disabled')
-            : t('deposit.failed'),
-        ),
-    });
+    );
   };
 
   return (

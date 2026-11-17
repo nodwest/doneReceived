@@ -1,5 +1,6 @@
 import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
 import { fetchParentFunds } from './parent-funds-api';
+import { fetchParentPaidTotal } from './parent-wallet-api';
 import { fetchChildWallet, fetchWallet } from './wallet-api';
 import { queryRoots } from '@shared/api';
 
@@ -11,6 +12,8 @@ export const walletKeys = {
   child: (childId: string) => [...walletKeys.all, 'child', childId] as const,
   funds: (familyId: string | null) =>
     [...walletKeys.all, 'funds', familyId] as const,
+  paidTotal: (familyId: string | null, parentId: string | null) =>
+    [...walletKeys.all, 'paid-total', familyId, parentId] as const,
 };
 
 export const walletQueryOptions = (familyId: string | null) =>
@@ -54,7 +57,7 @@ export function useChildBalance(
   familyId: string | null = null,
 ) {
   const { data, isPending } = useChildWallet(childId, familyId);
-  return { balance: data?.balance ?? 0, isPending };
+  return { balance: data?.balance ?? 0, isPending: !!childId && isPending };
 }
 
 /**
@@ -65,5 +68,19 @@ export function useParentFunds(familyId: string | null) {
   return useQuery({
     queryKey: walletKeys.funds(familyId),
     queryFn: familyId ? () => fetchParentFunds(familyId) : skipToken,
+  });
+}
+
+/** Выплачено родителю за всё время; без parentId — вошедшему. */
+export function useParentPaidTotal(
+  familyId: string | null,
+  parentId: string | null = null,
+) {
+  return useQuery({
+    queryKey: walletKeys.paidTotal(familyId, parentId),
+    queryFn:
+      familyId && parentId
+        ? () => fetchParentPaidTotal(familyId, parentId)
+        : skipToken,
   });
 }

@@ -18,7 +18,21 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  monthNav: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  monthArrow: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.childTint,
+  },
   month: {
+    flexShrink: 1,
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.extrabold,

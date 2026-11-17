@@ -33,7 +33,7 @@ import { styles } from './transactions.styled';
 
 type Tone = 'parent' | 'child';
 
-type ScreenProps<T extends { id: number; at: string }, F extends string> = {
+type ScreenProps<T extends { id: string; at: string }, F extends string> = {
   tone: Tone;
   isPending: boolean;
   filters: readonly { value: F; label: string }[];
@@ -73,7 +73,7 @@ function useDayTitle() {
  * `?transaction=<id>` — сразу карточку этой транзакции.
  */
 function TransactionsScreen<
-  T extends { id: number; at: string },
+  T extends { id: string; at: string },
   F extends string,
 >({
   tone,

@@ -31,6 +31,9 @@ const KNOWN: readonly FeedEventType[] = [
   'task_expired',
   'wish_added',
   'deposit',
+  'event_created',
+  'event_updated',
+  'event_cancelled',
 ];
 
 /**

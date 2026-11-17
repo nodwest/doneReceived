@@ -18,10 +18,11 @@ export function useTaskViewer(): TaskViewer | null {
         ? {
             familyId,
             userId: user.id,
+            familyRole: family?.role ?? user.family?.role,
             childName: user.kind === 'child' ? user.displayName : undefined,
           }
         : null,
-    [familyId, user],
+    [family?.role, familyId, user],
   );
 }
 

@@ -1,51 +1,84 @@
 import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
-import { EventRow, EventTile, FeaturedEventCard } from '@entities/family-event';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import {
+  EventRow,
+  EventTile,
+  FeaturedEventCard,
+  type FamilyEvent,
+} from '@entities/family-event';
 import { useViewerRole } from '@entities/user';
+import { useFamilyEvents } from '@features/family-event';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { formatClock, formatMonthDay, formatWeekdayShort } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { RoundButton, ScreenSection } from '@shared/ui';
 import { TabScreen } from '@widgets/bottom-nav';
 import { FamilyCalendar } from '@widgets/family-calendar';
-import { useCalendarDemo } from '../model/use-calendar-demo';
 import { styles } from './calendar.styled';
 
 const capitalize = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1);
 
 /**
- * Вкладка Calendar: свернутая неделя, фото события выходных и ближайшие
- * события. Плюс и «Все» показывают тост: экраны создания и списка событий
- * появятся вместе с серверным календарём.
+ * Вкладка Calendar: свернутая неделя, ближайшее событие и список следующих.
+ * «+» создаёт событие, тап по событию открывает его карточку.
  */
 export function CalendarPage() {
   const { t } = useTranslation();
+  const router = useRouter();
   const viewer = useViewerRole();
   const [expanded, setExpanded] = useState(false);
+  const [monthOffset, setMonthOffset] = useState(0);
   const {
     today,
-    events,
+    month,
+    rollingEvents,
+    monthEvents,
     featured,
     upcoming,
-    cinemaMeta,
-    doctorMeta,
-    meetingMeta,
-    homeworkMeta,
-    cinemaDay,
-    doctorDay,
-    meetingWeekday,
-    meetingDay,
-    homeworkWeekday,
-    homeworkDay,
-  } = useCalendarDemo();
+    isPending,
+    isMonthPending,
+    isError,
+    refetch,
+  } = useFamilyEvents(monthOffset, expanded);
 
-  const cinema = upcoming.find((event) => event.kind === 'cinema');
-  const doctor = upcoming.find((event) => event.kind === 'doctor');
-  const meeting = upcoming.find((event) => event.kind === 'meeting');
-  const homework = upcoming.find((event) => event.kind === 'homework');
+  const openEvent = (event: FamilyEvent) =>
+    router.push({
+      pathname: '/family-event/[id]',
+      params: {
+        id: event.id,
+        ...(event.repeat === 'annual'
+          ? { year: String(event.startsAt.getFullYear()) }
+          : {}),
+      },
+    });
+
+  const metaFor = (event: FamilyEvent) => {
+    const names = event.participants.map((person) => person.name);
+    const joined =
+      names.length === 0
+        ? ''
+        : names.length === 1
+          ? names[0]
+          : `${names.slice(0, -1).join(', ')} ${t('common.and')} ${
+              names[names.length - 1]
+            }`;
+    const time = formatClock(event.startsAt);
+    return joined
+      ? t('calendar.meta', { time, names: joined })
+      : t('calendar.metaTime', { time });
+  };
+
   const isParent = viewer !== 'child';
-  const showCreate = isParent;
+  const tiles = upcoming.slice(0, 2);
+  const rows = upcoming.slice(2);
 
   return (
     <TabScreen activeKey="calendar" activeColor={theme.colors.blue}>
@@ -58,74 +91,126 @@ export function CalendarPage() {
           <Text accessibilityRole="header" style={styles.title}>
             {t('calendar.title')}
           </Text>
-          {showCreate && (
+          {isParent && (
             <RoundButton
               icon="plus"
               tone="primary"
               accessibilityLabel={t('calendar.add')}
-              onPress={() => showToast(t('calendar.createSoon'))}
+              onPress={() => router.push('/create-family-event')}
             />
           )}
         </View>
 
         <FamilyCalendar
           today={today}
-          events={events}
+          events={expanded ? monthEvents : rollingEvents}
           expanded={expanded}
+          month={month}
+          onMonthChange={(direction) =>
+            setMonthOffset((value) => value + direction)
+          }
           onToggle={() => setExpanded((value) => !value)}
         />
 
-        <FeaturedEventCard event={featured} />
+        {expanded && isMonthPending && (
+          <ActivityIndicator style={styles.loading} color={theme.colors.blue} />
+        )}
 
-        <ScreenSection
-          title={t('calendar.upcoming')}
-          actionLabel={t('common.seeAll')}
-          actionColor={theme.colors.blue}
-          onAction={() => showToast(t('calendar.allSoon'))}
-        >
-          <View style={styles.sectionList}>
-            {(cinema || doctor) && (
-              <View style={styles.upcomingRow}>
-                {cinema && (
+        {expanded &&
+          !isMonthPending &&
+          !isError &&
+          monthEvents.length === 0 && (
+            <Text style={styles.monthEmpty}>{t('calendar.emptyMonth')}</Text>
+          )}
+
+        {isError && (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => refetch()}
+            style={styles.errorCard}
+          >
+            <Text style={styles.errorTitle}>{t('calendar.refreshError')}</Text>
+            <Text style={styles.errorLink}>{t('calendar.retry')}</Text>
+          </Pressable>
+        )}
+
+        {isPending && (
+          <ActivityIndicator style={styles.loading} color={theme.colors.blue} />
+        )}
+
+        {!isPending && featured && (
+          <FeaturedEventCard
+            event={featured}
+            onPress={() => openEvent(featured)}
+          />
+        )}
+
+        {!isPending && !isError && !featured && upcoming.length === 0 && (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyTitle}>{t('calendar.emptyTitle')}</Text>
+            <Text style={styles.emptyHint}>{t('calendar.emptyHint')}</Text>
+            {isParent && (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push('/create-family-event')}
+              >
+                <Text style={styles.emptyAction}>
+                  {t('calendar.createAction')}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        )}
+
+        {upcoming.length > 0 && (
+          <ScreenSection title={t('calendar.upcoming')}>
+            <View style={styles.sectionList}>
+              {tiles.length === 2 && (
+                <View style={styles.upcomingRow}>
                   <EventTile
                     icon="star"
                     tone="blue"
-                    dayLabel={capitalize(cinemaDay)}
-                    title={cinema.title}
-                    meta={cinemaMeta}
+                    dayLabel={capitalize(formatWeekdayShort(tiles[0].startsAt))}
+                    title={tiles[0].title}
+                    meta={metaFor(tiles[0])}
+                    onPress={() => openEvent(tiles[0])}
                   />
-                )}
-                {doctor && (
                   <EventTile
                     icon="bell"
                     tone="amber"
-                    dayLabel={doctorDay}
-                    title={doctor.title}
-                    meta={doctorMeta}
+                    dayLabel={formatMonthDay(tiles[1].startsAt)}
+                    title={tiles[1].title}
+                    meta={metaFor(tiles[1])}
+                    onPress={() => openEvent(tiles[1])}
                   />
-                )}
-              </View>
-            )}
-            {isParent && meeting && (
-              <EventRow
-                weekday={meetingWeekday.toUpperCase()}
-                day={meetingDay}
-                title={meeting.title}
-                meta={meetingMeta}
-                tag={t('calendar.remindTag')}
-              />
-            )}
-            {homework && (
-              <EventRow
-                weekday={homeworkWeekday.toUpperCase()}
-                day={homeworkDay}
-                title={homework.title}
-                meta={homeworkMeta}
-                tag={t('calendar.demo.homeworkTag')}
-              />
-            )}
-          </View>
-        </ScreenSection>
+                </View>
+              )}
+              {tiles.length === 1 && (
+                <View style={styles.upcomingRow}>
+                  <EventTile
+                    icon="star"
+                    tone="blue"
+                    dayLabel={capitalize(formatWeekdayShort(tiles[0].startsAt))}
+                    title={tiles[0].title}
+                    meta={metaFor(tiles[0])}
+                    onPress={() => openEvent(tiles[0])}
+                  />
+                </View>
+              )}
+              {rows.map((event) => (
+                <EventRow
+                  key={event.id}
+                  weekday={formatWeekdayShort(event.startsAt).toUpperCase()}
+                  day={event.startsAt.getDate()}
+                  title={event.title}
+                  meta={metaFor(event)}
+                  tag={event.reminderAt ? t('calendar.remindTag') : undefined}
+                  onPress={() => openEvent(event)}
+                />
+              ))}
+            </View>
+          </ScreenSection>
+        )}
       </ScrollView>
     </TabScreen>
   );

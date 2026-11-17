@@ -36,6 +36,7 @@ const APP_SCREENS = [
   'tasks',
   'family',
   'calendar',
+  'family-event/[id]',
   'wallet',
   'profile',
   'edit-profile',
@@ -138,6 +139,14 @@ function Screens({ signedIn, kind }: ScreensProps) {
           />
           <Stack.Screen
             name="edit-task"
+            options={{ presentation: 'modal', gestureEnabled: true }}
+          />
+          <Stack.Screen
+            name="create-family-event"
+            options={{ presentation: 'modal', gestureEnabled: true }}
+          />
+          <Stack.Screen
+            name="edit-family-event"
             options={{ presentation: 'modal', gestureEnabled: true }}
           />
         </Stack.Protected>

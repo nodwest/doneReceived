@@ -20,6 +20,7 @@ type ChildWalletDto = {
     /** Когда сдан одобренный отчёт. */
     submittedAt: string | null;
   }[];
+  next?: string | null;
 };
 
 /** Участники семьи — чтобы подписать, от кого награда, и показать фото. */
@@ -36,23 +37,37 @@ type MemberDto = {
  * участников семьи (не ответили — имя пустое). Выводов на карту на сервере
  * нет.
  */
+async function fetchAllEntries(familyId: string, childId: string) {
+  const entries: ChildWalletDto['entries'] = [];
+  let balancePoints = '0';
+  let before: string | null | undefined;
+  for (let page = 0; page < 20; page += 1) {
+    const query = new URLSearchParams({ limit: '100' });
+    if (before) query.set('before', before);
+    const data = await apiRequest<ChildWalletDto>(
+      `/families/${familyId}/children/${childId}/wallet?${query.toString()}`,
+    );
+    balancePoints = data.balancePoints;
+    entries.push(...data.entries);
+    before = data.next;
+    if (!before) break;
+  }
+  return { balancePoints, entries };
+}
 export async function fetchServerChildWallet(
   familyId: string,
   childId: string,
 ): Promise<ChildWallet> {
   const [wallet, members] = await Promise.all([
-    apiRequest<ChildWalletDto>(
-      `/families/${familyId}/children/${childId}/wallet`,
-    ),
+    fetchAllEntries(familyId, childId),
     apiRequest<MemberDto[]>(`/families/${familyId}/members`).catch(
       () => [] as MemberDto[],
     ),
   ]);
   const byId = new Map(members.map((member) => [member.userId, member]));
   const transactions: RewardTransaction[] = wallet.entries
-    .map((entry, index) => ({
-      // Экраны ключуют транзакции числом: номер по порядку в ответе.
-      id: index + 1,
+    .map((entry) => ({
+      id: entry.id,
       kind: 'reward' as const,
       amount: entry.points,
       at: entry.createdAt,
