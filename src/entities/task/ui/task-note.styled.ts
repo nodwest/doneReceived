@@ -22,8 +22,9 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.noteReviewBg,
     borderColor: withAlpha(theme.colors.reviewDot, 0.35),
   },
+  // Непрозрачный: сквозь пузырь не проступает бумага карточки.
   bubblePaid: {
-    backgroundColor: withAlpha(theme.colors.earned, 0.09),
+    backgroundColor: theme.colors.noteBubblePaid,
     borderColor: withAlpha(theme.colors.earned, 0.3),
   },
   text: {

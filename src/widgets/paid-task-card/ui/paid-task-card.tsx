@@ -66,7 +66,7 @@ export function PaidTaskCard({
 
   const tiles: InfoTileProps[] = [
     {
-      icon: 'sparkle',
+      icon: 'badge-check',
       tone: 'green',
       label: t(parent ? 'rewardCard.paidDay' : 'rewardCard.approvedDay', {
         day: formatDayInPhrase(paidAt, now),

@@ -51,6 +51,7 @@ import { RefreshIcon } from './refresh';
 import { ClockIcon } from './clock';
 import { CalendarIcon } from './calendar';
 import { SparkleIcon } from './sparkle';
+import { BadgeCheckIcon } from './badge-check';
 import { UndoIcon } from './undo';
 import { BusIcon } from './bus';
 import { ZoneIcon } from './zone';
@@ -113,6 +114,7 @@ export const icons = {
   clock: ClockIcon,
   calendar: CalendarIcon,
   sparkle: SparkleIcon,
+  'badge-check': BadgeCheckIcon,
   undo: UndoIcon,
   bus: BusIcon,
   zone: ZoneIcon,
