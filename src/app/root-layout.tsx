@@ -20,7 +20,7 @@ import {
 } from '@entities/session';
 import { useViewerRoleStore } from '@entities/user';
 import { theme } from '@shared/theme';
-import { ToastHost } from '@shared/ui';
+import { PaperPreload, ToastHost } from '@shared/ui';
 import { Providers } from './providers';
 
 // Экраны входа: пока не вошли. Первый из них — куда попадаем без входа.
@@ -90,6 +90,7 @@ export function RootLayout() {
     <Providers>
       <Screens signedIn={sessionStatus === 'signed-in'} kind={kind} />
       <ToastHost />
+      <PaperPreload />
     </Providers>
   );
 }
