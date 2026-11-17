@@ -8,7 +8,14 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ApiImage, Icon, PhotoCarousel, type IconName } from '@shared/ui';
+import {
+  ApiImage,
+  Icon,
+  PaperTexture,
+  PhotoCarousel,
+  type IconName,
+  type Paper,
+} from '@shared/ui';
 import {
   formatCountdown,
   KeepInViewContext,
@@ -43,13 +50,24 @@ const HERO_GRADIENTS = {
 } as const;
 
 const SHADOWS = {
-  parent: styles.shadowParent,
-  child: styles.shadowChild,
+  parent: styles.shadowSheet,
+  child: styles.shadowSheet,
   review: styles.shadowReview,
-  paid: styles.shadowPaid,
-  missed: styles.shadowMissed,
+  paid: styles.shadowSheet,
+  missed: styles.shadowSheet,
   wallet: styles.shadowWallet,
 };
+
+/** Бумага под телом карточки: у каждого статуса своя. */
+const PAPERS: Record<TaskSheetTone, { paper: Paper; opacity: number } | null> =
+  {
+    parent: { paper: 'white', opacity: 0.3 },
+    child: { paper: 'white', opacity: 0.3 },
+    review: { paper: 'kraft', opacity: 0.22 },
+    paid: { paper: 'paid', opacity: 0.55 },
+    missed: { paper: 'missed', opacity: 0.2 },
+    wallet: null,
+  };
 
 type TaskSheetProps = {
   tone: TaskSheetTone;
@@ -94,6 +112,7 @@ export function TaskSheet({
   style,
 }: TaskSheetProps) {
   const dark = tone === 'review';
+  const paper = PAPERS[tone];
   // Секции, которые растут (комментарий), держат низ над кнопками: выше
   // растворения у края.
   const { scrollRef, viewportRef, onScroll, keepInView } =
@@ -104,6 +123,7 @@ export function TaskSheet({
 
   return (
     <View style={[styles.card, SHADOWS[tone], style]}>
+      {paper && <PaperTexture paper={paper.paper} opacity={paper.opacity} />}
       <LinearGradient
         colors={HERO_GRADIENTS[tone]}
         start={{ x: 0, y: 0 }}
@@ -138,7 +158,7 @@ export function TaskSheet({
           style={[
             styles.title,
             amount && styles.titleAmount,
-            dark && styles.textDark,
+            dark && styles.titleOnWarm,
           ]}
           numberOfLines={2}
         >

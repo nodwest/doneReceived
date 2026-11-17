@@ -20,7 +20,9 @@ type TaskChecklistProps = {
 
 /**
  * Чеклист в карточке задания: полоса прогресса и шаги. Сделанные — на
- * бледно-зелёной подложке с зелёной галочкой, остальные — на белом.
+ * бледно-зелёной подложке с галочкой, остальные — на белом. С `onToggle`
+ * (ребёнок) у шагов чекбоксы, без него (родитель) — только галочки у
+ * сделанных.
  */
 export function TaskChecklist({
   label,
@@ -67,20 +69,26 @@ type StepProps = {
 };
 
 function Step({ item, first, onToggle }: StepProps) {
+  // Только просмотр (родитель): чекбоксов нет — нажать их нельзя. Сделанный
+  // шаг — зелёная галочка перед названием, у остальных её нет и название
+  // начинается от края.
+  const mark = !onToggle ? (
+    item.done && <Icon name="check" size={18} color={theme.colors.earnedDark} />
+  ) : item.done ? (
+    <LinearGradient
+      colors={[theme.colors.heroPaidFrom, theme.colors.earned]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.box}
+    >
+      <Icon name="check" size={16} color={theme.colors.white} />
+    </LinearGradient>
+  ) : (
+    <View style={[styles.box, styles.boxEmpty]} />
+  );
   const content = (
     <>
-      {item.done ? (
-        <LinearGradient
-          colors={[theme.colors.heroPaidFrom, theme.colors.earned]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.box}
-        >
-          <Icon name="check" size={16} color={theme.colors.white} />
-        </LinearGradient>
-      ) : (
-        <View style={[styles.box, styles.boxEmpty]} />
-      )}
+      {mark}
       <Text style={styles.title}>{item.title}</Text>
     </>
   );
@@ -94,8 +102,8 @@ function Step({ item, first, onToggle }: StepProps) {
     return (
       <View
         accessible
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: item.done, disabled: true }}
+        accessibilityLabel={item.title}
+        accessibilityState={{ checked: item.done }}
         style={rowStyle}
       >
         {content}

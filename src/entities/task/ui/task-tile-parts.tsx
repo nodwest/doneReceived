@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { formatCountdown, useNow } from '@shared/lib';
 import { theme, tracking } from '@shared/theme';
-import { Icon } from '@shared/ui';
+import { Icon, PaperTexture } from '@shared/ui';
 import { formatRewardShort } from '../model';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -88,8 +88,29 @@ export function RewardAmount({ reward, paid, missed }: RewardAmountProps) {
   );
 }
 
-/** Общие стили плиток заданий: шапка, название, описание. */
+/**
+ * Бумага плитки — первым ребёнком: крафт у заданий на проверке, белая у
+ * остальных.
+ */
+export function TilePaper({ review }: { review?: boolean }) {
+  return review ? (
+    <PaperTexture paper="kraft" opacity={0.22} />
+  ) : (
+    <PaperTexture paper="white" opacity={0.3} />
+  );
+}
+
+/** Между плитками в списках: тени соседних не накладываются. */
+export const TILE_GAP = 17;
+
+/** Общие стили плиток заданий: основа, шапка, название, описание. */
 export const tileStyles = StyleSheet.create({
+  // Белая основа под бумагой и тень со всех сторон.
+  surface: {
+    overflow: 'hidden',
+    backgroundColor: theme.colors.white,
+    boxShadow: '0px 0px 16px rgba(26, 26, 46, 0.26)',
+  },
   head: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,7 +181,7 @@ const styles = StyleSheet.create({
   },
   review: {
     paddingLeft: 12,
-    backgroundColor: theme.colors.white,
+    backgroundColor: theme.colors.reviewChipBg,
   },
   paid: {
     backgroundColor: theme.colors.approvedFrom,

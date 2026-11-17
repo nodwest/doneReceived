@@ -2,57 +2,43 @@ import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
-  row: {
-    gap: 14,
-    padding: 14,
+  tile: {
+    gap: 10,
+    padding: 16,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: theme.colors.reviewBorder,
-    overflow: 'hidden',
   },
   pressed: {
     opacity: 0.85,
   },
-  head: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  thumb: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: theme.colors.white,
-  },
-  thumbIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-  },
-  info: {
-    flex: 1,
-    gap: 3,
-  },
-  title: {
-    fontSize: theme.fontSize.md,
-    letterSpacing: tracking(theme.fontSize.md),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
-  },
   meta: {
+    gap: 4,
+  },
+  chip: {
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    backgroundColor: theme.colors.reviewChipBg,
+  },
+  chipText: {
+    fontSize: 11,
+    letterSpacing: tracking(11),
+    fontFamily: theme.fonts.bold,
+    color: theme.colors.reviewText,
+  },
+  footer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'space-between',
+    gap: 12,
+    paddingTop: 4,
   },
-  sent: {
-    fontSize: 13,
-    letterSpacing: tracking(13),
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+  footerAside: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   photoChip: {
     paddingVertical: 2,
@@ -66,34 +52,11 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.semibold,
     color: theme.colors.reviewChipText,
   },
-  status: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 8,
-    paddingLeft: 10,
-    paddingRight: 12,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-  },
-  checker: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    borderWidth: 2,
-    borderColor: theme.colors.yellow,
-  },
   checking: {
-    flex: 1,
+    flexShrink: 1,
     fontSize: 13,
     letterSpacing: tracking(13),
-    fontFamily: theme.fonts.bold,
-    color: theme.colors.reviewChipText,
-  },
-  reward: {
-    fontSize: theme.fontSize.sm,
-    letterSpacing: tracking(theme.fontSize.sm),
-    fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    fontFamily: theme.fonts.semibold,
+    color: theme.colors.grey,
   },
 });

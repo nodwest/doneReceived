@@ -1,12 +1,16 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Pressable, Text, View } from 'react-native';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
-import { theme } from '@shared/theme';
-import { Icon, ApiImage } from '@shared/ui';
-import { formatRewardShort, type Task, type TaskAssignee } from '../model';
-import { styles } from './child-review-row.styled';
+import type { Task, TaskAssignee } from '../model';
 import { AssigneeAvatar } from './assignee-avatar';
+import {
+  RewardAmount,
+  TILE_DESCRIPTION_LINES,
+  TilePaper,
+  TilePill,
+  tileStyles,
+} from './task-tile-parts';
+import { styles } from './child-review-row.styled';
 
 type ChildReviewRowProps = {
   task: Task;
@@ -16,8 +20,10 @@ type ChildReviewRowProps = {
 };
 
 /**
- * Задание ребёнка на проверке: фото-отчёт (или значок задания), когда
- * отправлено, кто из родителей проверяет и сколько придёт после проверки.
+ * Плитка задания ребёнка на проверке — как у родителя, на крафтовой бумаге,
+ * но глазами ребёнка. Шапка: родитель, который проверяет, чип On review и
+ * когда отправлено. Название, описание до 5 строк; внизу награда, сколько
+ * фото в отчёте и «Sarah is checking».
  */
 export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
   const { t } = useTranslation();
@@ -28,59 +34,59 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
       accessibilityRole="button"
       accessibilityLabel={task.title}
       onPress={() => onPress?.(task)}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.tile,
+        tileStyles.surface,
+        pressed && styles.pressed,
+      ]}
     >
-      <LinearGradient
-        colors={[theme.colors.reviewRowFrom, theme.colors.reviewRowTo]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      <View style={styles.head}>
-        {task.photos.length > 0 ? (
-          <ApiImage
-            source={task.photos[0]}
-            style={styles.thumb}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.thumbIcon}>
-            <Icon name="task" size={24} color={theme.colors.reviewIconSoft} />
-          </View>
-        )}
-        <View style={styles.info}>
-          <Text style={styles.title} numberOfLines={1}>
-            {task.title}
-          </Text>
-          <View style={styles.meta}>
-            {task.doneAt && (
-              <Text style={styles.sent}>
-                {t('tasks.sentAgo', {
-                  ago: formatTimeAgo(new Date(task.doneAt), now),
-                })}
-              </Text>
-            )}
-            {task.photos.length > 0 && (
-              <View style={styles.photoChip}>
-                <Text style={styles.photoChipText}>
-                  {t('tasks.photoCount', { count: task.photos.length })}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </View>
-      <View style={styles.status}>
+      <TilePaper review />
+      <View style={tileStyles.head}>
         <AssigneeAvatar
           source={author.avatar}
           name={author.name}
-          style={styles.checker}
+          style={tileStyles.avatar}
         />
-        <Text style={styles.checking} numberOfLines={1}>
-          {t('tasks.checking', { name: author.name })}
+        <View style={[tileStyles.meta, styles.meta]}>
+          <Text style={tileStyles.name} numberOfLines={1}>
+            {author.name}
+          </Text>
+          <View style={styles.chip}>
+            <Text style={styles.chipText}>{t('tasks.onReview')}</Text>
+          </View>
+        </View>
+        {task.doneAt && (
+          <TilePill
+            tone="review"
+            label={t('tasks.sentAgo', {
+              ago: formatTimeAgo(new Date(task.doneAt), now),
+            })}
+          />
+        )}
+      </View>
+      <Text style={tileStyles.title}>{task.title}</Text>
+      {!!task.description && (
+        <Text
+          style={tileStyles.description}
+          numberOfLines={TILE_DESCRIPTION_LINES}
+        >
+          {task.description}
         </Text>
-        <Icon name="coin" size={18} color={theme.colors.yellow} />
-        <Text style={styles.reward}>{formatRewardShort(task.reward)}</Text>
+      )}
+      <View style={styles.footer}>
+        <RewardAmount reward={task.reward} />
+        <View style={styles.footerAside}>
+          {task.photos.length > 0 && (
+            <View style={styles.photoChip}>
+              <Text style={styles.photoChipText}>
+                {t('tasks.photoCount', { count: task.photos.length })}
+              </Text>
+            </View>
+          )}
+          <Text style={styles.checking} numberOfLines={1}>
+            {t('tasks.checking', { name: author.name })}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );

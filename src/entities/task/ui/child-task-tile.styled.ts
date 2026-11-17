@@ -8,8 +8,6 @@ export const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     borderColor: theme.colors.cardBorder,
-    backgroundColor: theme.colors.white,
-    boxShadow: '0px 6px 16px rgba(26, 26, 51, 0.06)',
   },
   pressed: {
     opacity: 0.85,

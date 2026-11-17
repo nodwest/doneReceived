@@ -169,6 +169,14 @@ export function ChildTaskCard({
           <InfoTiles
             tiles={[
               {
+                icon: 'sparkle',
+                tone: 'cool',
+                label: t('taskCard.givenDay', {
+                  day: formatDayInPhrase(created, now),
+                }),
+                value: formatClock(created),
+              },
+              {
                 icon: 'calendar',
                 tone: 'warm',
                 label: expires
@@ -179,14 +187,6 @@ export function ChildTaskCard({
                 value: expires
                   ? formatClock(expires)
                   : t('taskCard.noDeadline'),
-              },
-              {
-                icon: 'sparkle',
-                tone: 'cool',
-                label: t('taskCard.givenDay', {
-                  day: formatDayInPhrase(created, now),
-                }),
-                value: formatClock(created),
               },
             ]}
           />

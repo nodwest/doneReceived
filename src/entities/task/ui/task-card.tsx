@@ -113,20 +113,20 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
       <InfoTiles
         tiles={[
           {
-            icon: 'calendar',
-            tone: 'warm',
-            label: expires
-              ? t('taskCard.dueDay', { day: formatDayInPhrase(expires, now) })
-              : t('taskCard.due'),
-            value: expires ? formatClock(expires) : t('taskCard.noDeadline'),
-          },
-          {
             icon: 'sparkle',
             tone: 'cool',
             label: t('taskCard.createdDay', {
               day: formatDayInPhrase(created, now),
             }),
             value: formatClock(created),
+          },
+          {
+            icon: 'calendar',
+            tone: 'warm',
+            label: expires
+              ? t('taskCard.dueDay', { day: formatDayInPhrase(expires, now) })
+              : t('taskCard.due'),
+            value: expires ? formatClock(expires) : t('taskCard.noDeadline'),
           },
         ]}
       />

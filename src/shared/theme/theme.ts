@@ -19,12 +19,12 @@ export const theme = {
     // Подсветка «на проверке»: плитка Tasks to Review и запись Pending review.
     reviewFrom: '#FFF3D1',
     reviewTo: '#FFE2C4',
+    // Чип и плашка «на проверке» на крафтовой бумаге плитки.
+    reviewChipBg: '#FFE9CC',
     reviewAccent: '#E67E00',
     reviewChip: '#FFE9CC',
     reviewChipText: '#B8650A',
     reviewBorder: '#F8CC94',
-    // Значок задания без фото в строке «на проверке»: спокойный янтарный.
-    reviewIconSoft: '#E0A23A',
     // Подтверждённая запись активности.
     approvedFrom: '#E0F8E7',
     approvedTo: '#C5EFD5',
@@ -128,6 +128,8 @@ export const theme = {
     checklistLine: '#E4E7EF',
     // Комментарий ребёнка в карточке на проверке: тёплый пузырь.
     noteReviewBg: '#FFF6E8',
+    // Пузырь комментария в выплаченном задании: earned 9% на белом.
+    noteBubblePaid: '#ECF9F2',
     // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
     heroSubtle: '#D9E0FF',
     violetIcon: '#EDE8FC',
@@ -165,8 +167,6 @@ export const theme = {
     dropZone: '#F4F9FF',
     galleryBorder: '#D6E6F8',
     cardBorder: '#E6E8F0',
-    reviewRowFrom: '#FFFAF0',
-    reviewRowTo: '#FFF1DC',
     childCount: '#DCEBFC',
     goalTrack: '#FFE08A',
     goalDot: '#FFC94D',

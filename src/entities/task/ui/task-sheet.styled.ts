@@ -12,23 +12,15 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     overflow: 'hidden',
   },
-  shadowParent: {
-    boxShadow: '0px 10px 28px rgba(75, 60, 196, 0.12)',
-  },
-  shadowChild: {
-    boxShadow: '0px 10px 28px rgba(31, 94, 184, 0.1)',
+  // Тень со всех сторон: карточка на бумаге не сливается с фоном экрана.
+  shadowSheet: {
+    boxShadow: '0px 0px 24px 2px rgba(26, 26, 46, 0.28)',
   },
   shadowReview: {
     boxShadow: '0px 10px 28px rgba(230, 126, 0, 0.12)',
   },
   shadowWallet: {
     boxShadow: '0px 10px 28px rgba(23, 33, 96, 0.14)',
-  },
-  shadowPaid: {
-    boxShadow: '0px 10px 28px rgba(26, 133, 79, 0.12)',
-  },
-  shadowMissed: {
-    boxShadow: '0px 10px 28px rgba(75, 84, 104, 0.12)',
   },
 
   hero: {
@@ -89,6 +81,12 @@ export const styles = StyleSheet.create({
   },
   textDark: {
     color: theme.colors.ink,
+  },
+  // Белое название на оранжевой шапке «на проверке»: тень держит контраст.
+  titleOnWarm: {
+    textShadowColor: 'rgba(140, 77, 0, 0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
 
   pill: {
@@ -248,6 +246,8 @@ export const styles = StyleSheet.create({
     gap: 10,
     padding: 12,
     borderRadius: 16,
+    // Плитка чуть вдавлена в бумагу карточки.
+    boxShadow: 'inset 1.5px 1.5px 2.5px rgba(51, 61, 82, 0.2)',
   },
   tileIcon: {
     width: 32,
