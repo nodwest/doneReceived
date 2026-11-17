@@ -16,6 +16,8 @@ type GradientButtonProps = {
   small?: boolean;
   /** Идёт запрос: спиннер вместо иконки, кнопка не нажимается. */
   loading?: boolean;
+  /** Фиолетово-синяя (по умолчанию) или голубая — вкладка Map. */
+  tone?: 'violet' | 'blue';
 };
 
 /** Широкая фиолетово-синяя кнопка высотой 48: Create Task, + Family member. */
@@ -27,15 +29,22 @@ export function GradientButton({
   compact,
   small,
   loading,
+  tone = 'violet',
 }: GradientButtonProps) {
+  const blue = tone === 'blue';
   return (
     <LinearGradient
-      colors={[theme.colors.violet, theme.colors.blue]}
+      colors={
+        blue
+          ? [theme.colors.childFrom, theme.colors.childDeep]
+          : [theme.colors.violet, theme.colors.blue]
+      }
       start={{ x: 0, y: 0.2 }}
       end={{ x: 1, y: 0.8 }}
       locations={[0, 0.7071]}
       style={[
         styles.gradient,
+        blue && styles.gradientBlue,
         small && styles.small,
         disabled && styles.disabled,
         loading && styles.loading,
@@ -46,7 +55,7 @@ export function GradientButton({
           styles.button,
           small && styles.small,
           hovered && styles.buttonHovered,
-          pressed && styles.buttonPressed,
+          pressed && (blue ? styles.buttonPressedBlue : styles.buttonPressed),
         ]}
         onPress={onPress}
         disabled={disabled || loading}
@@ -84,6 +93,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     boxShadow: `0px 4px 12px ${withAlpha(theme.colors.violet, 0.25)}`,
   },
+  gradientBlue: {
+    boxShadow: '0px 4px 12px rgba(30, 95, 184, 0.25)',
+  },
   small: {
     height: 40,
     borderRadius: 12,
@@ -114,6 +126,10 @@ const styles = StyleSheet.create({
   },
   buttonPressed: {
     backgroundColor: theme.colors.violet,
+    opacity: 1,
+  },
+  buttonPressedBlue: {
+    backgroundColor: theme.colors.childDeep,
     opacity: 1,
   },
   title: {

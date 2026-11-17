@@ -197,6 +197,7 @@ export function MapZonePage() {
                 onPress={() => save.mutate()}
                 disabled={!canSave}
                 loading={save.isPending}
+                tone="blue"
               />
             </View>
           </View>
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: theme.colors.mapAccent,
   },
   actions: {
     flexDirection: 'row',
