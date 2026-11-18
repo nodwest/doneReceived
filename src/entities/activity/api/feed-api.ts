@@ -8,6 +8,7 @@ type ActivityDto = {
     createdAt: string;
     actorId: string | null;
     childId: string | null;
+    assignmentId: string | null;
     taskTitle: string | null;
     points: number | null;
   }[];
@@ -20,6 +21,42 @@ type MemberDto = {
 };
 
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
+
+type MissedDto = {
+  items: { assignmentId: string; reason: 'expired' | 'rejected' }[];
+};
+
+/**
+ * Назначения, закрытые отказом без переделки, у детей с событиями
+ * task_rejected: в событии ленты нет `retry`, а в missed-tasks такие есть.
+ * Не ответили — считаем отказ возвратом на переделку.
+ */
+async function fetchClosedAssignments(
+  familyId: string,
+  items: ActivityDto['items'],
+): Promise<Set<string>> {
+  const childIds = [
+    ...new Set(
+      items
+        .filter((item) => item.type === 'task_rejected' && item.childId)
+        .map((item) => item.childId as string),
+    ),
+  ];
+  const lists = await Promise.all(
+    childIds.map((childId) =>
+      apiRequest<MissedDto>(
+        `/families/${familyId}/children/${childId}/missed-tasks`,
+      ).catch(() => ({ items: [] }) as MissedDto),
+    ),
+  );
+  return new Set(
+    lists.flatMap((list) =>
+      list.items
+        .filter((item) => item.reason === 'rejected')
+        .map((item) => item.assignmentId),
+    ),
+  );
+}
 
 const KNOWN: readonly FeedEventType[] = [
   'task_created',
@@ -35,6 +72,19 @@ const KNOWN: readonly FeedEventType[] = [
   'event_updated',
   'event_cancelled',
 ];
+
+/** Нет более позднего отказа по тому же назначению (лента — новые первыми). */
+const isLastRejection = (
+  items: ActivityDto['items'],
+  item: ActivityDto['items'][number],
+) =>
+  !items.some(
+    (other) =>
+      other !== item &&
+      other.type === 'task_rejected' &&
+      other.assignmentId === item.assignmentId &&
+      other.createdAt > item.createdAt,
+  );
 
 /**
  * GET /families/:id/activity — последние события семьи (ребёнку — только
@@ -64,6 +114,7 @@ export async function fetchFeed(
           () => [] as ChildDto[],
         ),
   ]);
+  const closed = await fetchClosedAssignments(familyId, activity.items);
   const photo = (url: string | null | undefined) =>
     url ? authorizedImage(url) : null;
   return activity.items
@@ -74,7 +125,15 @@ export async function fetchFeed(
       const child = children.find((entry) => entry.id === item.childId);
       return {
         id: item.id,
-        type: item.type,
+        // Закрывающий отказ — последний по назначению: после него событий
+        // по нему не бывает, поэтому любой task_rejected закрытого — закрытие.
+        type:
+          item.type === 'task_rejected' &&
+          item.assignmentId &&
+          closed.has(item.assignmentId) &&
+          isLastRejection(activity.items, item)
+            ? ('task_closed' as const)
+            : item.type,
         at: item.createdAt,
         title: item.taskTitle,
         points: item.points,
