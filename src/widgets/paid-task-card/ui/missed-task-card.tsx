@@ -4,6 +4,7 @@ import { formatAmount, type Operation } from '@entities/operation';
 import {
   HeroPill,
   InfoTiles,
+  RejectionNote,
   TaskBrief,
   TaskSheet,
   type InfoTileProps,
@@ -33,8 +34,9 @@ type MissedTaskCardProps = {
 /**
  * Карточка упущенного задания — Rewards history, тогл Missed. Графитовая
  * шапка («Missed by Liam · Missed $3» у родителя, «Task from Sarah» у
- * ребёнка), что нужно было сделать, срок и когда истекло; внизу — куда ушли
- * деньги: родителю вернулись в кошелёк, у ребёнка упущены.
+ * ребёнка), отказ родителя (у закрытого — закрывающий, у истёкшего —
+ * прошлый, если был), что нужно было сделать, срок и когда истекло; внизу —
+ * куда ушли деньги: родителю вернулись в кошелёк, у ребёнка упущены.
  */
 export function MissedTaskCard({
   operation,
@@ -116,6 +118,15 @@ export function MissedTaskCard({
         </View>
       }
     >
+      {operation.rejection && (
+        <RejectionNote
+          icon={closed ? 'close' : 'undo'}
+          title={t(closed ? 'rewardCard.closedBy' : 'taskCard.sentBack', {
+            name: author.name,
+          })}
+          rejection={operation.rejection}
+        />
+      )}
       <TaskBrief
         label={t('taskCard.whatToDo')}
         reward={operation.amount}

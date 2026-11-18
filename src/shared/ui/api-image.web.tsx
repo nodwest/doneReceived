@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image, type ImageProps } from 'react-native';
+import { currentAccessToken, refreshAccessToken } from '../api';
 
 // В вебе <img> не умеет слать заголовки, а react-native-web их отбрасывает:
 // картинку с токеном скачиваем fetch'ем и показываем через blob-ссылку.
@@ -11,19 +12,33 @@ const loaded = new Map<string, Promise<string>>();
 const ready = new Map<string, string>();
 const MAX_CACHED = 200;
 
-function load(uri: string, headers: Record<string, string>) {
+/**
+ * Скачать картинку с токеном. Токен берём свежий, а не тот, что запёкся в
+ * `source` при загрузке данных: он мог устареть. На 401 обновляем токены
+ * тем же единственным refresh, что у запросов, и пробуем ещё раз.
+ */
+async function download(uri: string, sourceToken: string | null) {
+  const get = (token: string | null) =>
+    fetch(uri, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+  const token = currentAccessToken() ?? sourceToken;
+  let response = await get(token);
+  if (response.status === 401 && token && (await refreshAccessToken(token))) {
+    response = await get(currentAccessToken());
+  }
+  if (!response.ok) throw new Error(String(response.status));
+  return response.blob();
+}
+
+function load(uri: string, sourceToken: string | null) {
   let pending = loaded.get(uri);
   if (!pending) {
-    pending = fetch(uri, { headers })
-      .then((response) => {
-        if (!response.ok) throw new Error(String(response.status));
-        return response.blob();
-      })
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        ready.set(uri, url);
-        return url;
-      });
+    pending = download(uri, sourceToken).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      ready.set(uri, url);
+      return url;
+    });
     // Ошибка не запоминается: при следующем показе (например, с новым
     // токеном) попробуем снова.
     pending.catch(() => loaded.delete(uri));
@@ -64,7 +79,7 @@ export function ApiImage({ source, ...props }: ImageProps) {
   useEffect(() => {
     if (!uri || ready.has(uri)) return;
     let alive = true;
-    load(uri, auth ? { Authorization: auth } : {})
+    load(uri, auth ? auth.replace(/^Bearer /, '') : null)
       .then((url) => {
         if (alive) setBlob({ uri, url });
       })

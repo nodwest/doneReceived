@@ -5,7 +5,17 @@ import { LetterAvatar } from '@shared/ui';
 import { styles } from './activity-item.styled';
 
 /** pending — на проверке (тёплая), approved — подтверждено (зелёная), new — новое (голубая). */
-export type ActivityTone = 'pending' | 'approved' | 'new';
+/**
+ * pending — на проверке, approved — принято, new — новое (голубое),
+ * sentBack — вернули на доработку (коралловое), missed — отменено, закрыто
+ * или истекло: награды не будет (графитовое, как упущенное в истории).
+ */
+export type ActivityTone =
+  | 'pending'
+  | 'approved'
+  | 'new'
+  | 'sentBack'
+  | 'missed';
 
 type ActivityCardProps = {
   tone: ActivityTone;
@@ -21,6 +31,8 @@ type ActivityCardProps = {
 const GRADIENTS = {
   pending: [theme.colors.reviewFrom, theme.colors.reviewTo],
   approved: [theme.colors.approvedFrom, theme.colors.approvedTo],
+  sentBack: [theme.colors.sentBackBg, theme.colors.white],
+  missed: [theme.colors.missedTile, theme.colors.white],
 } as const;
 
 /** Карточка события в ленте: аватар, что случилось, когда и сумма. */
@@ -75,10 +87,14 @@ const SUBTITLE_STYLES = {
   pending: null,
   approved: styles.subtitleApproved,
   new: styles.subtitleNew,
+  sentBack: styles.subtitleSentBack,
+  missed: styles.subtitleMissed,
 };
 
 const REWARD_STYLES = {
   pending: styles.rewardPending,
   approved: null,
   new: styles.rewardNew,
+  sentBack: styles.rewardSentBack,
+  missed: styles.rewardMissed,
 };

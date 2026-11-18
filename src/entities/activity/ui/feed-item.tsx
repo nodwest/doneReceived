@@ -3,13 +3,21 @@ import { useTimeAgo } from '@shared/lib';
 import type { FeedEvent, FeedEventType } from '../model';
 import { ActivityCard, type ActivityTone } from './activity-card';
 
-/** Сдано — тёплая «на проверке», принято — зелёная, остальное — голубая. */
-const tone = (type: FeedEventType): ActivityTone =>
-  type === 'task_submitted'
-    ? 'pending'
-    : type === 'task_approved'
-      ? 'approved'
-      : 'new';
+/**
+ * Сдано — тёплая «на проверке», принято — зелёная, вернули на доработку —
+ * коралловая, отменено / закрыто / истекло — графитовая (награды не будет),
+ * остальное — голубая.
+ */
+const TONES: Partial<Record<FeedEventType, ActivityTone>> = {
+  task_submitted: 'pending',
+  task_approved: 'approved',
+  task_rejected: 'sentBack',
+  task_closed: 'missed',
+  task_cancelled: 'missed',
+  task_expired: 'missed',
+  event_cancelled: 'missed',
+};
+const tone = (type: FeedEventType): ActivityTone => TONES[type] ?? 'new';
 
 type FeedItemProps = {
   event: FeedEvent;

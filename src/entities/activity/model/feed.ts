@@ -7,6 +7,8 @@ export type FeedEventType =
   | 'task_withdrawn'
   | 'task_approved'
   | 'task_rejected'
+  /** Отказ без переделки: сервер шлёт task_rejected, различаем по missed-tasks. */
+  | 'task_closed'
   | 'task_cancelled'
   | 'task_expired'
   | 'wish_added'

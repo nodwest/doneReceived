@@ -3,7 +3,8 @@ import type { Operation } from '../model/operation';
 
 // История наград детей с сервера: заработанные — начисления из кошельков
 // детей (с названием, описанием, кто одобрил, когда сдано и комментарием),
-// упущенные — назначения, не сданные к сроку (GET …/missed-tasks).
+// упущенные — назначения, не сданные к сроку или закрытые отказом без
+// переделки (GET …/missed-tasks).
 
 /** Кто смотрит историю. */
 export type OperationsViewer = {
@@ -39,16 +40,31 @@ type MissedItemDto = {
   taskTitle: string;
   taskDescription: string | null;
   rewardPoints: number;
-  /** Срок задания; у закрытого отказом мог не быть (п. 33). */
+  /** Срок задания; у закрытого отказом мог не быть. */
   deadlineAt: string | null;
-  /** Когда истекло (п. 32). */
-  expiredAt?: string | null;
+  /** Когда истекло; null — закрыто отказом. */
+  expiredAt: string | null;
   /** userId родителя, создавшего задание. */
   createdBy: string;
-  /** Почему упущено и когда (п. 33); нет — истекло, время — expiredAt. */
-  reason?: 'expired' | 'rejected';
-  closedAt?: string | null;
+  /** Почему упущено: не успел к сроку или закрыто отказом без переделки. */
+  reason: 'expired' | 'rejected';
+  /** Когда упущено: expiredAt или время закрывающего отказа. */
+  closedAt: string;
+  /** Последний отказ: у rejected — закрывающий, у expired — прошлый, если был. */
+  lastRejection: {
+    reasonCode: 'not_done_properly' | 'not_finished' | 'other';
+    comment: string | null;
+    reviewedBy: string;
+    reviewedAt: string;
+  } | null;
 };
+
+/** Код причины отказа на сервере → ключ причины в приложении. */
+const REJECT_REASONS = {
+  not_done_properly: 'not-done-properly',
+  not_finished: 'not-finished',
+  other: 'other',
+} as const;
 
 type MissedDto = {
   items: MissedItemDto[];
@@ -131,27 +147,31 @@ export async function fetchServerOperations(
         assignmentId: entry.assignmentId,
       }),
     );
-    const lost = missed.flatMap((item): Operation[] => {
-      const at = item.closedAt ?? item.expiredAt ?? item.deadlineAt;
-      if (!at) return [];
-      return [
-        {
-          id: item.assignmentId,
-          kind: 'missed',
-          title: item.taskTitle,
-          description: item.taskDescription ?? '',
-          amount: item.rewardPoints,
-          child: toChild(child),
-          parentId: item.createdBy,
-          at,
-          doneAt: null,
-          photos: [],
-          note: null,
-          assignmentId: item.assignmentId,
-          dueAt: item.deadlineAt,
-          missedReason: item.reason ?? 'expired',
-        },
-      ];
+    const lost = missed.map((item): Operation => {
+      const rejected = item.lastRejection;
+      return {
+        id: item.assignmentId,
+        kind: 'missed',
+        title: item.taskTitle,
+        description: item.taskDescription ?? '',
+        amount: item.rewardPoints,
+        child: toChild(child),
+        parentId: item.createdBy,
+        at: item.closedAt,
+        doneAt: null,
+        photos: [],
+        note: null,
+        assignmentId: item.assignmentId,
+        dueAt: item.deadlineAt,
+        missedReason: item.reason,
+        rejection: rejected
+          ? {
+              reason: REJECT_REASONS[rejected.reasonCode] ?? 'other',
+              comment: rejected.comment?.trim() ?? '',
+              by: rejected.reviewedBy,
+            }
+          : null,
+      };
     });
     return [...earned, ...lost];
   });

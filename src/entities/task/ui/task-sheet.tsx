@@ -87,6 +87,11 @@ type TaskSheetProps = {
   children: ReactNode;
   /** Кнопки внизу карточки: всегда видны. */
   footer?: ReactNode;
+  /**
+   * Кнопки в конце прокрутки, а не прибиты под ней: мало содержимого —
+   * стоят внизу карточки, много — доезжают до низа вместе с текстом.
+   */
+  footerInBody?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -109,6 +114,7 @@ export function TaskSheet({
   amount,
   children,
   footer,
+  footerInBody = false,
   style,
 }: TaskSheetProps) {
   const dark = tone === 'review';
@@ -174,25 +180,35 @@ export function TaskSheet({
           }}
           scrollEventThrottle={16}
           style={keepInViewScrollStyle}
-          contentContainerStyle={styles.body}
+          contentContainerStyle={[
+            styles.body,
+            footerInBody && footer ? styles.bodyWithFooter : null,
+          ]}
           showsVerticalScrollIndicator={false}
         >
           <KeepInViewContext.Provider value={keepInView}>
             {children}
+            {footerInBody && footer && (
+              <View style={styles.bodyFooter}>{footer}</View>
+            )}
           </KeepInViewContext.Provider>
         </ScrollView>
-        {scrolled && (
+        {/* Белое растворение — только на гладкой белой карточке: на бумаге
+            оно ложится молочной полупрозрачной полосой поверх фактуры. */}
+        {!paper && scrolled && (
           <LinearGradient
             colors={[theme.colors.white, withAlpha(theme.colors.white, 0)]}
             style={[styles.fade, styles.fadeTop]}
           />
         )}
-        <LinearGradient
-          colors={[withAlpha(theme.colors.white, 0), theme.colors.white]}
-          style={styles.fade}
-        />
+        {!paper && (
+          <LinearGradient
+            colors={[withAlpha(theme.colors.white, 0), theme.colors.white]}
+            style={styles.fade}
+          />
+        )}
       </View>
-      {footer && <View style={styles.footer}>{footer}</View>}
+      {!footerInBody && footer && <View style={styles.footer}>{footer}</View>}
     </View>
   );
 }

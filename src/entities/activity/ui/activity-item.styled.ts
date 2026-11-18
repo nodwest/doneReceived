@@ -17,6 +17,12 @@ export const styles = StyleSheet.create({
   approved: {
     borderColor: theme.colors.approvedBorder,
   },
+  sentBack: {
+    borderColor: theme.colors.sentBackBorder,
+  },
+  missed: {
+    borderColor: theme.colors.missedBorder,
+  },
   new: {
     overflow: 'hidden',
     borderColor: theme.colors.childTintBorder,
@@ -52,6 +58,12 @@ export const styles = StyleSheet.create({
   subtitleNew: {
     color: theme.colors.childDeep,
   },
+  subtitleSentBack: {
+    color: theme.colors.sentBack,
+  },
+  subtitleMissed: {
+    color: theme.colors.missedDeep,
+  },
   reward: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
@@ -63,5 +75,12 @@ export const styles = StyleSheet.create({
   },
   rewardNew: {
     color: theme.colors.childDeep,
+  },
+  rewardSentBack: {
+    color: theme.colors.sentBack,
+  },
+  // Упущенная сумма — серая, как в истории наград.
+  rewardMissed: {
+    color: theme.colors.missed,
   },
 });
