@@ -634,6 +634,7 @@ export const ru: Dictionary = {
     expiredChild: 'Время вышло · {{amount}} упущено',
     closedParent: 'Задание закрыто · {{amount}} вернулись к вам',
     closedChild: 'Задание закрыто · {{amount}} упущено',
+    closedBy: '{{name}} закрыл(а) задание',
     backToWallet: 'Снова в вашем кошельке · {{date}}',
     wentBackTo: 'Вернулись к {{name}} · {{date}}',
   },

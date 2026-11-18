@@ -27,6 +27,7 @@ import {
   TimerPill,
 } from './task-sheet';
 import { TaskChecklist } from './task-checklist';
+import { RejectionNote } from './rejection-note';
 import { TaskNote, TaskNoteField } from './task-note';
 import { styles as sheetStyles } from './task-sheet.styled';
 import { styles } from './child-task-card.styled';
@@ -106,32 +107,13 @@ export function ChildTaskCard({
       style={style}
     >
       {!review && task.rejection && (
-        // Вернули на переделку: кто вернул, причина чипом (у Other её нет —
-        // она ничего не говорит) и комментарий родителя словами.
-        <View style={styles.rejection}>
-          <View style={styles.rejectionIcon}>
-            <Icon name="undo" size={16} color={theme.colors.sentBackIcon} />
-          </View>
-          <View style={styles.rejectionText}>
-            <Text style={styles.rejectionTitle}>
-              {t('taskCard.sentBack', {
-                name: rejectedBy?.name ?? author.name,
-              })}
-            </Text>
-            {task.rejection.reason !== 'other' && (
-              <View style={styles.rejectionChip}>
-                <Text style={styles.rejectionChipText}>
-                  {t(`reviewTask.reasons.${task.rejection.reason}`)}
-                </Text>
-              </View>
-            )}
-            {!!task.rejection.comment && (
-              <Text style={styles.rejectionComment}>
-                {t('taskCard.quote', { text: task.rejection.comment })}
-              </Text>
-            )}
-          </View>
-        </View>
+        <RejectionNote
+          icon="undo"
+          title={t('taskCard.sentBack', {
+            name: rejectedBy?.name ?? author.name,
+          })}
+          rejection={task.rejection}
+        />
       )}
       <TaskBrief
         label={t('taskCard.whatToDo')}

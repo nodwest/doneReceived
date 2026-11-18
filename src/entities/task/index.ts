@@ -22,3 +22,4 @@ export * from './ui/task-checklist';
 export * from './ui/task-note';
 export * from './ui/task-tile-parts';
 export * from './ui/assignee-avatar';
+export * from './ui/rejection-note';

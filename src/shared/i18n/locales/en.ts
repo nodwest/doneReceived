@@ -617,6 +617,7 @@ export const en = {
     expiredChild: 'Time ran out · {{amount}} missed',
     closedParent: 'Task closed · {{amount}} back to you',
     closedChild: 'Task closed · {{amount}} missed',
+    closedBy: '{{name}} closed the task',
     backToWallet: 'Back in your wallet · {{date}}',
     wentBackTo: 'Went back to {{name}} · {{date}}',
   },

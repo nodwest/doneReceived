@@ -42,9 +42,23 @@ export interface Operation {
   dueAt?: string | null;
   /**
    * Почему упущена: срок прошёл (expired) или родитель закрыл задание отказом
-   * (rejected, Идеи.md п. 33 — пока сервер не отдаёт, всегда expired).
+   * (rejected).
    */
   missedReason?: MissedReason;
+  /**
+   * Упущенная: последний отказ родителя — у rejected закрывающий, у expired
+   * предыдущий, если был; null — отказов не было.
+   */
+  rejection?: OperationRejection | null;
+}
+
+/** Отказ родителя по упущенному заданию. */
+export interface OperationRejection {
+  reason: 'not-done-properly' | 'not-finished' | 'other';
+  /** Комментарий родителя; пустая строка — без комментария. */
+  comment: string;
+  /** userId родителя, который отказал. */
+  by: string;
 }
 
 export type MissedReason = 'expired' | 'rejected';
