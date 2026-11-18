@@ -181,16 +181,20 @@ export function TaskSheet({
             {children}
           </KeepInViewContext.Provider>
         </ScrollView>
-        {scrolled && (
+        {/* Белое растворение — только на гладкой белой карточке: на бумаге
+            оно ложится молочной полупрозрачной полосой поверх фактуры. */}
+        {!paper && scrolled && (
           <LinearGradient
             colors={[theme.colors.white, withAlpha(theme.colors.white, 0)]}
             style={[styles.fade, styles.fadeTop]}
           />
         )}
-        <LinearGradient
-          colors={[withAlpha(theme.colors.white, 0), theme.colors.white]}
-          style={styles.fade}
-        />
+        {!paper && (
+          <LinearGradient
+            colors={[withAlpha(theme.colors.white, 0), theme.colors.white]}
+            style={styles.fade}
+          />
+        )}
       </View>
       {footer && <View style={styles.footer}>{footer}</View>}
     </View>
