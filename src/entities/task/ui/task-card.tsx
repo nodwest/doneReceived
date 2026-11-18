@@ -68,6 +68,7 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
         aside={<ReviewPill label={t('tasks.onReview')} />}
         title={task.title}
         footer={footer}
+        footerInBody
         style={style}
       >
         <TaskBrief
@@ -102,6 +103,7 @@ export function TaskCard({ task, footer, style }: TaskCardProps) {
       aside={expires && <TimerPill ms={expires.getTime() - now.getTime()} />}
       title={task.title}
       footer={footer}
+      footerInBody
       style={style}
     >
       <TaskBrief

@@ -141,6 +141,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 24,
   },
+  // Кнопки в теле: тело не ниже карточки, кнопки прижаты к его низу.
+  bodyWithFooter: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  bodyFooter: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 'auto',
+  },
   // Текст уходит под кнопки не обрываясь, а растворяясь.
   fade: {
     position: 'absolute',
