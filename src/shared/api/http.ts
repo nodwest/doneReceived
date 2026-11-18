@@ -79,9 +79,12 @@ export function setAccessTokenGetter(
  * запрос идёт с Bearer-токеном (без него сервер ответит 401). Адрес с
  * токеном не логируем.
  */
-export function authorizedImage(url: string) {
+export function authorizedImage(url: string): {
+  uri: string;
+  headers: Record<string, string> | undefined;
+} {
   const token = getAccessToken();
-  const absolute = /^https?:\/\//i.test(url) ? url : `${API_URL}${url}`;
+  const absolute = /^https?:\/\//i.test(url) ? url : apiUrlFor(url);
   let trustedApiUrl = !/^https?:\/\//i.test(url);
   if (!trustedApiUrl) {
     try {
@@ -90,11 +93,33 @@ export function authorizedImage(url: string) {
       trustedApiUrl = false;
     }
   }
+  // Заголовки есть у любой картинки нашего API, даже если токена ещё нет:
+  // ApiImage подставит текущий токен при загрузке.
   return {
     uri: absolute,
-    headers:
-      token && trustedApiUrl ? { Authorization: `Bearer ${token}` } : undefined,
+    headers: trustedApiUrl
+      ? token
+        ? { Authorization: `Bearer ${token}` }
+        : {}
+      : undefined,
   };
+}
+
+/**
+ * Относительный адрес API → полный. Адрес уже с базовым путём API
+ * (`/doneReceived/users/avatars/…`) не получает его второй раз.
+ */
+function apiUrlFor(path: string) {
+  try {
+    const base = new URL(API_URL);
+    const prefix = base.pathname.replace(/\/$/, '');
+    if (prefix && (path === prefix || path.startsWith(`${prefix}/`))) {
+      return `${base.origin}${path}`;
+    }
+  } catch {
+    // API_URL без схемы — просто склеиваем.
+  }
+  return `${API_URL}${path}`;
 }
 
 // Обновление токенов подставляет сессия: true — новая пара сохранена.
