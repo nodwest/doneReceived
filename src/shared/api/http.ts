@@ -84,7 +84,9 @@ export function authorizedImage(url: string): {
   headers: Record<string, string> | undefined;
 } {
   const token = getAccessToken();
-  const absolute = /^https?:\/\//i.test(url) ? url : apiUrlFor(url);
+  const absolute = /^https?:\/\//i.test(url)
+    ? (fromParentDomain(url) ?? url)
+    : apiUrlFor(url);
   let trustedApiUrl = !/^https?:\/\//i.test(url);
   if (!trustedApiUrl) {
     try {
@@ -103,6 +105,25 @@ export function authorizedImage(url: string): {
         : {}
       : undefined,
   };
+}
+
+/**
+ * Сервер отдаёт `avatarUrl` с хостом сайта, а не API
+ * (`https://divmaster.space/users/avatars/…` вместо
+ * `https://api.divmaster.space/doneReceived/users/avatars/…`): туда без
+ * токена — 401, а токен на чужой хост мы не шлём. Адрес на родительском
+ * домене API переводим на сам API; остальные не трогаем.
+ */
+function fromParentDomain(url: string) {
+  try {
+    const target = new URL(url);
+    const api = new URL(API_URL);
+    if (target.origin === api.origin) return null;
+    if (!api.hostname.endsWith(`.${target.hostname}`)) return null;
+    return apiUrlFor(`${target.pathname}${target.search}`);
+  } catch {
+    return null;
+  }
 }
 
 /**
