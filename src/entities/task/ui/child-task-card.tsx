@@ -104,6 +104,7 @@ export function ChildTaskCard({
       }
       title={task.title}
       footer={footer}
+      footerInBody
       style={style}
     >
       {!review && task.rejection && (
