@@ -1,6 +1,6 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 import type { ImageSourcePropType } from 'react-native';
-import { apiRequest, queryRoots } from '@shared/api';
+import { apiRequest, authorizedImage, queryRoots } from '@shared/api';
 import type { SessionUser } from '../model/session';
 import { useSessionStore } from '../model/session-store';
 
@@ -42,15 +42,12 @@ export function useSessionFamilyId() {
 }
 
 /**
- * Аватар вошедшего для `<Image>`: сервер отдаёт его только с токеном. null —
+ * Аватар вошедшего для `<Image>`: сервер отдаёт его только с токеном. Адрес с
+ * хостом сайта переводим на API (`authorizedImage`), иначе получим 401. null —
  * фото нет (рисуем букву).
  */
 export function useMyAvatar(): ImageSourcePropType | null {
   const me = useMe();
-  const token = useSessionStore((state) => state.session?.accessToken);
   if (!me?.avatarUrl) return null;
-  return {
-    uri: me.avatarUrl,
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  };
+  return authorizedImage(me.avatarUrl);
 }

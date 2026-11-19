@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  ApiImage,
   Icon,
   PaperTexture,
   PhotoCarousel,
@@ -25,6 +24,7 @@ import {
 } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { formatRewardShort } from '../model';
+import { AssigneeAvatar } from './assignee-avatar';
 import { styles } from './task-sheet.styled';
 
 /**
@@ -142,7 +142,11 @@ export function TaskSheet({
               <Icon name={icon} size={20} color={theme.colors.white} />
             </View>
           ) : (
-            avatar && <ApiImage source={avatar} style={styles.avatar} />
+            <AssigneeAvatar
+              source={avatar ?? null}
+              name={name}
+              style={styles.avatar}
+            />
           )}
           <View style={styles.who}>
             <Text

@@ -81,7 +81,7 @@ export function CalendarPage() {
   const rows = upcoming.slice(2);
 
   return (
-    <TabScreen activeKey="calendar" activeColor={theme.colors.blue}>
+    <TabScreen activeKey="calendar">
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.body}

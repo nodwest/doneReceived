@@ -57,6 +57,22 @@ const APP_SCREENS = [
   'wishlist/[id]',
 ];
 
+// Нижние вкладки: переключаются кнопками навбара. Свайпа у них нет — экран и навбар
+// одинаковые, поэтому плавное растворение выглядит как смена одного содержимого:
+// кнопки остаются на месте. Вложенные экраны (профили, вишлисты) открываются как
+// раньше — сдвигом.
+const TAB_SCREENS = new Set([
+  'index',
+  'tasks',
+  'family',
+  'calendar',
+  'wallet',
+  'map',
+  'profile',
+]);
+
+const TAB_OPTIONS = { animation: 'fade' } as const;
+
 const restoreSession = async () => {
   await useSessionStore.getState().restore();
   // Вошедший раньше смотрит приложение от своего лица: родитель или ребёнок.
@@ -131,7 +147,11 @@ function Screens({ signedIn, kind }: ScreensProps) {
         </Stack.Protected>
         <Stack.Protected guard={entered && !needsFamily}>
           {APP_SCREENS.map((name) => (
-            <Stack.Screen key={name} name={name} />
+            <Stack.Screen
+              key={name}
+              name={name}
+              options={TAB_SCREENS.has(name) ? TAB_OPTIONS : undefined}
+            />
           ))}
           <Stack.Screen
             name="create-task"

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   Camera,
   GeoJSONSource,
@@ -25,6 +25,7 @@ import { authorizedImage } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
 import { theme, tracking } from '@shared/theme';
+import { ApiImage } from '@shared/ui';
 import { MAP_STYLE } from './config/map-style';
 import {
   defaultMapColor,
@@ -314,7 +315,7 @@ export function MapWeb({
                 style={[styles.pin, { backgroundColor: marker.color }]}
               >
                 {marker.avatarUrl ? (
-                  <Image
+                  <ApiImage
                     source={authorizedImage(marker.avatarUrl)}
                     style={styles.avatar}
                   />

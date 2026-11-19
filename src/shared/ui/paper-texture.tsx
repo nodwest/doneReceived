@@ -71,12 +71,16 @@ const styles = StyleSheet.create({
     width: 360,
     height: 640,
   },
+  // Края — с четырёх сторон, а не width/height: '100%'. Проценты Yoga считает
+  // от содержимого карточки (без padding), а top/left — от её края: картинка
+  // выходила меньше карточки и оставляла полосы справа и снизу. С четырьмя
+  // краями она растягивается ровно на всю карточку.
   texture: {
     position: 'absolute',
     top: 0,
+    right: 0,
+    bottom: 0,
     left: 0,
-    width: '100%',
-    height: '100%',
     pointerEvents: 'none',
   },
 });

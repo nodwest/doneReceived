@@ -1,13 +1,8 @@
-import {
-  Image,
-  Pressable,
-  Text,
-  View,
-  type ImageSourcePropType,
-} from 'react-native';
+import { Pressable, Text, View, type ImageSourcePropType } from 'react-native';
 import type { GeoPoint, Presence } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
 import { useTimeAgo } from '@shared/lib';
+import { ApiImage } from '@shared/ui';
 import { MiniMap } from './mini-map';
 import { styles } from './map-preview.styled';
 
@@ -42,7 +37,7 @@ export function MapPreview({
         <MiniMap center={position} />
       </View>
       <View style={styles.pin}>
-        <Image source={avatar} style={styles.pinPhoto} />
+        <ApiImage source={avatar} style={styles.pinPhoto} />
       </View>
       <View style={styles.place}>
         <Text style={styles.placeName}>

@@ -7,10 +7,13 @@ import { theme } from '@shared/theme';
 import { NAV_ITEMS } from '../config/nav-items';
 import { NAV_PADDING_VERTICAL, styles } from './bottom-nav.styled';
 
+/** Цвет активной вкладки — синий в стиле приложения (как вкладка Calendar). */
+const ACTIVE_COLOR = theme.colors.blue;
+
 type BottomNavProps = {
   activeKey: string;
   onNavigate?: (key: string) => void;
-  /** Цвет активной вкладки; по умолчанию фиолетовый. */
+  /** Цвет активной вкладки; по умолчанию синий приложения. */
   activeColor?: string;
 };
 
@@ -23,6 +26,7 @@ export function BottomNav({
   const router = useRouter();
   const pathname = usePathname();
   const { bottom } = useSafeAreaInsets();
+  const activeTint = activeColor ?? ACTIVE_COLOR;
 
   return (
     <View
@@ -33,10 +37,13 @@ export function BottomNav({
     >
       {NAV_ITEMS.map(({ key, icon, href }) => {
         const active = key === activeKey;
+        const color = active ? activeTint : theme.colors.grey;
         return (
           <Pressable
             key={key}
-            style={styles.item}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            style={({ pressed }) => [styles.item, pressed && styles.pressed]}
             onPress={() => {
               if (onNavigate) return onNavigate(key);
               // Вкладка уже в истории (Family → Tasks → Family) — откатываемся
@@ -46,21 +53,9 @@ export function BottomNav({
               if (pathname !== href) router.dismissTo(href);
             }}
           >
-            <Icon
-              name={icon}
-              size={24}
-              color={
-                active
-                  ? (activeColor ?? theme.colors.violet)
-                  : theme.colors.grey
-              }
-            />
+            <Icon name={icon} size={24} color={color} />
             <Text
-              style={[
-                styles.label,
-                active && styles.labelActive,
-                active && activeColor ? { color: activeColor } : null,
-              ]}
+              style={[styles.label, active && styles.labelActive, { color }]}
             >
               {t(`nav.${key}`)}
             </Text>
