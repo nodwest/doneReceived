@@ -1,6 +1,7 @@
 import { EVENTS_WS_URL } from '../config';
 import type { DataChange } from './data-sync';
 import { currentAccessToken, refreshAccessToken } from './http';
+import { openPrivateWebSocket } from './private-websocket';
 
 // События сервера «что изменилось» (Идеи.md п. 31): сокет /events, вход
 // access-токеном, затем `change` с `data.type`. Данные в событии не берём —
@@ -128,7 +129,7 @@ export function connectServerEvents({
     if (stopped) return;
     const token = currentAccessToken();
     if (!token) return;
-    const ws = new WebSocket(EVENTS_WS_URL);
+    const ws = openPrivateWebSocket(EVENTS_WS_URL);
     socket = ws;
 
     ws.onopen = () => {

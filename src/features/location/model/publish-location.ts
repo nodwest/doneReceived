@@ -1,5 +1,10 @@
 import { API_URL } from '@shared/config';
-import { ApiError, refreshAccessToken } from '@shared/api';
+import {
+  ApiError,
+  hasApiErrorCode,
+  parseRetryAfter,
+  refreshAccessToken,
+} from '@shared/api';
 import { useSessionStore } from '@entities/session';
 
 /**
@@ -51,6 +56,8 @@ function errorFrom(status: number, text: string) {
 }
 
 let activeRequest: AbortController | null = null;
+const DEFAULT_RATE_LIMIT_PAUSE_MS = 30_000;
+let rateLimitedUntil = 0;
 
 /** Отменяет незавершённую отправку при выходе, смене аккаунта или семьи. */
 export function cancelActiveLocationPublish() {
@@ -85,8 +92,23 @@ async function send(
       signal,
     },
   );
+  if (__DEV__) console.info('[location:upload] POST →', response.status);
   if (!response.ok) {
-    throw errorFrom(response.status, await response.text());
+    if (response.status === 429) {
+      const retryAfter = parseRetryAfter(response.headers.get('Retry-After'));
+      const pauseMs =
+        retryAfter === null ? DEFAULT_RATE_LIMIT_PAUSE_MS : retryAfter * 1_000;
+      rateLimitedUntil = Math.max(rateLimitedUntil, Date.now() + pauseMs);
+    }
+    const error = errorFrom(response.status, await response.text());
+    if (__DEV__ && response.status === 409) {
+      if (hasApiErrorCode(error, 'DEVICE_NOT_TRACKED')) {
+        console.info('[location:upload] DEVICE_NOT_TRACKED');
+      } else if (hasApiErrorCode(error, 'STALE_LOCATION')) {
+        console.info('[location:upload] STALE_LOCATION');
+      }
+    }
+    throw error;
   }
 }
 
@@ -102,6 +124,7 @@ export async function publishChildLocation(
   if (!sessionMatches(binding) || !current) {
     throw new ApiError(401, ['SESSION_CHANGED']);
   }
+  if (Date.now() < rateLimitedUntil) return;
 
   cancelActiveLocationPublish();
   const controller = new AbortController();
@@ -119,6 +142,10 @@ export async function publishChildLocation(
     const next = useSessionStore.getState().session;
     if (!refreshed || !next || !sessionMatches(binding)) {
       throw new ApiError(401, ['SESSION_CHANGED']);
+    }
+    if (next.accessToken === current.accessToken) {
+      if (__DEV__) console.info('[location:upload] access token unchanged');
+      throw new ApiError(401, ['ACCESS_TOKEN_UNCHANGED']);
     }
     await send(binding, point, next.accessToken, controller.signal);
   } finally {

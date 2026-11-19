@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   MapAttribution,
   MapLayersPanel,
   MapWeb,
+  type HistoryMapProps,
   useMapLayerStore,
 } from '@widgets/map';
 import { TabScreen } from '@widgets/bottom-nav';
@@ -12,10 +13,38 @@ import { LocationSharingCard } from '@features/location';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
+import { useSessionFamilyId, useSessionStore } from '@entities/session';
+import { MapHistory } from './map-history';
 
 export function MapPage() {
   const { t } = useTranslation();
   const [layersOpen, setLayersOpen] = useState(false);
+  const familyId = useSessionFamilyId();
+  const parent = useSessionStore(
+    (state) => state.session?.user.kind === 'parent',
+  );
+  const sessionKey = useSessionStore((state) =>
+    state.session
+      ? `${state.session.user.id}:${state.session.storageEpoch ?? 0}`
+      : '',
+  );
+  const historyKey = `${sessionKey}:${familyId}`;
+  const [history, setHistory] = useState<{
+    key: string;
+    route: HistoryMapProps;
+  } | null>(null);
+  const onHistoryRoute = useCallback(
+    (route: HistoryMapProps | null) => {
+      setHistory((current) =>
+        route
+          ? { key: historyKey, route }
+          : current?.key === historyKey
+            ? null
+            : current,
+      );
+    },
+    [historyKey],
+  );
   const family = useMapLayerStore((state) => state.family);
   const transport = useMapLayerStore((state) => state.transport);
   const areas = useMapLayerStore((state) => state.areas);
@@ -28,6 +57,11 @@ export function MapPage() {
     <TabScreen activeKey="map" wide>
       <View style={styles.map}>
         <MapWeb
+          history={
+            parent && !layersOpen && history?.key === historyKey
+              ? history.route
+              : undefined
+          }
           family={family}
           transport={transport}
           areas={areas}
@@ -37,24 +71,33 @@ export function MapPage() {
           pinnedRoutes={pinnedRoutes}
         />
         <MapAttribution />
-        <LocationSharingCard />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('mapLayers.open')}
-          accessibilityState={{ expanded: layersOpen }}
-          onPress={() => setLayersOpen((open) => !open)}
-          style={({ pressed }) => [
-            styles.openButton,
-            layersOpen && styles.openButtonActive,
-            pressed && styles.pressed,
-          ]}
-        >
-          <Icon
-            name="layers"
-            size={22}
-            color={layersOpen ? theme.colors.mapAccent : theme.colors.ink}
+        <View style={styles.mapControls} pointerEvents="box-none">
+          {!layersOpen && <LocationSharingCard />}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('mapLayers.open')}
+            accessibilityState={{ expanded: layersOpen }}
+            onPress={() => setLayersOpen((open) => !open)}
+            style={({ pressed }) => [
+              styles.openButton,
+              layersOpen && styles.openButtonActive,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Icon
+              name="layers"
+              size={22}
+              color={layersOpen ? theme.colors.mapAccent : theme.colors.ink}
+            />
+          </Pressable>
+        </View>
+        {parent && familyId && !layersOpen && (
+          <MapHistory
+            key={historyKey}
+            familyId={familyId}
+            onRoute={onHistoryRoute}
           />
-        </Pressable>
+        )}
         {layersOpen && (
           <Pressable
             accessibilityRole="button"
@@ -84,13 +127,17 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 0,
   },
-  openButton: {
+  mapControls: {
     position: 'absolute',
     top: 12,
     left: 16,
     // MapLibre вешает контролы (включая слой машин из deck.gl) на z-index 2 —
     // кнопка и шторка должны быть выше них.
     zIndex: 3,
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  openButton: {
     width: 44,
     height: 44,
     alignItems: 'center',

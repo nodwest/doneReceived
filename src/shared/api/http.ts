@@ -254,7 +254,7 @@ export async function apiRequest<T>(
 }
 
 /** `Retry-After`: секунды или дата HTTP; в секундах, иначе null. */
-function parseRetryAfter(value: string | null): number | null {
+export function parseRetryAfter(value: string | null): number | null {
   if (!value) return null;
   const seconds = Number(value);
   if (Number.isFinite(seconds)) return Math.max(seconds, 0);

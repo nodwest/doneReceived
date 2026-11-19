@@ -2,15 +2,31 @@ import { StyleSheet } from 'react-native';
 import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
+  indicator: {
+    zIndex: 1,
+  },
+  trigger: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 22,
+    backgroundColor: theme.colors.white,
+    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
+  },
+  pulse: {
+    position: 'absolute',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: theme.colors.mapAccent,
+  },
   card: {
     position: 'absolute',
-    right: 16,
-    bottom: 56,
-    left: 16,
-    zIndex: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    top: 0,
+    left: 52,
+    width: 216,
+    gap: 2,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 16,
@@ -25,10 +41,6 @@ export const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: theme.colors.childTint,
   },
-  copy: {
-    flex: 1,
-    gap: 1,
-  },
   title: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
@@ -40,15 +52,6 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: theme.colors.success,
-  },
-  dotError: {
-    backgroundColor: theme.colors.reviewAccent,
   },
   sheet: {
     paddingHorizontal: 20,

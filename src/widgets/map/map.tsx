@@ -31,6 +31,8 @@ import {
   type MapLayerSettings,
 } from './model/layer-preferences';
 import { zonesToGeoJson } from './layers/dynamic/zones';
+import { HistoryMapLayer } from './ui/history-map';
+import type { HistoryMapProps } from './ui/history-map-model';
 
 type FamilyMarker = {
   userId: string;
@@ -68,7 +70,8 @@ export function MapWeb({
   hiddenRoutes,
   hiddenZones,
   pinnedRoutes,
-}: MapLayerSettings) {
+  history,
+}: MapLayerSettings & { history?: HistoryMapProps }) {
   const { t } = useTranslation();
   const now = useNow(60_000);
   const cameraRef = useRef<CameraRef>(null);
@@ -327,6 +330,7 @@ export function MapWeb({
             </View>
           </Marker>
         ))}
+        {history && <HistoryMapLayer {...history} camera={cameraRef} />}
       </MapView>
 
       <View style={styles.zoomControls} pointerEvents="box-none">

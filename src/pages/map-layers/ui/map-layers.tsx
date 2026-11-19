@@ -23,6 +23,8 @@ import { busRouteKey, useBusesSocket } from '@features/buses';
 import {
   presenceKeys,
   useLocationPresence,
+  useMemberMapSettings,
+  useUpdateMemberMapSettings,
   type LocationPresence,
 } from '@features/location';
 import { TabScreen } from '@widgets/bottom-nav';
@@ -463,6 +465,61 @@ function MemberPresenceText({
 }
 
 /** Список строк раздела: максимум пять, остальное — скроллом. */
+function TrackedDevicePicker({
+  familyId,
+  userId,
+}: {
+  familyId: string;
+  userId: string;
+}) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const settings = useMemberMapSettings(familyId, userId, expanded);
+  const update = useUpdateMemberMapSettings();
+
+  return (
+    <View style={{ paddingHorizontal: 12, paddingBottom: 8, gap: 6 }}>
+      <PillButton
+        label={t('mapLayers.trackedDevice')}
+        variant="ghost"
+        onPress={() => setExpanded(!expanded)}
+      />
+      {expanded && settings.isError && (
+        <PillButton
+          label={t('mapLayers.deviceLoadRetry')}
+          variant="outline"
+          onPress={() => void settings.refetch()}
+        />
+      )}
+      {expanded && settings.data?.devices.length === 0 && (
+        <EmptyRow text={t('mapLayers.noTrackedDevices')} />
+      )}
+      {expanded &&
+        settings.data?.devices.map((device) => {
+          const selected = device.id === settings.data?.trackedDeviceId;
+          return (
+            <PillButton
+              key={device.id}
+              label={
+                selected
+                  ? t('mapLayers.selectedDevice', { device: device.label })
+                  : device.label
+              }
+              variant={selected ? 'primary' : 'outline'}
+              disabled={selected || update.isPending}
+              onPress={() =>
+                update.mutate(
+                  { familyId, userId, changes: { trackedDeviceId: device.id } },
+                  { onError: () => showToast(t('mapLayers.deviceSaveError')) },
+                )
+              }
+            />
+          );
+        })}
+    </View>
+  );
+}
+
 function SectionList({ children }: { children: ReactNode }) {
   return (
     <ScrollView
@@ -760,6 +817,12 @@ export function MapLayersPage() {
                         )
                       }
                     />
+                    {parent && familyId && member.kind === 'child' && (
+                      <TrackedDevicePicker
+                        familyId={familyId}
+                        userId={member.userId}
+                      />
+                    )}
                   </View>
                 );
               })}

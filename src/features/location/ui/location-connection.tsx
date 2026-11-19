@@ -65,8 +65,9 @@ export function LocationConnection() {
     if (currentFamilyId) {
       // Старые REST-точки могли быть получены до смены приватности: убираем
       // их, чтобы карта не показала скрытого человека до нового ответа.
-      queryClient.removeQueries({
+      void queryClient.resetQueries({
         queryKey: familyLocationsKeys.list(currentFamilyId),
+        exact: true,
       });
     }
   }, [queryClient, reset]);

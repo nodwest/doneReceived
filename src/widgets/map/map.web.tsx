@@ -27,6 +27,8 @@ import {
 } from './model/layer-preferences';
 import { useUserAvatarUrls } from './model/use-user-avatar-urls';
 import { UserMarker } from './ui/user-marker.web';
+import { HistoryMapLayer } from './ui/history-map.web';
+import type { HistoryMapProps } from './ui/history-map-model';
 
 type MarkerLocation = LiveLocation;
 
@@ -91,7 +93,8 @@ export function MapWeb({
   hiddenRoutes,
   hiddenZones,
   pinnedRoutes,
-}: MapLayerSettings) {
+  history,
+}: MapLayerSettings & { history?: HistoryMapProps }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { mapRef, deckOverlayRef, map } = useMap(containerRef);
@@ -369,6 +372,7 @@ export function MapWeb({
         height: '100%',
       }}
     >
+      {map && history && <HistoryMapLayer {...history} map={map} />}
       {map && family
         ? markers.map((location) => {
             const member = peopleById.get(location.userId)!;

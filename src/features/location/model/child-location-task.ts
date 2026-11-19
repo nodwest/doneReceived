@@ -27,8 +27,7 @@ const wait = (ms: number) =>
 function isTerminal(error: unknown) {
   return (
     error instanceof ApiError &&
-    (error.status === 401 ||
-      error.status === 403 ||
+    (error.status === 403 ||
       hasApiErrorCode(error, 'DEVICE_NOT_TRACKED') ||
       hasApiErrorCode(error, 'FORBIDDEN_ROLE'))
   );
@@ -37,7 +36,9 @@ function isTerminal(error: unknown) {
 function isIgnored(error: unknown) {
   return (
     error instanceof ApiError &&
-    (hasApiErrorCode(error, 'STALE_LOCATION') ||
+    (error.status === 401 ||
+      error.status === 429 ||
+      hasApiErrorCode(error, 'STALE_LOCATION') ||
       hasApiErrorCode(error, 'SESSION_CHANGED'))
   );
 }
@@ -52,6 +53,7 @@ if (!TaskManager.isTaskDefined(CHILD_LOCATION_TASK)) {
 
     // Headless-запуск не монтирует UI: поднимаем сессию из SecureStore.
     await useSessionStore.getState().restore();
+    if (!(await useSessionStore.getState().syncStoredSession())) return;
     const session = useSessionStore.getState().session;
     if (!session || session.user.kind !== 'child') return;
 
@@ -102,7 +104,7 @@ if (!TaskManager.isTaskDefined(CHILD_LOCATION_TASK)) {
       } catch (publishError) {
         if (isIgnored(publishError)) return;
         if (isTerminal(publishError)) {
-          // Устройство отвязано, сессия отозвана или роль сменилась:
+          // Устройство отвязано или роль сменилась:
           // прекращаем фон и не просим разрешения заново молча.
           setLocationSharingEnabled(userId, familyId, false);
           await stopChildLocationTask();

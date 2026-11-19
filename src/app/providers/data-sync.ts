@@ -55,10 +55,42 @@ export function useServerEvents(queryClient: QueryClient) {
   const userId = useSessionStore((state) => state.session?.user.id ?? null);
   useEffect(() => {
     if (!userId) return;
-    return connectServerEvents({
-      onChange: (change) => void syncData(queryClient, change),
-      onReconnect: () =>
-        void queryClient.invalidateQueries({ predicate: syncable }),
-    });
+    let disconnect: (() => void) | undefined;
+    let openedBefore = false;
+    const refresh = () =>
+      void queryClient.invalidateQueries({ predicate: syncable });
+    const updateConnection = (active: boolean) => {
+      if (!active) {
+        disconnect?.();
+        disconnect = undefined;
+        return;
+      }
+      if (disconnect) return;
+      disconnect = connectServerEvents({
+        onChange: (change) => void syncData(queryClient, change),
+        onReconnect: refresh,
+      });
+      if (openedBefore) refresh();
+      openedBefore = true;
+    };
+
+    if (Platform.OS === 'web') {
+      const onVisibilityChange = () =>
+        updateConnection(document.visibilityState === 'visible');
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      onVisibilityChange();
+      return () => {
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        disconnect?.();
+      };
+    }
+    const subscription = AppState.addEventListener('change', (state) =>
+      updateConnection(state === 'active'),
+    );
+    updateConnection(AppState.currentState === 'active');
+    return () => {
+      subscription.remove();
+      disconnect?.();
+    };
   }, [userId, queryClient]);
 }

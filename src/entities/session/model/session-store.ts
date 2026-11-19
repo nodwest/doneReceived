@@ -28,6 +28,8 @@ type SessionState = {
   session: Session | null;
   /** Поднять сохранённую сессию: один раз при запуске приложения. */
   restore: () => Promise<void>;
+  /** Сверить токены с сохранённой сессией перед фоновой отправкой. */
+  syncStoredSession: () => Promise<boolean>;
   /** Запомнить сессию после логина. */
   signIn: (session: Session) => Promise<void>;
   /** Забыть сессию: выход из аккаунта. */
@@ -77,6 +79,17 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     if (get().status !== 'restoring') return;
     set({ session, status: session ? 'signed-in' : 'signed-out' });
   },
+  syncStoredSession: () =>
+    withSessionLock(async () => {
+      const current = get().session;
+      if (!current || current.storageEpoch !== sessionEpoch()) return false;
+      if (pendingSave?.next === current) return true;
+      const saved = await readSessionForRefresh(current);
+      if (!saved || get().session !== current) return false;
+      if (saved.storageEpoch !== sessionEpoch()) return false;
+      if (saved !== current) set({ session: saved });
+      return true;
+    }),
   signIn: (session) =>
     withSessionLock(async () => {
       sessionScope = Symbol();

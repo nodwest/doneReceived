@@ -2,14 +2,17 @@ import { useEffect, useRef } from 'react';
 
 import { useFamilyChildren } from '@entities/family';
 import { useSessionKind, useSessionStore } from '@entities/session';
-import { currentAccessToken, refreshAccessToken } from '@shared/api';
+import {
+  currentAccessToken,
+  openPrivateWebSocket,
+  refreshAccessToken,
+} from '@shared/api';
 import { LOCATION_WS_URL } from '@shared/config';
 import type { Location } from '@entities/user';
 
 const RECONNECT_MS = [1_000, 2_000, 5_000, 10_000, 30_000];
 const CLOSE_TOKEN_EXPIRED = 4401;
-const CLOSE_SESSION_INVALID = 4403;
-/** Сервер закрывает так истёкший/непринятый токен или таймаут входа. */
+/** Старый сервер также использует этот код при истечении токена. */
 const CLOSE_POLICY_VIOLATION = 1008;
 
 type Message = { event?: unknown; data?: unknown };
@@ -71,8 +74,9 @@ export const useLocationSocket = (
       const token = currentAccessToken();
       if (!token) return;
 
-      const ws = new WebSocket(LOCATION_WS_URL);
+      const ws = openPrivateWebSocket(LOCATION_WS_URL);
       socket = ws;
+      let authenticated = false;
 
       ws.onopen = () => {
         ws.send(
@@ -89,6 +93,7 @@ export const useLocationSocket = (
 
         if (message.event === 'authenticated') {
           if (message.data !== true) return;
+          authenticated = true;
           attempt = 0;
           onAuthenticated?.();
           return;
@@ -107,7 +112,7 @@ export const useLocationSocket = (
 
         if (message.event !== 'location') return;
         const location = message.data as Location;
-        if (!location.userId || !location.childId) return;
+        if (!location?.userId || !location.childId) return;
         if (
           kind === 'child' &&
           location.userId !== myUserId &&
@@ -123,15 +128,22 @@ export const useLocationSocket = (
         onLocation(location);
       };
 
-      ws.onclose = async ({ code }) => {
+      ws.onclose = async ({ code, reason }) => {
         socket = null;
         if (stopped) return;
+        if (__DEV__) {
+          console.info(
+            '[location:ws] закрыт',
+            code,
+            authenticated ? 'после входа' : 'до входа',
+            reason,
+          );
+        }
         if (
           code === CLOSE_TOKEN_EXPIRED ||
-          code === CLOSE_SESSION_INVALID ||
-          code === CLOSE_POLICY_VIOLATION
+          (code === CLOSE_POLICY_VIOLATION && authenticated)
         ) {
-          await refreshAccessToken(token);
+          await refreshAccessToken(token).catch(() => null);
           if (stopped) return;
         }
         scheduleReconnect();

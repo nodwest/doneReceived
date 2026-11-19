@@ -19,7 +19,10 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.doneReceived",
-      "permissions": ["android.permission.POST_NOTIFICATIONS"]
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECEIVE_BOOT_COMPLETED"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -53,7 +56,8 @@
           "androidForegroundServiceIcon": "./assets/notification-icon.png"
         }
       ],
-      "@maplibre/maplibre-react-native"
+      "@maplibre/maplibre-react-native",
+      "./plugins/with-windows-cmake-paths"
     ]
   }
 }

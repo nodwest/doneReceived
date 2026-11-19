@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -7,6 +7,15 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
 import {
   useSessionFamilyId,
@@ -25,6 +34,7 @@ import {
   sharingErrorMessage,
 } from '../model/use-child-location-sharing';
 import { styles } from './location-sharing-card.styled';
+import { HistorySharingSetting } from './history-sharing-setting';
 
 /**
  * Плавающая карточка на карте ребёнка: явный выбор шаринга, состояние
@@ -38,14 +48,35 @@ export function LocationSharingCard() {
   const childId = useSessionStore((state) => state.session?.childId ?? null);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const web = Platform.OS === 'web';
   const now = useNow(60_000);
   const enabled = useLocationSharingStore((state) => state.enabled);
   const error = useLocationSharingStore((state) => state.error);
   const checking = useLocationSharingStore((state) => state.checking);
   const limited = useLocationSharingStore((state) => state.limited);
   const { data: locations = [] } = useFamilyLocations(familyId);
+  const active = !web && enabled && !error && kind === 'child' && !!familyId;
+  const reduceMotion = useReducedMotion();
+  const pulse = useSharedValue(0);
+  useEffect(() => {
+    if (!active || reduceMotion) return;
+    pulse.value = withRepeat(
+      withTiming(1, { duration: 1900, easing: Easing.out(Easing.quad) }),
+      -1,
+    );
+    return () => {
+      cancelAnimation(pulse);
+      pulse.value = 0;
+    };
+  }, [active, pulse, reduceMotion]);
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: 0.25 * (1 - pulse.value),
+    transform: [{ scale: 1 + 0.38 * pulse.value }],
+  }));
 
-  if (Platform.OS === 'web' || kind !== 'child' || !familyId || !userId) {
+  if (kind !== 'child' || !familyId || !userId) {
     return null;
   }
 
@@ -57,6 +88,18 @@ export function LocationSharingCard() {
   const lastPoint = own?.recordedAt ?? own?.updatedAt;
   const ago = lastPoint ? formatTimeAgo(new Date(lastPoint), now) : null;
   const message = sharingErrorMessage(error);
+  const title = web
+    ? t('locationSharing.lastPointLabel')
+    : t(enabled ? 'locationSharing.on' : 'locationSharing.off');
+  const updated = ago
+    ? t('locationSharing.lastPoint', { ago })
+    : t('locationSharing.waiting');
+  const subtitle = web
+    ? updated
+    : enabled
+      ? (message ?? updated)
+      : t('locationSharing.offHint');
+  const preview = hovered || focused || (web && open);
 
   const turnOn = async () => {
     setBusy(true);
@@ -78,39 +121,47 @@ export function LocationSharingCard() {
 
   return (
     <>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t(
-          enabled ? 'locationSharing.openOn' : 'locationSharing.openOff',
+      <View style={styles.indicator}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${title}. ${subtitle}`}
+          accessibilityState={{ expanded: preview || open }}
+          onHoverIn={() => setHovered(true)}
+          onHoverOut={() => setHovered(false)}
+          onFocus={() => {
+            if (web) setFocused(true);
+          }}
+          onBlur={() => {
+            setFocused(false);
+            if (web) setOpen(false);
+          }}
+          onPress={() => setOpen((current) => !current)}
+          style={({ pressed }) => [styles.trigger, pressed && styles.pressed]}
+        >
+          {active && !reduceMotion && (
+            <Animated.View
+              pointerEvents="none"
+              style={[styles.pulse, pulseStyle]}
+            />
+          )}
+          <View style={styles.icon}>
+            <Icon
+              name="map"
+              size={18}
+              color={active ? theme.colors.mapAccent : theme.colors.grey}
+            />
+          </View>
+        </Pressable>
+        {preview && (
+          <View pointerEvents="none" style={styles.card}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
+          </View>
         )}
-        onPress={() => setOpen(true)}
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-      >
-        <View style={styles.icon}>
-          <Icon
-            name="map"
-            size={18}
-            color={enabled ? theme.colors.earned : theme.colors.childDeep}
-          />
-        </View>
-        <View style={styles.copy}>
-          <Text style={styles.title}>
-            {enabled ? t('locationSharing.on') : t('locationSharing.off')}
-          </Text>
-          <Text style={styles.subtitle} numberOfLines={1}>
-            {enabled
-              ? (message ??
-                (ago
-                  ? t('locationSharing.lastPoint', { ago })
-                  : t('locationSharing.waiting')))
-              : t('locationSharing.offHint')}
-          </Text>
-        </View>
-        <View style={[styles.dot, (error || !enabled) && styles.dotError]} />
-      </Pressable>
+      </View>
 
       <BottomSheet
-        visible={open}
+        visible={!web && open}
         onClose={() => setOpen(false)}
         maxHeightRatio={0.82}
       >
@@ -178,6 +229,12 @@ export function LocationSharingCard() {
           </View>
 
           {message ? <Text style={styles.error}>{message}</Text> : null}
+          {!web && open && (
+            <HistorySharingSetting
+              key={`${userId}:${familyId}`}
+              familyId={familyId}
+            />
+          )}
           {checking ? (
             <ActivityIndicator size="small" color={theme.colors.childDeep} />
           ) : null}
