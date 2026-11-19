@@ -15,7 +15,6 @@ import {
   useMyChildBalance,
   useMyWishlistOwner,
 } from '@features/family-tasks';
-import { FeedItem } from '@entities/activity';
 import {
   ChildTaskTile,
   countTasks,
@@ -126,13 +125,7 @@ export function ChildHomePage() {
                 current={wishlist.current}
                 onPress={() => router.push('/wishlist')}
               />
-              {feed.length > 0 && (
-                <RecentActivity>
-                  {feed.map((event) => (
-                    <FeedItem key={event.id} event={event} viewer="child" />
-                  ))}
-                </RecentActivity>
-              )}
+              <RecentActivity events={feed} viewer="child" />
             </>
           )}
         </ScrollView>

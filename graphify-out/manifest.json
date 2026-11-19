@@ -306,21 +306,21 @@
     "semantic_hash": ""
   },
   "src/app/root-layout.tsx": {
-    "mtime": 1794923242.0244608,
-    "seen": 1795026546.7683666,
-    "ast_hash": "9d6c3031741535c9300f4d7ab6fe1972",
+    "mtime": 1795088921.4371495,
+    "seen": 1795089062.3736954,
+    "ast_hash": "468cad93cf8ddeb9f97d0d53da5317dd",
     "semantic_hash": ""
   },
   "src/entities/activity/api/feed-api.ts": {
-    "mtime": 1795026198.138043,
-    "seen": 1795026546.7683666,
-    "ast_hash": "5a1058b62ee0fd39f2110af4c71b1e56",
+    "mtime": 1795087086.1338603,
+    "seen": 1795089062.3736954,
+    "ast_hash": "616e4904ae9be2d0ca59f2f6ecd56ef8",
     "semantic_hash": ""
   },
   "src/entities/activity/api/feed-query.ts": {
-    "mtime": 1794899662.8386939,
-    "seen": 1794920449.2371485,
-    "ast_hash": "c77b06210a54a99e17bc6ae284262dce",
+    "mtime": 1795087091.2589178,
+    "seen": 1795089062.3736954,
+    "ast_hash": "3cfeba79e7edbe4cd3080ab7674238d4",
     "semantic_hash": ""
   },
   "src/entities/activity/index.ts": {
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "src/entities/activity/model/feed.ts": {
-    "mtime": 1795026198.138043,
-    "seen": 1795026546.7683666,
-    "ast_hash": "cf72909456b32563fd633c90ded26666",
+    "mtime": 1795087081.5449893,
+    "seen": 1795089062.3736954,
+    "ast_hash": "f9b7f8156c64151c84d77660444cc5bf",
     "semantic_hash": ""
   },
   "src/entities/activity/model/index.ts": {
@@ -342,21 +342,21 @@
     "semantic_hash": ""
   },
   "src/entities/activity/ui/activity-card.tsx": {
-    "mtime": 1795026198.1390483,
-    "seen": 1795026546.7683666,
-    "ast_hash": "01084d385d83577facdee1b409666f50",
+    "mtime": 1795089673.9363754,
+    "seen": 1795089803.6473577,
+    "ast_hash": "e26b470ec4d5ab806c511b26f2ec2828",
     "semantic_hash": ""
   },
   "src/entities/activity/ui/activity-item.styled.ts": {
-    "mtime": 1795026198.1400485,
-    "seen": 1795026546.7683666,
-    "ast_hash": "8edcfda28bfd6d6b4bf98b54899a3495",
+    "mtime": 1795089297.7245188,
+    "seen": 1795089382.0806005,
+    "ast_hash": "b596ab9aaeee3a2abbac140102131d64",
     "semantic_hash": ""
   },
   "src/entities/activity/ui/feed-item.tsx": {
-    "mtime": 1795026198.1400485,
-    "seen": 1795026546.7683666,
-    "ast_hash": "9591120ee34c4de80a116988e6f6b2f5",
+    "mtime": 1795089108.6652315,
+    "seen": 1795089225.9195426,
+    "ast_hash": "c06f3c27d7fea9dc13873b7f1023dfc3",
     "semantic_hash": ""
   },
   "src/entities/device/api/device-api.ts": {
@@ -516,9 +516,9 @@
     "semantic_hash": ""
   },
   "src/entities/session/api/me-query.ts": {
-    "mtime": 1794899663.1369267,
-    "seen": 1794920449.2381568,
-    "ast_hash": "8d474a6cc8970a38c234d43d90353df3",
+    "mtime": 1795082519.6058855,
+    "seen": 1795089062.3736954,
+    "ast_hash": "bfda8ae737a605ebbf806bbd848c41ad",
     "semantic_hash": ""
   },
   "src/entities/session/index.ts": {
@@ -732,9 +732,9 @@
     "semantic_hash": ""
   },
   "src/entities/task/ui/task-sheet.tsx": {
-    "mtime": 1795026198.1475115,
-    "seen": 1795026546.7683666,
-    "ast_hash": "531e9b0efa5b4fed78f80c8ca54fa88a",
+    "mtime": 1795084582.6907406,
+    "seen": 1795089062.3746955,
+    "ast_hash": "a547a29b2fe018fa09ad46cc83966a2d",
     "semantic_hash": ""
   },
   "src/entities/task/ui/task-tile-parts.tsx": {
@@ -1206,8 +1206,8 @@
     "semantic_hash": ""
   },
   "src/features/complete-task/model/use-task-actions.ts": {
-    "mtime": 1794899664.067283,
-    "seen": 1794920449.2381568,
+    "mtime": 1795091323.9617407,
+    "seen": 1795091551.6409874,
     "ast_hash": "20f356de296a2f280469ff144f1e3718",
     "semantic_hash": ""
   },
@@ -1776,9 +1776,9 @@
     "semantic_hash": ""
   },
   "src/pages/child-home/ui/child-home.tsx": {
-    "mtime": 1794899664.9210575,
-    "seen": 1794920449.2381568,
-    "ast_hash": "835ff8878c72e8b9cda35dea6b9abd6f",
+    "mtime": 1795087206.6195397,
+    "seen": 1795089062.3746955,
+    "ast_hash": "48dab6421548890dbf5674a6858fab89",
     "semantic_hash": ""
   },
   "src/pages/child-profile/index.ts": {
@@ -1998,9 +1998,9 @@
     "semantic_hash": ""
   },
   "src/pages/parent-home/ui/parent-home.tsx": {
-    "mtime": 1794901476.9677615,
-    "seen": 1794920449.2381568,
-    "ast_hash": "eb82edee6fcbb05701612b53764a230a",
+    "mtime": 1795087201.5062997,
+    "seen": 1795089062.3746955,
+    "ast_hash": "5a5f868e5c7efef2c309d8bd3924917b",
     "semantic_hash": ""
   },
   "src/pages/parent-profile/index.ts": {
@@ -2262,8 +2262,8 @@
     "semantic_hash": ""
   },
   "src/shared/api/http.ts": {
-    "mtime": 1795036185.638112,
-    "seen": 1795036212.8923175,
+    "mtime": 1795091323.9398103,
+    "seen": 1795091551.642322,
     "ast_hash": "37ba0112d8230f59fa16de43a989d20f",
     "semantic_hash": ""
   },
@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795044795.2253187,
-    "seen": 1795044853.8090425,
-    "ast_hash": "18542e077613b4fe0ae53417d85104bb",
+    "mtime": 1795087212.7542322,
+    "seen": 1795089062.375697,
+    "ast_hash": "cb3892e1e0f732276238f5c5b39f8768",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795044794.913826,
-    "seen": 1795044853.8090425,
-    "ast_hash": "a50cb420078554ac2f9d9dd975a5bf0e",
+    "mtime": 1795087218.9729576,
+    "seen": 1795089062.375697,
+    "ast_hash": "38ac1ccf490ae4c35c570e822d1745a3",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -2400,9 +2400,9 @@
     "semantic_hash": ""
   },
   "src/shared/lib/photo/photo-form-data.ts": {
-    "mtime": 1794899666.1774085,
-    "seen": 1794920449.2381568,
-    "ast_hash": "19555aa3a0491c0d4a52a149f64d0db5",
+    "mtime": 1795091129.0451329,
+    "seen": 1795091551.642322,
+    "ast_hash": "e07ad49e49612048c75269f4b945e643",
     "semantic_hash": ""
   },
   "src/shared/lib/photo/photo-form-data.web.ts": {
@@ -2478,9 +2478,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/api-image.tsx": {
-    "mtime": 1795026198.1505177,
-    "seen": 1795026546.7693708,
-    "ast_hash": "efafaaa7e45ff476f52674f318fd520b",
+    "mtime": 1795085730.9843798,
+    "seen": 1795089062.375697,
+    "ast_hash": "eb1348eb3214c4030a9ac14f8dce01fe",
     "semantic_hash": ""
   },
   "src/shared/ui/api-image.web.tsx": {
@@ -2598,9 +2598,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/icons/calendar.tsx": {
-    "mtime": 1794899666.4502935,
-    "seen": 1794920449.2381568,
-    "ast_hash": "932d5c02e9621d9710c5d8eb59d547d8",
+    "mtime": 1795083498.573865,
+    "seen": 1795089062.375697,
+    "ast_hash": "8b13d8c8f93b952ca58eb027310b8a4d",
     "semantic_hash": ""
   },
   "src/shared/ui/icons/camera-outline.tsx": {
@@ -3126,15 +3126,15 @@
     "semantic_hash": ""
   },
   "src/widgets/bottom-nav/ui/bottom-nav.styled.ts": {
-    "mtime": 1794899666.9491453,
-    "seen": 1794920449.2381568,
-    "ast_hash": "ab8ae8ab60ae369e47a8dc28aa0b39e6",
+    "mtime": 1795083471.6524405,
+    "seen": 1795089062.375697,
+    "ast_hash": "6fb95c038b6d7512b7017d76c0e3e7c1",
     "semantic_hash": ""
   },
   "src/widgets/bottom-nav/ui/bottom-nav.tsx": {
-    "mtime": 1794899666.9561508,
-    "seen": 1794920449.2381568,
-    "ast_hash": "7902ef666675c6888ac823c81e7be90f",
+    "mtime": 1795083461.255468,
+    "seen": 1795089062.375697,
+    "ast_hash": "329d17b56c4e40b3b4d4e4bc2e0c28ba",
     "semantic_hash": ""
   },
   "src/widgets/bottom-nav/ui/tab-screen.styled.ts": {
@@ -3144,9 +3144,9 @@
     "semantic_hash": ""
   },
   "src/widgets/bottom-nav/ui/tab-screen.tsx": {
-    "mtime": 1794899666.9640596,
-    "seen": 1794920449.2381568,
-    "ast_hash": "f7f2cd5dfa17c80d75b1974f963827fa",
+    "mtime": 1795083479.8676884,
+    "seen": 1795089062.375697,
+    "ast_hash": "31227db6484d20bc6cc0555ec52b38be",
     "semantic_hash": ""
   },
   "src/widgets/child-devices/index.ts": {
@@ -3438,9 +3438,9 @@
     "semantic_hash": ""
   },
   "src/widgets/map/map.tsx": {
-    "mtime": 1795041370.2882545,
-    "seen": 1795041494.1260116,
-    "ast_hash": "7bbe073f8b782d6759fa555e2474c28c",
+    "mtime": 1795085004.1125371,
+    "seen": 1795089062.375697,
+    "ast_hash": "4ffbf87923d15d2d68f546261c41ac72",
     "semantic_hash": ""
   },
   "src/widgets/map/map.web.tsx": {
@@ -3492,9 +3492,9 @@
     "semantic_hash": ""
   },
   "src/widgets/map/ui/map-preview.tsx": {
-    "mtime": 1794899667.2426016,
-    "seen": 1794920449.2381568,
-    "ast_hash": "4c4f38da074645eebfc4c2de5f866ceb",
+    "mtime": 1795085071.2866514,
+    "seen": 1795089062.375697,
+    "ast_hash": "d96262c2af55d2c401422cad888b935f",
     "semantic_hash": ""
   },
   "src/widgets/map/ui/mini-map.tsx": {
@@ -3618,15 +3618,15 @@
     "semantic_hash": ""
   },
   "src/widgets/recent-activity/ui/recent-activity.styled.ts": {
-    "mtime": 1794899667.4096782,
-    "seen": 1794920449.2381568,
-    "ast_hash": "4af76a7077d8acd14b1fe0a5b0e3e9d3",
+    "mtime": 1795088225.9034042,
+    "seen": 1795089062.375697,
+    "ast_hash": "6d281ceaef5ea905136d214031615152",
     "semantic_hash": ""
   },
   "src/widgets/recent-activity/ui/recent-activity.tsx": {
-    "mtime": 1794899667.4121933,
-    "seen": 1794920449.2381568,
-    "ast_hash": "598e05523bc4d6b48cf140456e9761ef",
+    "mtime": 1795087237.4999933,
+    "seen": 1795089062.375697,
+    "ast_hash": "f944bd1e63e5a729e288b49d3330ed45",
     "semantic_hash": ""
   },
   "src/widgets/task-carousel/index.ts": {
@@ -4518,9 +4518,9 @@
     "semantic_hash": ""
   },
   "src/pages/calendar/ui/calendar.tsx": {
-    "mtime": 1794889348.125443,
-    "seen": 1794890377.9580386,
-    "ast_hash": "5775e2e4a04ec9bd838f8820dd849f15",
+    "mtime": 1795083487.644688,
+    "seen": 1795089062.3746955,
+    "ast_hash": "55e39abb466e219d136737599aec2561",
     "semantic_hash": ""
   },
   "src/pages/change-email/index.ts": {
@@ -4830,9 +4830,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/paper-texture.tsx": {
-    "mtime": 1794923242.038822,
-    "seen": 1795026546.7693708,
-    "ast_hash": "785af31f78e7da5156a7ee066364715e",
+    "mtime": 1795085468.6692653,
+    "seen": 1795089062.375697,
+    "ast_hash": "d8e0bd7178830e66a6bd3464aad4a704",
     "semantic_hash": ""
   },
   "assets/images/paper/paper-kraft.jpg": {

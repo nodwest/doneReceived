@@ -5,6 +5,6 @@ export const styles = StyleSheet.create({
     gap: 16,
   },
   list: {
-    gap: 6,
+    gap: 8,
   },
 });

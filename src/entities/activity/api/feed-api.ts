@@ -135,6 +135,7 @@ export async function fetchFeed(
             ? ('task_closed' as const)
             : item.type,
         at: item.createdAt,
+        assignmentId: item.assignmentId,
         title: item.taskTitle,
         points: item.points,
         child: child

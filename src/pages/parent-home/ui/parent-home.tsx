@@ -9,7 +9,6 @@ import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
 import { useFamilyFeed, useFamilyTasks } from '@features/family-tasks';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
-import { FeedItem } from '@entities/activity';
 import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
@@ -98,13 +97,7 @@ export function ParentHomePage() {
             }
           />
           <CreateTaskButton onPress={() => router.push('/create-task')} />
-          {feed.length > 0 && (
-            <RecentActivity>
-              {feed.map((event) => (
-                <FeedItem key={event.id} event={event} viewer="parent" />
-              ))}
-            </RecentActivity>
-          )}
+          <RecentActivity events={feed} viewer="parent" />
         </ScrollView>
         <BottomNav activeKey="home" />
       </SafeAreaView>

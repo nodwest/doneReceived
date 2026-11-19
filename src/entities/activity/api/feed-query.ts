@@ -3,8 +3,12 @@ import type { FeedViewer } from '../model/feed';
 import { fetchFeed } from './feed-api';
 import { queryRoots } from '@shared/api';
 
-/** Сколько последних событий показывает лента на главной. */
-export const FEED_LIMIT = 5;
+/**
+ * Сколько последних событий берём для ленты на главной. Из них получаются
+ * карточки: у задания одна карточка со всей историей, поэтому событий нужно
+ * заметно больше, чем карточек.
+ */
+export const FEED_LIMIT = 50;
 
 export const feedKeys = {
   all: queryRoots.activity,
