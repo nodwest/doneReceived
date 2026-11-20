@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795207818.0299592,
-    "seen": 1795207902.2538953,
-    "ast_hash": "a673aab1c9b723bf244299c71f608b79",
+    "mtime": 1795217127.8983953,
+    "seen": 1795217642.296483,
+    "ast_hash": "37ea6819785645d4f25d4ee2acf5bbce",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795207818.0143995,
-    "seen": 1795207902.2538953,
-    "ast_hash": "74ca0f343d84c9cbc61b620e9701f26a",
+    "mtime": 1795217122.7312572,
+    "seen": 1795217642.296483,
+    "ast_hash": "bdbd765970afabb4e8be7dbb3ed4b0e5",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -4176,15 +4176,15 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1795207160.8185146,
-    "seen": 1795207369.3265119,
-    "ast_hash": "a4bd3be7166b62ec47e1829a6b8268ef",
+    "mtime": 1795214337.7322197,
+    "seen": 1795217642.296483,
+    "ast_hash": "414236be0e524da04a34b6a9b2d606c8",
     "semantic_hash": ""
   },
   "obsidian-done/C4.md": {
-    "mtime": 1795207050.8361645,
-    "seen": 1795207369.3265119,
-    "ast_hash": "03e8100907d7e106969ac03f0f0e64be",
+    "mtime": 1795214311.0580902,
+    "seen": 1795217642.296483,
+    "ast_hash": "32cfd188d95ddaf713f1a4b17c3115e0",
     "semantic_hash": ""
   },
   "obsidian-done/Features/DR-Registration.md": {
@@ -4206,15 +4206,15 @@
     "semantic_hash": ""
   },
   "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/MVP.md": {
-    "mtime": 1795207041.2259681,
-    "seen": 1795207369.3265119,
-    "ast_hash": "03599af6b31c4138ed4302ec39c87e1d",
+    "mtime": 1795214311.059096,
+    "seen": 1795217642.296483,
+    "ast_hash": "f1f9e07087d57395f2719080149b2d3f",
     "semantic_hash": ""
   },
   "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u0418\u0434\u0435\u0438.md": {
-    "mtime": 1795207050.8658645,
-    "seen": 1795207369.3265119,
-    "ast_hash": "981e138ee00a415bb7430ab862438a50",
+    "mtime": 1795214311.0613954,
+    "seen": 1795217642.296483,
+    "ast_hash": "d773a4cf62e5c83cfe3942fdad02b7cb",
     "semantic_hash": ""
   },
   "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u041d\u0430\u0432\u044b\u043a\u0438 Codex \u0434\u043b\u044f DoneReceived.md": {
@@ -4224,9 +4224,9 @@
     "semantic_hash": ""
   },
   "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u0421\u0422\u0415\u041a.md": {
-    "mtime": 1795207160.7976942,
-    "seen": 1795207369.3265119,
-    "ast_hash": "21a18b1a5fd047c43ff1eae2c09e5783",
+    "mtime": 1795214311.0623977,
+    "seen": 1795217642.296483,
+    "ast_hash": "2443ef2aa61409f54a6a9036ea153fb2",
     "semantic_hash": ""
   },
   "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u0421\u043e\u0433\u043b\u0430\u0448\u0435\u043d\u0438\u044f.md": {
@@ -4458,9 +4458,9 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/model/family-event.ts": {
-    "mtime": 1794880079.586685,
-    "seen": 1794889175.574333,
-    "ast_hash": "ef0d017a3d05b682ad567585e1f149f1",
+    "mtime": 1795217127.910412,
+    "seen": 1795217642.2951157,
+    "ast_hash": "be352a668d676c91d5e7b145cf22e218",
     "semantic_hash": ""
   },
   "src/entities/family-event/ui/calendar-event.styled.ts": {
@@ -4482,9 +4482,9 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/ui/featured-event-card.tsx": {
-    "mtime": 1794889864.6284096,
-    "seen": 1794890377.9580386,
-    "ast_hash": "5c00a9c70fd4e361a0509d1575d249f5",
+    "mtime": 1795217038.8467534,
+    "seen": 1795217642.2951157,
+    "ast_hash": "4c977949e3a8924d14e9045190b855cb",
     "semantic_hash": ""
   },
   "src/features/change-email/index.ts": {
@@ -4626,15 +4626,15 @@
     "semantic_hash": ""
   },
   "src/features/family-event-form/ui/family-event-form.styled.ts": {
-    "mtime": 1795156793.3283873,
-    "seen": 1795162011.5135324,
-    "ast_hash": "805a40ee2f72cdb5e55dcd4f0e32f327",
+    "mtime": 1795217027.9766424,
+    "seen": 1795217642.2951157,
+    "ast_hash": "d1492249d64a868d96f5a19897a1be28",
     "semantic_hash": ""
   },
   "src/features/family-event-form/ui/family-event-form.tsx": {
-    "mtime": 1795170491.6795614,
-    "seen": 1795170570.0919778,
-    "ast_hash": "c25831e135954770f3be6713869d5fff",
+    "mtime": 1795217172.8916755,
+    "seen": 1795217642.2951157,
+    "ast_hash": "2c84f9734d40409e7a8b8ea2fdbc3fb4",
     "semantic_hash": ""
   },
   "src/features/family-event/index.ts": {
@@ -4674,15 +4674,15 @@
     "semantic_hash": ""
   },
   "src/pages/family-event/ui/family-event.tsx": {
-    "mtime": 1795170491.68742,
-    "seen": 1795170570.0919778,
-    "ast_hash": "1a7748d8fbba396b2f923cb6eb89ba5f",
+    "mtime": 1795217051.3926592,
+    "seen": 1795217642.296483,
+    "ast_hash": "6536ca36a75254bce0e2f0a0c0a740f9",
     "semantic_hash": ""
   },
   "src/entities/family-event/api/family-events-api.ts": {
-    "mtime": 1794890242.7841606,
-    "seen": 1794890377.9580386,
-    "ast_hash": "fa80c078ba8bcf40ccff1824cc9aca26",
+    "mtime": 1795216937.1036453,
+    "seen": 1795217642.2951157,
+    "ast_hash": "087792a64dfb8f2c0da15e5ec333e3b2",
     "semantic_hash": ""
   },
   "src/entities/family-event/api/family-events-query.ts": {
@@ -5004,9 +5004,9 @@
     "semantic_hash": ""
   },
   "src/features/push-notifications/model/use-push-registration.ts": {
-    "mtime": 1795207823.5327861,
-    "seen": 1795207902.2533355,
-    "ast_hash": "97eb25fb02db3fbe3a235b6c8ed029ea",
+    "mtime": 1795214314.0692546,
+    "seen": 1795217642.2951157,
+    "ast_hash": "f78a99ef4d1ed2928657525adc35e08b",
     "semantic_hash": ""
   },
   "src/features/push-notifications/model/use-push-registration.web.ts": {
@@ -5025,12 +5025,6 @@
     "mtime": 1795207183.1238644,
     "seen": 1795207369.325324,
     "ast_hash": "5c1b5dc055dea318d4aab5eb32972b53",
-    "semantic_hash": ""
-  },
-  "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u0420\u0435\u043b\u0438\u0437.md": {
-    "mtime": 1795207129.6201458,
-    "seen": 1795207369.3265119,
-    "ast_hash": "1eca32537ebd4d93adf2527e80aebdcb",
     "semantic_hash": ""
   },
   "package-lock.json": {
