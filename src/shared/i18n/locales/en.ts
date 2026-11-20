@@ -1218,7 +1218,29 @@ export const en = {
     language: 'Language',
     help: 'Help & support',
     logOut: 'Log out',
+    deleteAccount: 'Delete account',
     childMode: 'Child mode (temporary)',
+  },
+  deleteAccount: {
+    title: 'Delete account',
+    heading: 'Before you delete',
+    intro: 'Please read this carefully.',
+    zeroBalanceTitle: 'Only with a $0 balance',
+    zeroBalanceText: 'Withdraw all your money from the wallet first.',
+    balanceNow: 'Your balance now: {{amount}}',
+    foreverTitle: 'It can’t be restored',
+    foreverText:
+      'Your profile, tasks, rewards and wishlist will be deleted for good.',
+    delete: 'Delete',
+    confirmTitle: 'Are you sure?',
+    confirmMessage: 'Your account will be deleted and can’t be restored.',
+    confirm: 'Delete account',
+    balanceTitle: 'Withdraw your money first',
+    balanceMessage:
+      'You still have {{amount}} on your balance. Withdraw all of it before deleting your account.',
+    withdrawSoon: 'Withdrawals are coming soon',
+    deleted: 'Account deleted',
+    failed: 'Couldn’t delete the account. Please try again.',
   },
 };
 

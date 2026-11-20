@@ -42,6 +42,7 @@ const APP_SCREENS = [
   'edit-profile',
   'change-password',
   'change-email',
+  'delete-account',
   'map',
   'map-layers',
   'map-zone',
