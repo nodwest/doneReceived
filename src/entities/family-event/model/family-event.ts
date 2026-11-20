@@ -1,13 +1,14 @@
 import type { ImageSourcePropType } from 'react-native';
 
-/** Тип события: иконка, тон и способ показа в календаре зависят от него. */
-export type FamilyEventKind =
-  | 'trip'
-  | 'cinema'
-  | 'doctor'
-  | 'meeting'
-  | 'homework'
-  | 'custom';
+/** Класс события: поездка, мероприятие или праздник. */
+export type FamilyEventKind = 'trip' | 'event' | 'holiday';
+
+/** Ключи i18n для классов события. */
+export const FAMILY_EVENT_KIND_LABELS = {
+  trip: 'calendar.kindTrip',
+  event: 'calendar.kindEvent',
+  holiday: 'calendar.kindHoliday',
+} as const satisfies Record<FamilyEventKind, string>;
 
 /** Разовое событие или ежегодная дата. */
 export type FamilyEventRepeat = 'once' | 'annual';

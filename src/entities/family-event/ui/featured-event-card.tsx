@@ -10,6 +10,7 @@ import {
 import { theme } from '@shared/theme';
 import { LetterAvatar } from '@shared/ui';
 import type { FamilyEvent } from '../model/family-event';
+import { FAMILY_EVENT_KIND_LABELS } from '../model/family-event';
 import { styles } from './calendar-event.styled';
 
 type FeaturedEventCardProps = {
@@ -37,7 +38,10 @@ export function FeaturedEventCard({ event, onPress }: FeaturedEventCardProps) {
       ? t('calendar.annualKicker', {
           date: formatMonthDay(event.startsAt),
         })
-      : t('calendar.eventKicker', { range });
+      : t('calendar.kindKicker', {
+          kind: t(FAMILY_EVENT_KIND_LABELS[event.kind]),
+          range,
+        });
 
   return (
     <Pressable

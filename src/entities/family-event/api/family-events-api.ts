@@ -1,6 +1,8 @@
 import { authorizedImage, apiRequest } from '@shared/api';
+import { appendPhoto, type PickedPhoto } from '@shared/lib';
 import type {
   FamilyEvent,
+  FamilyEventKind,
   FamilyEventPerson,
   FamilyEventResponse,
   FamilyEventRepeat,
@@ -20,6 +22,8 @@ type FamilyEventDto = {
   endsAt: string;
   timezone: string;
   repeat: FamilyEventRepeat;
+  kind: FamilyEventKind;
+  photoUrl: string | null;
   reminderLeadMinutes: number | null;
   participants: FamilyEventPersonDto[];
   viewer: {
@@ -35,6 +39,7 @@ export type FamilyEventPayload = {
   endsAt: Date;
   timezone: string;
   repeat: FamilyEventRepeat;
+  kind: FamilyEventKind;
   reminderLeadMinutes: number | null;
   participants: string[];
   /** Только для создания: retry после потерянного ответа не создаёт дубль. */
@@ -53,7 +58,7 @@ function toFamilyEvent(dto: FamilyEventDto): FamilyEvent {
   const endsAt = new Date(dto.endsAt);
   return {
     id: dto.id,
-    kind: 'custom',
+    kind: dto.kind ?? 'event',
     title: dto.title,
     description: dto.description,
     startsAt,
@@ -61,6 +66,7 @@ function toFamilyEvent(dto: FamilyEventDto): FamilyEvent {
     repeat: dto.repeat,
     timezone: dto.timezone,
     participants: (dto.participants ?? []).map(toPerson),
+    photo: dto.photoUrl ? authorizedImage(dto.photoUrl) : undefined,
     reminderLeadMinutes: dto.reminderLeadMinutes ?? undefined,
     reminderAt:
       dto.reminderLeadMinutes == null
@@ -78,6 +84,7 @@ const bodyOf = (payload: FamilyEventPayload) => ({
   endsAt: payload.endsAt.toISOString(),
   timezone: payload.timezone,
   repeat: payload.repeat,
+  kind: payload.kind,
   reminderLeadMinutes: payload.reminderLeadMinutes,
   participants: payload.participants,
 });
@@ -159,6 +166,30 @@ export function respondToFamilyEvent(
 /** DELETE /families/:id/events/:eventId — отмена события родителем. */
 export function cancelFamilyEvent(familyId: string, eventId: string) {
   return apiRequest<void>(`/families/${familyId}/events/${eventId}`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * PUT /families/:id/events/:eventId/photo — обложка события. Только родитель.
+ * Сервер отдаёт новую ссылку: прежняя обложка заменяется, а не дополняется.
+ */
+export async function uploadFamilyEventPhoto(
+  familyId: string,
+  eventId: string,
+  photo: PickedPhoto,
+) {
+  const form = new FormData();
+  await appendPhoto(form, 'photo', photo);
+  return apiRequest<{ id: string; url: string }>(
+    `/families/${familyId}/events/${eventId}/photo`,
+    { method: 'PUT', body: form },
+  );
+}
+
+/** DELETE /families/:id/events/:eventId/photo — убрать обложку. */
+export function removeFamilyEventPhoto(familyId: string, eventId: string) {
+  return apiRequest<void>(`/families/${familyId}/events/${eventId}/photo`, {
     method: 'DELETE',
   });
 }

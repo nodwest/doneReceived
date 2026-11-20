@@ -181,6 +181,33 @@ export const styles = createStyles((colors) => ({
     color: colors.childInk,
     fontFamily: theme.fonts.bold,
   },
+  coverRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  coverTile: {
+    width: 96,
+    height: 72,
+    borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: colors.childTint,
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  coverRemove: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
   visibility: {
     minHeight: 46,
     flexDirection: 'row',

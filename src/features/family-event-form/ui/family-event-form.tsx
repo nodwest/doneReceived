@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -7,26 +8,45 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCurrentFamily, useFamilyMembers } from '@entities/family';
 import {
   EventPersonChip,
+  FAMILY_EVENT_KIND_LABELS,
   FeaturedEventCard,
+  removeFamilyEventPhoto,
+  uploadFamilyEventPhoto,
   type FamilyEvent,
+  type FamilyEventKind,
   type FamilyEventPerson,
   type FamilyEventRepeat,
 } from '@entities/family-event';
-import { authorizedImage } from '@shared/api';
+import { authorizedImage, syncData } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { deviceTimeZone, formatDate, showToast } from '@shared/lib';
+import {
+  choosePhotos,
+  deviceTimeZone,
+  formatDate,
+  showToast,
+  type PickedPhoto,
+} from '@shared/lib';
 import { theme } from '@shared/theme';
-import { DateTimePickerSheet, Icon, Input, RoundButton } from '@shared/ui';
+import {
+  ApiImage,
+  DateTimePickerSheet,
+  Icon,
+  Input,
+  RoundButton,
+  SourceTile,
+} from '@shared/ui';
 import { useSaveFamilyEvent } from '../model/use-save-family-event';
 import { styles } from './family-event-form.styled';
 
 const HOUR_MS = 60 * 60 * 1000;
 const MINUTE_MS = 60 * 1000;
+const KIND_OPTIONS = ['trip', 'event', 'holiday'] as const;
 const REMINDER_OPTIONS = [
   { minutes: null, key: 'none' },
   { minutes: 60, key: 'h1' },
@@ -101,12 +121,17 @@ export function FamilyEventForm({
   const familyId = useCurrentFamily()?.id ?? null;
   const { data: members = [] } = useFamilyMembers(familyId);
   const saveEvent = useSaveFamilyEvent();
+  const queryClient = useQueryClient();
   const [now] = useState(() => new Date());
   const [timezone] = useState(() => event?.timezone ?? deviceTimeZone());
   const [initialStart] = useState(defaultStart);
   const [clientRequestId] = useState(createRequestId);
   const [title, setTitle] = useState(event?.title ?? '');
   const [description, setDescription] = useState(event?.description ?? '');
+  const [kind, setKind] = useState<FamilyEventKind>(event?.kind ?? 'event');
+  /** Локально выбранная обложка: загружается после сохранения события. */
+  const [cover, setCover] = useState<PickedPhoto | null>(null);
+  const [coverRemoved, setCoverRemoved] = useState(false);
   const [repeat, setRepeat] = useState<FamilyEventRepeat>(
     event?.repeat ?? 'once',
   );
@@ -172,7 +197,7 @@ export function FamilyEventForm({
 
   const previewEvent: FamilyEvent = {
     id: event?.id ?? 'preview',
-    kind: event?.kind ?? 'custom',
+    kind,
     title: title.trim() || t('calendar.createTitle'),
     description: description.trim() || t('calendar.descriptionPlaceholder'),
     startsAt: effectiveStart,
@@ -180,7 +205,7 @@ export function FamilyEventForm({
     repeat,
     timezone,
     participants: selectedParticipants,
-    photo: event?.photo,
+    photo: cover ? { uri: cover.uri } : coverRemoved ? undefined : event?.photo,
     reminderAt,
     reminderLeadMinutes: reminderLead ?? undefined,
     response: event?.response,
@@ -251,13 +276,28 @@ export function FamilyEventForm({
           endsAt: effectiveEnd,
           timezone,
           repeat,
+          kind,
           reminderLeadMinutes: reminderLead,
           participants: selectedParticipants.map((person) => person.id),
           clientRequestId: event ? undefined : clientRequestId,
         },
       },
       {
-        onSuccess: (saved) => onSaved(saved),
+        onSuccess: async (saved) => {
+          // Обложка грузится после события: ей нужен id. Если она не
+          // загрузилась, событие всё равно сохранено — сообщаем и закрываем.
+          if (familyId && (cover || coverRemoved)) {
+            try {
+              if (cover)
+                await uploadFamilyEventPhoto(familyId, saved.id, cover);
+              else await removeFamilyEventPhoto(familyId, saved.id);
+              await syncData(queryClient, 'calendar-changed');
+            } catch {
+              showToast(t('calendar.photoError'));
+            }
+          }
+          onSaved(saved);
+        },
         onError: () => showToast(t('calendar.saveError')),
       },
     );
@@ -303,6 +343,8 @@ export function FamilyEventForm({
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <ScrollView
+            bounces={false}
+            overScrollMode="never"
             style={styles.scroll}
             contentContainerStyle={styles.content}
             keyboardShouldPersistTaps="handled"
@@ -363,6 +405,36 @@ export function FamilyEventForm({
                 placeholderTextColor={theme.colors.placeholder}
                 style={styles.input}
               />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>{t('calendar.kindLabel')}</Text>
+              <View style={styles.reminderOptions}>
+                {KIND_OPTIONS.map((option) => {
+                  const selected = kind === option;
+                  return (
+                    <Pressable
+                      key={option}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected }}
+                      style={[
+                        styles.reminderOption,
+                        selected && styles.reminderOptionOn,
+                      ]}
+                      onPress={() => setKind(option)}
+                    >
+                      <Text
+                        style={[
+                          styles.reminderText,
+                          selected && styles.reminderTextOn,
+                        ]}
+                      >
+                        {t(FAMILY_EVENT_KIND_LABELS[option])}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
             </View>
 
             <View style={styles.field}>
@@ -449,6 +521,73 @@ export function FamilyEventForm({
                 multiline
                 style={styles.textarea}
               />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>{t('calendar.photoLabel')}</Text>
+              <View style={styles.coverRow}>
+                {cover ? (
+                  <View style={styles.coverTile}>
+                    <Image
+                      source={{ uri: cover.uri }}
+                      resizeMode="cover"
+                      style={styles.coverImage}
+                    />
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={t('calendar.removePhoto')}
+                      style={styles.coverRemove}
+                      onPress={() => setCover(null)}
+                    >
+                      <Icon name="close" size={11} color={theme.colors.ink} />
+                    </Pressable>
+                  </View>
+                ) : event?.photo && !coverRemoved ? (
+                  <View style={styles.coverTile}>
+                    <ApiImage
+                      source={event.photo}
+                      resizeMode="cover"
+                      style={styles.coverImage}
+                    />
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={t('calendar.removePhoto')}
+                      style={styles.coverRemove}
+                      onPress={() => setCoverRemoved(true)}
+                    >
+                      <Icon name="close" size={11} color={theme.colors.ink} />
+                    </Pressable>
+                  </View>
+                ) : (
+                  <>
+                    <SourceTile
+                      icon="camera"
+                      accessibilityLabel={t('calendar.photoCamera')}
+                      onPress={async () => {
+                        const [picked] = await choosePhotos('camera', 1);
+                        if (!picked) return;
+                        setCover(picked);
+                        setCoverRemoved(false);
+                      }}
+                    />
+                    <SourceTile
+                      icon="image-add"
+                      accessibilityLabel={t('calendar.photoLibrary')}
+                      onPress={async () => {
+                        const [picked] = await choosePhotos('library', 1);
+                        if (!picked) return;
+                        setCover(picked);
+                        setCoverRemoved(false);
+                      }}
+                    />
+                  </>
+                )}
+              </View>
+              <Text style={styles.labelHint}>
+                {cover || (event?.photo && !coverRemoved)
+                  ? t('calendar.photoHint')
+                  : t('calendar.photoEmptyHint')}
+              </Text>
             </View>
 
             <View style={styles.field}>
