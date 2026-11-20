@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -33,14 +32,7 @@ import {
   type PickedPhoto,
 } from '@shared/lib';
 import { theme } from '@shared/theme';
-import {
-  ApiImage,
-  DateTimePickerSheet,
-  Icon,
-  Input,
-  RoundButton,
-  SourceTile,
-} from '@shared/ui';
+import { DateTimePickerSheet, Icon, Input, RoundButton } from '@shared/ui';
 import { useSaveFamilyEvent } from '../model/use-save-family-event';
 import { styles } from './family-event-form.styled';
 
@@ -257,6 +249,19 @@ export function FamilyEventForm({
     setPicker(null);
   };
 
+  /** Галерея обложки: иконка на карточке-превью. */
+  const pickCover = async () => {
+    const [picked] = await choosePhotos('library', 1);
+    if (!picked) return;
+    setCover(picked);
+    setCoverRemoved(false);
+  };
+
+  const removeCover = () => {
+    setCover(null);
+    setCoverRemoved(true);
+  };
+
   const save = () => {
     if (!familyId) {
       showToast(t('calendar.formInvalid'));
@@ -350,8 +355,12 @@ export function FamilyEventForm({
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.preview} pointerEvents="none">
-              <FeaturedEventCard event={previewEvent} />
+            <View style={styles.preview}>
+              <FeaturedEventCard
+                event={previewEvent}
+                onPickPhoto={pickCover}
+                onRemovePhoto={removeCover}
+              />
             </View>
 
             <View style={styles.field}>
@@ -521,73 +530,6 @@ export function FamilyEventForm({
                 multiline
                 style={styles.textarea}
               />
-            </View>
-
-            <View style={styles.field}>
-              <Text style={styles.label}>{t('calendar.photoLabel')}</Text>
-              <View style={styles.coverRow}>
-                {cover ? (
-                  <View style={styles.coverTile}>
-                    <Image
-                      source={{ uri: cover.uri }}
-                      resizeMode="cover"
-                      style={styles.coverImage}
-                    />
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={t('calendar.removePhoto')}
-                      style={styles.coverRemove}
-                      onPress={() => setCover(null)}
-                    >
-                      <Icon name="close" size={11} color={theme.colors.ink} />
-                    </Pressable>
-                  </View>
-                ) : event?.photo && !coverRemoved ? (
-                  <View style={styles.coverTile}>
-                    <ApiImage
-                      source={event.photo}
-                      resizeMode="cover"
-                      style={styles.coverImage}
-                    />
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={t('calendar.removePhoto')}
-                      style={styles.coverRemove}
-                      onPress={() => setCoverRemoved(true)}
-                    >
-                      <Icon name="close" size={11} color={theme.colors.ink} />
-                    </Pressable>
-                  </View>
-                ) : (
-                  <>
-                    <SourceTile
-                      icon="camera"
-                      accessibilityLabel={t('calendar.photoCamera')}
-                      onPress={async () => {
-                        const [picked] = await choosePhotos('camera', 1);
-                        if (!picked) return;
-                        setCover(picked);
-                        setCoverRemoved(false);
-                      }}
-                    />
-                    <SourceTile
-                      icon="image-add"
-                      accessibilityLabel={t('calendar.photoLibrary')}
-                      onPress={async () => {
-                        const [picked] = await choosePhotos('library', 1);
-                        if (!picked) return;
-                        setCover(picked);
-                        setCoverRemoved(false);
-                      }}
-                    />
-                  </>
-                )}
-              </View>
-              <Text style={styles.labelHint}>
-                {cover || (event?.photo && !coverRemoved)
-                  ? t('calendar.photoHint')
-                  : t('calendar.photoEmptyHint')}
-              </Text>
             </View>
 
             <View style={styles.field}>
