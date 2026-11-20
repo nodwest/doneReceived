@@ -120,7 +120,7 @@ export function FeaturedEventCard({
         </View>
       )}
 
-      <View style={styles.copy}>
+      <View style={[styles.copy, onPickPhoto ? styles.copyWithActions : null]}>
         <View style={styles.text}>
           <Text style={styles.kicker}>{kicker}</Text>
           <Text style={styles.title} numberOfLines={2}>

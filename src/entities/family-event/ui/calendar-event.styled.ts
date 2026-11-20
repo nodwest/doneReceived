@@ -38,6 +38,10 @@ export const styles = createStyles((colors) => ({
     justifyContent: 'center',
     backgroundColor: 'rgba(8, 16, 32, 0.45)',
   },
+  /** В форме над карточкой есть кнопки: текст начинается ниже, без наложения. */
+  copyWithActions: {
+    paddingTop: 52,
+  },
   overlay: {
     position: 'absolute',
     top: 0,
