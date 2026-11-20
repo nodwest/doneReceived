@@ -9,6 +9,8 @@ export const ru: Dictionary = {
     seeAll: 'Все',
     optional: '(необязательно)',
     and: 'и',
+    loading: 'Загрузка…',
+    retry: 'Повторить',
   },
   nav: {
     home: 'Главная',
@@ -300,6 +302,8 @@ export const ru: Dictionary = {
     pending: 'Ждёт проверки',
     approved: 'Подтверждено',
     taskName: '«{{task}}»',
+    loading: 'Загружаем историю…',
+    loadError: 'Не удалось загрузить историю',
     changeCount_one: '{{count}} изменение',
     changeCount_few: '{{count}} изменения',
     changeCount_many: '{{count}} изменений',

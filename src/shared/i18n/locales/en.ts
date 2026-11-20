@@ -14,6 +14,8 @@ export const en = {
     seeAll: 'See all',
     optional: '(optional)',
     and: 'and',
+    loading: 'Loading…',
+    retry: 'Try again',
   },
   nav: {
     home: 'Home',
@@ -297,6 +299,8 @@ export const en = {
     pending: 'Pending review',
     approved: 'Approved',
     taskName: '“{{task}}”',
+    loading: 'Loading activity…',
+    loadError: 'Could not load activity',
     changeCount_one: '{{count}} change',
     changeCount_other: '{{count}} changes',
     status: {

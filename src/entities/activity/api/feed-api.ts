@@ -1,4 +1,5 @@
-import { apiRequest, authorizedImage } from '@shared/api';
+import { ApiError, apiRequest, authorizedImage } from '@shared/api';
+import { withTimeout } from '@shared/lib';
 import type { FeedEvent, FeedEventType, FeedViewer } from '../model/feed';
 
 type ActivityDto = {
@@ -98,9 +99,19 @@ export async function fetchFeed(
 ): Promise<FeedEvent[]> {
   const { familyId } = viewer;
   const [activity, members, children] = await Promise.all([
-    apiRequest<ActivityDto>(`/families/${familyId}/activity?limit=${limit}`),
-    apiRequest<MemberDto[]>(`/families/${familyId}/members`).catch(
-      () => [] as MemberDto[],
+    // Сервер иногда «подвисает» на ленте: не ждём бесконечно, иначе главная
+    // навсегда остаётся без истории. Не ответил — запрос падает, и виджет
+    // показывает «Повторить».
+    withTimeout<ActivityDto | null>(
+      apiRequest<ActivityDto>(`/families/${familyId}/activity?limit=${limit}`),
+      null,
+      15_000,
+    ),
+    // Имена и фото — необязательная подпись. Зависший /members не должен
+    // держать всю ленту: не ответил за отведённое время — показываем без имён.
+    withTimeout(
+      apiRequest<MemberDto[]>(`/families/${familyId}/members`),
+      [] as MemberDto[],
     ),
     viewer.child
       ? ([
@@ -110,14 +121,21 @@ export async function fetchFeed(
             avatarUrl: viewer.child.avatarUrl,
           },
         ] as ChildDto[])
-      : apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
-          () => [] as ChildDto[],
+      : withTimeout(
+          apiRequest<ChildDto[]>(`/families/${familyId}/children`),
+          [] as ChildDto[],
         ),
   ]);
-  const closed = await fetchClosedAssignments(familyId, activity.items);
+  if (!activity) throw new ApiError(0, []);
+  // Закрытые отказом без переделки — только уточнение статуса; без него
+  // показываем отказ как возврат на доработку.
+  const closed = await withTimeout(
+    fetchClosedAssignments(familyId, activity.items),
+    new Set<string>(),
+  );
   const photo = (url: string | null | undefined) =>
     url ? authorizedImage(url) : null;
-  return activity.items
+  const result = activity.items
     .filter((item) => KNOWN.includes(item.type))
     .map((item) => {
       const member = members.find((entry) => entry.userId === item.actorId);
@@ -151,4 +169,5 @@ export async function fetchFeed(
         byMe,
       };
     });
+  return result;
 }

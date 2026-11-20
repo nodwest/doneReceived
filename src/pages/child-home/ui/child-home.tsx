@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { DoneButton } from '@features/complete-task';
@@ -24,6 +24,7 @@ import {
 import { useMe, useMyAvatar } from '@entities/session';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
+import { theme } from '@shared/theme';
 import { styles } from './child-home.styled';
 
 const NO_TASKS: Task[] = [];
@@ -57,7 +58,8 @@ export function ChildHomePage() {
   const me = useMe();
   const myAvatar = useMyAvatar();
   // Лента — события ребёнка с сервера.
-  const { data: feed = [] } = useFamilyFeed();
+  const feedQuery = useFamilyFeed();
+  const { data: feed = [] } = feedQuery;
   const { data: myTasks = NO_TASKS, isPending: tasksPending } = useChildTasks();
   // Ближайшие по сроку — первыми, как в списке «To do».
   const activeTasks = useMemo(
@@ -89,7 +91,12 @@ export function ChildHomePage() {
             name={me?.displayName ?? ''}
             avatar={myAvatar}
           />
-          {!loading && (
+          {loading ? (
+            <View style={styles.loading}>
+              <ActivityIndicator color={theme.colors.blue} />
+              <Text style={styles.loadingText}>{t('common.loading')}</Text>
+            </View>
+          ) : (
             <>
               <HomeSummary
                 tone="child"
@@ -125,7 +132,15 @@ export function ChildHomePage() {
                 current={wishlist.current}
                 onPress={() => router.push('/wishlist')}
               />
-              <RecentActivity events={feed} viewer="child" />
+              <RecentActivity
+                events={feed}
+                viewer="child"
+                isLoading={feedQuery.isPending}
+                isError={feedQuery.isError}
+                onRetry={() => {
+                  void feedQuery.refetch();
+                }}
+              />
             </>
           )}
         </ScrollView>

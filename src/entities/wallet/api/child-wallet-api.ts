@@ -1,4 +1,5 @@
 import { apiRequest, authorizedImage } from '@shared/api';
+import { withTimeout } from '@shared/lib';
 import type { ChildWallet, RewardTransaction } from '../model/wallet';
 
 /**
@@ -60,8 +61,10 @@ export async function fetchServerChildWallet(
 ): Promise<ChildWallet> {
   const [wallet, members] = await Promise.all([
     fetchAllEntries(familyId, childId),
-    apiRequest<MemberDto[]>(`/families/${familyId}/members`).catch(
-      () => [] as MemberDto[],
+    // От кого награда — подпись. Без неё баланс и начисления всё равно нужны.
+    withTimeout(
+      apiRequest<MemberDto[]>(`/families/${familyId}/members`),
+      [] as MemberDto[],
     ),
   ]);
   const byId = new Map(members.map((member) => [member.userId, member]));

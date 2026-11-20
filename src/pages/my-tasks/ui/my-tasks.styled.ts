@@ -45,4 +45,8 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: theme.colors.grey,
   },
+  loading: {
+    marginTop: 48,
+    alignSelf: 'center',
+  },
 });

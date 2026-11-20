@@ -35,7 +35,8 @@ export function ParentHomePage() {
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
   const { data: tasks } = useFamilyTasks();
   // Лента — события семьи с сервера.
-  const { data: feed = [] } = useFamilyFeed();
+  const feedQuery = useFamilyFeed();
+  const { data: feed = [] } = feedQuery;
   // Счётчики — только задания вошедшего родителя: их он ведёт и проверяет.
   const total = tasks && countTasks(tasks, { createdBy: myId });
   // Выплачено вошедшим родителем за всё время — серверный агрегат, а не
@@ -97,7 +98,15 @@ export function ParentHomePage() {
             }
           />
           <CreateTaskButton onPress={() => router.push('/create-task')} />
-          <RecentActivity events={feed} viewer="parent" />
+          <RecentActivity
+            events={feed}
+            viewer="parent"
+            isLoading={feedQuery.isPending}
+            isError={feedQuery.isError}
+            onRetry={() => {
+              void feedQuery.refetch();
+            }}
+          />
         </ScrollView>
         <BottomNav activeKey="home" />
       </SafeAreaView>

@@ -1,4 +1,5 @@
 import { apiRequest, authorizedImage } from '@shared/api';
+import { withTimeout } from '@shared/lib';
 import type { Transaction, Wallet } from '../model/wallet';
 
 /**
@@ -62,8 +63,10 @@ export async function fetchServerWallet(familyId: string): Promise<Wallet> {
   const [historyItems, funds, children] = await Promise.all([
     fetchAllTransactions(familyId),
     apiRequest<{ balancePoints: string }>(`/families/${familyId}/wallet`),
-    apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
-      () => [] as ChildDto[],
+    // Имена детей — подпись выплат; без них история всё равно показывается.
+    withTimeout(
+      apiRequest<ChildDto[]>(`/families/${familyId}/children`),
+      [] as ChildDto[],
     ),
   ]);
   const transactions = historyItems.map((item): Transaction => {

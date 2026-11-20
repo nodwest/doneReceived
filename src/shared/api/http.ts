@@ -59,7 +59,15 @@ type RequestOptions = {
    * значит «сессии нет», повторять нечего.
    */
   skipRefresh?: boolean;
+  /** Свой таймаут; по умолчанию GET — 15 с, изменения — 60 с, файлы — 120 с. */
+  timeoutMs?: number;
 };
+
+// Зависший запрос не должен оставлять экран в вечной загрузке: обрываем
+// соединение, а React Query повторит запрос.
+const GET_TIMEOUT_MS = 15_000;
+const MUTATION_TIMEOUT_MS = 60_000;
+const UPLOAD_TIMEOUT_MS = 120_000;
 
 // Токен доступа подставляет сессия: shared не знает, где он хранится.
 let getAccessToken: () => string | null = () => null;
@@ -191,7 +199,7 @@ export async function refreshAccessToken(stale: string) {
  */
 export async function apiRequest<T>(
   path: string,
-  { method = 'GET', body, skipRefresh }: RequestOptions = {},
+  { method = 'GET', body, skipRefresh, timeoutMs }: RequestOptions = {},
 ): Promise<T> {
   const send = async (token: string | null) => {
     const headers: Record<string, string> = { Accept: 'application/json' };
@@ -201,10 +209,20 @@ export async function apiRequest<T>(
       headers['Content-Type'] = 'application/json';
     }
     if (token) headers.Authorization = `Bearer ${token}`;
+    const timeout =
+      timeoutMs ??
+      (form
+        ? UPLOAD_TIMEOUT_MS
+        : method === 'GET'
+          ? GET_TIMEOUT_MS
+          : MUTATION_TIMEOUT_MS);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
     try {
       return await fetch(`${API_URL}${path}`, {
         method,
         headers,
+        signal: controller.signal,
         body: form
           ? body
           : body === undefined
@@ -213,6 +231,8 @@ export async function apiRequest<T>(
       });
     } catch {
       throw new ApiError(0, []);
+    } finally {
+      clearTimeout(timer);
     }
   };
 

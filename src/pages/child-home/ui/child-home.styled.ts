@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { theme, tracking } from '@shared/theme';
 
 export const styles = StyleSheet.create({
   screen: {
@@ -21,5 +21,16 @@ export const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 24,
     paddingHorizontal: 12,
+  },
+  loading: {
+    marginTop: 40,
+    alignItems: 'center',
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: theme.fontSize.sm,
+    letterSpacing: tracking(theme.fontSize.sm),
+    fontFamily: theme.fonts.medium,
+    color: theme.colors.grey,
   },
 });

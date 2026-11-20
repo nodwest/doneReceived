@@ -1,5 +1,5 @@
 import { useMemo, useState, type ComponentProps } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -34,6 +34,7 @@ import {
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { useIsCompact } from '@shared/lib';
+import { theme } from '@shared/theme';
 import { EarnGoalCard } from './earn-goal-card';
 import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
@@ -201,7 +202,12 @@ export function MyTasksPage() {
               contentContainerStyle={styles.body}
               showsVerticalScrollIndicator={false}
             >
-              {isPending ? null : tasks.length === 0 ? (
+              {isPending ? (
+                <ActivityIndicator
+                  style={styles.loading}
+                  color={theme.colors.blue}
+                />
+              ) : tasks.length === 0 ? (
                 <Text style={styles.empty}>
                   {tab === 'review'
                     ? t('tasks.emptyReview')

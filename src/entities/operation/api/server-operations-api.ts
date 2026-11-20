@@ -1,4 +1,5 @@
 import { apiRequest, authorizedImage } from '@shared/api';
+import { withTimeout } from '@shared/lib';
 import type { Operation } from '../model/operation';
 
 // История наград детей с сервера: заработанные — начисления из кошельков
@@ -109,7 +110,10 @@ export async function fetchServerOperations(
           avatarUrl: viewer.child.avatarUrl,
         },
       ]
-    : await apiRequest<ChildDto[]>(`/families/${familyId}/children`);
+    : await withTimeout(
+        apiRequest<ChildDto[]>(`/families/${familyId}/children`),
+        [] as ChildDto[],
+      );
   // По каждому ребёнку — кошелёк и упущенные; не ответили — у ребёнка пусто.
   const histories = await Promise.all(
     children.map((child) =>

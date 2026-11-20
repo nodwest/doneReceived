@@ -1,5 +1,5 @@
 import { apiRequest, authorizedImage } from '@shared/api';
-import { appendPhoto, type PickedPhoto } from '@shared/lib';
+import { appendPhoto, withTimeout, type PickedPhoto } from '@shared/lib';
 import type { RejectReasonKey, Task, TaskState } from '../model/task';
 import type {
   ChecklistStepPayload,
@@ -181,12 +181,16 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
       `/families/${familyId}/tasks?status=assigned,submitted,rejected`,
     ),
     parent
-      ? apiRequest<ChildDto[]>(`/families/${familyId}/children`).catch(
-          () => [] as ChildDto[],
+      ? withTimeout(
+          apiRequest<ChildDto[]>(`/families/${familyId}/children`),
+          [] as ChildDto[],
         )
       : ([] as ChildDto[]),
-    apiRequest<MemberDto[]>(`/families/${familyId}/members`).catch(
-      () => [] as MemberDto[],
+    // Имя автора — подпись, а не сами задания: зависший /members не должен
+    // держать список. Не ответил — показываем «Родитель».
+    withTimeout(
+      apiRequest<MemberDto[]>(`/families/${familyId}/members`),
+      [] as MemberDto[],
     ),
   ]);
   const visible = items.filter(

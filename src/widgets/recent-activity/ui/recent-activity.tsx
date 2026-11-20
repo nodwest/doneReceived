@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { FeedItem, groupFeed, type FeedEvent } from '@entities/activity';
 import { useTranslation } from '@shared/i18n';
+import { theme } from '@shared/theme';
 import { SectionHeader } from '@shared/ui';
 import { styles } from './recent-activity.styled';
 
@@ -12,6 +13,11 @@ type RecentActivityProps = {
   /** События ленты с сервера, новые первыми. */
   events: FeedEvent[];
   viewer: 'parent' | 'child';
+  /** Первая загрузка: показываем заглушку, а не пустое место. */
+  isLoading?: boolean;
+  /** Лента не загрузилась: даём повторить. */
+  isError?: boolean;
+  onRetry?: () => void;
   onSeeAll?: () => void;
 };
 
@@ -23,6 +29,9 @@ type RecentActivityProps = {
 export function RecentActivity({
   events,
   viewer,
+  isLoading = false,
+  isError = false,
+  onRetry,
   onSeeAll,
 }: RecentActivityProps) {
   const { t } = useTranslation();
@@ -31,7 +40,7 @@ export function RecentActivity({
     [events],
   );
 
-  if (cards.length === 0) return null;
+  if (cards.length === 0 && !isLoading && !isError) return null;
 
   return (
     <View style={styles.container}>
@@ -40,11 +49,35 @@ export function RecentActivity({
         actionLabel={t('common.seeAll')}
         onAction={onSeeAll}
       />
-      <View style={styles.list}>
-        {cards.map((card) => (
-          <FeedItem key={card.key} card={card} viewer={viewer} />
-        ))}
-      </View>
+      {cards.length === 0 ? (
+        <View style={styles.state}>
+          {isLoading ? (
+            <>
+              <ActivityIndicator color={theme.colors.blue} />
+              <Text style={styles.stateText}>{t('activity.loading')}</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.stateText}>{t('activity.loadError')}</Text>
+              {onRetry && (
+                <Pressable
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  onPress={onRetry}
+                >
+                  <Text style={styles.retry}>{t('common.retry')}</Text>
+                </Pressable>
+              )}
+            </>
+          )}
+        </View>
+      ) : (
+        <View style={styles.list}>
+          {cards.map((card) => (
+            <FeedItem key={card.key} card={card} viewer={viewer} />
+          ))}
+        </View>
+      )}
     </View>
   );
 }

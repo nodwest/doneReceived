@@ -8,7 +8,7 @@ import { queryRoots } from '@shared/api';
  * карточки: у задания одна карточка со всей историей, поэтому событий нужно
  * заметно больше, чем карточек.
  */
-export const FEED_LIMIT = 50;
+export const FEED_LIMIT = 20;
 
 export const feedKeys = {
   all: queryRoots.activity,
