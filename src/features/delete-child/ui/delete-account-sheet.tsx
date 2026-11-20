@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { formatMoney } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking, useTheme } from '@shared/theme';
 import { BottomSheet, Icon, PillButton } from '@shared/ui';
 
 /**
@@ -33,6 +33,7 @@ export function DeleteAccountSheet({
   onConfirm,
   onWithdraw,
 }: DeleteAccountSheetProps) {
+  useTheme();
   const { t } = useTranslation();
   // Пока шторка уезжает (step уже null), показываем то, что было открыто,
   // иначе на время закрытия мелькнуло бы «Вы уверены?».
@@ -96,7 +97,7 @@ export function DeleteAccountSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   body: {
     alignItems: 'center',
     gap: 16,
@@ -110,10 +111,10 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.dangerSoft,
+    backgroundColor: colors.dangerSoft,
   },
   iconBalance: {
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   header: {
     alignItems: 'center',
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   subtitle: {
     textAlign: 'center',
@@ -132,11 +133,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   actions: {
     alignSelf: 'stretch',
     flexDirection: 'row',
     gap: 12,
   },
-});
+}));

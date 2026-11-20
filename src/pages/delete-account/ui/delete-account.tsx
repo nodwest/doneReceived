@@ -13,7 +13,7 @@ import { useMyChildBalance } from '@features/family-tasks';
 import { formatMoney } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { Icon, PillButton, RoundButton, type IconName } from '@shared/ui';
 import { styles } from './delete-account.styled';
 
@@ -28,6 +28,7 @@ const goBack = () =>
  * выход, тост и логин.
  */
 export function DeleteAccountPage() {
+  useTheme();
   const { t } = useTranslation();
   const { balance, isPending: balanceLoading } = useMyChildBalance();
   const deleteProfile = useDeleteMyProfile();
