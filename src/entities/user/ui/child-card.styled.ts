@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -10,8 +9,8 @@ export const styles = StyleSheet.create({
     height: 130,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
   pressed: {
@@ -30,7 +29,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // Чипы в два ряда: «active tasks» над «tasks to review».
   stats: {
@@ -44,25 +43,25 @@ export const styles = StyleSheet.create({
     paddingVertical: 9.5,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   statReview: {
-    backgroundColor: theme.colors.reviewChip,
+    backgroundColor: colors.reviewChip,
   },
   statValue: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   statLabel: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   statReviewText: {
-    color: theme.colors.reviewChipText,
+    color: colors.reviewChipText,
   },
   homeBadge: {
     position: 'absolute',
@@ -74,4 +73,4 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

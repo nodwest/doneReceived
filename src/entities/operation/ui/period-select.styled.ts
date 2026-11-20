@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -13,7 +12,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   trigger: {
     flexDirection: 'row',
@@ -23,7 +22,7 @@ export const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 8,
     borderRadius: 12,
-    backgroundColor: theme.colors.violetChip,
+    backgroundColor: colors.violetChip,
   },
   pressed: {
     opacity: 0.7,
@@ -32,7 +31,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   // Стрелка вниз, пока меню закрыто, и вверх, пока открыто.
   chevron: {
@@ -41,4 +40,4 @@ export const styles = StyleSheet.create({
   chevronOpen: {
     transform: [{ rotate: '-90deg' }],
   },
-});
+}));

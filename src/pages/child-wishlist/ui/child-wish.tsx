@@ -2,6 +2,7 @@ import { ScrollView } from 'react-native';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useWishlistProgress, WishDetails } from '@entities/wish';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { useChildBalance } from '@entities/wallet';
 import { HeaderAvatar, ScreenHeader } from '@shared/ui';
@@ -14,6 +15,7 @@ import { styles } from './child-wishlist.styled';
  * заметка ребёнка и ссылка на магазин. Только просмотр.
  */
 export function ChildWishPage() {
+  useTheme();
   const { t } = useTranslation();
   const { id, wishId } = useLocalSearchParams<{ id: string; wishId: string }>();
   const { child, owner, familyId, loading } = useWishlistChild(id);

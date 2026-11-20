@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { formatCountdown, useNow } from '@shared/lib';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { Icon, PaperTexture } from '@shared/ui';
 import { formatRewardShort } from '../model';
 
@@ -104,11 +104,11 @@ export function TilePaper({ review }: { review?: boolean }) {
 export const TILE_GAP = 17;
 
 /** Общие стили плиток заданий: основа, шапка, название, описание. */
-export const tileStyles = StyleSheet.create({
+export const tileStyles = createStyles((colors) => ({
   // Белая основа под бумагой и тень со всех сторон.
   surface: {
     overflow: 'hidden',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.paperBase,
     boxShadow: '0px 0px 16px rgba(26, 26, 46, 0.26)',
   },
   head: {
@@ -130,18 +130,18 @@ export const tileStyles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // «from» перед именем автора.
   namePrefix: {
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   caption: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Название целиком, сколько бы строк ни заняло.
   title: {
@@ -149,21 +149,21 @@ export const tileStyles = StyleSheet.create({
     lineHeight: 24,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   description: {
     fontSize: theme.fontSize.sm,
     lineHeight: 20,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
-});
+}));
 
 /** Описание в плитке — не длиннее стольких строк, дальше многоточие. */
 export const TILE_DESCRIPTION_LINES = 5;
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   pill: {
     height: 34,
     flexDirection: 'row',
@@ -174,20 +174,20 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   warm: {
-    backgroundColor: theme.colors.timerWarm,
+    backgroundColor: colors.timerWarm,
   },
   cool: {
-    backgroundColor: theme.colors.timerCool,
+    backgroundColor: colors.timerCool,
   },
   review: {
     paddingLeft: 12,
-    backgroundColor: theme.colors.reviewChipBg,
+    backgroundColor: colors.reviewChipBg,
   },
   paid: {
-    backgroundColor: theme.colors.approvedFrom,
+    backgroundColor: colors.approvedFrom,
   },
   missed: {
-    backgroundColor: theme.colors.missedTile,
+    backgroundColor: colors.missedTile,
   },
   timerText: {
     fontSize: 15,
@@ -199,13 +199,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.reviewText,
+    color: colors.reviewText,
   },
   pillTextPaid: {
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   pillTextMissed: {
-    color: theme.colors.missedDeep,
+    color: colors.missedDeep,
   },
   reward: {
     flexDirection: 'row',
@@ -216,12 +216,12 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   rewardTextPaid: {
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   rewardTextMissed: {
-    color: theme.colors.missedDeep,
+    color: colors.missedDeep,
   },
-});
+}));

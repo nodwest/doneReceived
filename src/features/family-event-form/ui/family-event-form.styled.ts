@@ -1,14 +1,14 @@
-import { Platform, StyleSheet, type TextStyle } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { Platform, type TextStyle } from 'react-native';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 const webInputReset = Platform.select({
   web: { outlineWidth: 0, outlineStyle: 'none', resize: 'none' },
 }) as unknown as TextStyle;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   container: {
     flex: 1,
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     letterSpacing: tracking(17),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   headerSide: {
     width: 48,
@@ -39,10 +39,10 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.blue,
+    color: colors.blueInk,
   },
   headerActionDisabled: {
-    color: theme.colors.placeholder,
+    color: colors.placeholder,
   },
   scroll: {
     flex: 1,
@@ -63,20 +63,20 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   labelHint: {
     fontSize: 9,
     letterSpacing: tracking(9),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   seg: {
     flexDirection: 'row',
     gap: 3,
     padding: 3,
     borderRadius: 13,
-    backgroundColor: '#EAECF3',
+    backgroundColor: colors.line,
   },
   segItem: {
     flex: 1,
@@ -86,17 +86,17 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   segItemOn: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 2px 5px rgba(26, 26, 46, 0.08)',
   },
   segText: {
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   segTextOn: {
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   dateField: {
     minHeight: 54,
@@ -107,8 +107,8 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   dateIcon: {
     width: 33,
@@ -116,7 +116,7 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
     flexShrink: 0,
   },
   dateBody: {
@@ -127,7 +127,7 @@ export const styles = StyleSheet.create({
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
     textTransform: 'uppercase',
   },
   dateValue: {
@@ -135,14 +135,14 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   dateHint: {
     marginTop: 1,
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   dateRow: {
     gap: 7,
@@ -162,23 +162,23 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   reminderOptionOn: {
-    borderColor: theme.colors.childFrom,
-    backgroundColor: theme.colors.childTint,
+    borderColor: colors.childFrom,
+    backgroundColor: colors.childTint,
   },
   reminderText: {
     fontSize: 9,
     letterSpacing: tracking(9),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   reminderTextOn: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
     fontFamily: theme.fonts.bold,
   },
   visibility: {
@@ -190,8 +190,8 @@ export const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   eye: {
     width: 28,
@@ -199,45 +199,45 @@ export const styles = StyleSheet.create({
     borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   visibilityTitle: {
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   visibilityHint: {
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
     marginLeft: 'auto',
   },
   footer: {
     paddingHorizontal: 16,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.line,
-    backgroundColor: theme.colors.prime,
+    borderTopColor: colors.line,
+    backgroundColor: colors.prime,
   },
   save: {
     height: 48,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.blue,
+    backgroundColor: colors.blue,
     boxShadow: '0px 4px 12px rgba(74, 144, 226, 0.22)',
   },
   saveDisabled: {
-    backgroundColor: theme.colors.placeholder,
+    backgroundColor: colors.placeholder,
     boxShadow: 'none',
   },
   saveText: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   input: {
     minHeight: 50,
@@ -245,12 +245,12 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
     ...webInputReset,
   },
   textarea: {
@@ -259,13 +259,13 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     fontSize: 13,
     letterSpacing: tracking(13),
     lineHeight: 18,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
     textAlignVertical: 'top',
     ...webInputReset,
   },
@@ -273,6 +273,6 @@ export const styles = StyleSheet.create({
     fontSize: 9,
     letterSpacing: tracking(9),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

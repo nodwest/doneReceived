@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   scroll: {
     flex: 1,
   },
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     fontSize: 30,
     letterSpacing: tracking(30),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   sectionList: {
     gap: 10,
@@ -37,55 +36,55 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
     textAlign: 'center',
   },
   errorCard: {
     padding: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.dangerBorder,
-    backgroundColor: theme.colors.dangerTint,
+    borderColor: colors.dangerBorder,
+    backgroundColor: colors.dangerTint,
     gap: 4,
   },
   errorTitle: {
     fontSize: 12,
     letterSpacing: tracking(12),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.dangerText,
+    color: colors.dangerText,
   },
   errorLink: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.dangerText,
+    color: colors.dangerText,
   },
   emptyCard: {
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     gap: 5,
   },
   emptyTitle: {
     fontSize: 14,
     letterSpacing: tracking(14),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   emptyHint: {
     fontSize: 11,
     letterSpacing: tracking(11),
     lineHeight: 16,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   emptyAction: {
     marginTop: 4,
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.blue,
+    color: colors.blueInk,
   },
-});
+}));

@@ -1,13 +1,12 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   tile: {
     gap: 14,
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: theme.colors.cardBorder,
+    borderColor: colors.cardBorder,
   },
   pressed: {
     opacity: 0.85,
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.sentBack,
+    color: colors.sentBack,
   },
   footer: {
     flexDirection: 'row',
@@ -29,4 +28,4 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
-});
+}));

@@ -1,15 +1,14 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 export const DAY_GAP = 4;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     padding: 14,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 6px 18px rgba(26, 26, 46, 0.045)',
   },
   header: {
@@ -29,14 +28,14 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   month: {
     flexShrink: 1,
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   toggle: {
     height: 27,
@@ -45,13 +44,13 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   toggleText: {
     fontSize: 9.5,
     letterSpacing: tracking(9.5),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   chevronUp: {
     transform: [{ rotate: '180deg' }],
@@ -69,22 +68,22 @@ export const styles = StyleSheet.create({
     height: 62,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
   },
   dayToday: {
     borderColor: 'transparent',
-    backgroundColor: theme.colors.blue,
+    backgroundColor: colors.blue,
     boxShadow: '0px 7px 16px rgba(74, 144, 226, 0.32)',
   },
   dayWeekday: {
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
     textTransform: 'uppercase',
   },
   dayWeekdayToday: {
@@ -95,10 +94,10 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(16),
     lineHeight: 17,
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   dayNumberToday: {
-    color: theme.colors.white,
+    color: colors.white,
   },
   dot: {
     position: 'absolute',
@@ -106,13 +105,13 @@ export const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: theme.colors.yellow,
+    backgroundColor: colors.yellow,
   },
   dotBlue: {
-    backgroundColor: theme.colors.blue,
+    backgroundColor: colors.blue,
   },
   dotToday: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   weekCaption: {
     marginTop: 9,
@@ -125,13 +124,13 @@ export const styles = StyleSheet.create({
     fontSize: 9.5,
     letterSpacing: tracking(9.5),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   weekCaptionHint: {
     fontSize: 9,
     letterSpacing: tracking(9),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
 
   weekdays: {
@@ -144,7 +143,7 @@ export const styles = StyleSheet.create({
     fontSize: 7.5,
     letterSpacing: tracking(7.5),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
     textTransform: 'uppercase',
   },
   monthGrid: {
@@ -161,27 +160,27 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   monthDayToday: {
-    backgroundColor: theme.colors.blue,
+    backgroundColor: colors.blue,
   },
   monthDayRange: {
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   monthNumber: {
     fontSize: 10.5,
     letterSpacing: tracking(10.5),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   monthNumberOutside: {
-    color: theme.colors.placeholder,
+    color: colors.placeholder,
     fontFamily: theme.fonts.medium,
   },
   monthNumberToday: {
-    color: theme.colors.white,
+    color: colors.white,
     fontFamily: theme.fonts.extrabold,
   },
   monthNumberRange: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   monthDot: {
     position: 'absolute',
@@ -189,12 +188,12 @@ export const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: theme.colors.yellow,
+    backgroundColor: colors.yellow,
   },
   monthDotBlue: {
-    backgroundColor: theme.colors.blue,
+    backgroundColor: colors.blue,
   },
   monthDotToday: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
-});
+}));

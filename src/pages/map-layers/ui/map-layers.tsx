@@ -36,7 +36,7 @@ import {
 import { authorizedImage } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { formatClock, formatTimeAgo, showToast, useNow } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import {
   BottomSheet,
   GradientButton,
@@ -539,6 +539,7 @@ function SectionList({ children }: { children: ReactNode }) {
  * REST-списка маршрутов на сервере нет.
  */
 export function MapLayersPage() {
+  useTheme();
   const { t } = useTranslation();
   const { height: windowHeight } = useWindowDimensions();
   const now = useNow(60_000);

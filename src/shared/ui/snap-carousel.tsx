@@ -1,7 +1,7 @@
 import { useState, type Key, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
+import { ScrollView, View, type ViewStyle } from 'react-native';
 import { useSnapCarousel } from '../lib';
-import { theme } from '../theme';
+import { createStyles, theme } from '../theme';
 
 const GUTTER = 12;
 // Между плитками: их тени не накладываются.
@@ -178,7 +178,7 @@ export function SnapCarousel<T>({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   // Лента растягивается на всю свободную высоту, карточки — вслед за ней.
   root: {
     flexGrow: 1,
@@ -217,9 +217,9 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: theme.colors.placeholder,
+    backgroundColor: colors.placeholder,
   },
   dotActive: {
     width: 20,
   },
-});
+}));

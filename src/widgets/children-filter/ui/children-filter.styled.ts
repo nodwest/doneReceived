@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     height: 48,
     flexDirection: 'row',
@@ -10,8 +9,8 @@ export const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.06)',
   },
   segment: {
@@ -29,8 +28,8 @@ export const styles = StyleSheet.create({
   // Выбранный — белый в тёмной рамке, как выбранный день на графике.
   segmentActive: {
     borderWidth: 1.5,
-    borderColor: theme.colors.ink,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.ink,
+    backgroundColor: colors.surface,
     boxShadow: '0px 2px 8px rgba(26, 26, 46, 0.08)',
   },
   label: {
@@ -38,7 +37,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   labelActive: {
     fontFamily: theme.fonts.semibold,
@@ -54,9 +53,9 @@ export const styles = StyleSheet.create({
   },
   stacked: {
     borderWidth: 2,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
   },
   overlap: {
     marginLeft: -9,
   },
-});
+}));

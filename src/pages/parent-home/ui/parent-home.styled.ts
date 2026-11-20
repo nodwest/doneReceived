@@ -1,11 +1,10 @@
-import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { createStyles } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
     minHeight: '100%',
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   container: {
     flex: 1,
@@ -22,4 +21,4 @@ export const styles = StyleSheet.create({
     paddingBottom: 24,
     paddingHorizontal: 12,
   },
-});
+}));

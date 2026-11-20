@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useTranslation } from '../i18n';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 import { Icon } from './icons';
 
 const OPEN_MS = 160;
@@ -153,7 +153,7 @@ export function SelectMenu<T extends string>({
                 {option.label}
               </Text>
               {selected && (
-                <Icon name="check" size={16} color={theme.colors.violet} />
+                <Icon name="check" size={16} color={theme.colors.violetInk} />
               )}
             </Pressable>
           );
@@ -163,14 +163,14 @@ export function SelectMenu<T extends string>({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   menu: {
     position: 'absolute',
     padding: MENU_PADDING,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 12px 32px rgba(26, 26, 46, 0.16)',
   },
   option: {
@@ -183,16 +183,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   optionActive: {
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   label: {
     fontSize: 15,
     fontFamily: theme.fonts.medium,
     letterSpacing: tracking(15),
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   labelSelected: {
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

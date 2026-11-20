@@ -17,6 +17,7 @@ import {
 } from '@features/family-tasks';
 import { ChildTransactionRow } from '@entities/wallet';
 import { useWishlistProgress } from '@entities/wish';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
@@ -41,6 +42,7 @@ const RECENT_TRANSACTIONS = 4;
  * карту; «See all» — вся история транзакций.
  */
 export function ChildWalletPage() {
+  useTheme();
   const { t } = useTranslation();
   const { data: operations = NO_OPERATIONS } = useFamilyOperations();
   const { childId } = useChildAccount();

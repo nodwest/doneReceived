@@ -7,9 +7,6 @@ import { theme } from '@shared/theme';
 import { NAV_ITEMS } from '../config/nav-items';
 import { NAV_PADDING_VERTICAL, styles } from './bottom-nav.styled';
 
-/** Цвет активной вкладки — синий в стиле приложения (как вкладка Calendar). */
-const ACTIVE_COLOR = theme.colors.blue;
-
 type BottomNavProps = {
   activeKey: string;
   onNavigate?: (key: string) => void;
@@ -26,7 +23,8 @@ export function BottomNav({
   const router = useRouter();
   const pathname = usePathname();
   const { bottom } = useSafeAreaInsets();
-  const activeTint = activeColor ?? ACTIVE_COLOR;
+  // Активная вкладка — синий в стиле приложения (как вкладка Calendar).
+  const activeTint = activeColor ?? theme.colors.blueInk;
 
   return (
     <View

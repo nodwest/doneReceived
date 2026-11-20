@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { Text, View } from 'react-native';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 type SectionHeadProps = {
   title: string;
@@ -29,7 +29,7 @@ export function SectionHead({ title, count, hint, tone }: SectionHeadProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   head: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   count: {
     minWidth: 24,
@@ -49,25 +49,25 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 11,
-    backgroundColor: theme.colors.childCount,
+    backgroundColor: colors.childCount,
   },
   countReview: {
-    backgroundColor: theme.colors.reviewChip,
+    backgroundColor: colors.reviewChip,
   },
   countText: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   countTextReview: {
-    color: theme.colors.reviewChipText,
+    color: colors.reviewChipText,
   },
   hint: {
     marginLeft: 'auto',
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

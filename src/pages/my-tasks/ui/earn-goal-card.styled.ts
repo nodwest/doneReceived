@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     gap: 14,
     padding: 16,
@@ -27,7 +26,7 @@ export const styles = StyleSheet.create({
     fontSize: 34,
     letterSpacing: tracking(34),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   forTasks: {
     fontSize: 15,
@@ -48,7 +47,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   nums: {
     fontSize: 13,
@@ -58,7 +57,7 @@ export const styles = StyleSheet.create({
   },
   numsStrong: {
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   track: {
     height: 10,
@@ -69,7 +68,7 @@ export const styles = StyleSheet.create({
   },
   saved: {
     height: '100%',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   fromTasks: {
     height: '100%',
@@ -83,7 +82,7 @@ export const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: theme.colors.goalDot,
+    backgroundColor: colors.goalDot,
   },
   captionText: {
     flex: 1,
@@ -92,4 +91,4 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: 'rgba(255, 255, 255, 0.9)',
   },
-});
+}));

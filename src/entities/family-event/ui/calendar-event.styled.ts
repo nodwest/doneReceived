@@ -1,13 +1,12 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Большая карточка события: фото, затемнение и текст сверху.
   card: {
     height: 205,
     borderRadius: 24,
     overflow: 'hidden',
-    backgroundColor: theme.colors.childDeep,
+    backgroundColor: colors.childDeep,
     boxShadow: '0px 12px 24px rgba(26, 26, 46, 0.18)',
   },
   pressed: {
@@ -52,7 +51,7 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(24),
     lineHeight: 25,
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   description: {
     maxWidth: 300,
@@ -100,8 +99,8 @@ export const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 12px rgba(26, 26, 46, 0.035)',
   },
   tileTop: {
@@ -117,29 +116,29 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconTileBlue: {
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   iconTileAmber: {
-    backgroundColor: theme.colors.yellowSoft,
+    backgroundColor: colors.yellowSoft,
   },
   dayChip: {
     height: 21,
     paddingHorizontal: 8,
     borderRadius: 999,
     justifyContent: 'center',
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   dayChipAmber: {
-    backgroundColor: theme.colors.yellowSoft,
+    backgroundColor: colors.yellowSoft,
   },
   dayText: {
     fontSize: 8.5,
     letterSpacing: tracking(8.5),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   dayTextAmber: {
-    color: theme.colors.reviewText,
+    color: colors.reviewText,
   },
   tileTitle: {
     marginTop: 10,
@@ -147,7 +146,7 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(12.5),
     lineHeight: 14,
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   tileMeta: {
     marginTop: 3,
@@ -155,7 +154,7 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(9.5),
     lineHeight: 13,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
 
   // Строка «Родительское собрание» под карточками.
@@ -166,8 +165,8 @@ export const styles = StyleSheet.create({
     padding: 11,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   dateBox: {
     width: 37,
@@ -175,13 +174,13 @@ export const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   dateWeekday: {
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
     textTransform: 'uppercase',
   },
   dateDay: {
@@ -189,7 +188,7 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(13),
     lineHeight: 14,
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   rowBody: {
     flex: 1,
@@ -199,26 +198,26 @@ export const styles = StyleSheet.create({
     fontSize: 10.5,
     letterSpacing: tracking(10.5),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   rowMeta: {
     marginTop: 2,
     fontSize: 9,
     letterSpacing: tracking(9),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   rowTag: {
     height: 21,
     paddingHorizontal: 8,
     borderRadius: 999,
     justifyContent: 'center',
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   rowTagText: {
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
-});
+}));

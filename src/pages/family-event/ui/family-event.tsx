@@ -30,7 +30,7 @@ import {
   isSameDay,
   showToast,
 } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { BottomSheet, Icon, LetterAvatar, ScreenHeader } from '@shared/ui';
 import { styles } from './family-event.styled';
 
@@ -90,6 +90,7 @@ function reminderLeadKey(start: Date, reminderAt: Date) {
  * GET /families/:familyId/events/:eventId.
  */
 export function FamilyEventPage() {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -117,7 +118,10 @@ export function FamilyEventPage() {
         <View style={styles.missingHeader}>
           <ScreenHeader title={t('calendar.title')} onBack={back} />
         </View>
-        <ActivityIndicator style={styles.loading} color={theme.colors.blue} />
+        <ActivityIndicator
+          style={styles.loading}
+          color={theme.colors.blueInk}
+        />
       </View>
     );
   }
@@ -417,7 +421,7 @@ export function FamilyEventPage() {
                   {option.label}
                 </Text>
                 {selected && (
-                  <Icon name="check" size={17} color={theme.colors.childDeep} />
+                  <Icon name="check" size={17} color={theme.colors.childInk} />
                 )}
               </Pressable>
             );

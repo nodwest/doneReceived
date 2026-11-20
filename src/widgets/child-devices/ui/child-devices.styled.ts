@@ -1,8 +1,7 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { withAlpha } from '@shared/lib';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Строка-переключатель: «2 devices ⌄», заголовок раскрытого блока
   // «Devices ⌃» или «No devices yet» с кнопкой Connect device.
   toggle: {
@@ -23,13 +22,13 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   toggleLabelNone: {
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   toggleLabelOpen: {
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   connect: {
     height: 30,
@@ -38,13 +37,13 @@ export const styles = StyleSheet.create({
     gap: 5,
     paddingHorizontal: 12,
     borderRadius: 14,
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
   },
   connectLabel: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   chevronUp: {
     transform: [{ rotate: '180deg' }],
@@ -67,16 +66,16 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1.2,
     borderStyle: 'dashed',
-    borderColor: withAlpha(theme.colors.violet, 0.35),
-    backgroundColor: theme.colors.violetSoft,
+    borderColor: withAlpha(colors.violet, 0.35),
+    backgroundColor: colors.violetSoft,
   },
   connectNewLabel: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   pressed: {
     opacity: 0.7,
   },
-});
+}));

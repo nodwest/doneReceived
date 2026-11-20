@@ -53,7 +53,7 @@ export function RecentActivity({
         <View style={styles.state}>
           {isLoading ? (
             <>
-              <ActivityIndicator color={theme.colors.blue} />
+              <ActivityIndicator color={theme.colors.blueInk} />
               <Text style={styles.stateText}>{t('activity.loading')}</Text>
             </>
           ) : (

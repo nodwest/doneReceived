@@ -20,7 +20,7 @@ import {
 import { ROLE_COLORS } from '@entities/user';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { AuthLayout, GradientButton, Icon, type IconName } from '@shared/ui';
 import { styles } from './family-setup.styled';
 
@@ -36,6 +36,7 @@ type Mode = 'create' | 'join';
  * GET /families, приложение само уходит на главную.
  */
 export function FamilySetupPage() {
+  useTheme();
   const { t } = useTranslation();
   const logout = useLogout();
   const [mode, setMode] = useState<Mode>('create');

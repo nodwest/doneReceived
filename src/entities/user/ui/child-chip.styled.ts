@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -11,11 +10,11 @@ export const styles = StyleSheet.create({
     paddingRight: 18,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   chipSelected: {
-    borderColor: theme.colors.violet,
+    borderColor: colors.violet,
   },
   avatar: {
     width: 32,
@@ -25,18 +24,18 @@ export const styles = StyleSheet.create({
   initial: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.childChip,
+    backgroundColor: colors.childChip,
   },
   letter: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   name: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
-});
+}));

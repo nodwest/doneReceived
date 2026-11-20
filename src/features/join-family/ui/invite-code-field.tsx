@@ -40,7 +40,7 @@ export function InviteCodeField({ state, hint }: InviteCodeFieldProps) {
             error && styles.inputError,
           ]}
         >
-          <Icon name="key" size={20} color={theme.colors.violet} />
+          <Icon name="key" size={20} color={theme.colors.violetInk} />
           <TextInput
             value={code}
             onChangeText={setCode}

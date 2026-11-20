@@ -10,6 +10,7 @@ import {
   type HintTone,
   type RegistrationForm,
 } from '@features/auth';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import {
   AuthFootnote,
@@ -39,6 +40,7 @@ const EMPTY_FORM: RegistrationForm = {
  * экран подтверждения почты.
  */
 export function Registration() {
+  useTheme();
   const { t } = useTranslation();
   const [form, setForm] = useState(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);

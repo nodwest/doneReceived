@@ -11,6 +11,7 @@ import {
   WishDetails,
   WishPhotosError,
 } from '@entities/wish';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import {
   choosePhotos,
@@ -27,6 +28,7 @@ import { styles } from './my-wish.styled';
  * wish, готовое желание можно попросить купить.
  */
 export function MyWishPage() {
+  useTheme();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.

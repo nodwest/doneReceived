@@ -1,9 +1,11 @@
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useFamilyTasks } from '@features/family-tasks';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { TaskFormScreen } from './task-form-screen';
 
 export function EditTaskPage() {
+  useTheme();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { data: tasks, isPending } = useFamilyTasks();

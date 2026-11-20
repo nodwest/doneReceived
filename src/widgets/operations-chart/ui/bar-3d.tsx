@@ -5,7 +5,7 @@ import {
   OPERATION_KIND_COLORS,
   type OperationKind,
 } from '@entities/operation';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import {
   DEPTH_X,
   DEPTH_Y,
@@ -17,11 +17,11 @@ import { styles } from './bar-3d.styled';
 type CubeColors = { front: string; side: string; top: string };
 
 // Будущий или пустой день: одинаковый серый кубик минимальной высоты.
-const FUTURE_COLORS: CubeColors = {
+const FUTURE_COLORS = themedValue<CubeColors>(() => ({
   front: theme.colors.future,
   side: theme.colors.futureDark,
   top: theme.colors.futureLight,
-};
+}));
 
 // Подпись суммы помещается на лицевую грань не ниже этой высоты.
 const MIN_LABEL_HEIGHT = 16;

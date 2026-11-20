@@ -1,6 +1,6 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme } from '../theme';
+import { createStyles, theme } from '../theme';
 
 type ToggleProps = {
   value: boolean;
@@ -55,7 +55,7 @@ export function Toggle({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   disabled: {
     opacity: 0.5,
   },
@@ -71,15 +71,15 @@ const styles = StyleSheet.create({
   },
   trackOff: {
     justifyContent: 'flex-start',
-    backgroundColor: theme.colors.placeholder,
+    backgroundColor: colors.placeholder,
   },
   trackOffBlue: {
-    backgroundColor: theme.colors.toggleOff,
+    backgroundColor: colors.toggleOff,
   },
   knob: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
-});
+}));

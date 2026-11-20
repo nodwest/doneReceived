@@ -1,13 +1,6 @@
 import { useState } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  type TextStyle,
-} from 'react-native';
-import { theme, tracking } from '../theme';
+import { Platform, Text, TextInput, View, type TextStyle } from 'react-native';
+import { createStyles, theme, tracking } from '../theme';
 
 type CodeInputProps = {
   value: string;
@@ -92,7 +85,7 @@ export function CodeInput({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   row: {
     flexDirection: 'row',
     gap: 8,
@@ -104,28 +97,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   cellActive: {
     borderWidth: 1.5,
-    borderColor: theme.colors.violet,
+    borderColor: colors.violet,
     boxShadow: '0px 0px 0px 3px rgba(108, 92, 231, 0.15)',
   },
   cellError: {
-    borderColor: theme.colors.danger,
+    borderColor: colors.danger,
   },
   char: {
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   caret: {
     width: 2,
     height: 24,
     borderRadius: 1,
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
   },
   // Поле лежит поверх ячеек и ловит ввод, но его не видно.
   hiddenInput: {
@@ -140,4 +133,4 @@ const styles = StyleSheet.create({
       web: { outlineWidth: 0, outlineStyle: 'none' } as unknown as TextStyle,
     }),
   },
-});
+}));

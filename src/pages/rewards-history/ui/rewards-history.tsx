@@ -38,7 +38,7 @@ import { balanceAfter } from '@entities/wallet';
 import { getRewardGoal, useWishes } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { formatDayLabel, formatMonthDay, startOfDay } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { RoundButton, SnapCarousel } from '@shared/ui';
 import { styles } from './rewards-history.styled';
 import { authorizedImage } from '@shared/api';
@@ -61,6 +61,7 @@ const NO_OPERATIONS: Operation[] = [];
  * карточке — на сколько награда приблизила желание.
  */
 export function RewardsHistoryPage({ childId }: { childId?: string }) {
+  useTheme();
   const myId = useMyId();
   const { t } = useTranslation();
   const { data: allOperations = NO_OPERATIONS, isPending } =
@@ -464,6 +465,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
 
 /** История наград вошедшего ребёнка от его лица. */
 export function ChildRewardsHistoryPage() {
+  useTheme();
   const { childId } = useChildAccount();
   return <RewardsHistoryPage childId={childId ?? ''} />;
 }

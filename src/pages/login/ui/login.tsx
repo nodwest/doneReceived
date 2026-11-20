@@ -8,6 +8,7 @@ import {
   type FieldError,
   type LoginForm,
 } from '@features/auth';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import {
   AuthFootnote,
@@ -24,6 +25,7 @@ import { styles } from './login.styled';
  * попытки войти; после входа — главная.
  */
 export function Login() {
+  useTheme();
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ email?: string }>();
   const [form, setForm] = useState<LoginForm>({

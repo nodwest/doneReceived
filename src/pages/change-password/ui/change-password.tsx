@@ -8,6 +8,7 @@ import {
   useChangePassword,
   type ChangePasswordErrorInfo,
 } from '@features/change-password';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { GradientButton, InputWithIcon, Label, RoundButton } from '@shared/ui';
@@ -29,6 +30,7 @@ const goBack = () =>
  * разлогинивает.
  */
 export function ChangePasswordPage() {
+  useTheme();
   const { t } = useTranslation();
   const [form, setForm] = useState(EMPTY);
   const [focused, setFocused] = useState<Field | null>(null);

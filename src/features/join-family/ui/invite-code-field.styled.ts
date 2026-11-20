@@ -1,7 +1,7 @@
-import { Platform, StyleSheet, type TextStyle } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { Platform, type TextStyle } from 'react-native';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     gap: 12,
   },
@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   input: {
     height: 56,
@@ -22,14 +22,14 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.prime,
+    borderColor: colors.line,
+    backgroundColor: colors.prime,
   },
   inputFocused: {
-    borderColor: theme.colors.violet,
+    borderColor: colors.violet,
   },
   inputError: {
-    borderColor: theme.colors.danger,
+    borderColor: colors.danger,
   },
   text: {
     flex: 1,
@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     // Код читается по группам: без сжатия, как в CopyableCode.
     letterSpacing: 0,
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
     ...Platform.select<TextStyle>({
       // Рамку фокуса рисует контейнер поля, браузерная не нужна. Значения
       // 'none' нет в типах RN, поэтому приведение через unknown.
@@ -51,9 +51,9 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   error: {
-    color: theme.colors.danger,
+    color: colors.danger,
   },
-});
+}));

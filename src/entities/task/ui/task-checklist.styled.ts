@@ -1,20 +1,19 @@
-import { StyleSheet } from 'react-native';
 import { withAlpha } from '@shared/lib';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   progress: {
     marginLeft: 'auto',
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.earnedDark,
+    color: colors.earnedDark,
   },
   track: {
     height: 6,
     borderRadius: 3,
     overflow: 'hidden',
-    backgroundColor: withAlpha(theme.colors.earned, 0.14),
+    backgroundColor: withAlpha(colors.earned, 0.14),
   },
   bar: {
     height: 6,
@@ -24,8 +23,8 @@ export const styles = StyleSheet.create({
   list: {
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.checklistLine,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.checklistLine,
+    backgroundColor: colors.surface,
     overflow: 'hidden',
   },
   step: {
@@ -37,11 +36,11 @@ export const styles = StyleSheet.create({
   },
   divider: {
     borderTopWidth: 1,
-    borderTopColor: theme.colors.checklistLine,
+    borderTopColor: colors.checklistLine,
   },
   // Сделанный шаг: бледно-зелёная подложка, чтобы отделялся, но не пестрил.
   stepDone: {
-    backgroundColor: withAlpha(theme.colors.earned, 0.09),
+    backgroundColor: withAlpha(colors.earned, 0.09),
   },
   pressed: {
     opacity: 0.7,
@@ -55,8 +54,8 @@ export const styles = StyleSheet.create({
   },
   boxEmpty: {
     borderWidth: 1.5,
-    borderColor: theme.colors.checklistHandle,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.checklistHandle,
+    backgroundColor: colors.surface,
   },
   title: {
     flex: 1,
@@ -65,13 +64,13 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   hint: {
     fontSize: theme.fontSize.xs,
     lineHeight: 16,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

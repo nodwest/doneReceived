@@ -17,7 +17,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from '../i18n';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 import { ApiImage } from './api-image';
 import { Icon } from './icons';
 
@@ -348,12 +348,12 @@ function ViewerContent({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   root: {
     flex: 1,
   },
   backdrop: {
-    backgroundColor: theme.colors.viewerBg,
+    backgroundColor: colors.viewerBg,
   },
   page: {
     paddingRight: GAP,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.viewerChrome,
+    backgroundColor: colors.viewerChrome,
   },
   pressed: {
     opacity: 0.7,
@@ -386,13 +386,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 999,
-    backgroundColor: theme.colors.viewerChrome,
+    backgroundColor: colors.viewerChrome,
   },
   counterText: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   dots: {
     position: 'absolute',
@@ -411,6 +411,6 @@ const styles = StyleSheet.create({
   },
   dotActive: {
     width: 20,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
-});
+}));

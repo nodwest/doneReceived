@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   hero: {
     alignItems: 'center',
     gap: 8,
@@ -12,13 +11,13 @@ export const styles = StyleSheet.create({
   },
   heroParent: {
     borderWidth: 1.5,
-    borderColor: theme.colors.reviewBorder,
+    borderColor: colors.reviewBorder,
   },
   name: {
     fontSize: 22,
     fontFamily: theme.fonts.bold,
     letterSpacing: tracking(22),
-    color: theme.colors.white,
+    color: colors.white,
   },
   avatar: {
     width: 68,
@@ -30,6 +29,6 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     fontFamily: theme.fonts.medium,
     letterSpacing: tracking(theme.fontSize.inputName),
-    color: theme.colors.heroSubtle,
+    color: colors.heroSubtle,
   },
-});
+}));

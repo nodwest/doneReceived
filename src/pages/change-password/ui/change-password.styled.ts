@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -14,7 +13,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   headerSpacer: {
     width: 44,
@@ -31,7 +30,7 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 20,
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   form: {
     gap: 16,
@@ -43,11 +42,11 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Прижимает кнопку к низу, когда форма короче экрана.
   footer: {
     flexGrow: 1,
     justifyContent: 'flex-end',
   },
-});
+}));

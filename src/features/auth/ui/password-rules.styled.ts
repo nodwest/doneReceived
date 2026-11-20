@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     gap: 4,
   },
@@ -9,9 +8,9 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.blue,
+    color: colors.blueInk,
   },
   error: {
-    color: theme.colors.danger,
+    color: colors.danger,
   },
-});
+}));

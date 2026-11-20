@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     gap: 12,
   },
@@ -9,16 +8,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   placeholderText: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   error: {
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.dangerText,
+    color: colors.dangerText,
   },
-});
+}));

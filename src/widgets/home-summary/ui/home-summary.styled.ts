@@ -1,5 +1,4 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 const card = {
   flex: 1,
@@ -11,7 +10,7 @@ const card = {
   boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.1)',
 } as const;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     flexDirection: 'row',
     gap: 6,
@@ -27,8 +26,8 @@ export const styles = StyleSheet.create({
   },
   card: {
     ...card,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   cardAccent: {
     ...card,
@@ -36,7 +35,7 @@ export const styles = StyleSheet.create({
   },
   cardReview: {
     ...card,
-    borderColor: theme.colors.reviewBorder,
+    borderColor: colors.reviewBorder,
   },
   valueRow: {
     flexDirection: 'row',
@@ -47,15 +46,15 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   label: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   textAccent: {
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
+}));

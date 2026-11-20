@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -6,7 +6,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTranslation } from '../i18n';
 import { copyText, showToast } from '../lib';
-import { theme } from '../theme';
+import { createStyles, theme } from '../theme';
 import { Icon } from './icons';
 
 type CopyableCodeProps = {
@@ -56,7 +56,7 @@ export function CopyableCode({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   field: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   pressed: {
     opacity: 0.7,
@@ -75,6 +75,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: theme.fonts.bold,
     letterSpacing: 1,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
-});
+}));

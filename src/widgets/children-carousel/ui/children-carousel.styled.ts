@@ -1,5 +1,4 @@
-import { StyleSheet } from 'react-native';
-import { theme } from '@shared/theme';
+import { createStyles } from '@shared/theme';
 
 export const CAROUSEL_GUTTER = 12;
 export const CAROUSEL_GAP = 12;
@@ -7,7 +6,7 @@ const SHADOW_ROOM = 24;
 // Какая часть следующей карточки выглядывает у правого края (как в макете).
 export const CAROUSEL_PEEK = 24;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Лента выходит за боковые отступы страницы, чтобы следующая карточка была видна у края.
   // Вертикальный запас в ленте нужен для тени карточки, снаружи он гасится отрицательным отступом.
   scroll: {
@@ -34,10 +33,10 @@ export const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: theme.colors.placeholder,
+    backgroundColor: colors.placeholder,
   },
   dotActive: {
     width: 20,
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
   },
-});
+}));

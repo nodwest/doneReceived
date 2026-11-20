@@ -1,12 +1,12 @@
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useViewerRole } from '@entities/user';
 import { useFamilyEvent } from '@features/family-event';
 import { FamilyEventForm } from '@features/family-event-form';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking, useTheme } from '@shared/theme';
 import { ScreenHeader } from '@shared/ui';
 
 type FamilyEventFormPageProps = {
@@ -23,6 +23,7 @@ export function EditFamilyEventPage() {
 }
 
 export function FamilyEventFormPage({ mode }: FamilyEventFormPageProps) {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -48,7 +49,10 @@ export function FamilyEventFormPage({ mode }: FamilyEventFormPageProps) {
     return (
       <View style={[styles.screen, { paddingTop: insets.top }]}>
         <ScreenHeader title={t('calendar.editTitle')} onBack={close} />
-        <ActivityIndicator style={styles.loading} color={theme.colors.blue} />
+        <ActivityIndicator
+          style={styles.loading}
+          color={theme.colors.blueInk}
+        />
       </View>
     );
   }
@@ -76,10 +80,10 @@ export function FamilyEventFormPage({ mode }: FamilyEventFormPageProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
     paddingHorizontal: 12,
   },
   loading: {
@@ -95,7 +99,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
     textAlign: 'center',
   },
-});
+}));

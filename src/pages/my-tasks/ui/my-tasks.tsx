@@ -34,7 +34,7 @@ import {
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { useIsCompact } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { EarnGoalCard } from './earn-goal-card';
 import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
@@ -71,6 +71,7 @@ function MyTaskCard(
  * `?tab=review` открывает вкладку проверки, `?task=<id>` — сразу карточку.
  */
 export function MyTasksPage() {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ tab?: string; task?: string }>();
@@ -205,7 +206,7 @@ export function MyTasksPage() {
               {isPending ? (
                 <ActivityIndicator
                   style={styles.loading}
-                  color={theme.colors.blue}
+                  color={theme.colors.blueInk}
                 />
               ) : tasks.length === 0 ? (
                 <Text style={styles.empty}>

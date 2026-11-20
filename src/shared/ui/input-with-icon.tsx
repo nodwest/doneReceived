@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useTranslation } from '../i18n';
-import { theme } from '../theme';
+import { createStyles, theme } from '../theme';
 import { Input } from './input';
 import { Icon, type IconName } from './icons';
 
@@ -36,7 +36,13 @@ function InputWithIcon(prop: InputWithIconProps) {
   return (
     <View style={[styles.container, error && styles.containerError]}>
       <View style={styles.icon}>
-        {iconName && <Icon name={iconName} size={20} color="#9CA3AF" />}
+        {iconName && (
+          <Icon
+            name={iconName}
+            size={20}
+            color={theme.colors.placeholderSoft}
+          />
+        )}
       </View>
       <Input
         {...props}
@@ -54,26 +60,30 @@ function InputWithIcon(prop: InputWithIconProps) {
           onPress={() => setHidden((v) => !v)}
           style={styles.eye}
         >
-          <Icon name={hidden ? 'eye' : 'eye-off'} size={20} color="#9CA3AF" />
+          <Icon
+            name={hidden ? 'eye' : 'eye-off'}
+            size={20}
+            color={theme.colors.placeholderSoft}
+          />
         </Pressable>
       )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   container: {
     height: 56,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: colors.line,
     borderRadius: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.05)',
   },
   containerError: {
-    borderColor: theme.colors.danger,
+    borderColor: colors.danger,
   },
   icon: {
     position: 'absolute',
@@ -101,6 +111,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
-});
+}));
 
 export { InputWithIcon };

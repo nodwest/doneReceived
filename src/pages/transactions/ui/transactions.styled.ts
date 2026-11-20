@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Назад слева, кнопка вида справа, заголовок по центру между ними.
   header: {
     flexDirection: 'row',
@@ -16,7 +15,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   headerSpacer: {
     width: 44,
@@ -45,7 +44,7 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   totals: {
     flexDirection: 'row',
@@ -55,16 +54,16 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   outcome: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.reviewChipText,
+    color: colors.reviewChipText,
   },
   outcomeChild: {
-    color: theme.colors.queueText,
+    color: colors.queueText,
   },
   empty: {
     marginTop: 32,
@@ -72,7 +71,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Карточки транзакций дня во всю высоту под шапкой.
   cards: {
@@ -82,4 +81,4 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
-});
+}));

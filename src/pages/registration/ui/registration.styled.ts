@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   form: {
     gap: 16,
   },
@@ -11,14 +10,14 @@ export const styles = StyleSheet.create({
   label: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Ошибка под полем.
   error: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.danger,
+    color: colors.danger,
   },
   action: {
     gap: 12,
@@ -27,4 +26,4 @@ export const styles = StyleSheet.create({
   requestError: {
     textAlign: 'center',
   },
-});
+}));

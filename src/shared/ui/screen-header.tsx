@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useTranslation } from '../i18n';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 import { RoundButton } from './round-button';
 
 type ScreenHeaderProps = {
@@ -35,7 +35,7 @@ export function ScreenHeader({ title, onBack, right }: ScreenHeaderProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -53,6 +53,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     letterSpacing: tracking(24),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
-});
+}));

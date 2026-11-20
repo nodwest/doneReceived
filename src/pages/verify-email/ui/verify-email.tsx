@@ -10,6 +10,7 @@ import {
   useResendVerification,
   useVerifyEmail,
 } from '@features/auth';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { AuthLayout, CodeInput, GradientButton } from '@shared/ui';
@@ -30,6 +31,7 @@ const formatSeconds = (seconds: number) =>
  * логин с подставленной почтой.
  */
 export function VerifyEmail() {
+  useTheme();
   const { t } = useTranslation();
   const { email } = useLocalSearchParams<{ email?: string }>();
   const [code, setCode] = useState('');

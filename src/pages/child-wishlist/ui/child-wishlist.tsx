@@ -5,7 +5,7 @@ import { TabScreen } from '@widgets/bottom-nav';
 import { useWishlistProgress, WishRow } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { useChildBalance } from '@entities/wallet';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { HeaderAvatar, Icon, ScreenHeader } from '@shared/ui';
 import { useWishlistChild } from '../model/use-wishlist-child';
 import { styles } from './child-wishlist.styled';
@@ -16,6 +16,7 @@ import { styles } from './child-wishlist.styled';
  * переставлять и править может сам ребёнок. Тап — карточка желания.
  */
 export function ChildWishlistPage() {
+  useTheme();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { child, owner, familyId, loading } = useWishlistChild(id);

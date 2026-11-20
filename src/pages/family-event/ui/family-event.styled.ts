@@ -1,10 +1,9 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   scroll: {
     flex: 1,
@@ -22,7 +21,7 @@ export const styles = StyleSheet.create({
     height: 300,
     position: 'relative',
     overflow: 'hidden',
-    backgroundColor: theme.colors.childDeep,
+    backgroundColor: colors.childDeep,
   },
   heroImage: {
     width: '100%',
@@ -77,7 +76,7 @@ export const styles = StyleSheet.create({
     lineHeight: 28,
     letterSpacing: tracking(26),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   heroDate: {
     marginTop: 4,
@@ -100,13 +99,13 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     letterSpacing: tracking(18),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   count: {
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   people: {
     flexDirection: 'row',
@@ -125,13 +124,13 @@ export const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
   },
   personName: {
     fontSize: 9,
     letterSpacing: tracking(9),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   going: {
     marginLeft: 'auto',
@@ -144,25 +143,25 @@ export const styles = StyleSheet.create({
     borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.approvedFrom,
+    backgroundColor: colors.approvedFrom,
   },
   goingText: {
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   description: {
     padding: 12,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     fontSize: 12,
     letterSpacing: tracking(12),
     lineHeight: 18,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   reminder: {
     flexDirection: 'row',
@@ -171,8 +170,8 @@ export const styles = StyleSheet.create({
     padding: 9,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   bell: {
     width: 30,
@@ -180,8 +179,8 @@ export const styles = StyleSheet.create({
     borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.yellowSoft,
-    color: theme.colors.reviewText,
+    backgroundColor: colors.yellowSoft,
+    color: colors.reviewText,
   },
   reminderBody: {
     flex: 1,
@@ -191,14 +190,14 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   reminderText: {
     marginTop: 1,
     fontSize: 9,
     letterSpacing: tracking(9),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   chip: {
     height: 23,
@@ -206,13 +205,13 @@ export const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.yellowSoft,
+    backgroundColor: colors.yellowSoft,
   },
   chipText: {
     fontSize: 8,
     letterSpacing: tracking(8),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.reviewText,
+    color: colors.reviewText,
   },
   spacer: {
     flex: 1,
@@ -221,21 +220,21 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.line,
-    backgroundColor: theme.colors.prime,
+    borderTopColor: colors.line,
+    backgroundColor: colors.prime,
   },
   action: {
     height: 48,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   actionText: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   sheet: {
     padding: 16,
@@ -245,15 +244,15 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     letterSpacing: tracking(18),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
     marginBottom: 4,
   },
   responseRow: {
     minHeight: 48,
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -261,17 +260,17 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   responseRowOn: {
-    borderColor: theme.colors.childFrom,
-    backgroundColor: theme.colors.childTint,
+    borderColor: colors.childFrom,
+    backgroundColor: colors.childTint,
   },
   responseText: {
     fontSize: 12,
     letterSpacing: tracking(12),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   responseTextOn: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
     fontFamily: theme.fonts.bold,
   },
   empty: {
@@ -285,13 +284,13 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
     textAlign: 'center',
   },
   emptyLink: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.blue,
+    color: colors.blueInk,
   },
-});
+}));

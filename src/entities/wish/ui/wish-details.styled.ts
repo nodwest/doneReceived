@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   root: {
     gap: 18,
   },
@@ -9,7 +8,7 @@ export const styles = StyleSheet.create({
     gap: 12,
     padding: 16,
     borderRadius: 24,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 14px rgba(26, 26, 51, 0.06)',
   },
   noPhotosEmpty: {
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   noPhotosRow: {
     flexDirection: 'row',
@@ -47,21 +46,21 @@ export const styles = StyleSheet.create({
     fontSize: 26,
     letterSpacing: tracking(26),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   price: {
     fontSize: 26,
     letterSpacing: tracking(26),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   priceReady: {
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   track: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
     overflow: 'hidden',
   },
   fill: {
@@ -77,10 +76,10 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   savedReady: {
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   meta: {
     flexDirection: 'row',
@@ -101,7 +100,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   note: {
     gap: 6,
@@ -109,7 +108,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.childTintBorder,
+    borderColor: colors.childTintBorder,
     overflow: 'hidden',
   },
   noteLabel: {
@@ -121,14 +120,14 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   noteText: {
     fontSize: 15,
     letterSpacing: tracking(15),
     lineHeight: 21,
     fontFamily: theme.fonts.regular,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   store: {
     flexDirection: 'row',
@@ -137,7 +136,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 18,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 14px rgba(26, 26, 51, 0.06)',
   },
   pressed: {
@@ -159,12 +158,12 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   storeUrl: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

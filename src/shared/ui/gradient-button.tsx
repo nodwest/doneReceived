@@ -1,7 +1,7 @@
-import { ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { withAlpha } from '../lib';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 import { Button } from './button';
 import { Icon, type IconName } from './icons';
 
@@ -86,12 +86,12 @@ export function GradientButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   gradient: {
     width: '100%',
     height: 48,
     borderRadius: 14,
-    boxShadow: `0px 4px 12px ${withAlpha(theme.colors.violet, 0.25)}`,
+    boxShadow: `0px 4px 12px ${withAlpha(colors.violet, 0.25)}`,
   },
   gradientBlue: {
     boxShadow: '0px 4px 12px rgba(30, 95, 184, 0.25)',
@@ -125,18 +125,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonPressed: {
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
     opacity: 1,
   },
   buttonPressedBlue: {
-    backgroundColor: theme.colors.childDeep,
+    backgroundColor: colors.childDeep,
     opacity: 1,
   },
   title: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   titleCompact: {
     flexShrink: 1,
@@ -147,4 +147,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
   },
-});
+}));

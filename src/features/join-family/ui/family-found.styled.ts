@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -11,7 +10,7 @@ export const styles = StyleSheet.create({
     paddingRight: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.approvedBorder,
+    borderColor: colors.approvedBorder,
   },
   text: {
     flex: 1,
@@ -21,20 +20,20 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   role: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   members: {
     fontSize: theme.fontSize.xs,
     lineHeight: 16,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   check: {
     width: 24,
@@ -42,6 +41,6 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.success,
+    backgroundColor: colors.success,
   },
-});
+}));

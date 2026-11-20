@@ -19,7 +19,7 @@ import {
 import { useFamilyMembers, type FamilyMember } from '@entities/family';
 import { apiRequest } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
+import { createStyles, theme } from '@shared/theme';
 import { Icon, Wheel } from '@shared/ui';
 import {
   type HistoryMapProps,
@@ -558,7 +558,7 @@ function HistoryDay({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   headerLabels: {
     flex: 1,
     minWidth: 0,
@@ -568,12 +568,12 @@ const styles = StyleSheet.create({
   },
   headerButton: { minHeight: 44, justifyContent: 'center' },
   headerMember: { flexShrink: 1, minWidth: 0 },
-  headerText: { color: theme.colors.ink, fontSize: 16, fontWeight: '700' },
+  headerText: { color: colors.ink, fontSize: 16, fontWeight: '700' },
   headerBadge: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: theme.colors.mapAccentTint,
+    backgroundColor: colors.mapAccentTint,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 12,
     borderRadius: 20,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   option: {
     minHeight: 44,
@@ -609,19 +609,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   routeSwatch: {
     width: 18,
     borderTopWidth: 3,
-    borderColor: theme.colors.mapAccent,
+    borderColor: colors.mapAccent,
   },
   gapSwatch: {
     width: 18,
     borderTopWidth: 3,
     borderStyle: 'dashed',
-    borderColor: '#8d93a7',
+    borderColor: colors.grey,
   },
   button: {
     position: 'absolute',
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
   compactDock: {
@@ -642,11 +642,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
-  compactArrow: { color: theme.colors.ink, fontSize: 18 },
-  count: { color: theme.colors.ink, fontSize: 14 },
-  active: { backgroundColor: theme.colors.mapAccentTint },
+  compactArrow: { color: colors.ink, fontSize: 18 },
+  count: { color: colors.ink, fontSize: 14 },
+  active: { backgroundColor: colors.mapAccentTint },
   panelWrap: {
     position: 'absolute',
     top: '48%',
@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     borderRadius: 18,
     boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.14)',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   checkpointsScroll: { flexGrow: 0, flexShrink: 1, maxHeight: 185 },
   row: {
@@ -680,29 +680,29 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: '#e2eaf5',
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   checkpointPanel: {
     paddingHorizontal: 0,
     paddingBottom: 4,
     gap: 8,
     borderRadius: 22,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   badge: {
     width: 29,
     height: 29,
     borderRadius: 15,
-    backgroundColor: theme.colors.mapAccentTint,
+    backgroundColor: colors.mapAccentTint,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  doneBadge: { backgroundColor: '#dcf3e6' },
-  doneText: { color: '#176d45', fontWeight: '700' },
-  caption: { color: '#575e78', fontSize: 13 },
+  doneBadge: { backgroundColor: colors.readySoft },
+  doneText: { color: colors.readyText, fontWeight: '700' },
+  caption: { color: colors.inkSoft, fontSize: 13 },
   eventCopy: { flex: 1, gap: 3 },
-  name: { fontWeight: '600', color: theme.colors.ink },
-  link: { color: theme.colors.mapAccent, fontWeight: '700' },
+  name: { fontWeight: '600', color: colors.ink },
+  link: { color: colors.mapAccent, fontWeight: '700' },
   member: { minHeight: 44, paddingHorizontal: 10, justifyContent: 'center' },
-});
+}));

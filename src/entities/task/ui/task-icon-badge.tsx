@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from '@shared/ui';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { styles } from './task-icon-badge.styled';
 
 type BadgeSize = 52 | 48 | 44 | 40;
@@ -10,11 +10,13 @@ const ICON_SIZE: Record<BadgeSize, number> = { 52: 24, 48: 22, 44: 20, 40: 19 };
 
 // child — голубая (задания ребёнка), earned / missed — история наград:
 // зелёная выплаченная и серая упущенная.
-const GRADIENTS = {
+const GRADIENTS = themedValue<
+  Record<'child' | 'earned' | 'missed', readonly [string, string]>
+>(() => ({
   child: [theme.colors.childTo, theme.colors.childFrom],
   earned: [theme.colors.earnedLight, theme.colors.earned],
   missed: [theme.colors.missedLight, theme.colors.missed],
-} as const;
+}));
 
 type TaskIconBadgeProps = {
   size?: BadgeSize;

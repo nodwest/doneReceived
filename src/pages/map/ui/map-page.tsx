@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   MapAttribution,
@@ -11,12 +11,13 @@ import {
 import { TabScreen } from '@widgets/bottom-nav';
 import { LocationSharingCard } from '@features/location';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
+import { createStyles, theme, useTheme } from '@shared/theme';
 import { Icon } from '@shared/ui';
 import { useSessionFamilyId, useSessionStore } from '@entities/session';
 import { MapHistory } from './map-history';
 
 export function MapPage() {
+  useTheme();
   const { t } = useTranslation();
   const [layersOpen, setLayersOpen] = useState(false);
   const familyId = useSessionFamilyId();
@@ -122,7 +123,7 @@ export function MapPage() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   map: {
     flex: 1,
     minHeight: 0,
@@ -143,12 +144,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 22,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
   // Шторка слоёв открыта: кнопка подсвечена голубым.
   openButtonActive: {
-    backgroundColor: theme.colors.mapAccentTint,
+    backgroundColor: colors.mapAccentTint,
   },
   // Затемнение карты под шторкой: тап по нему закрывает шторку.
   dim: {
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     zIndex: 3,
-    backgroundColor: theme.colors.mapDim,
+    backgroundColor: colors.mapDim,
   },
   panelWrap: {
     position: 'absolute',
@@ -170,4 +171,4 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.75,
   },
-});
+}));

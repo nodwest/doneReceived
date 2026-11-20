@@ -1,13 +1,12 @@
 import { ApiImage } from './api-image';
 import {
-  StyleSheet,
   Text,
   View,
   type ImageSourcePropType,
   type ImageStyle,
   type StyleProp,
 } from 'react-native';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 
 type LetterAvatarProps = {
   /** Фото; null — фото нет, рисуем первую букву имени. */
@@ -55,14 +54,14 @@ export function LetterAvatar({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   initial: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.violetSoft,
+    backgroundColor: colors.violetSoft,
   },
   initialBlue: {
-    backgroundColor: theme.colors.childTint,
+    backgroundColor: colors.childTint,
   },
   initialOnDark: {
     backgroundColor: 'rgba(255, 255, 255, 0.92)',
@@ -71,12 +70,12 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   letterBlue: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   letterOnDark: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
-});
+}));

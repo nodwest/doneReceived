@@ -122,7 +122,7 @@ export function ChildDevices({
         onPress={() => open('list')}
         style={({ pressed }) => [styles.toggle, pressed && styles.pressed]}
       >
-        <Icon name="phone" size={16} color={theme.colors.blue} />
+        <Icon name="phone" size={16} color={theme.colors.blueInk} />
         <Text style={styles.toggleLabel}>
           {t('devices.count', { count: devices.length })}
         </Text>
@@ -149,7 +149,7 @@ export function ChildDevices({
           {connecting ? t('connectDevice.title') : t('devices.title')}
         </Text>
         <View style={styles.chevronUp}>
-          <Icon name="chevron-down" size={18} color={theme.colors.violet} />
+          <Icon name="chevron-down" size={18} color={theme.colors.violetInk} />
         </View>
       </Pressable>
       <View style={[styles.panel, connecting && styles.panelConnect]}>
@@ -176,7 +176,7 @@ export function ChildDevices({
                 pressed && styles.pressed,
               ]}
             >
-              <Icon name="plus" size={16} color={theme.colors.violet} />
+              <Icon name="plus" size={16} color={theme.colors.violetInk} />
               <Text style={styles.connectNewLabel}>
                 {t('devices.connectNew')}
               </Text>

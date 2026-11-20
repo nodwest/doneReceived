@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -40,11 +39,11 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
 
   segments: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
     flexShrink: 1,
     flexDirection: 'row',
@@ -78,7 +77,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   segmentLabelCompact: {
     fontSize: theme.fontSize.inputName,
@@ -98,11 +97,11 @@ export const styles = StyleSheet.create({
   },
   segmentLabelAll: {
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   segmentLabelReview: {
     fontFamily: theme.fonts.bold,
-    color: theme.colors.reviewText,
+    color: colors.reviewText,
   },
   badge: {
     minWidth: 20,
@@ -117,6 +116,6 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.xs),
     lineHeight: 20,
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
+}));

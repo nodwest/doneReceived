@@ -1,6 +1,6 @@
 import type { ReactNode, Ref } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { theme, tracking } from '../theme';
+import { Pressable, Text, View } from 'react-native';
+import { createStyles, theme, tracking } from '../theme';
 import { Icon, type IconName } from './icons';
 
 type SettingsRowProps = {
@@ -35,10 +35,10 @@ export function SettingsRow({
         pressed && onPress && styles.pressed,
       ]}
       onPress={onPress}
-      disabled={!onPress}
+      disabled={!onPress && !right}
     >
       <View style={styles.icon}>
-        <Icon name={icon} size={20} color={theme.colors.violet} />
+        <Icon name={icon} size={20} color={theme.colors.violetInk} />
       </View>
       <Text style={styles.label}>{label}</Text>
       {right ?? (
@@ -51,7 +51,7 @@ export function SettingsRow({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -68,19 +68,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.violetIcon,
+    backgroundColor: colors.violetIcon,
   },
   label: {
     flex: 1,
     fontSize: 15,
     fontFamily: theme.fonts.semibold,
     letterSpacing: tracking(15),
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   value: {
     fontSize: theme.fontSize.inputName,
     fontFamily: theme.fonts.medium,
     letterSpacing: tracking(theme.fontSize.inputName),
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

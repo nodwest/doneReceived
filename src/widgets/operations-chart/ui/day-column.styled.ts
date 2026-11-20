@@ -1,5 +1,4 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import {
   CHART_HEIGHT,
   COLUMN_GAP,
@@ -9,7 +8,7 @@ import {
   DAY_SLOT_WIDTH,
 } from '../config/sizes';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   column: {
     width: DAY_SLOT_WIDTH,
     height: CHART_HEIGHT,
@@ -31,14 +30,14 @@ export const styles = StyleSheet.create({
     paddingBottom: 7,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 3px 4px rgba(26, 26, 51, 0.07)',
   },
   chipSelected: {
     width: COLUMN_WIDTH_SELECTED,
     borderWidth: 1.5,
-    borderColor: theme.colors.ink,
+    borderColor: colors.ink,
     boxShadow: '0px 2px 8px rgba(26, 26, 46, 0.08)',
   },
   // Будущий день: без тени, весь текст серый.
@@ -47,24 +46,24 @@ export const styles = StyleSheet.create({
     boxShadow: 'none',
   },
   textFuture: {
-    color: theme.colors.placeholder,
+    color: colors.placeholder,
   },
   weekday: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   day: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   month: {
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

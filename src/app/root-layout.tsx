@@ -6,8 +6,9 @@ import {
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 // Инициализация i18next до первого рендера.
 import '@shared/i18n';
@@ -19,7 +20,7 @@ import {
   type AccountKind,
 } from '@entities/session';
 import { useViewerRoleStore } from '@entities/user';
-import { theme } from '@shared/theme';
+import { createStyles, syncNativeAppearance, useTheme } from '@shared/theme';
 import { PaperPreload, ToastHost } from '@shared/ui';
 import { Providers } from './providers';
 
@@ -83,6 +84,8 @@ const restoreSession = async () => {
 };
 
 export function RootLayout() {
+  // Подписка на тему: переключатель в профиле перерисовывает всё дерево.
+  const { isDark } = useTheme();
   const [fontsLoaded, fontsError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -96,6 +99,11 @@ export function RootLayout() {
     restoreSession();
   }, []);
 
+  // Сохранённая тема: статус-бар, клавиатура и системные диалоги сразу в ней.
+  useEffect(() => {
+    syncNativeAppearance();
+  }, []);
+
   const sessionStatus = useSessionStore((state) => state.status);
   const kind = useSessionKind();
 
@@ -105,6 +113,8 @@ export function RootLayout() {
 
   return (
     <Providers>
+      {/* Статус-бар и фон стека следуют теме: система и экран не расходятся. */}
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Screens signedIn={sessionStatus === 'signed-in'} kind={kind} />
       <ToastHost />
       <PaperPreload />
@@ -126,6 +136,8 @@ type ScreensProps = {
  * открытый, поэтому после создания семьи приложение само уходит на главную.
  */
 function Screens({ signedIn, kind }: ScreensProps) {
+  // Смена темы меняет фон стека между экранами.
+  const { colors } = useTheme();
   const parent = signedIn && kind === 'parent';
   const families = useMyFamilies(parent);
   const entered = signedIn;
@@ -136,7 +148,12 @@ function Screens({ signedIn, kind }: ScreensProps) {
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.prime },
+        }}
+      >
         <Stack.Protected guard={!entered}>
           {AUTH_SCREENS.map((name) => (
             <Stack.Screen key={name} name={name} />
@@ -176,13 +193,13 @@ function Screens({ signedIn, kind }: ScreensProps) {
   );
 }
 
-const screensStyles = StyleSheet.create({
+const screensStyles = createStyles((colors) => ({
   cover: {
     position: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
-});
+}));

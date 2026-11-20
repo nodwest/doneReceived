@@ -9,7 +9,7 @@ import {
   type ParentFunds,
 } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { Icon } from '@shared/ui';
 import { styles } from './balance-card.styled';
 
@@ -29,10 +29,12 @@ type BalanceCardProps = {
   onDeposit?: () => void;
 };
 
-const GRADIENTS = {
-  parent: [theme.colors.parentTo, theme.colors.parentFrom],
-  child: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+const GRADIENTS = themedValue<Record<FamilyRole, readonly [string, string]>>(
+  () => ({
+    parent: [theme.colors.parentTo, theme.colors.parentFrom],
+    child: [theme.colors.childFrom, theme.colors.childDeep],
+  }),
+);
 
 /**
  * Карточка баланса на вкладке Wallet: у родителя — доступное на задания,
@@ -126,7 +128,7 @@ export function BalanceCard({
               pressed && styles.pressed,
             ]}
           >
-            <Icon name="plus" size={16} color={theme.colors.parentFrom} />
+            <Icon name="plus" size={16} color={theme.colors.parentInk} />
             <Text style={[styles.buttonText, styles.depositText]}>
               {t('wallet.depositAction')}
             </Text>

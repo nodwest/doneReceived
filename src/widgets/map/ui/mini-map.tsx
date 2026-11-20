@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Camera,
   Map,
@@ -8,7 +8,7 @@ import {
 } from '@maplibre/maplibre-react-native';
 
 import type { GeoPoint } from '@entities/user';
-import { theme } from '@shared/theme';
+import { createStyles } from '@shared/theme';
 import { MAP_STYLE } from '../config/map-style';
 
 const ZOOM = 15;
@@ -55,13 +55,13 @@ export function MiniMap({ center }: { center: GeoPoint }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   container: {
     flex: 1,
     overflow: 'hidden',
-    backgroundColor: theme.colors.mapPlaceholder,
+    backgroundColor: colors.mapPlaceholder,
   },
   map: {
     flex: 1,
   },
-});
+}));

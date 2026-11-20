@@ -40,7 +40,7 @@ export function HomeSummary({
         label={amountLabel ?? t('summary.rewardsPaid')}
       />
       <StatCard
-        icon={<Icon name="tasks" size={20} color={theme.colors.blue} />}
+        icon={<Icon name="tasks" size={20} color={theme.colors.blueInk} />}
         value={String(activeTasks)}
         label={t('summary.activeTasks')}
         onPress={onActiveTasksPress}
@@ -48,7 +48,7 @@ export function HomeSummary({
       {tasksToReview !== undefined && (
         <StatCard
           highlight
-          icon={<Icon name="cheque" size={20} color={theme.colors.violet} />}
+          icon={<Icon name="cheque" size={20} color={theme.colors.violetInk} />}
           value={String(tasksToReview)}
           label={reviewLabel ?? t('summary.tasksToReview')}
           onPress={onTasksToReviewPress}

@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -10,8 +9,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: theme.colors.childTintBorder,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.childTintBorder,
+    backgroundColor: colors.surface,
     overflow: 'hidden',
   },
   pressed: {
@@ -38,19 +37,19 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.childFrom,
+    color: colors.childFrom,
   },
   chip: {
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 8,
-    backgroundColor: theme.colors.readySoft,
+    backgroundColor: colors.readySoft,
   },
   chipText: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   head: {
     flexDirection: 'row',
@@ -61,18 +60,18 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   price: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   track: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     overflow: 'hidden',
   },
   fill: {
@@ -83,6 +82,6 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
-});
+}));

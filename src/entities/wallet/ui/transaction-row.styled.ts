@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -15,8 +14,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   pressed: {
     opacity: 0.85,
@@ -37,14 +36,14 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.violetIcon,
+    backgroundColor: colors.violetIcon,
   },
   iconLarge: {
     width: 44,
     height: 44,
   },
   iconWithdrawal: {
-    backgroundColor: theme.colors.queueBg,
+    backgroundColor: colors.queueBg,
   },
   middle: {
     flex: 1,
@@ -54,13 +53,13 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   subtitle: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   amount: {
     paddingHorizontal: 10,
@@ -73,21 +72,21 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
   },
   amountPayout: {
-    backgroundColor: theme.colors.reviewFrom,
+    backgroundColor: colors.reviewFrom,
   },
   amountTextPayout: {
-    color: theme.colors.homeBrown,
+    color: colors.homeBrown,
   },
   amountIncome: {
-    backgroundColor: theme.colors.rewardSoft,
+    backgroundColor: colors.rewardSoft,
   },
   amountTextIncome: {
-    color: theme.colors.earnedLabel,
+    color: colors.earnedLabel,
   },
   amountWithdrawal: {
-    backgroundColor: theme.colors.queueBg,
+    backgroundColor: colors.queueBg,
   },
   amountTextWithdrawal: {
-    color: theme.colors.queueText,
+    color: colors.queueText,
   },
-});
+}));

@@ -381,7 +381,7 @@ export function FamilyEventForm({
                     <Icon
                       name="calendar"
                       size={17}
-                      color={theme.colors.childDeep}
+                      color={theme.colors.childInk}
                     />
                   </View>
                   <View style={styles.dateBody}>
@@ -420,7 +420,7 @@ export function FamilyEventForm({
                       <Icon
                         name="calendar"
                         size={17}
-                        color={theme.colors.childDeep}
+                        color={theme.colors.childInk}
                       />
                     </View>
                     <View style={styles.dateBody}>
@@ -509,7 +509,7 @@ export function FamilyEventForm({
               <Text style={styles.label}>{t('calendar.visibilityLabel')}</Text>
               <View style={styles.visibility}>
                 <View style={styles.eye}>
-                  <Icon name="eye" size={16} color={theme.colors.childDeep} />
+                  <Icon name="eye" size={16} color={theme.colors.childInk} />
                 </View>
                 <Text style={styles.visibilityTitle}>
                   {t('calendar.allFamily')}

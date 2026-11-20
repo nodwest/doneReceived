@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { styles } from './home-summary.styled';
 
 type StatCardProps = {
@@ -15,10 +15,12 @@ type StatCardProps = {
   onPress?: () => void;
 };
 
-const ACCENT_GRADIENTS = {
+const ACCENT_GRADIENTS = themedValue<
+  Record<'parent' | 'child', readonly [string, string]>
+>(() => ({
   parent: [theme.colors.violet, theme.colors.blue],
   child: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+}));
 
 export function StatCard({
   icon,

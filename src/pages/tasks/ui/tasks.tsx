@@ -19,6 +19,7 @@ import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren, useFamilyMembers } from '@entities/family';
 import { filterTasks, TaskCard, TaskRow, type Task } from '@entities/task';
 import { useMyId } from '@entities/session';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
@@ -50,6 +51,7 @@ type TasksScope = 'all' | 'child' | 'parent';
  * Family. У родителя нет вкладки Review — показываем только активные.
  */
 export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
+  useTheme();
   const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();

@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { withAlpha } from '@shared/lib';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Подпись источников и «i» в ряд у левого нижнего угла карты.
   bar: {
     position: 'absolute',
@@ -16,13 +16,13 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: withAlpha(colors.surface, 0.9),
   },
   creditText: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   info: {
     width: 22,
@@ -30,13 +30,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 11,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: withAlpha(colors.surface, 0.9),
   },
   infoText: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   sheet: {
     paddingTop: 4,
@@ -48,15 +48,15 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // Источники одной карточкой с рамкой, как слои в шторке «Слои карты».
   group: {
     paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     overflow: 'hidden',
   },
   row: {
@@ -70,7 +70,7 @@ export const styles = StyleSheet.create({
   divider: {
     height: 1,
     marginLeft: 60,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   iconTile: {
     width: 36,
@@ -79,7 +79,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    backgroundColor: theme.colors.mapAccentTint,
+    backgroundColor: colors.mapAccentTint,
   },
   rowCopy: {
     flex: 1,
@@ -90,15 +90,15 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   rowSubtitle: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   pressed: {
     opacity: 0.72,
   },
-});
+}));

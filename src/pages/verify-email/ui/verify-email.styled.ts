@@ -1,11 +1,10 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Почта в подзаголовке: тёмная и жирнее, чтобы сразу заметить опечатку.
   email: {
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   field: {
     gap: 8,
@@ -14,13 +13,13 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   error: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.danger,
+    color: colors.danger,
   },
   resendRow: {
     flexDirection: 'row',
@@ -33,7 +32,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   resend: {
     paddingVertical: 6,
@@ -45,16 +44,16 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   // Пока идёт отсчёт: надпись серая, время фиолетовое.
   resendWaiting: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   timer: {
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

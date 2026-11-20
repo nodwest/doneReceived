@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import * as maplibregl from 'maplibre-gl';
 import { useTranslation } from '@shared/i18n';
+import { useTheme } from '@shared/theme';
 import { formatTimeAgo, useNow } from '@shared/lib';
 
 const CARD_WIDTH = 184;
@@ -37,6 +38,7 @@ const pinPath =
  */
 export function UserMarker({ map, user }: UserMarkerProps) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const now = useNow(60_000);
   const [element] = useState<HTMLDivElement>(() => {
     const node = document.createElement('div');
@@ -117,7 +119,7 @@ export function UserMarker({ map, user }: UserMarkerProps) {
     width: CARD_WIDTH,
     padding: '9px 11px 8px 12px',
     borderRadius: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     boxShadow:
       '0 10px 28px rgba(16, 24, 40, 0.18), 0 0 0 1px rgba(26, 26, 46, 0.05)',
     pointerEvents: 'none',
@@ -132,7 +134,7 @@ export function UserMarker({ map, user }: UserMarkerProps) {
     width: 10,
     height: 10,
     borderRadius: 2,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     transform: 'rotate(45deg)',
     boxShadow: '-1px 1px 2px rgba(16, 24, 40, 0.06)',
   };
@@ -192,7 +194,7 @@ export function UserMarker({ map, user }: UserMarkerProps) {
           borderRadius: '50%',
           display: 'grid',
           placeItems: 'center',
-          backgroundColor: '#EEEBFF',
+          backgroundColor: colors.violetIcon,
           color: user.color,
           fontFamily: 'Inter, system-ui, sans-serif',
           fontSize: 14,
@@ -219,7 +221,7 @@ export function UserMarker({ map, user }: UserMarkerProps) {
             height: 34,
             borderRadius: '50%',
             objectFit: 'cover',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: colors.surface,
           }}
         />
       ) : null}
@@ -263,7 +265,7 @@ export function UserMarker({ map, user }: UserMarkerProps) {
             <span
               style={{
                 overflow: 'hidden',
-                color: '#1A1A2E',
+                color: colors.ink,
                 fontFamily: 'Inter, system-ui, sans-serif',
                 fontSize: 12,
                 fontWeight: 700,
@@ -279,7 +281,7 @@ export function UserMarker({ map, user }: UserMarkerProps) {
             style={{
               margin: '3px 0 0 14px',
               overflow: 'hidden',
-              color: '#8A8FA3',
+              color: colors.grey,
               fontFamily: 'Inter, system-ui, sans-serif',
               fontSize: 10.5,
               fontWeight: 500,
@@ -297,7 +299,7 @@ export function UserMarker({ map, user }: UserMarkerProps) {
               gap: 5,
               margin: '4px 0 0 14px',
               overflow: 'hidden',
-              color: '#6F7285',
+              color: colors.inkSoft,
               fontFamily: 'Inter, system-ui, sans-serif',
               fontSize: 10,
               fontWeight: 500,
@@ -319,13 +321,13 @@ export function UserMarker({ map, user }: UserMarkerProps) {
                 width="7"
                 height="9"
                 rx="1.6"
-                stroke="#8A8FA3"
+                stroke={colors.grey}
                 strokeWidth="1.1"
                 fill="none"
               />
               <path
                 d="M3.5 8.8h2"
-                stroke="#8A8FA3"
+                stroke={colors.grey}
                 strokeWidth="1.1"
                 strokeLinecap="round"
               />

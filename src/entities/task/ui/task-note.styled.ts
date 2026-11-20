@@ -1,13 +1,8 @@
-import {
-  Platform,
-  StyleSheet,
-  type TextStyle,
-  type ViewStyle,
-} from 'react-native';
+import { Platform, type TextStyle, type ViewStyle } from 'react-native';
 import { withAlpha } from '@shared/lib';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Пузырь комментария: острый верхний левый угол — как сообщение.
   bubble: {
     paddingVertical: 12,
@@ -19,33 +14,33 @@ export const styles = StyleSheet.create({
     borderBottomRightRadius: 16,
   },
   bubbleReview: {
-    backgroundColor: theme.colors.noteReviewBg,
-    borderColor: withAlpha(theme.colors.reviewDot, 0.35),
+    backgroundColor: colors.noteReviewBg,
+    borderColor: withAlpha(colors.reviewDot, 0.35),
   },
   // Непрозрачный: сквозь пузырь не проступает бумага карточки.
   bubblePaid: {
-    backgroundColor: theme.colors.noteBubblePaid,
-    borderColor: withAlpha(theme.colors.earned, 0.3),
+    backgroundColor: colors.noteBubblePaid,
+    borderColor: withAlpha(colors.earned, 0.3),
   },
   text: {
     fontSize: 15,
     lineHeight: 22,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
 
   optional: {
     paddingVertical: 2,
     paddingHorizontal: 7,
     borderRadius: 6,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   optionalText: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   field: {
     paddingTop: 14,
@@ -53,8 +48,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.checklistLine,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.checklistLine,
+    backgroundColor: colors.surface,
     // На вебе над всем полем — текстовый курсор, как над самим текстом.
     ...Platform.select<ViewStyle>({
       web: { cursor: 'text' } as unknown as ViewStyle,
@@ -67,7 +62,7 @@ export const styles = StyleSheet.create({
     lineHeight: 22,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.ink,
+    color: colors.ink,
     textAlignVertical: 'top',
     // Браузерную рамку фокуса и ручку ресайза на вебе убираем.
     ...Platform.select<TextStyle>({
@@ -93,20 +88,20 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 7,
     borderRadius: 6,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   counterText: {
     fontSize: 11,
     lineHeight: 14,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   hint: {
     fontSize: theme.fontSize.xs,
     lineHeight: 16,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

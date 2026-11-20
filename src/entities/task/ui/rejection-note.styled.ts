@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Плашка «вернули на переделку»: коралловая, без тревожного красного.
   root: {
     flexDirection: 'row',
@@ -12,8 +11,8 @@ export const styles = StyleSheet.create({
     paddingRight: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.sentBackBorder,
-    backgroundColor: theme.colors.sentBackBg,
+    borderColor: colors.sentBackBorder,
+    backgroundColor: colors.sentBackBg,
   },
   icon: {
     width: 28,
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   text: {
     flex: 1,
@@ -34,19 +33,19 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.sentBack,
+    color: colors.sentBack,
   },
   chip: {
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 8,
-    backgroundColor: theme.colors.sentBackChip,
+    backgroundColor: colors.sentBackChip,
   },
   chipText: {
     fontSize: 12,
     letterSpacing: tracking(12),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.sentBackChipText,
+    color: colors.sentBackChipText,
   },
   comment: {
     alignSelf: 'stretch',
@@ -54,6 +53,6 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
-});
+}));

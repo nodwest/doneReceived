@@ -1,5 +1,5 @@
-import { StyleSheet, type ImageSourcePropType } from 'react-native';
-import { theme } from '../theme';
+import { type ImageSourcePropType } from 'react-native';
+import { createStyles } from '../theme';
 import { LetterAvatar } from './letter-avatar';
 
 type HeaderAvatarProps = {
@@ -20,13 +20,13 @@ export function HeaderAvatar({ source, name }: HeaderAvatarProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
-});
+}));

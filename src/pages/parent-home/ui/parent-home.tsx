@@ -13,6 +13,7 @@ import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
 import { useParentPaidTotal } from '@entities/wallet';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { styles } from './parent-home.styled';
 import { authorizedImage } from '@shared/api';
@@ -25,6 +26,7 @@ function greetingKey(hour: number) {
 }
 
 export function ParentHomePage() {
+  useTheme();
   const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();

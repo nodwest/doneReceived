@@ -17,7 +17,7 @@ import { useViewerRole } from '@entities/user';
 import { useFamilyEvents } from '@features/family-event';
 import { useTranslation } from '@shared/i18n';
 import { formatClock, formatMonthDay, formatWeekdayShort } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { RoundButton, ScreenSection } from '@shared/ui';
 import { TabScreen } from '@widgets/bottom-nav';
 import { FamilyCalendar } from '@widgets/family-calendar';
@@ -31,6 +31,7 @@ const capitalize = (value: string) =>
  * «+» создаёт событие, тап по событию открывает его карточку.
  */
 export function CalendarPage() {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const viewer = useViewerRole();
@@ -113,7 +114,10 @@ export function CalendarPage() {
         />
 
         {expanded && isMonthPending && (
-          <ActivityIndicator style={styles.loading} color={theme.colors.blue} />
+          <ActivityIndicator
+            style={styles.loading}
+            color={theme.colors.blueInk}
+          />
         )}
 
         {expanded &&
@@ -135,7 +139,10 @@ export function CalendarPage() {
         )}
 
         {isPending && (
-          <ActivityIndicator style={styles.loading} color={theme.colors.blue} />
+          <ActivityIndicator
+            style={styles.loading}
+            color={theme.colors.blueInk}
+          />
         )}
 
         {!isPending && featured && (

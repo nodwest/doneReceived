@@ -1,12 +1,16 @@
 import { StyleSheet } from 'react-native';
+import { withAlpha } from '@shared/lib';
+import { theme, themedArray } from '@shared/theme';
 import { CHART_HEIGHT } from '../config/sizes';
 
 // Фон экрана (theme.colors.prime) от плотного к прозрачному.
-export const FADE_COLORS = [
-  'rgba(245, 246, 250, 0.85)',
-  'rgba(245, 246, 250, 0.3)',
-  'rgba(245, 246, 250, 0)',
-] as const;
+export const FADE_COLORS = themedArray<readonly [string, string, string]>(
+  () => [
+    withAlpha(theme.colors.prime, 0.85),
+    withAlpha(theme.colors.prime, 0.3),
+    withAlpha(theme.colors.prime, 0),
+  ],
+);
 
 export const styles = StyleSheet.create({
   container: {

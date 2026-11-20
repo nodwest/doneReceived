@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -17,13 +16,13 @@ export const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: theme.colors.blue,
+    backgroundColor: colors.blue,
   },
   dotError: {
-    backgroundColor: theme.colors.danger,
+    backgroundColor: colors.danger,
   },
   dotMuted: {
-    backgroundColor: theme.colors.grey,
+    backgroundColor: colors.grey,
   },
   text: {
     flexShrink: 1,
@@ -32,15 +31,15 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
   },
   hint: {
-    color: theme.colors.blue,
+    color: colors.blueInk,
   },
   met: {
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   error: {
-    color: theme.colors.danger,
+    color: colors.danger,
   },
   muted: {
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

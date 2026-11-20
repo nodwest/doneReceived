@@ -4,7 +4,6 @@ import {
   Modal,
   PanResponder,
   Pressable,
-  StyleSheet,
   Text,
   useWindowDimensions,
   View,
@@ -17,7 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { useTranslation } from '../i18n';
 import { cropPhoto, showToast, type PickedPhoto } from '../lib';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 import { GradientButton } from './gradient-button';
 import { Icon } from './icons';
 
@@ -460,7 +459,7 @@ function ZoomSlider({ value, disabled, label, onChange }: ZoomSliderProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   root: {
     position: 'absolute',
     top: 0,
@@ -468,11 +467,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     overflow: 'hidden',
-    backgroundColor: theme.colors.viewerBg,
+    backgroundColor: colors.viewerBg,
   },
   scrim: {
     position: 'absolute',
-    borderColor: theme.colors.viewerScrim,
+    borderColor: colors.viewerScrim,
   },
   hint: {
     position: 'absolute',
@@ -500,7 +499,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.viewerChrome,
+    backgroundColor: colors.viewerChrome,
   },
   title: {
     flex: 1,
@@ -508,7 +507,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   // Пустое место справа — чтобы заголовок стоял ровно по центру.
   spacer: {
@@ -538,14 +537,14 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.viewerChrome,
+    backgroundColor: colors.viewerChrome,
   },
   bar: {
     position: 'absolute',
     width: 12,
     height: 2,
     borderRadius: 1,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   barVertical: {
     width: 2,
@@ -572,7 +571,7 @@ const styles = StyleSheet.create({
     width: THUMB,
     height: THUMB,
     borderRadius: THUMB / 2,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.3)',
   },
-});
+}));

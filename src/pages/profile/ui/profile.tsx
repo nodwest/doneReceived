@@ -8,7 +8,8 @@ import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
 import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
 import { getLanguageLabel, useLanguage, useTranslation } from '@shared/i18n';
-import { SettingsRow, type AnchorRect } from '@shared/ui';
+import { useTheme } from '@shared/theme';
+import { SettingsRow, Toggle, type AnchorRect } from '@shared/ui';
 import { ProfileHero } from './profile-hero';
 import { styles } from './profile.styled';
 
@@ -23,6 +24,7 @@ import { styles } from './profile.styled';
  */
 export function ProfilePage() {
   const { t } = useTranslation();
+  const { isDark, toggle: toggleTheme } = useTheme();
   const role = useSessionKind() ?? 'parent';
   const isChild = role === 'child';
   // Карточка — вошедшего (GET /users/me).
@@ -93,6 +95,18 @@ export function ProfilePage() {
                 label={t('profile.language')}
                 value={getLanguageLabel(language)}
                 onPress={openLanguageMenu}
+              />
+              <View style={styles.divider} />
+              <SettingsRow
+                icon={isDark ? 'moon' : 'sun'}
+                label={t('profile.darkTheme')}
+                right={
+                  <Toggle
+                    value={isDark}
+                    onValueChange={toggleTheme}
+                    accessibilityLabel={t('profile.darkTheme')}
+                  />
+                }
               />
               <View style={styles.divider} />
               <SettingsRow icon="help" label={t('profile.help')} />

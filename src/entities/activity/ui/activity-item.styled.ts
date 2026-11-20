@@ -1,30 +1,29 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     gap: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: 18,
     borderWidth: 1,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.08)',
   },
   pending: {
-    borderColor: theme.colors.reviewBorder,
+    borderColor: colors.reviewBorder,
   },
   approved: {
-    borderColor: theme.colors.approvedBorder,
+    borderColor: colors.approvedBorder,
   },
   sentBack: {
-    borderColor: theme.colors.sentBackBorder,
+    borderColor: colors.sentBackBorder,
   },
   missed: {
-    borderColor: theme.colors.missedBorder,
+    borderColor: colors.missedBorder,
   },
   new: {
-    borderColor: theme.colors.childTintBorder,
+    borderColor: colors.childTintBorder,
   },
   background: {
     position: 'absolute',
@@ -61,7 +60,7 @@ export const styles = StyleSheet.create({
     lineHeight: 19,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // Статус не обрезается вместе с длинным названием: не влез в строку —
   // переносится на следующую.
@@ -77,37 +76,37 @@ export const styles = StyleSheet.create({
     lineHeight: 15,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   subtitlePending: {
-    color: theme.colors.reviewText,
+    color: colors.reviewText,
   },
   subtitleApproved: {
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   subtitleNew: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   subtitleSentBack: {
-    color: theme.colors.sentBack,
+    color: colors.sentBack,
   },
   subtitleMissed: {
-    color: theme.colors.missedDeep,
+    color: colors.missedDeep,
   },
   statusPending: {
-    color: theme.colors.reviewText,
+    color: colors.reviewText,
   },
   statusApproved: {
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   statusNew: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   statusSentBack: {
-    color: theme.colors.sentBack,
+    color: colors.sentBack,
   },
   statusMissed: {
-    color: theme.colors.missedDeep,
+    color: colors.missedDeep,
   },
   track: {
     position: 'relative',
@@ -141,7 +140,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   tooltip: {
     position: 'absolute',
@@ -151,14 +150,14 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.ink,
+    backgroundColor: colors.inverseSurface,
     boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.18)',
   },
   tooltipText: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   reward: {
     marginTop: 1,
@@ -166,19 +165,19 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.yellow,
+    color: colors.yellow,
   },
   rewardPending: {
-    color: theme.colors.reviewAccent,
+    color: colors.reviewAccent,
   },
   rewardNew: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   rewardSentBack: {
-    color: theme.colors.sentBack,
+    color: colors.sentBack,
   },
   // Упущенная сумма — серая, как в истории наград.
   rewardMissed: {
-    color: theme.colors.missed,
+    color: colors.missed,
   },
-});
+}));

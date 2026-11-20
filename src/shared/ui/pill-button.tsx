@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { withAlpha } from '../lib';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, themedValue, tracking } from '../theme';
 
 type PillButtonVariant =
   | 'primary'
@@ -25,12 +25,14 @@ type PillButtonProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-const GRADIENTS = {
+const GRADIENTS = themedValue<
+  Record<'primary' | 'child' | 'danger', readonly [string, string]>
+>(() => ({
   primary: [theme.colors.violet, theme.colors.blue],
   // Экраны ребёнка: голубая кнопка I did it!.
   child: [theme.colors.childFrom, theme.colors.childDeep],
   danger: [theme.colors.dangerFrom, theme.colors.danger],
-} as const;
+}));
 
 /** Широкая скруглённая кнопка: градиентная, тёмная или с обводкой. */
 export function PillButton({
@@ -79,7 +81,7 @@ export function PillButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   button: {
     flex: 1,
     height: 48,
@@ -89,25 +91,25 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   primary: {
-    boxShadow: `0px 4px 12px ${withAlpha(theme.colors.violet, 0.25)}`,
+    boxShadow: `0px 4px 12px ${withAlpha(colors.violet, 0.25)}`,
   },
   child: {
     boxShadow: '0px 4px 12px rgba(30, 95, 184, 0.22)',
   },
   danger: {},
   dark: {
-    backgroundColor: theme.colors.ink,
+    backgroundColor: colors.inverseSurface,
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.1)',
   },
   outline: {
     borderWidth: 1.5,
-    borderColor: theme.colors.placeholder,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.placeholder,
+    backgroundColor: colors.surface,
   },
   ghost: {
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   dimmed: {
     opacity: 0.85,
@@ -116,12 +118,12 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   labelInk: {
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   labelGrey: {
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

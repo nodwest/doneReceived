@@ -1,15 +1,14 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   panel: {
     gap: 12,
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.08)',
   },
   head: {
@@ -23,12 +22,12 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: theme.fonts.bold,
     letterSpacing: tracking(17),
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   hint: {
     fontSize: theme.fontSize.inputName,
     fontFamily: theme.fonts.medium,
     letterSpacing: tracking(theme.fontSize.inputName),
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, router, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from '../i18n';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 import { Icon, type IconName } from './icons';
 import { RoundButton } from './round-button';
 
@@ -109,10 +109,10 @@ export function AuthFootnote({ text, linkLabel, href }: AuthFootnoteProps) {
 // Высота строки под кнопкой: держим её и без ссылки (выбор роли).
 const FOOTNOTE_HEIGHT = 18;
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   container: {
     flexGrow: 1,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.h1,
     letterSpacing: tracking(theme.fontSize.h1),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   subtitle: {
     textAlign: 'center',
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 18,
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   body: {
     marginTop: 24,
@@ -177,10 +177,10 @@ const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: FOOTNOTE_HEIGHT,
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   link: {
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

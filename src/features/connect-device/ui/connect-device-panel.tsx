@@ -116,7 +116,7 @@ export function ConnectDevicePanel({
             onPress={() => refetch()}
             style={({ pressed }) => [styles.newCode, pressed && styles.pressed]}
           >
-            <Icon name="refresh" size={16} color={theme.colors.violet} />
+            <Icon name="refresh" size={16} color={theme.colors.violetInk} />
             <Text style={styles.newCodeLabel}>
               {failed ? t('connectDevice.retry') : t('connectDevice.newCode')}
             </Text>

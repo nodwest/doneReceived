@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   section: {
     gap: 10,
   },
@@ -13,10 +12,10 @@ export const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 14,
     borderRadius: 16,
-    backgroundColor: theme.colors.stepperBg,
+    backgroundColor: colors.stepperBg,
   },
   taskChild: {
-    backgroundColor: theme.colors.currentBg,
+    backgroundColor: colors.currentBg,
   },
   pressed: {
     opacity: 0.85,
@@ -27,7 +26,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   taskText: {
     flex: 1,
@@ -37,23 +36,23 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   taskCaption: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   details: {
     paddingVertical: 4,
     paddingHorizontal: 14,
     borderRadius: 16,
-    backgroundColor: theme.colors.detailsBg,
+    backgroundColor: colors.detailsBg,
   },
   divider: {
     height: 1,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   detailRow: {
     flexDirection: 'row',
@@ -66,7 +65,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   detailValue: {
     flexShrink: 1,
@@ -74,7 +73,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   note: {
     flex: 1,
@@ -86,7 +85,7 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(66, 84, 173, 0.18)',
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   noteIcon: {
     width: 32,
@@ -94,10 +93,10 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.parentTo,
+    backgroundColor: colors.parentTo,
   },
   noteIconChild: {
-    backgroundColor: theme.colors.childDeep,
+    backgroundColor: colors.childDeep,
   },
   noteText: {
     flex: 1,
@@ -107,12 +106,12 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   noteCaption: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
-});
+}));

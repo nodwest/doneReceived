@@ -1,8 +1,7 @@
-import { StyleSheet } from 'react-native';
 import { TILE_GAP } from '@entities/task';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   body: {
     paddingBottom: 24,
   },
@@ -28,7 +27,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   filter: {
     marginTop: 12,
@@ -69,16 +68,16 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   paidDayTotal: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   missedDayTotal: {
-    color: theme.colors.missedDeep,
+    color: colors.missedDeep,
   },
   // Карточки наград дня во всю высоту под шапкой.
   cards: {
@@ -95,7 +94,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   empty: {
     marginTop: 24,
@@ -103,6 +102,6 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

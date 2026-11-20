@@ -59,6 +59,8 @@ import { LayersIcon } from './layers';
 import { CodeIcon } from './code';
 import { GlobeOutlineIcon } from './globe-outline';
 import { MapFoldIcon } from './map-fold';
+import { MoonIcon } from './moon';
+import { SunIcon } from './sun';
 
 export const icons = {
   price: PriceIcon,
@@ -122,4 +124,6 @@ export const icons = {
   code: CodeIcon,
   'globe-outline': GlobeOutlineIcon,
   'map-fold': MapFoldIcon,
+  moon: MoonIcon,
+  sun: SunIcon,
 };

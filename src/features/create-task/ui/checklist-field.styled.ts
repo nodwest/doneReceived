@@ -1,10 +1,5 @@
-import {
-  Platform,
-  StyleSheet,
-  type TextStyle,
-  type ViewStyle,
-} from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { Platform, type TextStyle, type ViewStyle } from 'react-native';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 // Убирает браузерную рамку фокуса; в типах RN этих значений нет.
 const webInputReset = Platform.select({
@@ -16,7 +11,7 @@ const webNoOutline = Platform.select({
   web: { outlineWidth: 0, outlineStyle: 'none' },
 }) as unknown as ViewStyle;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Свёрнуто: пунктирная кнопка Add checklist.
   addButton: {
     flexDirection: 'row',
@@ -28,8 +23,8 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderColor: theme.colors.checklistBorder,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.checklistBorder,
+    backgroundColor: colors.surface,
   },
   addText: {
     flex: 1,
@@ -40,13 +35,13 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   addSubtitle: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   pressed: {
     opacity: 0.7,
@@ -66,13 +61,13 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   editor: {
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     overflow: 'hidden',
   },
   step: {
@@ -83,14 +78,14 @@ export const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 12,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderBottomColor: colors.line,
+    backgroundColor: colors.surface,
   },
   stepLifted: {
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
   stepDraft: {
-    backgroundColor: theme.colors.checklistDraftBg,
+    backgroundColor: colors.checklistDraftBg,
   },
   handle: {
     width: 12,
@@ -101,11 +96,11 @@ export const styles = StyleSheet.create({
     height: 20,
     borderRadius: 6,
     borderWidth: 1.8,
-    borderColor: theme.colors.placeholder,
+    borderColor: colors.placeholder,
   },
   checkboxDraft: {
     borderStyle: 'dashed',
-    borderColor: theme.colors.violet,
+    borderColor: colors.violet,
   },
   stepInput: {
     flex: 1,
@@ -114,14 +109,14 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
     ...webInputReset,
   },
   enterHint: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   addStep: {
     flexDirection: 'row',
@@ -136,7 +131,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   hint: {
     flexDirection: 'row',
@@ -149,6 +144,6 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -11,25 +10,25 @@ export const styles = StyleSheet.create({
     paddingRight: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.approvedBorder,
+    borderColor: colors.approvedBorder,
   },
   avatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
     borderWidth: 2,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
   },
   initial: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.violetSoft,
+    backgroundColor: colors.violetSoft,
   },
   initialText: {
     fontSize: 18,
     letterSpacing: tracking(18),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   text: {
     flex: 1,
@@ -39,13 +38,13 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   account: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   check: {
     width: 24,
@@ -53,6 +52,6 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.success,
+    backgroundColor: colors.success,
   },
-});
+}));

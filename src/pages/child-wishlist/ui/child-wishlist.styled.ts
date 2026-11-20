@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   body: {
     gap: 10,
     paddingTop: 12,
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   list: {
     gap: 8,
@@ -32,7 +31,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   wishBody: {
     gap: 16,
@@ -40,4 +39,4 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 24,
   },
-});
+}));

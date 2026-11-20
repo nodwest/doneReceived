@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { Pressable, Text } from 'react-native';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { LetterAvatar } from '@shared/ui';
 import type { FamilyEventPerson } from '../model/family-event';
 
@@ -44,7 +44,7 @@ export function EventPersonChip({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   chip: {
     maxWidth: 150,
     height: 36,
@@ -55,12 +55,12 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   selected: {
-    borderColor: theme.colors.childFrom,
-    backgroundColor: theme.colors.childTint,
+    borderColor: colors.childFrom,
+    backgroundColor: colors.childTint,
   },
   pressed: {
     opacity: 0.8,
@@ -75,10 +75,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   nameSelected: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
     fontFamily: theme.fonts.bold,
   },
-});
+}));

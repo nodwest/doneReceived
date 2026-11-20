@@ -8,6 +8,7 @@ import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import type { UpdateTaskPayload } from '@entities/task';
 import type { ChipChild } from '@entities/user';
 import { useParentFunds } from '@entities/wallet';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { RoundButton } from '@shared/ui';
 import { showToast, useIsCompact } from '@shared/lib';
@@ -27,6 +28,7 @@ export function TaskFormScreen({
   successMessage,
   task,
 }: TaskFormScreenProps) {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const gutter = useIsCompact() ? 16 : 24;

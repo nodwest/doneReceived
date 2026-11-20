@@ -22,7 +22,7 @@ import {
   useKeepInView,
   withAlpha,
 } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { formatRewardShort } from '../model';
 import { AssigneeAvatar } from './assignee-avatar';
 import { styles } from './task-sheet.styled';
@@ -40,23 +40,25 @@ export type TaskSheetTone =
   | 'missed'
   | 'wallet';
 
-const HERO_GRADIENTS = {
-  parent: [theme.colors.heroChildFrom, theme.colors.childDeep],
-  child: [theme.colors.heroChildFrom, theme.colors.childDeep],
+const HERO_GRADIENTS = themedValue<
+  Record<TaskSheetTone, readonly [string, string]>
+>(() => ({
+  parent: [theme.colors.heroChildFrom, theme.colors.heroChildTo],
+  child: [theme.colors.heroChildFrom, theme.colors.heroChildTo],
   review: [theme.colors.heroReviewFrom, theme.colors.heroReviewTo],
-  paid: [theme.colors.heroPaidFrom, theme.colors.earnedDark],
-  missed: [theme.colors.missed, theme.colors.missedDeep],
+  paid: [theme.colors.heroPaidFrom, theme.colors.heroPaidTo],
+  missed: [theme.colors.missedHeroFrom, theme.colors.missedHeroTo],
   wallet: [theme.colors.heroWalletFrom, theme.colors.parentFrom],
-} as const;
+}));
 
-const SHADOWS = {
+const SHADOWS = themedValue(() => ({
   parent: styles.shadowSheet,
   child: styles.shadowSheet,
   review: styles.shadowReview,
   paid: styles.shadowSheet,
   missed: styles.shadowSheet,
   wallet: styles.shadowWallet,
-};
+}));
 
 /** Бумага под телом карточки: у каждого статуса своя. */
 const PAPERS: Record<TaskSheetTone, { paper: Paper; opacity: number } | null> =
@@ -201,13 +203,19 @@ export function TaskSheet({
             оно ложится молочной полупрозрачной полосой поверх фактуры. */}
         {!paper && scrolled && (
           <LinearGradient
-            colors={[theme.colors.white, withAlpha(theme.colors.white, 0)]}
+            colors={[
+              theme.colors.paperBase,
+              withAlpha(theme.colors.paperBase, 0),
+            ]}
             style={[styles.fade, styles.fadeTop]}
           />
         )}
         {!paper && (
           <LinearGradient
-            colors={[withAlpha(theme.colors.white, 0), theme.colors.white]}
+            colors={[
+              withAlpha(theme.colors.paperBase, 0),
+              theme.colors.paperBase,
+            ]}
             style={styles.fade}
           />
         )}
@@ -328,12 +336,12 @@ export type InfoTileProps = {
   value: string;
 };
 
-const TILE_TONES = {
+const TILE_TONES = themedValue(() => ({
   warm: { bg: theme.colors.dueTile, ink: theme.colors.dueInk },
-  cool: { bg: theme.colors.givenTile, ink: theme.colors.childDeep },
+  cool: { bg: theme.colors.givenTile, ink: theme.colors.childInk },
   green: { bg: theme.colors.readySoft, ink: theme.colors.readyText },
   grey: { bg: theme.colors.missedTile, ink: theme.colors.missedDeep },
-};
+}));
 
 /** Пара плиток «когда»: срок и когда выдано / создано. */
 export function InfoTiles({ tiles }: { tiles: readonly InfoTileProps[] }) {

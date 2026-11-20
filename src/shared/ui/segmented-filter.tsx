@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, themedValue, tracking } from '../theme';
 
 type Option<T extends string> = { value: T; label: string };
 
@@ -12,10 +12,12 @@ type SegmentedFilterProps<T extends string> = {
   tone?: 'parent' | 'child';
 };
 
-const GRADIENTS = {
+const GRADIENTS = themedValue<
+  Record<'parent' | 'child', readonly [string, string]>
+>(() => ({
   parent: [theme.colors.violet, theme.colors.blue],
   child: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+}));
 
 /** Белая полоса с вариантами фильтра, выбранный — на цветной плашке. */
 export function SegmentedFilter<T extends string>({
@@ -58,7 +60,7 @@ export function SegmentedFilter<T extends string>({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   bar: {
     height: 48,
     flexDirection: 'row',
@@ -66,8 +68,8 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.04)',
   },
   // Ширина — по подписи («All» узкий, «Withdrawals» шире), остаток делится
@@ -89,10 +91,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   labelSelected: {
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
+}));

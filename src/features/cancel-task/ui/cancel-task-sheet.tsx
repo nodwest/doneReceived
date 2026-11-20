@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useTranslation } from '@shared/i18n';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { BottomSheet, Icon, PillButton } from '@shared/ui';
 
 type CancelTaskSheetProps = {
@@ -49,7 +49,7 @@ export function CancelTaskSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   body: {
     alignItems: 'center',
     gap: 16,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.dangerSoft,
+    backgroundColor: colors.dangerSoft,
   },
   header: {
     alignItems: 'center',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   subtitle: {
     textAlign: 'center',
@@ -81,11 +81,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   actions: {
     alignSelf: 'stretch',
     flexDirection: 'row',
     gap: 12,
   },
-});
+}));

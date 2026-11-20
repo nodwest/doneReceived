@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -10,7 +9,7 @@ export const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 10,
     borderRadius: 14,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   icon: {
     width: 36,
@@ -18,10 +17,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   iconOnline: {
-    backgroundColor: theme.colors.violetSoft,
+    backgroundColor: colors.violetSoft,
   },
   texts: {
     flex: 1,
@@ -31,13 +30,13 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   status: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   remove: {
     width: 34,
@@ -45,9 +44,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 17,
-    backgroundColor: theme.colors.dangerSoft,
+    backgroundColor: colors.dangerSoft,
   },
   pressed: {
     opacity: 0.7,
   },
-});
+}));

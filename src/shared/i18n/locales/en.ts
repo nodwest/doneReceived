@@ -1216,6 +1216,7 @@ export const en = {
     familyCodes: 'Family codes',
     joinFamily: 'Join family',
     language: 'Language',
+    darkTheme: 'Dark theme',
     help: 'Help & support',
     logOut: 'Log out',
     childMode: 'Child mode (temporary)',

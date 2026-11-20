@@ -8,7 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, themedValue, tracking } from '../theme';
 import { Icon, type IconName } from './icons';
 
 type CardButtonVariant =
@@ -38,19 +38,21 @@ type CardButtonProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-const GRADIENTS = {
+const GRADIENTS = themedValue<
+  Record<'primary' | 'child', readonly [string, string]>
+>(() => ({
   primary: [theme.colors.violet, theme.colors.blue],
   child: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+}));
 
-const LABEL_COLORS: Record<CardButtonVariant, string> = {
+const LABEL_COLORS = themedValue<Record<CardButtonVariant, string>>(() => ({
   primary: theme.colors.white,
   child: theme.colors.white,
   dark: theme.colors.white,
   outline: theme.colors.ink,
   'danger-outline': theme.colors.dangerText,
   'review-outline': theme.colors.reviewChipText,
-};
+}));
 
 /**
  * Кнопка внутри карточки задания: скруглённая плашка (не пилюля) с иконкой.
@@ -117,7 +119,7 @@ export function CardButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   button: {
     height: 48,
     borderRadius: 14,
@@ -149,23 +151,23 @@ const styles = StyleSheet.create({
     boxShadow: '0px 4px 12px rgba(31, 94, 184, 0.22)',
   },
   dark: {
-    backgroundColor: theme.colors.ink,
+    backgroundColor: colors.inverseSurface,
     boxShadow: '0px 4px 12px rgba(26, 26, 46, 0.18)',
   },
   outline: {
     borderWidth: 1.5,
-    borderColor: theme.colors.placeholder,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.placeholder,
+    backgroundColor: colors.outlineBg,
   },
   'danger-outline': {
     borderWidth: 1.5,
-    borderColor: theme.colors.dangerBorder,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.dangerBorder,
+    backgroundColor: colors.outlineBg,
   },
   'review-outline': {
     borderWidth: 1.5,
-    borderColor: theme.colors.reviewBorder,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.reviewBorder,
+    backgroundColor: colors.outlineBg,
   },
   // Спиннер в размер иконки: подпись не сдвигается.
   spinner: {
@@ -184,4 +186,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
   },
-});
+}));

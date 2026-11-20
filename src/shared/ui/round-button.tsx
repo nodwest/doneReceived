@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet } from 'react-native';
-import { theme } from '../theme';
+import { Pressable } from 'react-native';
+import { createStyles, theme } from '../theme';
 import { Icon, type IconName } from './icons';
 
 type RoundButtonProps = {
@@ -56,28 +56,28 @@ export function RoundButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   button: {
     width: 44,
     height: 44,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
   small: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
     boxShadow: 'none',
   },
   primary: {
-    backgroundColor: theme.colors.blue,
+    backgroundColor: colors.blue,
     boxShadow: '0px 8px 20px rgba(74, 144, 226, 0.3)',
   },
   disabled: {
     opacity: 0.4,
   },
-});
+}));

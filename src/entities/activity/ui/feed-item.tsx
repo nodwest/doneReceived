@@ -1,4 +1,4 @@
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { useTimeAgo } from '@shared/lib';
 import type { FeedCard, FeedEventType } from '../model';
@@ -26,7 +26,7 @@ const TONES: Record<FeedEventType, ActivityTone> = {
 };
 
 /** Цвет точки статуса на дорожке: каждый шаг задания — свой цвет. */
-const DOT_COLORS: Record<FeedEventType, string> = {
+const DOT_COLORS = themedValue<Record<FeedEventType, string>>(() => ({
   task_created: theme.colors.mapAccent,
   task_submitted: theme.colors.reviewDot,
   task_withdrawn: theme.colors.mapAccent,
@@ -40,7 +40,7 @@ const DOT_COLORS: Record<FeedEventType, string> = {
   event_created: theme.colors.violet,
   event_updated: theme.colors.violet,
   event_cancelled: theme.colors.missed,
-};
+}));
 
 /** Ключи короткого статуса — он дописывается к названию задания. */
 const STATUS_KEYS = {

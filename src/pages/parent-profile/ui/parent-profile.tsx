@@ -28,6 +28,7 @@ import {
 import { useMyId } from '@entities/session';
 import { countTasks, type Task } from '@entities/task';
 import { useParentPaidTotal } from '@entities/wallet';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { ScreenSection } from '@shared/ui';
 import { styles } from './parent-profile.styled';
@@ -51,6 +52,7 @@ const openReward = (operation: Operation) =>
  * заданиям, которые он создал.
  */
 export function ParentProfilePage() {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();

@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     gap: 10,
   },
@@ -14,7 +13,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   totals: {
     flexDirection: 'row',
@@ -57,4 +56,4 @@ export const styles = StyleSheet.create({
     flexGrow: 0,
     flexBasis: 'auto',
   },
-});
+}));

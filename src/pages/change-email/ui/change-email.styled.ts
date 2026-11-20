@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -14,7 +13,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   headerSpacer: {
     width: 44,
@@ -50,7 +49,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.h1,
     letterSpacing: tracking(theme.fontSize.h1),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   heroSubtitle: {
     textAlign: 'center',
@@ -58,19 +57,19 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 18,
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   intro: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 20,
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Почта в тексте: тёмная и жирнее, чтобы сразу заметить опечатку.
   email: {
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   form: {
     gap: 16,
@@ -82,7 +81,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   resendRow: {
     flexDirection: 'row',
@@ -95,7 +94,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   resend: {
     paddingVertical: 6,
@@ -107,17 +106,17 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   // Пока идёт отсчёт: надпись серая, время фиолетовое.
   resendWaiting: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   timer: {
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   // Прижимает кнопки к низу, когда форма короче экрана.
   footer: {
@@ -138,13 +137,13 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 18,
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   footnoteLink: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     lineHeight: 18,
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

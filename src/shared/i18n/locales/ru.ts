@@ -1262,6 +1262,7 @@ export const ru: Dictionary = {
     familyCodes: 'Коды семьи',
     joinFamily: 'Присоединиться к семье',
     language: 'Язык',
+    darkTheme: 'Тёмная тема',
     help: 'Помощь и поддержка',
     logOut: 'Выйти',
     childMode: 'Режим ребёнка (временно)',

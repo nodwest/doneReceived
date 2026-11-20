@@ -2,14 +2,13 @@ import {
   Animated,
   PanResponder,
   Pressable,
-  StyleSheet,
   Text,
   View,
   type PanResponderCallbacks,
 } from 'react-native';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { GradientButton, Icon, Toggle, type IconName } from '@shared/ui';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { type MapLayerKey, useMapLayerStore } from '../model/layer-preferences';
 
@@ -146,7 +145,7 @@ export function MapLayersPanel({ onClose, onConfigure }: MapLayersPanelProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   panel: {
     width: '100%',
     maxWidth: 480,
@@ -156,7 +155,7 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   handle: {
     width: 40,
@@ -164,14 +163,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 16,
     borderRadius: 3,
-    backgroundColor: theme.colors.sheetGrabber,
+    backgroundColor: colors.sheetGrabber,
   },
   title: {
     marginBottom: 12,
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // Слои одной карточкой с рамкой, строки разделены чертой от текста.
   group: {
@@ -179,8 +178,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     overflow: 'hidden',
   },
   row: {
@@ -194,7 +193,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     marginLeft: 60,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   pressed: {
     opacity: 0.72,
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    backgroundColor: theme.colors.mapAccentTint,
+    backgroundColor: colors.mapAccentTint,
   },
   copy: {
     flex: 1,
@@ -217,12 +216,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   subtitle: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

@@ -1,12 +1,11 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 // Действия у смахнутой строки: две кнопки по 60, промежуток 8 и отступ 12
 // от строки.
 export const ACTIONS_GAP = 8;
 export const ACTIONS_WIDTH = 140;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   body: {
     gap: 10,
     paddingTop: 12,
@@ -25,7 +24,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   balance: {
     gap: 2,
@@ -37,13 +36,13 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   balanceHint: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.white,
+    color: colors.white,
     opacity: 0.9,
   },
   handle: {
@@ -64,10 +63,10 @@ export const styles = StyleSheet.create({
       '0px 8px 16px rgba(26, 26, 46, 0.24), 0px 2px 4px rgba(26, 26, 46, 0.12)',
   },
   edit: {
-    backgroundColor: theme.colors.childFrom,
+    backgroundColor: colors.childFrom,
   },
   delete: {
-    backgroundColor: theme.colors.dangerAction,
+    backgroundColor: colors.dangerAction,
   },
   pressed: {
     opacity: 0.8,
@@ -76,7 +75,7 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   add: {
     flexDirection: 'row',
@@ -99,13 +98,13 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   addLabel: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   empty: {
     marginVertical: 24,
@@ -113,6 +112,6 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   shadow: {
     borderRadius: 20,
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.08)',
@@ -22,7 +21,7 @@ export const styles = StyleSheet.create({
   // Низ карточки: устройства ребёнка под тонкой чертой.
   footer: {
     borderTopWidth: 1,
-    borderTopColor: theme.colors.childTintBorder,
+    borderTopColor: colors.childTintBorder,
   },
   avatar: {
     width: 56,
@@ -32,19 +31,19 @@ export const styles = StyleSheet.create({
   initial: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.violetSoft,
+    backgroundColor: colors.violetSoft,
   },
   initialText: {
     fontSize: 24,
     letterSpacing: tracking(24),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   subtitle: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   info: {
     flex: 1,
@@ -60,19 +59,19 @@ export const styles = StyleSheet.create({
     fontSize: 17,
     letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   you: {
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 8,
-    backgroundColor: theme.colors.violetSoft,
+    backgroundColor: colors.violetSoft,
   },
   youText: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   stats: {
     alignItems: 'flex-end',
@@ -85,24 +84,24 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 10,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   chipReview: {
-    backgroundColor: theme.colors.reviewChip,
+    backgroundColor: colors.reviewChip,
   },
   chipValue: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   chipLabel: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   chipReviewText: {
-    color: theme.colors.reviewChipText,
+    color: colors.reviewChipText,
   },
-});
+}));

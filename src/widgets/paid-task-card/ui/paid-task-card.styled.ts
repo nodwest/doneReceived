@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   wish: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -11,8 +10,8 @@ export const styles = StyleSheet.create({
     paddingRight: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.childTintBorder,
-    backgroundColor: theme.colors.currentBg,
+    borderColor: colors.childTintBorder,
+    backgroundColor: colors.currentBg,
   },
   wishIcon: {
     width: 40,
@@ -36,28 +35,28 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   wishNums: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   track: {
     height: 8,
     flexDirection: 'row',
     borderRadius: 4,
     overflow: 'hidden',
-    backgroundColor: theme.colors.childChip,
+    backgroundColor: colors.childChip,
   },
   saved: {
     height: '100%',
-    backgroundColor: theme.colors.childDeep,
+    backgroundColor: colors.childDeep,
   },
   added: {
     height: '100%',
-    backgroundColor: theme.colors.earned,
+    backgroundColor: colors.earned,
   },
 
   note: {
@@ -70,7 +69,7 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(46, 184, 115, 0.35)',
-    backgroundColor: theme.colors.readyBg,
+    backgroundColor: colors.readyBg,
   },
   noteIcon: {
     width: 32,
@@ -78,7 +77,7 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.earned,
+    backgroundColor: colors.earned,
   },
   noteText: {
     flex: 1,
@@ -88,24 +87,24 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   noteCaption: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
 
   // Упущенное задание: серая плашка внизу и коралловые часы.
   noteMissed: {
-    borderColor: theme.colors.missedBorder,
-    backgroundColor: theme.colors.prime,
+    borderColor: colors.missedBorder,
+    backgroundColor: colors.prime,
   },
   noteIconMissed: {
-    backgroundColor: theme.colors.missedClock,
+    backgroundColor: colors.missedClock,
   },
   noteTitleMissed: {
-    color: theme.colors.missedInk,
+    color: colors.missedInk,
   },
-});
+}));

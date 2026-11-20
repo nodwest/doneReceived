@@ -1,7 +1,7 @@
 import { Text, type ImageSourcePropType } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { FamilyRole } from '@entities/user';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { LetterAvatar } from '@shared/ui';
 import { styles } from './profile-hero.styled';
 
@@ -13,10 +13,12 @@ type ProfileHeroProps = {
   role: FamilyRole;
 };
 
-const HERO_COLORS = {
-  parent: [theme.colors.parentTo, theme.colors.parentFrom],
-  child: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+const HERO_COLORS = themedValue<Record<FamilyRole, readonly [string, string]>>(
+  () => ({
+    parent: [theme.colors.parentTo, theme.colors.parentFrom],
+    child: [theme.colors.childFrom, theme.colors.childDeep],
+  }),
+);
 
 /**
  * Карточка вошедшего пользователя: имя, аватар и почта. У родителя —

@@ -44,7 +44,7 @@ export function PeriodSelect({ value, onChange }: PeriodSelectProps) {
       >
         <Text style={styles.value}>{t(`period.${value}`)}</Text>
         <View style={[styles.chevron, open && styles.chevronOpen]}>
-          <Icon name="chevron-right" size={16} color={theme.colors.violet} />
+          <Icon name="chevron-right" size={16} color={theme.colors.violetInk} />
         </View>
       </Pressable>
       <SelectMenu

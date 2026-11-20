@@ -1,4 +1,4 @@
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import type { OperationKind } from '../model/operation';
 
 type KindColors = {
@@ -16,12 +16,14 @@ type KindColors = {
 };
 
 /** Цвета 3D-кубиков и плашек по виду операции. */
-export const OPERATION_KIND_COLORS: Record<OperationKind, KindColors> = {
+export const OPERATION_KIND_COLORS = themedValue<
+  Record<OperationKind, KindColors>
+>(() => ({
   earned: {
     front: theme.colors.earned,
     side: theme.colors.earnedDark,
     top: theme.colors.earnedLight,
-    label: theme.colors.earnedLabel,
+    label: theme.colors.earnedBarLabel,
     ink: theme.colors.earnedInk,
     soft: theme.colors.earnedSoft,
   },
@@ -33,4 +35,4 @@ export const OPERATION_KIND_COLORS: Record<OperationKind, KindColors> = {
     ink: theme.colors.missedInk,
     soft: theme.colors.missedSoft,
   },
-};
+}));

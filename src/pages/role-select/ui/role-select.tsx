@@ -7,6 +7,7 @@ import {
   usePairDevice,
 } from '@features/sign-in-by-code';
 import { RoleIcon, type FamilyRole } from '@entities/user';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { AuthLayout, GradientButton } from '@shared/ui';
@@ -28,6 +29,7 @@ const ROLES: readonly { key: Role; icon: FamilyRole }[] = [
  * continue» подключает устройство: сессия ребёнка, его главная.
  */
 export function RoleSelectPage() {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<Role>('parent');

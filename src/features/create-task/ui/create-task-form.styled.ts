@@ -1,12 +1,12 @@
-import { Platform, StyleSheet, type TextStyle } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { Platform, type TextStyle } from 'react-native';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 // Убирает браузерную рамку фокуса и ручку ресайза; в типах RN этих значений нет.
 const webInputReset = Platform.select({
   web: { outlineWidth: 0, outlineStyle: 'none', resize: 'none' },
 }) as unknown as TextStyle;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   flex: {
     flex: 1,
   },
@@ -36,13 +36,13 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   optional: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
 
   input: {
@@ -51,12 +51,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
     boxShadow: 'none',
   },
   // Рамка и отступы на обёртке, чтобы высота TextInput равнялась высоте текста.
@@ -66,8 +66,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   textareaInput: {
     minHeight: 56,
@@ -76,7 +76,7 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(15),
     lineHeight: 20,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
     textAlignVertical: 'top',
     ...webInputReset,
   },
@@ -110,21 +110,21 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   chipSelected: {
-    borderColor: theme.colors.violet,
-    backgroundColor: theme.colors.violet,
+    borderColor: colors.violet,
+    backgroundColor: colors.violet,
   },
   chipText: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   chipTextSelected: {
-    color: theme.colors.white,
+    color: colors.white,
   },
 
   reward: {
@@ -135,20 +135,20 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: theme.colors.yellow,
+    borderColor: colors.yellow,
     overflow: 'hidden',
   },
   rewardError: {
-    borderColor: theme.colors.dangerText,
+    borderColor: colors.dangerText,
   },
   rewardSign: {
     fontSize: 32,
     letterSpacing: tracking(32),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.yellow,
+    color: colors.yellow,
   },
   rewardSignError: {
-    color: theme.colors.dangerText,
+    color: colors.dangerText,
   },
   rewardInput: {
     flex: 1,
@@ -157,7 +157,7 @@ export const styles = StyleSheet.create({
     fontSize: 44,
     letterSpacing: tracking(44),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
     ...webInputReset,
   },
   rewardInputCompact: {
@@ -169,10 +169,10 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   deadlineError: {
-    color: theme.colors.danger,
+    color: colors.danger,
   },
   deadlineRow: {
     flexDirection: 'row',
@@ -185,16 +185,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: theme.colors.violet,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.violet,
+    backgroundColor: colors.surface,
   },
   dateButtonInvalid: {
-    borderColor: theme.colors.danger,
+    borderColor: colors.danger,
   },
   dateButtonText: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

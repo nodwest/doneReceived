@@ -1,9 +1,8 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '../../theme';
+import { createStyles, theme, tracking } from '../../theme';
 
 export const WHEEL_ITEM_HEIGHT = 44;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   body: {
     paddingHorizontal: 24,
     paddingBottom: 16,
@@ -18,13 +17,13 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   summary: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
 
   timeRow: {
@@ -37,7 +36,7 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     letterSpacing: tracking(24),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   wheelBand: {
     position: 'absolute',
@@ -45,7 +44,7 @@ export const styles = StyleSheet.create({
     right: 0,
     height: WHEEL_ITEM_HEIGHT,
     borderRadius: 12,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   wheelItem: {
     height: WHEEL_ITEM_HEIGHT,
@@ -56,14 +55,14 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   wheelTextSelected: {
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   wheelTextDisabled: {
-    color: theme.colors.placeholder,
+    color: colors.placeholder,
   },
 
   footer: {
@@ -75,16 +74,16 @@ export const styles = StyleSheet.create({
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
+    borderColor: colors.line,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   cancelText: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   confirmWrap: {
     flex: 1,
@@ -98,12 +97,12 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   confirmPressed: {
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
   },
   confirmText: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
+}));

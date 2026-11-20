@@ -1,15 +1,14 @@
-import { StyleSheet } from 'react-native';
 import { TILE_GAP } from '@entities/task';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 // Отступ под точками карусели, когда снизу нет навбара.
 export const CARDS_PADDING_BOTTOM = 16;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
     minHeight: '100%',
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   container: {
     flex: 1,
@@ -43,10 +42,10 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   loading: {
     marginTop: 48,
     alignSelf: 'center',
   },
-});
+}));

@@ -25,7 +25,7 @@ import { useChildWallet } from '@entities/wallet';
 import { useWishlistProgress, WishRow } from '@entities/wish';
 import { useMyId } from '@entities/session';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
 import { authorizedImage } from '@shared/api';
@@ -41,6 +41,7 @@ const RECENT_REWARDS = 3;
  * нет.
  */
 export function ServerChildProfile({ id }: { id: string }) {
+  useTheme();
   const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();

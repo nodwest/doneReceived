@@ -21,7 +21,7 @@ import { formatMoney } from '@entities/wallet';
 import { authorizedImage, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { Icon, ScreenSection, SwipeableRow } from '@shared/ui';
 import { DELETE_ACTION_WIDTH, REVEAL_GAP, styles } from './family.styled';
 
@@ -41,6 +41,7 @@ const photo = (url: string | null) => (url ? authorizedImage(url) : undefined);
  * имена).
  */
 export function FamilyPage() {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const user = useSessionUser();

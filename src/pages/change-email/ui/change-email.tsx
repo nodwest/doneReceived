@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useMe, useSessionKind } from '@entities/session';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { RoundButton } from '@shared/ui';
@@ -23,6 +24,7 @@ const goBack = () =>
  * устройства сервер разлогинивает. У ребёнка почты нет — экрана тоже.
  */
 export function ChangeEmailPage() {
+  useTheme();
   const { t } = useTranslation();
   const isChild = useSessionKind() === 'child';
   const me = useMe();

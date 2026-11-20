@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -11,7 +10,7 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
   },
   away: {
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   text: {
     fontSize: theme.fontSize.inputName,
@@ -19,10 +18,10 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.semibold,
   },
   homeText: {
-    color: theme.colors.homeBrown,
+    color: colors.homeBrown,
   },
   awayText: {
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   compact: {
     flexDirection: 'row',
@@ -48,6 +47,6 @@ export const styles = StyleSheet.create({
   },
   compactAway: {
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

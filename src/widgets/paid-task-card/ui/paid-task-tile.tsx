@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import type { Operation } from '@entities/operation';
 import {
   AssigneeAvatar,
@@ -11,7 +11,7 @@ import {
 } from '@entities/task';
 import { useTranslation } from '@shared/i18n';
 import { formatClock, formatMonthDay } from '@shared/lib';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 type PaidTaskTileProps = {
   /** Начисленная награда из истории. */
@@ -102,13 +102,13 @@ export function PaidTaskTile({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   tile: {
     gap: 10,
     padding: 16,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: theme.colors.cardBorder,
+    borderColor: colors.cardBorder,
   },
   pressed: {
     opacity: 0.85,
@@ -120,13 +120,13 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 8,
-    backgroundColor: theme.colors.rewardSoft,
+    backgroundColor: colors.rewardSoft,
   },
   chipText: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   footer: {
     flexDirection: 'row',
@@ -140,6 +140,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 import { useToastStore } from '../lib/toast';
 
 // Даём нативной модалке уехать вниз, прежде чем показывать тост.
@@ -52,7 +52,7 @@ export function ToastHost() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   overlay: {
     ...StyleSheet.absoluteFill,
     alignItems: 'center',
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 24,
-    backgroundColor: theme.colors.ink,
+    backgroundColor: colors.inverseSurface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
   },
   badge: {
@@ -75,19 +75,19 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.success,
+    backgroundColor: colors.success,
   },
   badgeText: {
     fontSize: 16,
     letterSpacing: tracking(16),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   message: {
     flexShrink: 1,
     fontSize: 16,
     letterSpacing: tracking(16),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
+}));

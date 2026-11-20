@@ -5,6 +5,7 @@ import { TabScreen } from '@widgets/bottom-nav';
 import { DepositSheet } from '@features/deposit-funds';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
 import { TransactionRow, useParentFunds, useWallet } from '@entities/wallet';
+import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
@@ -31,6 +32,7 @@ const RECENT_TRANSACTIONS = 4;
  * ничего не делают.
  */
 export function WalletPage() {
+  useTheme();
   const { t } = useTranslation();
   // Деньги и транзакции родителя — с сервера (без семьи — моки).
   const familyId = useCurrentFamily()?.id ?? null;

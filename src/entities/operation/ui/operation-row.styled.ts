@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -10,8 +9,8 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   pressed: {
     opacity: 0.85,
@@ -35,30 +34,30 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   subtitle: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   reward: {
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 14,
-    backgroundColor: theme.colors.rewardSoft,
+    backgroundColor: colors.rewardSoft,
   },
   rewardText: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.rewardText,
+    color: colors.rewardText,
   },
   rewardMissed: {
-    backgroundColor: theme.colors.missedSoft,
+    backgroundColor: colors.missedSoft,
   },
   rewardTextMissed: {
-    color: theme.colors.missedDeep,
+    color: colors.missedDeep,
   },
-});
+}));

@@ -15,7 +15,7 @@ import {
 } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { Icon, RoundButton, SortableList, SwipeableRow } from '@shared/ui';
 import { ACTIONS_GAP, ACTIONS_WIDTH, styles } from './wishlist.styled';
 
@@ -28,6 +28,7 @@ import { ACTIONS_GAP, ACTIONS_WIDTH, styles } from './wishlist.styled';
  * Тап по желанию — его карточка (`/wishlist/[id]`).
  */
 export function WishlistPage() {
+  useTheme();
   const { t } = useTranslation();
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
   const { balance } = useMyChildBalance();
@@ -189,7 +190,7 @@ export function WishlistPage() {
             pressed && styles.pressed,
           ]}
         >
-          <Icon name="plus" size={18} color={theme.colors.childDeep} />
+          <Icon name="plus" size={18} color={theme.colors.childInk} />
           <Text style={styles.addLabel}>{t('wishlist.add')}</Text>
         </Pressable>
         {atLimit && <Text style={styles.limitHint}>{limitHint}</Text>}

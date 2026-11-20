@@ -7,7 +7,7 @@ import {
   type ImageSourcePropType,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { LetterAvatar } from '@shared/ui';
 import { styles } from './activity-item.styled';
@@ -51,13 +51,15 @@ type ActivityCardProps = {
   changesCount?: number;
 };
 
-const GRADIENTS = {
-  pending: [theme.colors.reviewFrom, theme.colors.reviewTo],
-  approved: [theme.colors.approvedFrom, theme.colors.approvedTo],
-  sentBack: [theme.colors.sentBackBg, theme.colors.white],
-  missed: [theme.colors.missedTile, theme.colors.white],
-  new: [theme.colors.childTint, theme.colors.childTintLight],
-} as const;
+const GRADIENTS = themedValue<Record<ActivityTone, readonly [string, string]>>(
+  () => ({
+    pending: [theme.colors.reviewFrom, theme.colors.reviewTo],
+    approved: [theme.colors.approvedFrom, theme.colors.approvedTo],
+    sentBack: [theme.colors.sentBackBg, theme.colors.surface],
+    missed: [theme.colors.missedTile, theme.colors.surface],
+    new: [theme.colors.childTint, theme.colors.childTintLight],
+  }),
+);
 
 const CONNECTORS: Record<ActivityTone, string> = {
   pending: 'rgba(230, 126, 0, 0.3)',
@@ -197,26 +199,26 @@ export function ActivityCard({
   );
 }
 
-const SUBTITLE_STYLES = {
+const SUBTITLE_STYLES = themedValue(() => ({
   pending: styles.subtitlePending,
   approved: styles.subtitleApproved,
   new: styles.subtitleNew,
   sentBack: styles.subtitleSentBack,
   missed: styles.subtitleMissed,
-};
+}));
 
-const STATUS_STYLES = {
+const STATUS_STYLES = themedValue(() => ({
   pending: styles.statusPending,
   approved: styles.statusApproved,
   new: styles.statusNew,
   sentBack: styles.statusSentBack,
   missed: styles.statusMissed,
-};
+}));
 
-const REWARD_STYLES = {
+const REWARD_STYLES = themedValue(() => ({
   pending: styles.rewardPending,
   approved: null,
   new: styles.rewardNew,
   sentBack: styles.rewardSentBack,
   missed: styles.rewardMissed,
-};
+}));

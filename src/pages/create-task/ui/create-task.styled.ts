@@ -1,10 +1,9 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   container: {
     flex: 1,
@@ -25,9 +24,9 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   spacer: {
     width: 44,
   },
-});
+}));

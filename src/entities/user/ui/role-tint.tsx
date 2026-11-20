@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { theme } from '@shared/theme';
+import { createStyles } from '@shared/theme';
 import { ROLE_COLORS } from '../config/role-colors';
 import type { FamilyRole } from '../model/role';
 
@@ -29,9 +29,9 @@ export function RoleTint({ role, style, children }: RoleTintProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   base: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     borderWidth: 1,
   },
-});
+}));

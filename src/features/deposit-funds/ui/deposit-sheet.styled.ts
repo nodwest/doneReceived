@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   body: {
     gap: 14,
     paddingTop: 6,
@@ -17,7 +16,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   close: {
     width: 36,
@@ -25,13 +24,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 18,
-    backgroundColor: theme.colors.closeBg,
+    backgroundColor: colors.closeBg,
   },
   dollar: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   presets: {
     flexDirection: 'row',
@@ -43,28 +42,28 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   presetSelected: {
-    borderColor: theme.colors.violet,
-    backgroundColor: theme.colors.violet,
+    borderColor: colors.violet,
+    backgroundColor: colors.violet,
   },
   presetLabel: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   presetLabelSelected: {
-    color: theme.colors.white,
+    color: colors.white,
   },
   hint: {
     fontSize: theme.fontSize.xs,
     lineHeight: 16,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   button: {
     height: 48,
@@ -82,9 +81,9 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   pressed: {
     opacity: 0.7,
   },
-});
+}));

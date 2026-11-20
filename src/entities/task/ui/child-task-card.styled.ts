@@ -1,18 +1,17 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   optional: {
     paddingVertical: 2,
     paddingHorizontal: 7,
     borderRadius: 6,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   optionalText: {
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   drop: {
     gap: 12,
@@ -22,7 +21,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderStyle: 'dashed',
     borderColor: 'rgba(74, 158, 240, 0.45)',
-    backgroundColor: theme.colors.dropZone,
+    backgroundColor: colors.dropZone,
   },
   picked: {
     flexDirection: 'row',
@@ -63,12 +62,12 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
   },
   camera: {
-    backgroundColor: theme.colors.childChip,
+    backgroundColor: colors.childChip,
   },
   gallery: {
     borderWidth: 1,
-    borderColor: theme.colors.galleryBorder,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.galleryBorder,
+    backgroundColor: colors.surface,
   },
   pressed: {
     opacity: 0.8,
@@ -77,7 +76,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   hint: {
     textAlign: 'center',
@@ -85,6 +84,6 @@ export const styles = StyleSheet.create({
     lineHeight: 15,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

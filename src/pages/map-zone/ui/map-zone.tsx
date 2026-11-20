@@ -3,7 +3,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -22,7 +21,7 @@ import { TabScreen } from '@widgets/bottom-nav';
 import { presenceKeys } from '@features/location';
 import { showToast } from '@shared/lib';
 import { useTranslation } from '@shared/i18n';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking, useTheme } from '@shared/theme';
 import { GradientButton, Input, PillButton, ScreenHeader } from '@shared/ui';
 
 /** Больше 12 вершин на телефоне рисовать неудобно; сервер разрешает до 64. */
@@ -46,6 +45,7 @@ function zoneCenter(points: readonly ZonePoint[]): ZonePoint | undefined {
  * проверяет сервер, после сохранения список областей обновляется.
  */
 export function MapZonePage() {
+  useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const familyId = useCurrentFamily()?.id ?? null;
@@ -207,11 +207,11 @@ export function MapZonePage() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   header: {
     paddingHorizontal: 12,
@@ -223,12 +223,12 @@ const styles = StyleSheet.create({
     minHeight: 260,
     marginTop: 4,
     overflow: 'hidden',
-    backgroundColor: theme.colors.mapPlaceholder,
+    backgroundColor: colors.mapPlaceholder,
   },
   form: {
     flexGrow: 0,
     maxHeight: '48%',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
   },
@@ -243,13 +243,13 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   points: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.mapAccent,
+    color: colors.mapAccent,
   },
   actions: {
     flexDirection: 'row',
@@ -262,4 +262,4 @@ const styles = StyleSheet.create({
   save: {
     flex: 1.4,
   },
-});
+}));

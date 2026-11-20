@@ -3,7 +3,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { Icon, PhotoCarousel } from '@shared/ui';
 import { storeUrl, type WishProgress, type WishStatus } from '../model';
 import { styles } from './wish-details.styled';
@@ -24,16 +24,20 @@ type WishDetailsProps = WishProgress & {
   footer?: ReactNode;
 };
 
-const CHIPS: Record<WishStatus, { bg: string; text: string }> = {
-  ready: { bg: theme.colors.readySoft, text: theme.colors.readyText },
-  current: { bg: theme.colors.childChip, text: theme.colors.childDeep },
-  waiting: { bg: theme.colors.queueSoft, text: theme.colors.queueText },
-};
+const CHIPS = themedValue<Record<WishStatus, { bg: string; text: string }>>(
+  () => ({
+    ready: { bg: theme.colors.readySoft, text: theme.colors.readyText },
+    current: { bg: theme.colors.childChip, text: theme.colors.childInk },
+    waiting: { bg: theme.colors.queueSoft, text: theme.colors.queueText },
+  }),
+);
 
-const FILLS = {
+const FILLS = themedValue<
+  Record<'ready' | 'current', readonly [string, string]>
+>(() => ({
   ready: [theme.colors.earned, theme.colors.readyText],
   current: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+}));
 
 /**
  * Карточка желания — общая для ребёнка и родителя: фото (листаются) или
@@ -131,7 +135,7 @@ export function WishDetails({
             style={StyleSheet.absoluteFill}
           />
           <View style={styles.noteLabel}>
-            <Icon name="note" size={16} color={theme.colors.childDeep} />
+            <Icon name="note" size={16} color={theme.colors.childInk} />
             <Text style={styles.noteLabelText}>{noteLabel}</Text>
           </View>
           <Text style={styles.noteText}>{wish.description}</Text>
@@ -145,7 +149,7 @@ export function WishDetails({
           style={({ pressed }) => [styles.store, pressed && styles.pressed]}
         >
           <View style={styles.storeIcon}>
-            <Icon name="link" size={20} color={theme.colors.violet} />
+            <Icon name="link" size={20} color={theme.colors.violetInk} />
           </View>
           <View style={styles.storeInfo}>
             <Text style={styles.storeTitle}>{t('wishCard.openStore')}</Text>

@@ -1,13 +1,12 @@
 import { ApiImage } from '@shared/ui';
 import {
-  StyleSheet,
   Text,
   View,
   type ImageSourcePropType,
   type ImageStyle,
   type StyleProp,
 } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 type AssigneeAvatarProps = {
   /** Фото; null — у ребёнка с сервера фото пока нет. */
@@ -27,16 +26,16 @@ export function AssigneeAvatar({ source, name, style }: AssigneeAvatarProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   initial: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.violetSoft,
+    backgroundColor: colors.violetSoft,
   },
   letter: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   body: {
     gap: 14,
     paddingTop: 6,
@@ -17,7 +16,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   close: {
     width: 36,
@@ -25,7 +24,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 18,
-    backgroundColor: theme.colors.closeBg,
+    backgroundColor: colors.closeBg,
   },
   field: {
     gap: 6,
@@ -34,7 +33,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   photos: {
     flexDirection: 'row',
@@ -60,7 +59,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   next: {
     gap: 2,
@@ -68,21 +67,21 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.childTintBorder,
+    borderColor: colors.childTintBorder,
     overflow: 'hidden',
   },
   nextTitle: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   nextHint: {
     fontSize: theme.fontSize.xs,
     lineHeight: 15,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   button: {
     height: 48,
@@ -100,9 +99,9 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   pressed: {
     opacity: 0.7,
   },
-});
+}));

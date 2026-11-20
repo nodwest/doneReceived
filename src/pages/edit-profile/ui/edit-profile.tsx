@@ -19,7 +19,7 @@ import {
   showToast,
   type PickedPhoto,
 } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import {
   AvatarCropper,
   GradientButton,
@@ -49,6 +49,7 @@ import { styles } from './edit-profile.styled';
 type PhotoChoice = 'camera' | 'library' | 'remove' | 'none';
 
 export function EditProfilePage() {
+  useTheme();
   const { t } = useTranslation();
   // Данные вошедшего (GET /users/me).
   const isChild = useSessionKind() === 'child';

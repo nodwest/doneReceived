@@ -1,14 +1,13 @@
 import { useState, type ReactNode } from 'react';
 import {
   Platform,
-  StyleSheet,
   Text,
   TextInput,
   View,
   type TextInputProps,
   type TextStyle,
 } from 'react-native';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 
 const FIELD_HEIGHT = 50;
 
@@ -64,7 +63,7 @@ export function SheetField({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   field: {
     gap: 6,
   },
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   input: {
     minHeight: FIELD_HEIGHT,
@@ -82,14 +81,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.prime,
+    borderColor: colors.line,
+    backgroundColor: colors.prime,
   },
   inputFocused: {
     borderWidth: 2,
     paddingHorizontal: 15,
-    borderColor: theme.colors.childFrom,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.childFrom,
+    backgroundColor: colors.surface,
   },
   inputMultiline: {
     minHeight: 76,
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
     ...Platform.select<TextStyle>({
       // Своя рамка фокуса у обёртки поля: браузерную убираем совсем —
       // даже прозрачная outline: auto закрашивает рамку поверх поля.
@@ -117,4 +116,4 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textAlignVertical: 'top',
   },
-});
+}));

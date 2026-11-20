@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import {
   Camera,
   GeoJSONSource,
@@ -24,7 +24,7 @@ import {
 import { authorizedImage } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { ApiImage } from '@shared/ui';
 import { MAP_STYLE } from './config/map-style';
 import {
@@ -369,12 +369,12 @@ export function MapWeb({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   container: {
     flex: 1,
     minHeight: 0,
     overflow: 'hidden',
-    backgroundColor: theme.colors.mapPlaceholder,
+    backgroundColor: colors.mapPlaceholder,
   },
   map: {
     flex: 1,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     width: 44,
     overflow: 'hidden',
     borderRadius: 22,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
   },
   zoomButton: {
@@ -399,13 +399,13 @@ const styles = StyleSheet.create({
   zoomDivider: {
     height: 1,
     marginHorizontal: 10,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   zoomLabel: {
     fontSize: 24,
     lineHeight: 26,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   markerWrap: {
     alignItems: 'center',
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 22,
     borderWidth: 3,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.24)',
   },
   avatar: {
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   initial: {
     fontSize: 16,
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   pinTail: {
     width: 0,
@@ -447,27 +447,27 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 10,
     borderRadius: 12,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 8px 22px rgba(16, 24, 40, 0.18)',
   },
   calloutName: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   calloutPlace: {
     marginTop: 2,
     fontSize: 11,
     letterSpacing: 0.1,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   calloutDevice: {
     marginTop: 3,
     fontSize: 10,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   error: {
     position: 'absolute',
@@ -483,9 +483,9 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.white,
+    color: colors.white,
   },
   pressed: {
     opacity: 0.7,
   },
-});
+}));

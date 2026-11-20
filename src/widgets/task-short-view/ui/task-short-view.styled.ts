@@ -1,10 +1,10 @@
-import { StyleSheet } from 'react-native';
+import { createStyles } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   content: {
     gap: 8,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     paddingHorizontal: 16,
     paddingVertical: 12,
     shadowColor: '#000',
@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#93c5fd',
+    backgroundColor: colors.childTo,
   },
   reward: {
     display: 'flex',
@@ -36,12 +36,12 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 28,
     fontWeight: '600',
-    color: '#0A0A0A',
+    color: colors.ink,
   },
   description: {
     fontSize: 14,
     lineHeight: 14,
     fontWeight: '500',
-    color: '#9CA3AF',
+    color: colors.grey,
   },
-});
+}));

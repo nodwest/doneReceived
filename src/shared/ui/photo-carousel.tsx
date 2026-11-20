@@ -6,12 +6,11 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
   type ImageSourcePropType,
 } from 'react-native';
-import { theme, tracking } from '../theme';
+import { createStyles, theme, tracking } from '../theme';
 
 // Белая полоса между фото, чтобы соседние не сливались при листании.
 const GAP = 8;
@@ -154,17 +153,17 @@ export function PhotoCarousel({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   root: {
     overflow: 'hidden',
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   page: {
     paddingRight: GAP,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   photo: {
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   fill: {
     width: '100%',
@@ -183,7 +182,7 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   dots: {
     position: 'absolute',
@@ -202,6 +201,6 @@ const styles = StyleSheet.create({
   },
   dotActive: {
     width: 20,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
-});
+}));

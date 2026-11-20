@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   shadow: {
     borderRadius: 20,
     boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.05)',
@@ -25,18 +24,18 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.sm,
     fontFamily: theme.fonts.bold,
     letterSpacing: tracking(theme.fontSize.sm),
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   footnote: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   hint: {
     fontSize: theme.fontSize.xs,
     fontFamily: theme.fonts.medium,
     letterSpacing: tracking(theme.fontSize.xs),
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
-});
+}));

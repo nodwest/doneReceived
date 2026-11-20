@@ -12,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { LetterAvatar, RoundButton } from '@shared/ui';
 import { useIsCompact } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, themedArray } from '@shared/theme';
 import { styles } from './tasks-header.styled';
 
 export type TasksTab = 'all' | 'review';
@@ -40,10 +40,10 @@ type TasksHeaderProps = {
 type Tone = 'parent' | 'child';
 
 /** Выбранный All и бейдж счётчика — синие у родителя и у ребёнка. */
-const ACCENT_GRADIENT = [
+const ACCENT_GRADIENT = themedArray<readonly [string, string]>(() => [
   theme.colors.childFrom,
   theme.colors.childDeep,
-] as const;
+]);
 
 /** Чьи задания; avatar null — первая буква имени (ребёнок с сервера). */
 type Owner = { name: string; avatar: ImageSourcePropType | null };

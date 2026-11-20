@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import {
   type CameraRef,
   GeoJSONSource,
@@ -8,7 +8,7 @@ import {
 } from '@maplibre/maplibre-react-native';
 import type { FeatureCollection, LineString } from 'geojson';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
+import { createStyles, theme } from '@shared/theme';
 import {
   HISTORY_GAP_COLOR,
   routeSegments,
@@ -219,7 +219,7 @@ export function HistoryMapLayer({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   marker: {
     width: 30,
     height: 30,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.mapAccent,
+    backgroundColor: colors.mapAccent,
   },
   task: { backgroundColor: '#16764b' },
   selected: { borderWidth: 4 },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: theme.colors.mapAccent,
+    backgroundColor: colors.mapAccent,
     borderWidth: 2,
     borderColor: '#fff',
   },
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     padding: 9,
     borderRadius: 10,
-    color: theme.colors.ink,
-    backgroundColor: '#fff',
+    color: colors.ink,
+    backgroundColor: colors.surface,
   },
-});
+}));

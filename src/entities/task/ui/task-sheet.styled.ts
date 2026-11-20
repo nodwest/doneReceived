@@ -1,15 +1,14 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 // Подписи-заголовки секций капсом: «WHAT TO DO», «PHOTO REPORT».
 const CAPS_TRACKING = 0.66;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     flex: 1,
     minHeight: 0,
     borderRadius: 32,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.paperBase,
     overflow: 'hidden',
   },
   // Тень со всех сторон: карточка на бумаге не сливается с фоном экрана.
@@ -58,20 +57,20 @@ export const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.75)',
   },
   captionDark: {
-    color: theme.colors.heroReviewCaption,
+    color: colors.heroReviewCaption,
   },
   name: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   title: {
     fontSize: 30,
     lineHeight: 34,
     letterSpacing: tracking(30),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   titleAmount: {
     fontSize: 36,
@@ -80,7 +79,7 @@ export const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   textDark: {
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // Белое название на оранжевой шапке «на проверке»: тень держит контраст.
   titleOnWarm: {
@@ -102,19 +101,19 @@ export const styles = StyleSheet.create({
   pillLight: {
     gap: 8,
     paddingLeft: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: colors.reviewPillBg,
   },
   pillText: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
     fontVariant: ['tabular-nums'],
   },
   pillTextReview: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
-    color: theme.colors.reviewChipText,
+    color: colors.reviewChipText,
   },
   dotRing: {
     width: 16,
@@ -128,7 +127,7 @@ export const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: theme.colors.reviewDot,
+    backgroundColor: colors.reviewDot,
   },
 
   bodyWrap: {
@@ -177,7 +176,7 @@ export const styles = StyleSheet.create({
     letterSpacing: CAPS_TRACKING,
     textTransform: 'uppercase',
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   section: {
     gap: 10,
@@ -192,7 +191,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
 
   brief: {
@@ -209,7 +208,7 @@ export const styles = StyleSheet.create({
     lineHeight: 25,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
 
   rewardChip: {
@@ -221,28 +220,28 @@ export const styles = StyleSheet.create({
     paddingRight: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.rewardChipBorder,
+    borderColor: colors.rewardChipBorder,
     overflow: 'hidden',
   },
   rewardChipPaid: {
-    borderColor: theme.colors.readyBorder,
-    backgroundColor: theme.colors.readySoft,
+    borderColor: colors.readyBorder,
+    backgroundColor: colors.readySoft,
   },
   rewardChipValuePaid: {
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   rewardChipMissed: {
-    borderColor: theme.colors.missedBorder,
-    backgroundColor: theme.colors.missedTile,
+    borderColor: colors.missedBorder,
+    backgroundColor: colors.missedTile,
   },
   rewardChipValueMissed: {
-    color: theme.colors.missedDeep,
+    color: colors.missedDeep,
   },
   rewardChipValue: {
     fontSize: 18,
     letterSpacing: tracking(18),
     fontFamily: theme.fonts.extrabold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
 
   tiles: {
@@ -265,7 +264,7 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   tileText: {
     flex: 1,
@@ -275,13 +274,13 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   tileValue: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
 
   photoHead: {
@@ -289,4 +288,4 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-});
+}));

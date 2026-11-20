@@ -27,7 +27,7 @@ import {
   formatWeekdayShort,
   startOfDay,
 } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { RoundButton, SegmentedFilter, SnapCarousel } from '@shared/ui';
 import { styles } from './transactions.styled';
 
@@ -234,6 +234,7 @@ type ParentFilter = 'all' | Transaction['kind'];
  * детям, пополнения и выводы. Карточка выплаты ведёт в карточку задания.
  */
 export function TransactionsPage() {
+  useTheme();
   const { t } = useTranslation();
   const { data: wallet, isPending } = useWallet(useCurrentFamily()?.id ?? null);
   const [filter, setFilter] = useState<ParentFilter>('all');
@@ -295,6 +296,7 @@ type ChildFilter = 'all' | ChildTransaction['kind'];
  * задания и выводы на карту. Карточка награды ведёт в карточку задания.
  */
 export function ChildTransactionsPage() {
+  useTheme();
   const { t } = useTranslation();
   const { data: wallet, isPending } = useMyChildWallet();
   const [filter, setFilter] = useState<ChildFilter>('all');

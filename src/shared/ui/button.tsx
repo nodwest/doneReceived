@@ -1,13 +1,12 @@
 import {
   Platform,
   Pressable,
-  StyleSheet,
   type PressableProps,
   type PressableStateCallbackType,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { theme } from '../theme';
+import { createStyles } from '../theme';
 
 // react-native-web добавляет к состоянию Pressable наведение мыши.
 type ButtonState = PressableStateCallbackType & { hovered?: boolean };
@@ -33,7 +32,7 @@ function Button({ style, ...props }: ButtonProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   base: {
     height: 56,
     flexShrink: 0,
@@ -52,13 +51,13 @@ const styles = StyleSheet.create({
     }),
   },
   hovered: {
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
   },
   pressed: Platform.select<ViewStyle>({
     web: { opacity: 0.1 },
-    default: { backgroundColor: theme.colors.violet },
+    default: { backgroundColor: colors.violet },
   }),
-});
+}));
 
 export { Button };
 export type { ButtonProps };

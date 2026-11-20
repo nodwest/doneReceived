@@ -1,5 +1,4 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 /** Кнопки под смахнутой строкой: 50×50, между ними 8, по 12 до краёв. */
 const SWIPE_ACTION_SIZE = 50;
@@ -11,11 +10,11 @@ export const swipeActionsWidth = (count: number) =>
   (count - 1) * SWIPE_ACTION_GAP +
   2 * SWIPE_ACTION_EDGE;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: theme.colors.prime,
+    backgroundColor: colors.prime,
   },
   header: {
     paddingHorizontal: 12,
@@ -32,8 +31,8 @@ export const styles = StyleSheet.create({
     paddingBottom: 4,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 12px rgba(26, 26, 46, 0.06)',
     overflow: 'hidden',
   },
@@ -53,13 +52,13 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.72,
     textTransform: 'uppercase',
     fontFamily: theme.fonts.bold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   cardCount: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Список раздела: высоту ограничивает SECTION_LIST_MAX_HEIGHT, дальше скролл.
   sectionList: {
@@ -67,7 +66,7 @@ export const styles = StyleSheet.create({
   },
   rowWrap: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   row: {
     flex: 1,
@@ -93,12 +92,12 @@ export const styles = StyleSheet.create({
     borderRadius: 2,
   },
   accentOn: {
-    backgroundColor: theme.colors.success,
+    backgroundColor: colors.success,
   },
   divider: {
     height: 1,
     marginHorizontal: 14,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
   dividerInset: {
     marginLeft: 60,
@@ -114,10 +113,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    backgroundColor: theme.colors.mapAccentTint,
+    backgroundColor: colors.mapAccentTint,
   },
   rowIconBus: {
-    backgroundColor: theme.colors.busTile,
+    backgroundColor: colors.busTile,
   },
   avatar: {
     width: 40,
@@ -139,13 +138,13 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   rowSubtitle: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   statusLine: {
     flexDirection: 'row',
@@ -158,21 +157,21 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.homeBrown,
+    color: colors.homeBrown,
   },
   statusInside: {
     flexShrink: 1,
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.presenceInside,
+    color: colors.presenceInside,
   },
   statusMuted: {
     flexShrink: 1,
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.mutedSoft,
+    color: colors.mutedSoft,
   },
   statusAvatar: {
     width: 18,
@@ -184,10 +183,10 @@ export const styles = StyleSheet.create({
     height: 6,
     marginRight: 2,
     borderRadius: 3,
-    backgroundColor: theme.colors.grey,
+    backgroundColor: colors.grey,
   },
   statusDotSoft: {
-    backgroundColor: theme.colors.placeholder,
+    backgroundColor: colors.placeholder,
   },
   // Кто сейчас в области: фото детей, второе чуть наезжает на первое.
   who: {
@@ -198,7 +197,7 @@ export const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
   },
   whoOverlap: {
     marginLeft: -10,
@@ -211,7 +210,7 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Пунктирная кнопка «Добавить…» внизу карточки.
   addWrap: {
@@ -228,21 +227,21 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderColor: theme.colors.mapAccentBorder,
-    backgroundColor: theme.colors.mapAccentSoft,
+    borderColor: colors.mapAccentBorder,
+    backgroundColor: colors.mapAccentSoft,
   },
   addText: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.mapAccent,
+    color: colors.mapAccent,
   },
   // Смахнутая область: под строкой серый фон и кнопки Edit / Delete.
   swipeBack: {
-    backgroundColor: theme.colors.swipeBack,
+    backgroundColor: colors.swipeBack,
   },
   swipeFront: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   swipeAction: {
     width: SWIPE_ACTION_SIZE,
@@ -255,17 +254,17 @@ export const styles = StyleSheet.create({
       '0px 1px 3px rgba(26, 26, 46, 0.1), 0px 4px 10px rgba(26, 26, 46, 0.18)',
   },
   swipeEdit: {
-    backgroundColor: theme.colors.childFrom,
+    backgroundColor: colors.childFrom,
   },
   swipeDelete: {
     marginRight: SWIPE_ACTION_EDGE,
-    backgroundColor: theme.colors.dangerAction,
+    backgroundColor: colors.dangerAction,
   },
   swipeLabel: {
     fontSize: 10,
     letterSpacing: tracking(10),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   swipeHint: {
     flexDirection: 'row',
@@ -277,7 +276,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   sheet: {
     paddingTop: 4,
@@ -289,7 +288,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xl,
     letterSpacing: tracking(theme.fontSize.xl),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // Маршруты в шторке — карточкой с рамкой.
   sheetList: {
@@ -298,7 +297,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
+    borderColor: colors.line,
   },
   sheetEmpty: {
     alignItems: 'center',
@@ -312,14 +311,14 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 28,
-    backgroundColor: theme.colors.busTile,
+    backgroundColor: colors.busTile,
   },
   sheetEmptyText: {
     textAlign: 'center',
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   confirmBody: {
     alignItems: 'center',
@@ -334,7 +333,7 @@ export const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.dangerIconBg,
+    backgroundColor: colors.dangerIconBg,
   },
   confirmHeader: {
     alignItems: 'center',
@@ -344,7 +343,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   confirmSubtitle: {
     textAlign: 'center',
@@ -352,7 +351,7 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   confirmActions: {
     alignSelf: 'stretch',
@@ -366,13 +365,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
-    backgroundColor: theme.colors.dangerText,
+    backgroundColor: colors.dangerText,
     boxShadow: '0px 4px 12px rgba(229, 72, 77, 0.22)',
   },
   confirmDeleteText: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
+}));

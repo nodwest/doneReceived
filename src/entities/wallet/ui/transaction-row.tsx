@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useTranslation } from '@shared/i18n';
 import { formatClock, formatDayLabel, startOfDay } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { Icon, LetterAvatar } from '@shared/ui';
 import {
   formatTransactionAmount,
@@ -34,14 +34,14 @@ function useWhen(at: string, caption: RowLook['caption']) {
 }
 
 // Выплаты — жёлтые, как выплаченные награды; приход — зелёный; вывод — синий.
-const AMOUNT_STYLES = {
+const AMOUNT_STYLES = themedValue(() => ({
   payout: { pill: styles.amountPayout, text: styles.amountTextPayout },
   income: { pill: styles.amountIncome, text: styles.amountTextIncome },
   withdrawal: {
     pill: styles.amountWithdrawal,
     text: styles.amountTextWithdrawal,
   },
-};
+}));
 
 type RowFrameProps = RowLook & {
   leading: ReactNode;

@@ -1,9 +1,8 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 const TILE = 72;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   body: {
     gap: 14,
     paddingTop: 6,
@@ -19,7 +18,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   close: {
     width: 36,
@@ -27,7 +26,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 18,
-    backgroundColor: theme.colors.closeBg,
+    backgroundColor: colors.closeBg,
   },
   field: {
     gap: 6,
@@ -36,13 +35,13 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   currency: {
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   // Крестик фото выступает за край: место под него сверху и справа.
   photosScroll: {
@@ -73,14 +72,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
     backgroundColor: 'rgba(26, 26, 46, 0.75)',
   },
   hint: {
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   topWish: {
     flexDirection: 'row',
@@ -90,7 +89,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.childTintBorder,
+    borderColor: colors.childTintBorder,
     overflow: 'hidden',
   },
   topWishText: {
@@ -101,13 +100,13 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   topWishHint: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   button: {
     height: 48,
@@ -125,12 +124,12 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   delete: {
-    backgroundColor: theme.colors.dangerSoft,
+    backgroundColor: colors.dangerSoft,
   },
   deleteLabel: {
-    color: theme.colors.dangerText,
+    color: colors.dangerText,
   },
-});
+}));

@@ -1,11 +1,11 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
   type SharedValue,
 } from 'react-native-reanimated';
 import { useTranslation } from '@shared/i18n';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { Icon } from '@shared/ui';
 
 const ROW_HEIGHT = 18;
@@ -83,14 +83,14 @@ export function ResetInviteCodeRow({
           (pressed || disabled) && styles.dimmed,
         ]}
       >
-        <Icon name="refresh" size={14} color={theme.colors.violet} />
+        <Icon name="refresh" size={14} color={theme.colors.violetInk} />
         <Text style={styles.linkText}>{t('resetInviteCode.action')}</Text>
       </Pressable>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   // Одна высота и высота строки у обоих состояний: зелёный текст стоит
   // ровно на месте подсказки.
   row: {
@@ -108,11 +108,11 @@ const styles = StyleSheet.create({
   },
   question: {
     flex: 1,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   freshText: {
     flexShrink: 1,
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   link: {
     flexDirection: 'row',
@@ -127,6 +127,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

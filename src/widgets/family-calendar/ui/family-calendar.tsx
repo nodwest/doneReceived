@@ -200,11 +200,7 @@ export function FamilyCalendar({
               onPress={() => onMonthChange(-1)}
               style={styles.monthArrow}
             >
-              <Icon
-                name="arrow-left"
-                size={13}
-                color={theme.colors.childDeep}
-              />
+              <Icon name="arrow-left" size={13} color={theme.colors.childInk} />
             </Pressable>
           )}
           <Text style={styles.month} numberOfLines={1}>
@@ -221,7 +217,7 @@ export function FamilyCalendar({
               <Icon
                 name="arrow-right"
                 size={13}
-                color={theme.colors.childDeep}
+                color={theme.colors.childInk}
               />
             </Pressable>
           )}
@@ -240,11 +236,7 @@ export function FamilyCalendar({
             {expanded ? t('calendar.collapse') : t('calendar.expand')}
           </Text>
           <View style={expanded ? styles.chevronUp : undefined}>
-            <Icon
-              name="chevron-down"
-              size={14}
-              color={theme.colors.childDeep}
-            />
+            <Icon name="chevron-down" size={14} color={theme.colors.childInk} />
           </View>
         </Pressable>
       </View>

@@ -283,7 +283,7 @@ function PhotoSource({ icon, label, onPress, variant }: PhotoSourceProps) {
         pressed && styles.pressed,
       ]}
     >
-      <Icon name={icon} size={20} color={theme.colors.childDeep} />
+      <Icon name={icon} size={20} color={theme.colors.childInk} />
       <Text style={styles.sourceLabel}>{label}</Text>
     </Pressable>
   );

@@ -34,7 +34,7 @@ export function RewardInput({ presets, error, footer }: RewardInputProps) {
       <LinearGradient
         colors={[
           error ? theme.colors.dangerTint : theme.colors.yellowSoft,
-          theme.colors.white,
+          theme.colors.surface,
         ]}
         locations={[0, 0.7071]}
         start={{ x: 0.46, y: 0 }}

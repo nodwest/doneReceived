@@ -1,11 +1,7 @@
-import { StyleSheet } from 'react-native';
 import { withAlpha } from '@shared/lib';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-const RADIO_BORDER = '#D9DBE3';
-const SUBMIT_DISABLED = '#E9EAF0';
-
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Кнопки проверки занимают всю ширину низа карточки.
   reviewActions: {
     flex: 1,
@@ -32,7 +28,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     letterSpacing: tracking(22),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   close: {
     width: 36,
@@ -40,14 +36,14 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 18,
-    backgroundColor: theme.colors.closeBg,
+    backgroundColor: colors.closeBg,
   },
   subtitle: {
     fontSize: 14,
     lineHeight: 20,
     letterSpacing: tracking(14),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
 
   reasons: {
@@ -63,46 +59,46 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   reasonSelected: {
     paddingVertical: 12.5,
     paddingHorizontal: 15.5,
     borderWidth: 1.5,
-    borderColor: theme.colors.violet,
-    backgroundColor: withAlpha(theme.colors.violet, 0.06),
+    borderColor: colors.violet,
+    backgroundColor: withAlpha(colors.violet, 0.06),
   },
   radio: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: RADIO_BORDER,
+    borderColor: colors.sheetGrabber,
     alignItems: 'center',
     justifyContent: 'center',
   },
   radioSelected: {
-    borderColor: theme.colors.violet,
+    borderColor: colors.violet,
   },
   radioDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
   },
   reasonLabel: {
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   reasonLabelSelected: {
     fontFamily: theme.fonts.semibold,
   },
 
   required: {
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
 
   // Плашка «Let Emma redo it»: включено — фиолетовая, выключено — серая,
@@ -118,15 +114,15 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   redoOn: {
-    borderColor: withAlpha(theme.colors.violet, 0.2),
+    borderColor: withAlpha(colors.violet, 0.2),
   },
   redoOff: {
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.prime,
+    borderColor: colors.line,
+    backgroundColor: colors.prime,
   },
   redoExpired: {
-    borderColor: withAlpha(theme.colors.reviewDot, 0.3),
-    backgroundColor: theme.colors.noteReviewBg,
+    borderColor: withAlpha(colors.reviewDot, 0.3),
+    backgroundColor: colors.noteReviewBg,
   },
   redoInfo: {
     flex: 1,
@@ -136,17 +132,17 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   redoTitleExpired: {
-    color: theme.colors.heroReviewCaption,
+    color: colors.heroReviewCaption,
   },
   redoHint: {
     fontSize: 12,
     lineHeight: 16,
     letterSpacing: tracking(12),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
 
   submit: {
@@ -160,13 +156,13 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   submitRetry: {
-    boxShadow: `0px 6px 16px ${withAlpha(theme.colors.violet, 0.25)}`,
+    boxShadow: `0px 6px 16px ${withAlpha(colors.violet, 0.25)}`,
   },
   submitClose: {
-    boxShadow: `0px 6px 16px ${withAlpha(theme.colors.danger, 0.22)}`,
+    boxShadow: `0px 6px 16px ${withAlpha(colors.danger, 0.22)}`,
   },
   submitDisabled: {
-    backgroundColor: SUBMIT_DISABLED,
+    backgroundColor: colors.line,
   },
   pressed: {
     opacity: 0.85,
@@ -176,9 +172,9 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: tracking(16),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   submitLabelDisabled: {
-    color: theme.colors.placeholderSoft,
+    color: colors.placeholderSoft,
   },
-});
+}));

@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useTranslation } from '@shared/i18n';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 import { Icon } from '@shared/ui';
 
 type ViewOnlyNoteProps = {
@@ -29,7 +29,7 @@ export function ViewOnlyNote({ author, review }: ViewOnlyNoteProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   note: {
     flex: 1,
     minHeight: 56,
@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.prime,
+    borderColor: colors.line,
+    backgroundColor: colors.prime,
   },
   text: {
     flex: 1,
@@ -49,6 +49,6 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
-});
+}));

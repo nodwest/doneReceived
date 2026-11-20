@@ -24,7 +24,7 @@ import {
 import { useMe, useMyAvatar } from '@entities/session';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { styles } from './child-home.styled';
 
 const NO_TASKS: Task[] = [];
@@ -52,6 +52,7 @@ function greetingKey(hour: number) {
  * вкладке Tasks.
  */
 export function ChildHomePage() {
+  useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   // Имя и фото вошедшего ребёнка (GET /users/me).
@@ -93,7 +94,7 @@ export function ChildHomePage() {
           />
           {loading ? (
             <View style={styles.loading}>
-              <ActivityIndicator color={theme.colors.blue} />
+              <ActivityIndicator color={theme.colors.blueInk} />
               <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
           ) : (

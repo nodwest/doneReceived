@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   panel: {
     gap: 10,
   },
@@ -10,7 +9,7 @@ export const styles = StyleSheet.create({
     lineHeight: 18,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   codeBox: {
     minHeight: 67,
@@ -20,21 +19,21 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 44,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: theme.colors.violet,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.violet,
+    backgroundColor: colors.surface,
   },
   codeBoxExpired: {
-    borderColor: theme.colors.line,
+    borderColor: colors.line,
   },
   code: {
     fontSize: 30,
     // Код читают вслух и переписывают: символы пошире.
     letterSpacing: 2,
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   codeExpired: {
-    color: theme.colors.placeholderSoft,
+    color: colors.placeholderSoft,
   },
   copy: {
     position: 'absolute',
@@ -58,20 +57,20 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
   left: {
     fontSize: 17,
     letterSpacing: tracking(17),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
     fontVariant: ['tabular-nums'],
   },
   expired: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.dangerText,
+    color: colors.dangerText,
   },
   newCode: {
     height: 39,
@@ -81,22 +80,22 @@ export const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 30,
     borderRadius: 12,
-    backgroundColor: theme.colors.violetSoft,
+    backgroundColor: colors.violetSoft,
   },
   newCodeLabel: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
   footnote: {
     fontSize: theme.fontSize.xs,
     lineHeight: 16,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   pressed: {
     opacity: 0.7,
   },
-});
+}));

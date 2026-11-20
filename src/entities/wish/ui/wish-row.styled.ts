@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -15,8 +14,8 @@ export const styles = StyleSheet.create({
     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.04)',
   },
   ready: {
-    borderColor: theme.colors.readyBorder,
-    backgroundColor: theme.colors.readyBg,
+    borderColor: colors.readyBorder,
+    backgroundColor: colors.readyBg,
   },
   // Рамка толще на 0.5 — отступы меньше на 0.5, чтобы высота не менялась.
   current: {
@@ -24,12 +23,12 @@ export const styles = StyleSheet.create({
     paddingLeft: 11.5,
     paddingRight: 9.5,
     borderWidth: 1.5,
-    borderColor: theme.colors.childFrom,
-    backgroundColor: theme.colors.currentBg,
+    borderColor: colors.childFrom,
+    backgroundColor: colors.currentBg,
   },
   waiting: {
-    borderColor: theme.colors.queueBorder,
-    backgroundColor: theme.colors.queueBg,
+    borderColor: colors.queueBorder,
+    backgroundColor: colors.queueBg,
   },
   // Поднятая строка, пока её перетаскивают.
   lifted: {
@@ -54,10 +53,10 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
   },
   iconReady: {
-    backgroundColor: theme.colors.readyIconBg,
+    backgroundColor: colors.readyIconBg,
   },
   iconWaiting: {
-    backgroundColor: theme.colors.queueIconBg,
+    backgroundColor: colors.queueIconBg,
   },
   photo: {
     width: 56,
@@ -81,7 +80,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   // Кнопка в шапке: лежит поверх строки, а не внутри нажимаемой области.
   action: {
@@ -98,13 +97,13 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
   },
   readyChip: {
-    backgroundColor: theme.colors.readySoft,
+    backgroundColor: colors.readySoft,
   },
   currentChip: {
-    backgroundColor: theme.colors.childChip,
+    backgroundColor: colors.childChip,
   },
   waitingChip: {
-    backgroundColor: theme.colors.queueSoft,
+    backgroundColor: colors.queueSoft,
   },
   chipText: {
     fontSize: theme.fontSize.xs,
@@ -112,22 +111,22 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.bold,
   },
   readyText: {
-    color: theme.colors.readyText,
+    color: colors.readyText,
   },
   currentText: {
-    color: theme.colors.childDeep,
+    color: colors.childInk,
   },
   waitingText: {
-    color: theme.colors.queueText,
+    color: colors.queueText,
   },
   track: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
     overflow: 'hidden',
   },
   trackWaiting: {
-    backgroundColor: theme.colors.queueSoft,
+    backgroundColor: colors.queueSoft,
   },
   fill: {
     height: '100%',
@@ -144,7 +143,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   note: {
     flexShrink: 1,
@@ -157,9 +156,9 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   noteWaiting: {
-    color: theme.colors.inkSoft,
+    color: colors.inkSoft,
   },
-});
+}));

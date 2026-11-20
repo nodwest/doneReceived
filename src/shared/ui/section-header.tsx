@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { theme, tracking } from '../theme';
+import { Pressable, Text, View } from 'react-native';
+import { createStyles, theme, tracking } from '../theme';
 
 type SectionHeaderProps = {
   title: string;
@@ -31,7 +31,7 @@ export function SectionHeader({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -41,12 +41,12 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   action: {
     fontSize: theme.fontSize.sm,
     letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.violet,
+    color: colors.violetInk,
   },
-});
+}));

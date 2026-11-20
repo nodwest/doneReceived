@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
-import { theme } from '@shared/theme';
+import { theme, themedValue } from '@shared/theme';
 import { Icon, ApiImage } from '@shared/ui';
 import type { WishProgress } from '../model';
 import { styles } from './wish-row.styled';
@@ -26,10 +26,12 @@ type WishRowProps = WishProgress & {
   style?: StyleProp<ViewStyle>;
 };
 
-const FILLS = {
+const FILLS = themedValue<
+  Record<'ready' | 'current', readonly [string, string]>
+>(() => ({
   ready: [theme.colors.earned, theme.colors.readyText],
   current: [theme.colors.childFrom, theme.colors.childDeep],
-} as const;
+}));
 
 /**
  * Желание в вишлисте: фото или иконка, название с чипом, полоса и строка

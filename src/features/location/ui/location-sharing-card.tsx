@@ -236,7 +236,7 @@ export function LocationSharingCard() {
             />
           )}
           {checking ? (
-            <ActivityIndicator size="small" color={theme.colors.childDeep} />
+            <ActivityIndicator size="small" color={theme.colors.childInk} />
           ) : null}
 
           <GradientButton

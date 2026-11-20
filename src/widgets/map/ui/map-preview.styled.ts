@@ -1,17 +1,17 @@
 import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
 const PIN_SIZE = 44;
 const PHOTO_SIZE = 36;
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   // Не выше четверти экрана телефона (812pt).
   card: {
     height: 180,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.mapPlaceholder,
+    borderColor: colors.line,
+    backgroundColor: colors.mapPlaceholder,
     overflow: 'hidden',
   },
   map: {
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     borderRadius: PIN_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
     pointerEvents: 'none',
   },
@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
     boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)',
     pointerEvents: 'none',
   },
@@ -55,12 +55,12 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   placeTime: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
-});
+}));

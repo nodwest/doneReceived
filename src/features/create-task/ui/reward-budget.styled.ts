@@ -1,19 +1,18 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     gap: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
   },
   cardOver: {
     borderColor: 'rgba(229, 72, 77, 0.3)',
-    backgroundColor: theme.colors.dangerTint,
+    backgroundColor: colors.dangerTint,
   },
   header: {
     flexDirection: 'row',
@@ -25,10 +24,10 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   titleOver: {
-    color: theme.colors.dangerText,
+    color: colors.dangerText,
   },
   amount: {
     flexDirection: 'row',
@@ -39,16 +38,16 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   amountFree: {
-    color: theme.colors.fundsFree,
+    color: colors.fundsFree,
   },
   amountUnit: {
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   meter: {
     gap: 6,
@@ -64,7 +63,7 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: tracking(11),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.grey,
   },
   legend: {
     flexDirection: 'row',
@@ -83,7 +82,7 @@ export const styles = StyleSheet.create({
     letterSpacing: tracking(theme.fontSize.xs),
     lineHeight: 16,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   deposit: {
     flexDirection: 'row',
@@ -92,15 +91,15 @@ export const styles = StyleSheet.create({
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 10,
-    backgroundColor: theme.colors.violet,
+    backgroundColor: colors.violet,
   },
   depositLabel: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   pressed: {
     opacity: 0.8,
   },
-});
+}));

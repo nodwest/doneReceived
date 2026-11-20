@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import { Platform, StyleSheet, TextInput, type TextStyle } from 'react-native';
-
-const BORDER = '#E5E5E5';
-const RING = '#A1A1A1';
+import { Platform, TextInput, type TextStyle } from 'react-native';
+import { createStyles, theme } from '../theme';
 
 function Input({
   style,
   onFocus,
   onBlur,
-  placeholderTextColor = '#000000',
+  placeholderTextColor = theme.colors.ink,
   ...props
 }: React.ComponentProps<typeof TextInput> & React.RefAttributes<TextInput>) {
   // Рамка фокуса нужна только на вебе: на нативе её не было.
@@ -36,7 +34,7 @@ function Input({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   input: {
     height: 56,
     width: '100%',
@@ -44,12 +42,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: BORDER,
+    borderColor: colors.line,
     borderRadius: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: Platform.OS === 'web' ? 24 : 16,
-    color: '#0A0A0A',
+    color: colors.ink,
     lineHeight: 20,
     boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.05)',
     ...Platform.select<TextStyle>({
@@ -64,9 +62,9 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   focused: {
-    borderColor: RING,
+    borderColor: colors.grey,
     boxShadow: '0px 0px 0px 3px rgba(161, 161, 161, 0.5)',
   },
-});
+}));
 
 export { Input };

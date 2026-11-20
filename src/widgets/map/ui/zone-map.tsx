@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Camera,
   GeoJSONSource,
@@ -11,7 +11,7 @@ import {
 } from '@maplibre/maplibre-react-native';
 
 import type { ZonePoint } from '@entities/zone';
-import { theme } from '@shared/theme';
+import { createStyles } from '@shared/theme';
 import { MAP_STYLE } from '../config/map-style';
 import { zoneDraftToGeoJson } from '../layers/dynamic/zones';
 
@@ -147,12 +147,12 @@ export function ZoneMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   container: {
     flex: 1,
     minHeight: 260,
     overflow: 'hidden',
-    backgroundColor: theme.colors.mapPlaceholder,
+    backgroundColor: colors.mapPlaceholder,
   },
   map: {
     flex: 1,
@@ -162,10 +162,10 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     borderWidth: 2,
-    borderColor: theme.colors.white,
+    borderColor: colors.white,
     backgroundColor: '#2F80DD',
   },
   vertexSelected: {
     borderColor: '#E5484D',
   },
-});
+}));

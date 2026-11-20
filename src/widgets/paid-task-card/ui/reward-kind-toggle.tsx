@@ -2,17 +2,19 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { OperationKind } from '@entities/operation';
 import { useTranslation } from '@shared/i18n';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, themedValue, tracking } from '@shared/theme';
 
 type RewardKindToggleProps = {
   value: OperationKind;
   onChange: (value: OperationKind) => void;
 };
 
-const GRADIENTS = {
-  earned: [theme.colors.heroPaidFrom, theme.colors.earnedDark],
-  missed: [theme.colors.missed, theme.colors.missedDeep],
-} as const;
+const GRADIENTS = themedValue<Record<OperationKind, readonly [string, string]>>(
+  () => ({
+    earned: [theme.colors.heroPaidFrom, theme.colors.earnedDark],
+    missed: [theme.colors.missedHeroFrom, theme.colors.missedHeroTo],
+  }),
+);
 
 const KINDS: readonly OperationKind[] = ['earned', 'missed'];
 
@@ -40,7 +42,7 @@ export function RewardKindToggle({ value, onChange }: RewardKindToggleProps) {
             style={[
               styles.segment,
               selected && styles.segmentSelected,
-              selected && SHADOWS[kind],
+              selected && styles[kind],
             ]}
           >
             {selected && (
@@ -64,7 +66,7 @@ export function RewardKindToggle({ value, onChange }: RewardKindToggleProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   bar: {
     width: '100%',
     maxWidth: 212,
@@ -74,8 +76,8 @@ const styles = StyleSheet.create({
     padding: 4,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.04)',
   },
   segment: {
@@ -98,12 +100,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     letterSpacing: tracking(13),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   labelSelected: {
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
-
-const SHADOWS = { earned: styles.earned, missed: styles.missed };
+}));

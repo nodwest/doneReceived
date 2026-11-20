@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   card: {
     gap: 4,
     padding: 16,
@@ -10,13 +9,13 @@ export const styles = StyleSheet.create({
   },
   cardParent: {
     borderWidth: 1.5,
-    borderColor: theme.colors.reviewBorder,
+    borderColor: colors.reviewBorder,
   },
   caption: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.heroSubtle,
+    color: colors.heroSubtle,
   },
   captionChild: {
     color: 'rgba(255, 255, 255, 0.92)',
@@ -37,7 +36,7 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: tracking(15),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   weekLabel: {
     fontSize: 11,
@@ -49,7 +48,7 @@ export const styles = StyleSheet.create({
     fontSize: 38,
     letterSpacing: tracking(38),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.white,
+    color: colors.white,
   },
   // Полоса «в резерве / доступно» под суммой у родителя.
   meter: {
@@ -69,7 +68,7 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
-    color: theme.colors.heroSubtle,
+    color: colors.heroSubtle,
   },
   actions: {
     flexDirection: 'row',
@@ -89,7 +88,7 @@ export const styles = StyleSheet.create({
     opacity: 0.8,
   },
   deposit: {
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   withdraw: {
     borderWidth: 1,
@@ -102,9 +101,9 @@ export const styles = StyleSheet.create({
     fontFamily: theme.fonts.semibold,
   },
   depositText: {
-    color: theme.colors.parentFrom,
+    color: colors.parentInk,
   },
   withdrawText: {
-    color: theme.colors.white,
+    color: colors.white,
   },
-});
+}));

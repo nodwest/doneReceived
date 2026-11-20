@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { createStyles } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   container: {
     width: 130,
     flexDirection: 'row',
@@ -12,10 +12,10 @@ export const styles = StyleSheet.create({
     boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.05)',
   },
   containerReward: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: colors.approvedFrom,
   },
   containerPenalty: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: colors.dangerTint,
   },
   circle: {
     width: 40,
@@ -25,26 +25,26 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circleReward: {
-    backgroundColor: '#86EFAC',
+    backgroundColor: colors.approvedBorder,
   },
   circlePenalty: {
-    backgroundColor: '#FCA5A5',
+    backgroundColor: colors.dangerBorder,
   },
   texts: {
     gap: 4,
   },
   label: {
     fontSize: 13,
-    color: '#555555',
+    color: colors.inkSoft,
   },
   amount: {
     fontSize: 18,
     fontWeight: '600',
   },
   amountReward: {
-    color: '#4ADE80',
+    color: colors.earned,
   },
   amountPenalty: {
-    color: '#F87171',
+    color: colors.dangerText,
   },
-});
+}));

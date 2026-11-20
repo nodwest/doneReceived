@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from '../i18n';
-import { theme } from '../theme';
+import { createStyles } from '../theme';
 
 const OPEN_MS = 280;
 const CLOSE_MS = 220;
@@ -106,7 +106,7 @@ export function BottomSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = createStyles((colors) => ({
   root: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingTop: 8,
     borderRadius: 28,
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.surface,
   },
   handle: {
     width: 40,
@@ -132,6 +132,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 2,
     alignSelf: 'center',
-    backgroundColor: theme.colors.line,
+    backgroundColor: colors.line,
   },
-});
+}));

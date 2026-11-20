@@ -1,0 +1,415 @@
+/**
+ * Палитры интерфейса. Светлая — текущий вид приложения, тёмная — его вариант
+ * для переключателя темы в профиле. Ключи одинаковые: компоненты и стили
+ * берут цвета по смыслу, а не по конкретному оттенку.
+ *
+ * `white` остаётся белым в обеих темах: это текст и иконки на цветных
+ * градиентах. Фон карточек — `surface`, фон экрана — `prime`.
+ */
+export const lightColors = {
+  prime: '#F5F6FA',
+  violet: '#6C5CE7',
+  /** Фиолетовый для текста и иконок на поверхности. */
+  violetInk: '#6C5CE7',
+  blue: '#4A90E2',
+  /** Синий для текста и иконок на поверхности. */
+  blueInk: '#4A90E2',
+  yellow: '#FFB930',
+  grey: '#8A8FA3',
+  ink: '#1A1A2E',
+  // Просмотр фото на весь экран: почти чёрный фон и полупрозрачные кнопки на нём.
+  viewerBg: '#0B0C12',
+  viewerChrome: 'rgba(255, 255, 255, 0.14)',
+  // Затемнение вокруг круга при обрезке аватарки.
+  viewerScrim: 'rgba(11, 12, 18, 0.62)',
+  success: '#2ECC71',
+  white: '#FFFFFF',
+  // Карточки, меню, поля и шторки.
+  surface: '#FFFFFF',
+  // Основа бумажных карточек заданий: под фактурой. В тёмной теме — почти
+  // чёрная, как в макете, чтобы бумага читалась нейтральной, а не синей.
+  paperBase: '#FFFFFF',
+  // Фон кнопок с обводкой: в светлой теме — карточка, в тёмной — прозрачный,
+  // чтобы сквозь кнопку была видна бумага, как в макете.
+  outlineBg: '#FFFFFF',
+  // Тёмная плашка: тост и вариант dark у кнопок.
+  inverseSurface: '#1A1A2E',
+  line: '#ECEDF3',
+  placeholder: '#CDD0DB',
+  yellowSoft: '#FFF7E6',
+  // Подсветка «на проверке»: плитка Tasks to Review и запись Pending review.
+  reviewFrom: '#FFF3D1',
+  reviewTo: '#FFE2C4',
+  // Чип и плашка «на проверке» на крафтовой бумаге плитки.
+  reviewChipBg: '#FFE9CC',
+  reviewAccent: '#E67E00',
+  reviewChip: '#FFE9CC',
+  reviewChipText: '#B8650A',
+  reviewBorder: '#F8CC94',
+  // Плашка «On review» в шапке карточки: светлая на янтарной шапке.
+  reviewPillBg: 'rgba(255, 255, 255, 0.85)',
+  // Подтверждённая запись активности.
+  approvedFrom: '#E0F8E7',
+  approvedTo: '#C5EFD5',
+  approvedBorder: '#AFDDC0',
+  // Значок «ребёнок дома» на карточке ребёнка.
+  homeFrom: '#FFF4D6',
+  homeTo: '#FFE3B3',
+  homeBrown: '#B8791A',
+  danger: '#ef4444',
+  dangerFrom: '#FF7A7A',
+  dangerForeground: '#ffffff',
+  // Экран заданий: второстепенный текст, обводка аватара, чип Active, текст «на проверке».
+  inkSoft: '#55586E',
+  violetSoft: '#EEEBFF',
+  violetChip: '#EFEDFC',
+  reviewText: '#B26A00',
+  // Заглушка фото-отчёта, когда ребёнок не приложил снимок.
+  photoFrom: '#EFEAE0',
+  photoTo: '#DCD3C8',
+  // История операций: заработано (зелёный) и упущено (графит). Грани
+  // 3D-столбиков: лицевая, боковая (тёмная) и верхняя (светлая).
+  earned: '#2EB873',
+  earnedDark: '#1A854F',
+  earnedLight: '#80E0A8',
+  earnedInk: '#0D6638',
+  earnedLabel: '#084524',
+  // Подпись суммы на лицевой грани зелёного столбика: тёмная на среднем
+  // зелёном в обеих темах, иначе цифры теряются.
+  earnedBarLabel: '#084524',
+  earnedSoft: 'rgba(46, 184, 115, 0.16)',
+  rewardText: '#1F995C',
+  rewardSoft: 'rgba(46, 184, 115, 0.14)',
+  missed: '#8A93A8',
+  missedDark: '#5B6478',
+  missedLight: '#C3C9D6',
+  missedInk: '#3A4152',
+  missedLabel: '#262B38',
+  missedSoft: 'rgba(138, 147, 168, 0.16)',
+  // Упущенное задание: конец градиента шапки карточки и выбранного Missed,
+  // текст суммы, плитка «истекло», значок часов в плашке внизу карточки.
+  missedDeep: '#4B5468',
+  // Градиент шапки упущенного задания: текст на нём белый в обеих темах.
+  missedHeroFrom: '#8A93A8',
+  missedHeroTo: '#4B5468',
+  missedTile: '#EEF0F4',
+  missedBorder: '#D5D9E2',
+  missedClock: '#F26B4F',
+  // Будущие дни на графике: серый кубик-заглушка.
+  future: '#E1E3EC',
+  futureDark: '#CDD0DB',
+  futureLight: '#EEEFF4',
+  // Заглушка карты там, где карты нет (нативные платформы).
+  mapPlaceholder: '#EFEAE0',
+  // Роли в семье: родитель (тёмно-синий) и ребёнок (голубой) — иконки,
+  // блоки кодов и карточки участников на вкладке Family.
+  parentFrom: '#17215E',
+  parentTo: '#4254AD',
+  /** Тёмно-синий для текста и иконок на поверхности. */
+  parentInk: '#17215E',
+  childFrom: '#4A9EF0',
+  childTo: '#A8D9FF',
+  // Экраны ребёнка: конец голубого градиента (шапка профиля, плитка
+  // баланса, кнопка I did it!) и лёгкая голубая подложка (плитка
+  // вишлиста, новое задание в ленте, чип Active).
+  childDeep: '#1E5FB8',
+  /** Голубой для текста и иконок на поверхности. */
+  childInk: '#1E5FB8',
+  childTint: 'rgba(74, 158, 240, 0.16)',
+  childTintLight: 'rgba(168, 217, 255, 0.09)',
+  childTintBorder: 'rgba(74, 158, 240, 0.18)',
+  childChip: 'rgba(74, 158, 240, 0.14)',
+  // Вишлист: желание, которое уже можно купить (зелёное), наполняемое
+  // (голубое) и ждущее очереди (индиго, как parentTo). readySoft /
+  // readyText — и чип «1 ready to buy».
+  // Деньги родителя: резерв за задания и свободные — шкала в форме задания
+  // (на светлом) и в карточке баланса Wallet (на тёмном).
+  fundsReserved: '#B9BDD3',
+  fundsFree: '#22A06B',
+  fundsReservedDark: 'rgba(255, 255, 255, 0.45)',
+  fundsFreeDark: '#4ADE9A',
+  fundsTrackDark: 'rgba(255, 255, 255, 0.14)',
+  readySoft: '#E3F7EB',
+  readyText: '#1E9A5C',
+  readyBg: '#F1FBF5',
+  readyBorder: 'rgba(46, 184, 115, 0.5)',
+  readyIconBg: 'rgba(30, 154, 92, 0.14)',
+  currentBg: '#F2F8FF',
+  queueBg: '#ECEFF9',
+  queueText: '#4254AD',
+  queueBorder: 'rgba(66, 84, 173, 0.35)',
+  queueSoft: 'rgba(66, 84, 173, 0.12)',
+  queueIconBg: 'rgba(66, 84, 173, 0.14)',
+  // Удаление: кнопка Delete у смахнутой строки и Delete wish в шторке.
+  dangerAction: '#FF5A5F',
+  dangerSoft: 'rgba(255, 90, 95, 0.1)',
+  dangerText: '#E5484D',
+  // Фон поля с ошибкой: код ребёнка истёк или неверен.
+  dangerTint: '#FFF5F5',
+  // Формы в шторках: подсказка в пустом поле, фон кнопки закрытия,
+  // ручка перетаскивания строки.
+  placeholderSoft: '#A9ADBD',
+  closeBg: '#F1F2F7',
+  dragHandle: '#B4B8C6',
+  // Чеклист в форме задания: пунктир кнопки Add checklist, подложка
+  // плюса, строка нового шага и его пунктирный квадратик, ручка шага.
+  checklistBorder: '#D9D4FB',
+  checklistPlusBg: '#EFEDFD',
+  checklistDraftBg: '#F6F4FF',
+  checklistHandle: '#C3C6D3',
+  // Чеклист в карточке задания: рамка списка и черта между шагами.
+  checklistLine: '#E4E7EF',
+  // Комментарий ребёнка в карточке на проверке: тёплый пузырь.
+  noteReviewBg: '#FFF6E8',
+  // Пузырь комментария в выплаченном задании: earned 9% на белом.
+  noteBubblePaid: '#ECF9F2',
+  // Вкладка Profile: почта в шапке и подложка иконок пунктов меню.
+  heroSubtle: '#D9E0FF',
+  violetIcon: '#EDE8FC',
+
+  // Карточки заданий (v3): градиенты шапки — активное задание (голубой,
+  // у родителя и ребёнка), на проверке (оранжевый); плашка награды, плитки
+  // срока и выдачи, таймер (тёплый — меньше суток, холодный — дольше).
+  heroChildFrom: '#5AAEF5',
+  heroChildTo: '#1E5FB8',
+  heroPaidFrom: '#3FCF86',
+  heroPaidTo: '#1A854F',
+  heroWalletFrom: '#4F62BF',
+  // Блок подробностей в карточке транзакции.
+  detailsBg: '#F7F8FB',
+  heroReviewFrom: '#FFD98C',
+  heroReviewTo: '#FFB24A',
+  heroReviewCaption: '#9A5200',
+  reviewDot: '#F29A1F',
+  rewardChipFrom: '#FFF8E1',
+  rewardChipTo: '#FFEBB8',
+  rewardChipBorder: '#FFD36B',
+  dueTile: '#FFF7EA',
+  dueInk: '#C76E00',
+  givenTile: '#EEF5FE',
+  timerWarm: '#FFF3DC',
+  timerCool: '#E6F1FD',
+  stepperBg: '#F5F3FF',
+  dangerBorder: '#FFC9CA',
+  // Задание вернули на переделку: коралловый — заметно, но не тревожно,
+  // как красный.
+  sentBack: '#C24A2A',
+  sentBackIcon: '#F2643F',
+  sentBackBg: '#FFF2EE',
+  sentBackBorder: 'rgba(255, 122, 89, 0.3)',
+  sentBackChip: '#FFE0D6',
+  sentBackChipText: '#B8441F',
+  dropZone: '#F4F9FF',
+  galleryBorder: '#D6E6F8',
+  cardBorder: '#E6E8F0',
+  childCount: '#DCEBFC',
+  goalTrack: '#FFE08A',
+  goalDot: '#FFC94D',
+  // Вкладка Map и «Слои карты»: голубой акцент (иконки, ссылки, области
+  // на карте), подложка иконок, пунктирная кнопка «Добавить…», выключенный
+  // переключатель, плитка автобуса, «кто внутри» и пустые подписи.
+  mapAccent: '#2F80DD',
+  mapAccentTint: '#EAF3FE',
+  mapAccentSoft: '#F2F8FF',
+  mapAccentBorder: 'rgba(47, 128, 221, 0.4)',
+  mapAccentActive: '#1E5FB8',
+  toggleOff: '#E4E6EE',
+  busTile: '#FFF3D6',
+  busIcon: '#B07A00',
+  presenceInside: '#1F9D55',
+  mutedSoft: '#A3A7B7',
+  sheetGrabber: '#D9DBE3',
+  dangerIconBg: '#FFECEC',
+  mapDim: 'rgba(11, 16, 48, 0.45)',
+  swipeBack: '#F2F4F8',
+
+  // Старые семантические ключи: оставлены для совместимости.
+  background: '#F5F6FA',
+  surfaceAlt: '#FFFFFF',
+  text: '#1A1A2E',
+  textMuted: '#8A8FA3',
+  border: '#ECEDF3',
+};
+
+export type ThemeColors = {
+  [Key in keyof typeof lightColors]: string;
+};
+
+export type ThemeMode = 'light' | 'dark';
+
+export const darkColors: ThemeColors = {
+  prime: '#0B0F1A',
+  violet: '#6C5CE7',
+  violetInk: '#A79AFB',
+  blue: '#4A90E2',
+  blueInk: '#6FAEF5',
+  yellow: '#FFB930',
+  grey: '#9CA3B8',
+  ink: '#F3F5FB',
+  viewerBg: '#05060A',
+  viewerChrome: 'rgba(255, 255, 255, 0.16)',
+  viewerScrim: 'rgba(0, 0, 0, 0.7)',
+  success: '#3DDC84',
+  white: '#FFFFFF',
+  surface: '#161B2B',
+  paperBase: '#121317',
+  // Сплошная тёмная заливка кнопок с обводкой, как в макете: фактура бумаги
+  // сквозь кнопку не просвечивает.
+  outlineBg: '#181A20',
+  inverseSurface: '#2A3148',
+  line: '#252C40',
+  placeholder: '#6C7691',
+  yellowSoft: '#2A2412',
+  reviewFrom: '#3B2C14',
+  reviewTo: '#4A3618',
+  reviewChipBg: '#3A2B12',
+  reviewAccent: '#FFB24A',
+  reviewChip: '#3A2B12',
+  reviewChipText: '#FFC46B',
+  reviewBorder: '#5A4322',
+  // Тёмная полупрозрачная плашка на приглушённой янтарной шапке.
+  reviewPillBg: 'rgba(0, 0, 0, 0.22)',
+  approvedFrom: '#123023',
+  approvedTo: '#17402E',
+  approvedBorder: '#2C5A41',
+  homeFrom: '#3A2E10',
+  homeTo: '#4A3A14',
+  homeBrown: '#FFD27A',
+  danger: '#FF6B6B',
+  dangerFrom: '#FF8A8A',
+  dangerForeground: '#ffffff',
+  inkSoft: '#B9C0D4',
+  violetSoft: '#221E3A',
+  violetChip: '#252244',
+  reviewText: '#FFB24A',
+  photoFrom: '#242936',
+  photoTo: '#1A1F2C',
+  earned: '#2EB873',
+  earnedDark: '#1F9A5F',
+  earnedLight: '#80E0A8',
+  earnedInk: '#B9F5D0',
+  earnedLabel: '#D7FBE4',
+  earnedBarLabel: '#084524',
+  earnedSoft: 'rgba(46, 184, 115, 0.2)',
+  rewardText: '#5FE0A0',
+  rewardSoft: 'rgba(46, 184, 115, 0.18)',
+  missed: '#8A93A8',
+  missedDark: '#5B6478',
+  missedLight: '#C3C9D6',
+  missedInk: '#E2E6EF',
+  missedLabel: '#262B38',
+  missedSoft: 'rgba(138, 147, 168, 0.2)',
+  missedDeep: '#C3C9D6',
+  missedHeroFrom: '#3A4152',
+  missedHeroTo: '#232936',
+  missedTile: '#1C2231',
+  missedBorder: '#2E364A',
+  missedClock: '#FF8A6B',
+  future: '#262D40',
+  futureDark: '#1B2131',
+  futureLight: '#303850',
+  mapPlaceholder: '#1A2030',
+  parentFrom: '#17215E',
+  parentTo: '#4254AD',
+  parentInk: '#B7C2FF',
+  childFrom: '#4A9EF0',
+  childTo: '#A8D9FF',
+  childDeep: '#1E5FB8',
+  childInk: '#7CC0FF',
+  childTint: 'rgba(74, 158, 240, 0.18)',
+  childTintLight: 'rgba(168, 217, 255, 0.06)',
+  childTintBorder: 'rgba(74, 158, 240, 0.32)',
+  childChip: 'rgba(74, 158, 240, 0.2)',
+  fundsReserved: '#4C5570',
+  fundsFree: '#4ADE9A',
+  fundsReservedDark: 'rgba(255, 255, 255, 0.45)',
+  fundsFreeDark: '#4ADE9A',
+  fundsTrackDark: 'rgba(255, 255, 255, 0.14)',
+  readySoft: 'rgba(46, 184, 115, 0.18)',
+  readyText: '#5FE0A0',
+  readyBg: '#112419',
+  readyBorder: 'rgba(46, 184, 115, 0.45)',
+  readyIconBg: 'rgba(30, 154, 92, 0.22)',
+  currentBg: '#111E2E',
+  queueBg: '#1A1D2E',
+  queueText: '#A9B4FF',
+  queueBorder: 'rgba(120, 140, 255, 0.4)',
+  queueSoft: 'rgba(120, 140, 255, 0.16)',
+  queueIconBg: 'rgba(120, 140, 255, 0.2)',
+  dangerAction: '#FF5A5F',
+  dangerSoft: 'rgba(255, 90, 95, 0.16)',
+  dangerText: '#FF8A8A',
+  dangerTint: '#2A1618',
+  placeholderSoft: '#7A8299',
+  closeBg: '#202638',
+  dragHandle: '#4A5166',
+  checklistBorder: '#3B3560',
+  checklistPlusBg: '#262244',
+  checklistDraftBg: '#1D1A30',
+  checklistHandle: '#4A5166',
+  checklistLine: '#252C40',
+  noteReviewBg: '#35270E',
+  noteBubblePaid: '#12281D',
+  heroSubtle: '#C6CDFF',
+  violetIcon: '#241F3D',
+  // В тёмной теме шапка карточки задания — приглушённая, как в макете:
+  // тёмно-синяя у активного, тёмно-зелёная у выплаченного, тёмно-янтарная
+  // у задания на проверке. Белый текст на них остаётся читаемым.
+  heroChildFrom: '#23486F',
+  heroChildTo: '#142C48',
+  heroPaidFrom: '#2A5C42',
+  heroPaidTo: '#183B2C',
+  heroWalletFrom: '#3C4685',
+  detailsBg: '#121726',
+  heroReviewFrom: '#856315',
+  heroReviewTo: '#5F470F',
+  heroReviewCaption: '#FFD9A0',
+  reviewDot: '#FFA53D',
+  rewardChipFrom: '#3A2E12',
+  rewardChipTo: '#4A3A16',
+  rewardChipBorder: '#6A5420',
+  dueTile: '#3A2C12',
+  dueInk: '#FFC46B',
+  givenTile: '#152436',
+  timerWarm: '#3A2C12',
+  timerCool: '#14263A',
+  stepperBg: '#1C2234',
+  dangerBorder: 'rgba(255, 107, 107, 0.35)',
+  sentBack: '#FF9B7A',
+  sentBackIcon: '#FF7A55',
+  sentBackBg: '#2A1A15',
+  sentBackBorder: 'rgba(255, 122, 89, 0.35)',
+  sentBackChip: '#3A2018',
+  sentBackChipText: '#FFB199',
+  dropZone: '#101B2A',
+  galleryBorder: '#2B4A6A',
+  cardBorder: '#252C40',
+  childCount: '#1B3550',
+  goalTrack: '#5A4A16',
+  goalDot: '#FFC94D',
+  mapAccent: '#5B9DF0',
+  mapAccentTint: '#16233A',
+  mapAccentSoft: '#111B2B',
+  mapAccentBorder: 'rgba(91, 157, 240, 0.4)',
+  mapAccentActive: '#7CC0FF',
+  toggleOff: '#333A52',
+  busTile: '#342C12',
+  busIcon: '#FFC46B',
+  presenceInside: '#4ADE80',
+  mutedSoft: '#6F7892',
+  sheetGrabber: '#3E4560',
+  dangerIconBg: '#341A1C',
+  mapDim: 'rgba(0, 0, 0, 0.55)',
+  swipeBack: '#202638',
+
+  background: '#0B0F1A',
+  surfaceAlt: '#0E1320',
+  text: '#F3F5FB',
+  textMuted: '#9CA3B8',
+  border: '#252C40',
+};
+
+export const palettes: Record<ThemeMode, ThemeColors> = {
+  light: lightColors,
+  dark: darkColors,
+};
