@@ -1288,4 +1288,7 @@ export const ru: Dictionary = {
     deleted: 'Аккаунт удалён',
     failed: 'Не получилось удалить аккаунт. Попробуйте ещё раз.',
   },
+  push: {
+    channelReminders: 'Напоминания',
+  },
 };

@@ -1243,6 +1243,9 @@ export const en = {
     deleted: 'Account deleted',
     failed: 'Couldn’t delete the account. Please try again.',
   },
+  push: {
+    channelReminders: 'Reminders',
+  },
 };
 
 /** Формы множественного числа, которых нет в английском. */
