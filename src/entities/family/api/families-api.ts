@@ -150,6 +150,17 @@ export function deleteChild(familyId: string, childId: string) {
 }
 
 /**
+ * DELETE /families/:id/children/me — ребёнок удаляет свой профиль. Только
+ * при нулевом балансе (иначе 409 `CHILD_HAS_BALANCE`); незавершённые задания
+ * сервер отклоняет и возвращает резервы родителям.
+ */
+export function deleteMyChildProfile(familyId: string) {
+  return apiRequest<null>(`/families/${familyId}/children/me`, {
+    method: 'DELETE',
+  });
+}
+
+/**
  * GET /families/:id/members — участники с активным членством (родители и
  * дети). Только родителям: ребёнку 403 (Идеи.md п. 8).
  */

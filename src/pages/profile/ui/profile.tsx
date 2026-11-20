@@ -20,7 +20,8 @@ import { styles } from './profile.styled';
  * profile открывает отдельную страницу. Language раскрывает выпадающий выбор
  * языка прямо у пункта. Остальные пункты пока не работают, тогл уведомлений
  * только переключается. У ребёнка голубая карточка, нет Family codes и Join
- * family. Log out забывает сессию и ведёт на логин.
+ * family, зато последний пункт — Delete account (страница `/delete-account`).
+ * Log out забывает сессию и ведёт на логин.
  */
 export function ProfilePage() {
   const { t } = useTranslation();
@@ -110,6 +111,16 @@ export function ProfilePage() {
               />
               <View style={styles.divider} />
               <SettingsRow icon="help" label={t('profile.help')} />
+              {isChild && (
+                <>
+                  <View style={styles.divider} />
+                  <SettingsRow
+                    icon="trash"
+                    label={t('profile.deleteAccount')}
+                    onPress={() => router.push('/delete-account')}
+                  />
+                </>
+              )}
             </View>
             <Pressable
               accessibilityRole="button"
