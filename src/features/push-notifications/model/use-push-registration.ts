@@ -82,7 +82,10 @@ async function requestExpoToken() {
   try {
     return (await Notifications.getExpoPushTokenAsync({ projectId })).data;
   } catch (error) {
-    pushLog('Expo не выдал токен', { error: String(error) });
+    // Текст ошибки нативного модуля в лог не пишем: там может быть projectId.
+    pushLog('Expo не выдал токен', {
+      error: error instanceof Error ? error.name : 'unknown',
+    });
     return null;
   }
 }
