@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795217127.8983953,
-    "seen": 1795217642.296483,
-    "ast_hash": "37ea6819785645d4f25d4ee2acf5bbce",
+    "mtime": 1795218680.542978,
+    "seen": 1795218767.413416,
+    "ast_hash": "1fbde75301f8a07cbce6d6cea3f8104c",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795217122.7312572,
-    "seen": 1795217642.296483,
-    "ast_hash": "bdbd765970afabb4e8be7dbb3ed4b0e5",
+    "mtime": 1795218680.543496,
+    "seen": 1795218767.413416,
+    "ast_hash": "5ae5161779659cabe7fa9fc140379fd0",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -4464,9 +4464,9 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/ui/calendar-event.styled.ts": {
-    "mtime": 1795156836.90651,
-    "seen": 1795162011.5135324,
-    "ast_hash": "73a6b8887612a1d2b6a079f5acb77b51",
+    "mtime": 1795218573.4865265,
+    "seen": 1795218767.4124198,
+    "ast_hash": "fb805edfb0b885828a6c70c66ae4d4ab",
     "semantic_hash": ""
   },
   "src/entities/family-event/ui/event-row.tsx": {
@@ -4482,9 +4482,9 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/ui/featured-event-card.tsx": {
-    "mtime": 1795217038.8467534,
-    "seen": 1795217642.2951157,
-    "ast_hash": "4c977949e3a8924d14e9045190b855cb",
+    "mtime": 1795218573.4742084,
+    "seen": 1795218767.4124198,
+    "ast_hash": "e29a6a98b61b1a25b07a89f4153f1f15",
     "semantic_hash": ""
   },
   "src/features/change-email/index.ts": {
@@ -4626,15 +4626,15 @@
     "semantic_hash": ""
   },
   "src/features/family-event-form/ui/family-event-form.styled.ts": {
-    "mtime": 1795217027.9766424,
-    "seen": 1795217642.2951157,
-    "ast_hash": "d1492249d64a868d96f5a19897a1be28",
+    "mtime": 1795218599.3901424,
+    "seen": 1795218767.413416,
+    "ast_hash": "805a40ee2f72cdb5e55dcd4f0e32f327",
     "semantic_hash": ""
   },
   "src/features/family-event-form/ui/family-event-form.tsx": {
-    "mtime": 1795217172.8916755,
-    "seen": 1795217642.2951157,
-    "ast_hash": "2c84f9734d40409e7a8b8ea2fdbc3fb4",
+    "mtime": 1795218721.9769213,
+    "seen": 1795218767.413416,
+    "ast_hash": "d8af466be0e3dd427bee180d0d7f7c39",
     "semantic_hash": ""
   },
   "src/features/family-event/index.ts": {
