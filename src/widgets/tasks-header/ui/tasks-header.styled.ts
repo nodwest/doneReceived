@@ -46,10 +46,24 @@ export const styles = createStyles((colors) => ({
     backgroundColor: colors.surface,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.1)',
     flexShrink: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
     padding: 4,
     borderRadius: 22,
+  },
+  // Внутренняя строка без padding: по ней измеряются сегменты, и в ней же
+  // едет плашка — координаты onLayout и absolute совпадают.
+  segmentTrack: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  // Едущая плашка выбранного сегмента: положение и ширина — из Reanimated.
+  indicator: {
+    position: 'absolute',
+    left: 0,
+    borderRadius: 18,
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.18)',
   },
   segment: {
     height: 36,
@@ -66,12 +80,6 @@ export const styles = createStyles((colors) => ({
   },
   segmentCompact: {
     paddingHorizontal: 9,
-  },
-  segmentAllActive: {
-    boxShadow: '0px 3px 8px rgba(30, 95, 184, 0.3)',
-  },
-  segmentReviewActive: {
-    boxShadow: '0px 3px 8px rgba(248, 204, 148, 0.45)',
   },
   segmentLabel: {
     fontSize: theme.fontSize.sm,
@@ -94,14 +102,6 @@ export const styles = createStyles((colors) => ({
     left: 0,
     right: 0,
     textAlign: 'center',
-  },
-  segmentLabelAll: {
-    fontFamily: theme.fonts.bold,
-    color: colors.white,
-  },
-  segmentLabelReview: {
-    fontFamily: theme.fonts.bold,
-    color: colors.reviewText,
   },
   badge: {
     minWidth: 20,

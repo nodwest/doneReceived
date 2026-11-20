@@ -3684,15 +3684,15 @@
     "semantic_hash": ""
   },
   "src/widgets/tasks-header/ui/tasks-header.styled.ts": {
-    "mtime": 1795156839.0329604,
-    "seen": 1795162011.5145373,
-    "ast_hash": "be4f7c4a004dc2ac8a5a01af1fe3fbb9",
+    "mtime": 1795167467.694983,
+    "seen": 1795167533.918155,
+    "ast_hash": "7223d41aee38ea558b7ecfc0a20ae985",
     "semantic_hash": ""
   },
   "src/widgets/tasks-header/ui/tasks-header.tsx": {
-    "mtime": 1795156525.0488398,
-    "seen": 1795162011.5145373,
-    "ast_hash": "5eb0bc47ba958a8457c96f1f3543a96f",
+    "mtime": 1795167467.694983,
+    "seen": 1795167533.918155,
+    "ast_hash": "dc8ffa230b9e50b798eebb3ad425fecb",
     "semantic_hash": ""
   },
   "src/widgets/transaction-card/index.ts": {
@@ -4935,6 +4935,12 @@
     "mtime": 1795163632.7414505,
     "seen": 1795164937.0569663,
     "ast_hash": "2e032bb16459cc30a6223ce5a8440d90",
+    "semantic_hash": ""
+  },
+  "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u0423\u044f\u0437\u0432\u0438\u043c\u043e\u0441\u0442\u0438/\u0410\u0443\u0434\u0438\u0442 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 2026-11-20.md": {
+    "mtime": 1795165843.6805718,
+    "seen": 1795167533.918155,
+    "ast_hash": "35c52e5d4837e627e215feb00d1514d6",
     "semantic_hash": ""
   },
   "package-lock.json": {
