@@ -22,8 +22,10 @@ import {
 import {
   useChildTasks,
   useMyChildBalance,
+  useMyChildWallet,
   useMyWishlistOwner,
 } from '@features/family-tasks';
+import { getWordsOverview, rewardsOf } from '@features/english-words';
 import {
   ChildReviewRow,
   ChildTaskCard,
@@ -32,6 +34,7 @@ import {
   type Task,
 } from '@entities/task';
 import { useWishlistProgress } from '@entities/wish';
+import { isWordsTitle, WordsTaskRow } from '@entities/word';
 import { useTranslation } from '@shared/i18n';
 import { useIsCompact } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
@@ -80,7 +83,24 @@ export function MyTasksPage() {
   const { toggleStep } = useTaskActions();
   // Порядок как в списке: активные по сроку, затем на проверке — карточки
   // листаются в том же порядке.
-  const allTasks = useMemo(() => sortTasksByUrgency(data), [data]);
+  // Слова дня: следующая порция создаётся сразу после проверки, но
+  // открывается завтра — до тех пор её не показываем.
+  const { data: wallet } = useMyChildWallet();
+  const words = useMemo(
+    () => getWordsOverview(data, rewardsOf(wallet)),
+    [data, wallet],
+  );
+  const allTasks = useMemo(
+    () =>
+      sortTasksByUrgency(
+        data.filter(
+          (task) =>
+            // Слова, сданные сегодня, — не показываем.
+            !(words.status === 'tomorrow' && task.id === words.task?.id),
+        ),
+      ),
+    [data, words],
+  );
   const activeTasks = useMemo(
     () => allTasks.filter((task) => task.status === 'active'),
     [allTasks],
@@ -111,14 +131,19 @@ export function MyTasksPage() {
   );
 
   const tasks = tab === 'review' ? reviewTasks : allTasks;
+  // Слова дня учат на вкладке Languages: в карточках их нет.
+  const cardTasks = useMemo(
+    () => tasks.filter((task) => !isWordsTitle(task.title)),
+    [tasks],
+  );
   const currentId = currentIds[tab];
   const setCurrentId = (id: string) =>
     setCurrentIds((prev) => ({ ...prev, [tab]: id }));
   const currentIndex = Math.max(
-    tasks.findIndex((task) => task.id === currentId),
+    cardTasks.findIndex((task) => task.id === currentId),
     0,
   );
-  const cards = view === 'cards' && tasks.length > 0;
+  const cards = view === 'cards' && cardTasks.length > 0;
   // Список уже был на экране: назад из карточек ведёт к нему. Открыли сразу
   // карточку (с главной) — назад туда, откуда пришли.
   const [listSeen, setListSeen] = useState(initialTaskId === null);
@@ -130,6 +155,23 @@ export function MyTasksPage() {
     setView('cards');
   };
 
+  /** Слова дня — строкой, которая ведёт на вкладку Languages. */
+  const wordsRow = (task: Task) => (
+    <WordsTaskRow
+      key={task.id}
+      tone="child"
+      status={task.status === 'review' ? 'review' : 'active'}
+      reward={task.reward}
+      title={t('words.homeBanner')}
+      subtitle={
+        task.status === 'review'
+          ? t('words.rowChildReview')
+          : t('words.rowChildLearn', { count: task.checklist.length })
+      }
+      onPress={() => router.dismissTo('/languages')}
+    />
+  );
+
   const reviewSection = reviewTasks.length > 0 && (
     <View style={styles.section}>
       <SectionHead
@@ -138,14 +180,18 @@ export function MyTasksPage() {
         count={reviewTasks.length}
         hint={t('myTasks.waitingParent')}
       />
-      {reviewTasks.map((task) => (
-        <ChildReviewRow
-          key={task.id}
-          task={task}
-          author={authorOf(task, t('member.parent'))}
-          onPress={openCard}
-        />
-      ))}
+      {reviewTasks.map((task) =>
+        isWordsTitle(task.title) ? (
+          wordsRow(task)
+        ) : (
+          <ChildReviewRow
+            key={task.id}
+            task={task}
+            author={authorOf(task, t('member.parent'))}
+            onPress={openCard}
+          />
+        ),
+      )}
     </View>
   );
 
@@ -182,9 +228,9 @@ export function MyTasksPage() {
             <TaskCarousel
               fullWidth
               tone="child"
-              tasks={tasks}
+              tasks={cardTasks}
               initialIndex={currentIndex}
-              onIndexChange={(index) => setCurrentId(tasks[index].id)}
+              onIndexChange={(index) => setCurrentId(cardTasks[index].id)}
               renderTask={(task, style) => (
                 <MyTaskCard
                   task={task}
@@ -239,15 +285,19 @@ export function MyTasksPage() {
                         count={activeTasks.length}
                         hint={t('myTasks.soonestFirst')}
                       />
-                      {activeTasks.map((task) => (
-                        <ChildTaskTile
-                          key={task.id}
-                          task={task}
-                          author={authorOf(task, t('member.parent'))}
-                          onPress={openCard}
-                          action={<DoneButton task={task} />}
-                        />
-                      ))}
+                      {activeTasks.map((task) =>
+                        isWordsTitle(task.title) ? (
+                          wordsRow(task)
+                        ) : (
+                          <ChildTaskTile
+                            key={task.id}
+                            task={task}
+                            author={authorOf(task, t('member.parent'))}
+                            onPress={openCard}
+                            action={<DoneButton task={task} />}
+                          />
+                        ),
+                      )}
                     </View>
                   )}
                   {reviewSection}

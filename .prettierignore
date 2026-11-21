@@ -5,6 +5,9 @@ obsidian-done
 canvases
 package-lock.json
 
+# Словарь для бека: одно слово — одна строка, форматировать не нужно
+data/english-words/
+
 # Готовые навыки агента — копии из внешних репозиториев, форматируются их авторами
 .claude/skills/expo-*/
 .claude/skills/vercel-react-native-skills/

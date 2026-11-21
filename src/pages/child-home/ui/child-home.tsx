@@ -13,8 +13,10 @@ import {
   useFamilyFeed,
   useChildTasks,
   useMyChildBalance,
+  useMyChildWallet,
   useMyWishlistOwner,
 } from '@features/family-tasks';
+import { getWordsOverview, rewardsOf } from '@features/english-words';
 import {
   ChildTaskTile,
   countTasks,
@@ -22,6 +24,7 @@ import {
   type Task,
 } from '@entities/task';
 import { useMe, useMyAvatar } from '@entities/session';
+import { isWordsTitle, WordsTaskRow } from '@entities/word';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { theme, useTheme } from '@shared/theme';
@@ -63,10 +66,20 @@ export function ChildHomePage() {
   const { data: feed = [] } = feedQuery;
   const { data: myTasks = NO_TASKS, isPending: tasksPending } = useChildTasks();
   // Ближайшие по сроку — первыми, как в списке «To do».
+  // Слова дня учат на вкладке Languages: в карусели их нет, над ней — строка.
   const activeTasks = useMemo(
     () =>
-      sortTasksByUrgency(myTasks.filter((task) => task.status === 'active')),
+      sortTasksByUrgency(
+        myTasks.filter(
+          (task) => task.status === 'active' && !isWordsTitle(task.title),
+        ),
+      ),
     [myTasks],
+  );
+  const { data: wallet } = useMyChildWallet();
+  const words = useMemo(
+    () => getWordsOverview(myTasks, rewardsOf(wallet)),
+    [myTasks, wallet],
   );
   const counts = countTasks(myTasks);
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
@@ -113,6 +126,18 @@ export function ChildHomePage() {
                   router.push({ pathname: '/tasks', params: { tab: 'review' } })
                 }
               />
+              {words.status === 'learning' && words.task && (
+                <WordsTaskRow
+                  tone="child"
+                  status="active"
+                  reward={words.task.reward}
+                  title={t('words.homeBanner')}
+                  subtitle={t('words.rowChildLearn', {
+                    count: words.words.length,
+                  })}
+                  onPress={() => router.dismissTo('/languages')}
+                />
+              )}
               {activeTasks.length > 0 && (
                 <TaskCarousel
                   tone="child"

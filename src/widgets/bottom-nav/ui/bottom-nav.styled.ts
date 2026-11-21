@@ -9,7 +9,7 @@ export const styles = createStyles((colors) => ({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: NAV_PADDING_VERTICAL,
-    // Семь вкладок: на 320pt подписи должны помещаться без переносов.
+    // Восемь вкладок: на 320pt подписи должны помещаться без переносов.
     paddingHorizontal: 12,
     backgroundColor: colors.surface,
   },

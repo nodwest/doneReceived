@@ -20,6 +20,7 @@ export const en = {
   nav: {
     home: 'Home',
     tasks: 'Tasks',
+    languages: 'Languages',
     family: 'Family',
     calendar: 'Calendar',
     wallet: 'Wallet',
@@ -1242,6 +1243,173 @@ export const en = {
     withdrawSoon: 'Withdrawals are coming soon',
     deleted: 'Account deleted',
     failed: 'Couldn’t delete the account. Please try again.',
+  },
+  words: {
+    title: 'English',
+    rank: '{{rank}}.',
+    rankLabel: 'Rank {{rank}}',
+    translation: 'Translation',
+    collocations: 'Common phrases',
+    forms: 'Forms: {{forms}}',
+    translationHidden: 'Hidden — tap “Show translation”',
+    sayWord: 'Say “{{word}}”',
+    sayExample: 'Say the sentence',
+    taskTitle: 'Words {{from}}–{{to}}',
+    taskDescription: 'Learn the new words in the Languages tab: {{words}}',
+    rejectComment: 'Didn’t remember: {{words}}',
+    rowLearning: 'Learning',
+    rowReview: 'To check',
+    rowDone: 'Done · paid',
+    rowReward: 'Reward {{amount}}',
+    rowChildLearn: 'Learn {{count}} new words in the Languages tab',
+    rowChildReview: 'A parent will check them in the evening',
+    rowParentTitle: 'English: {{name}}',
+    rowParentLearning: 'Learning words {{from}}–{{to}}',
+    rowParentDone:
+      'Words are checked and the reward is paid. New words tomorrow',
+    rowParentReview: 'Check {{name}}’s words',
+    rowParentReviewHint: '{{name}} learned the words — tap to start the check',
+    homeBanner: 'English',
+    homeBannerText: '{{count}} new words · {{amount}}',
+    viewer: {
+      open: '{{word}} — {{translation}}. Open the card',
+      next: 'Next word',
+      previous: 'Previous word',
+      hintPage: '— next words',
+      hintClose: '— close',
+    },
+    intro: {
+      title: 'How it works',
+      open: 'How it works',
+      step1:
+        'Every day you get {{count}} new English words. Listen to the word, read the example and the translation.',
+      step2:
+        'Remember the word — tap “Got it”. Not sure — tap “Remind me”, and the word comes back at the end.',
+      step3: 'When every word is remembered, they go to a parent to check.',
+      step4:
+        'In the evening a parent shows you the words on their phone — you say the translation.',
+      step5:
+        'From the second day, {{count}} words you already learned are added to the check — repeat them too.',
+      step6:
+        'Get everything right — and the reward is yours. If not, the words come back to repeat. New words open the next day.',
+      start: 'Got it, let’s start',
+    },
+    reward: {
+      title: 'How much to pay for {{count}} words a day?',
+      editTitle: 'Reward for a day',
+      text: 'Every day the child learns {{count}} new words. This amount is paid to the child automatically for every day the words are checked without mistakes.',
+      placeholder: 'Your amount',
+      inputLabel: 'Reward for a day, in dollars',
+      perDay: 'a day',
+      changeLater:
+        'You can change the amount later with the pencil at the top. It applies from the next words.',
+      invalid: 'Whole dollars from 1 to {{max}}',
+      start: 'Start · {{amount}} a day',
+      save: 'Save',
+      edit: 'Change the reward',
+      saved: 'Now {{amount}} a day — from the next words',
+    },
+    child: {
+      remembered: 'Learned',
+      remindLater: 'Remind me',
+      gotIt: 'Got it',
+      hint: 'Listen, read the example and tap “Got it” when you remember the word. “Remind me” shows it again later.',
+      lastWordHint:
+        'The last word — remember it and the words go to a parent to check.',
+      learned: 'Words learned',
+      sentBackTitle: 'Let’s repeat!',
+      sentBackText:
+        'Not every word was right. Learn them again — then a parent will check once more.',
+      submitting: 'Sending the words to check…',
+      submitFailedTitle: 'Couldn’t send to check',
+      submitFailedText:
+        'Check the connection and try again — your words are remembered.',
+      retry: 'Try again',
+      noneTitle: 'No words yet',
+      noneText:
+        'Ask a parent to start English — {{count}} new words a day and a reward for learning them.',
+      reviewTitle: 'That’s all for today!',
+      reviewText:
+        'In the evening a parent will check the words: today’s ones and a few from before. Get all right — and earn {{amount}}.',
+      tomorrowTitle: 'Words are checked',
+      tomorrowText: 'The reward is paid. New words open tomorrow.',
+      finishedTitle: 'You learned every word!',
+      finishedText:
+        'All {{total}} words are learned. New words are coming soon.',
+    },
+    parent: {
+      hint: 'Every day a child learns {{count}} new words. In the evening you check them here — all right means {{amount}} goes to the child.',
+      card: {
+        learnedCount: '{{count}} of {{total}} words learned',
+        noneTitle: 'No words yet',
+        noneText:
+          'Give the first {{count}} words — {{amount}} for a day without mistakes.',
+        noneNext: 'Give the next words: {{from}}–{{to}}.',
+        learningTitle: 'Learning words {{from}}–{{to}}',
+        learningText:
+          'When {{name}} learns them all, the words come to you for checking.',
+        learningRedo:
+          '{{name}} is repeating the words after the check — they will come back to you.',
+        reviewTitle: 'Ready to check',
+        reviewText:
+          '{{name}} learned words {{from}}–{{to}}. Check them together: new words and a few old ones.',
+        doneTitle: 'Checked today',
+        doneText: '{{amount}} paid to {{name}}. New words tomorrow.',
+        finishedTitle: 'The whole dictionary is done',
+        finishedText: 'All {{total}} words learned.',
+        dictionary: 'Dictionary',
+        streak: 'Days in a row',
+        days: 'Days in total',
+        earned: 'Earned',
+      },
+      give: 'Give {{count}} words · {{amount}}',
+      giveHint: 'The reward is reserved in your wallet until the check.',
+      check: 'Check the words',
+      checksAuthor: '{{name}} will check these words',
+      todayWords: 'Today’s words',
+      noChildren: 'Add a child on the Family tab to start.',
+      checkGone: 'This check is already done.',
+    },
+    check: {
+      title: 'Word check',
+      subtitle: '{{name}}',
+      undo: 'Change the last answer',
+      progress: 'Card {{current}} of {{total}}',
+      askHint:
+        'Show {{name}} the word — let them translate it. Then tap “Show translation” and compare. Card {{current}} of {{total}}.',
+      reveal: 'Show translation',
+      newWord: 'New word',
+      reviewWord: 'Repeat',
+      right: 'Right',
+      wrong: 'Wrong',
+      allRightTitle: 'All {{total}} right!',
+      allRightText: '{{name}} knows every word. Pay the reward {{amount}}?',
+      pay: 'Pay {{amount}}',
+      someWrongTitle: '{{right}} of {{total}} right',
+      someWrongText:
+        'Every word has to be right. The words go back to {{name}} to repeat — check again when ready.',
+      sendBack: 'Send back to repeat',
+      missed: 'Didn’t remember',
+      changeLast: 'Change the last answer',
+      sentBackTitle: 'Words are back with {{name}}',
+      sentBackText: 'When {{name}} repeats them, the check appears here again.',
+      done: 'Done',
+    },
+    errors: {
+      failed: 'Something went wrong. Try again.',
+      network: 'No connection. Try again.',
+      noFunds:
+        'Not enough money in your wallet for the reward. Deposit on the Wallet tab.',
+      alreadyChecked: 'These words are already checked.',
+      next: {
+        failed:
+          'The reward is paid, but the next words weren’t given. Give them on the Languages tab.',
+        network:
+          'The reward is paid, but the next words weren’t given: no connection. Give them on the Languages tab.',
+        noFunds:
+          'The reward is paid. Not enough money for the next words — deposit and give them on the Languages tab.',
+      },
+    },
   },
 };
 

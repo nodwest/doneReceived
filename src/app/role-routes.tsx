@@ -1,4 +1,5 @@
 import { ChildHomePage } from '@pages/child-home';
+import { ChildLanguagesPage, LanguagesPage } from '@pages/languages';
 import { MyTasksPage } from '@pages/my-tasks';
 import { ParentHomePage } from '@pages/parent-home';
 import {
@@ -39,5 +40,13 @@ export function TransactionsRoute() {
     <ChildTransactionsPage />
   ) : (
     <TransactionsPage />
+  );
+}
+
+export function LanguagesRoute() {
+  return useViewerRole() === 'child' ? (
+    <ChildLanguagesPage />
+  ) : (
+    <LanguagesPage />
   );
 }
