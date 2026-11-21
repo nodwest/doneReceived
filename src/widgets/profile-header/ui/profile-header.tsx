@@ -8,7 +8,7 @@ type ProfileHeaderProps = {
   name: string;
   /** Фото; null — первая буква имени. */
   avatar: ImageSourcePropType | null;
-  /** Статус «дома»; у ребёнка с сервера его пока нет — без плашки. */
+  /** Подтверждённый статус при наличии свежих данных о геопозиции. */
   presence?: Presence;
   onBack: () => void;
 };

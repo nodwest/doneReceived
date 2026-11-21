@@ -79,12 +79,6 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(style);
 }
 
-const later = (a: string | undefined, b: string | undefined) => {
-  if (!a) return b;
-  if (!b) return a;
-  return Date.parse(b) > Date.parse(a) ? b : a;
-};
-
 export function MapWeb({
   family,
   transport,
@@ -157,13 +151,17 @@ export function MapWeb({
     for (const [userId, location] of Object.entries(liveLocations)) {
       if (!location.childId) continue;
       const previous = points.get(userId);
+      const measuredAt = location.recordedAt ?? location.updatedAt;
+      if (
+        previous?.updatedAt &&
+        (!measuredAt ||
+          Date.parse(measuredAt) <= Date.parse(previous.updatedAt))
+      )
+        continue;
       points.set(userId, {
         ...location,
         userId,
-        updatedAt: later(
-          previous?.updatedAt,
-          location.recordedAt ?? location.updatedAt,
-        ),
+        updatedAt: measuredAt,
       });
     }
     return [...points.values()].filter(

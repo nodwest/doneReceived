@@ -1,6 +1,7 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 import { apiRequest, queryRoots } from '@shared/api';
-import type { Location, ZonePresence } from '@entities/user';
+import type { Location, Presence, ZonePresence } from '@entities/user';
+import { useLocationZones } from '@entities/zone';
 
 export type ChildPresence = {
   childId: string;
@@ -10,7 +11,55 @@ export type ChildPresence = {
   recordedAt?: string | null;
   accuracy: number | null;
   zones: ZonePresence[];
+  /** Подтверждённо дома; в ответах старого сервера поля нет. */
+  atHome?: boolean;
+  /** Когда пришёл домой или ушёл; null — момент неизвестен. */
+  atHomeSince?: string | null;
 };
+
+/** Час без координат — уже «нет данных», а не «дома вчера». */
+export const LOCATION_STALE_MS = 60 * 60_000;
+
+/** Данные ребёнка свежие: можно показывать его статус, а не «нет данных». */
+export function isLocationPresenceFresh(
+  child: ChildPresence | undefined,
+  now: Date,
+) {
+  if (!child?.updatedAt) return false;
+  return now.getTime() - Date.parse(child.updatedAt) <= LOCATION_STALE_MS;
+}
+
+/**
+ * Плашка «Дома / Не дома» по подтверждённому `atHome` с сервера.
+ * `undefined` — статус неизвестен: данных нет, они устарели или сервер
+ * старый и новых полей не присылает.
+ */
+export function homePresenceFrom(
+  child: ChildPresence | undefined,
+  now: Date,
+  homeZoneId: string | null | undefined,
+): Presence | undefined {
+  if (!child || child.atHome === undefined) return undefined;
+  if (!isLocationPresenceFresh(child, now)) return undefined;
+  if (
+    !child.atHome &&
+    (homeZoneId === undefined ||
+      (homeZoneId !== null &&
+        !child.zones.some(
+          (zone) => zone.zoneId === homeZoneId && zone.state === 'outside',
+        )))
+  )
+    return undefined;
+  return {
+    atHome: child.atHome,
+    since: child.atHomeSince ?? null,
+  };
+}
+
+export function useHomeZoneId(familyId: string | null) {
+  const { data: zones } = useLocationZones(familyId);
+  return zones ? (zones.find((zone) => zone.isHome)?.id ?? null) : undefined;
+}
 
 export type LocationPresence = {
   children: ChildPresence[];
@@ -54,13 +103,35 @@ export function applyLocationPresence(
   if (!childId) return current ?? { children: [] };
   const children = current?.children ?? [];
   const previous = children.find((child) => child.childId === childId);
+  const measuredAt = location.recordedAt ?? location.updatedAt;
+  const previousMeasuredAt = previous?.recordedAt ?? previous?.updatedAt;
+  const measuredTime = measuredAt ? Date.parse(measuredAt) : null;
+  const previousTime = previousMeasuredAt
+    ? Date.parse(previousMeasuredAt)
+    : null;
+  // REST мог уже загрузить новое назначение дома для той же GPS-точки.
+  if (
+    previousTime !== null &&
+    measuredTime !== null &&
+    measuredTime <= previousTime
+  ) {
+    return current;
+  }
+  const atHome =
+    location.atHome === undefined ? previous?.atHome : location.atHome;
+  const atHomeSince =
+    location.atHome === undefined
+      ? (previous?.atHomeSince ?? null)
+      : (location.atHomeSince ?? null);
   const previousZones = previous?.zones ?? [];
   const nextZones = location.zones ?? previousZones;
-  // Координаты приходят каждые пару секунд, а состояние зоны меняется редко.
-  // Не перерисовываем экран на каждую точку: возраст обновит опрос раз в 30 с.
+  // Координаты приходят каждые пару секунд, а состояние зоны и «дома» меняется
+  // редко. Не перерисовываем экран на каждую точку: возраст обновит опрос.
   if (
     previous?.updatedAt &&
-    JSON.stringify(previousZones) === JSON.stringify(nextZones)
+    JSON.stringify(previousZones) === JSON.stringify(nextZones) &&
+    previous.atHome === atHome &&
+    (previous.atHomeSince ?? null) === atHomeSince
   ) {
     return current ?? { children: [] };
   }
@@ -70,6 +141,8 @@ export function applyLocationPresence(
     recordedAt: location.recordedAt ?? previous?.recordedAt ?? null,
     accuracy: location.accuracy ?? previous?.accuracy ?? null,
     zones: nextZones,
+    atHome,
+    atHomeSince,
   };
   return {
     children: [...children.filter((child) => child.childId !== childId), next],

@@ -10,6 +10,11 @@ import {
   useFamilyTasks,
   useTaskFamilyId,
 } from '@features/family-tasks';
+import {
+  homePresenceFrom,
+  useHomeZoneId,
+  useLocationPresence,
+} from '@features/location';
 import { useFamilyChildren } from '@entities/family';
 import {
   latestRewards,
@@ -25,6 +30,7 @@ import { useChildWallet } from '@entities/wallet';
 import { useWishlistProgress, WishRow } from '@entities/wish';
 import { useMyId } from '@entities/session';
 import { useTranslation } from '@shared/i18n';
+import { useNow } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
 import { ScreenSection, SnapCarousel } from '@shared/ui';
 import { styles } from './child-profile.styled';
@@ -37,8 +43,7 @@ const RECENT_REWARDS = 3;
 /**
  * Профиль ребёнка семьи с сервера: имя (без фото — буква), баланс из его
  * кошелька, задания, итоги и награды (из истории, собранной из кошелька и
- * заданий), вишлист. Статуса «дома» и карты с сервера пока нет — этих блоков
- * нет.
+ * заданий), вишлист и статус домашней геозоны.
  */
 export function ServerChildProfile({ id }: { id: string }) {
   useTheme();
@@ -47,6 +52,10 @@ export function ServerChildProfile({ id }: { id: string }) {
   const router = useRouter();
   const familyId = useTaskFamilyId();
   const { data: children, isPending } = useFamilyChildren(familyId);
+  // Общий статус «дома»: тот же запрос и live-события, что на Family.
+  const now = useNow(60_000);
+  const { data: presence } = useLocationPresence(familyId);
+  const homeZoneId = useHomeZoneId(familyId);
   const { data: tasks = NO_TASKS } = useFamilyTasks();
   const { data: wallet } = useChildWallet(id, familyId);
   const { data: operations = NO_OPERATIONS } = useFamilyOperations();
@@ -92,6 +101,11 @@ export function ServerChildProfile({ id }: { id: string }) {
         <ProfileHeader
           name={child.displayName}
           avatar={child.avatarUrl ? authorizedImage(child.avatarUrl) : null}
+          presence={homePresenceFrom(
+            presence?.children.find((item) => item.childId === id),
+            now,
+            homeZoneId,
+          )}
           onBack={() =>
             router.canGoBack() ? router.back() : router.replace('/')
           }

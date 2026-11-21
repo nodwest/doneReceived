@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,35 +9,49 @@ import {
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentFamily } from '@entities/family';
+import { useSessionFamilyId } from '@entities/session';
 import {
   createLocationZone,
   updateLocationZone,
   useLocationZones,
   zonesKeys,
+  type MapZone,
   type ZonePoint,
 } from '@entities/zone';
 import { MapAttribution, ZoneMap } from '@widgets/map';
 import { TabScreen } from '@widgets/bottom-nav';
 import { presenceKeys } from '@features/location';
+import { hasApiErrorCode, isApiError } from '@shared/api';
 import { showToast } from '@shared/lib';
 import { useTranslation } from '@shared/i18n';
 import { createStyles, theme, tracking, useTheme } from '@shared/theme';
-import { GradientButton, Input, PillButton, ScreenHeader } from '@shared/ui';
+import {
+  GradientButton,
+  Input,
+  PillButton,
+  ScreenHeader,
+  Toggle,
+} from '@shared/ui';
 
 /** Больше 12 вершин на телефоне рисовать неудобно; сервер разрешает до 64. */
 const MAX_ZONE_POINTS = 12;
 
-/** Центр контура — среднее вершин: туда наводим карту при правке. */
-function zoneCenter(points: readonly ZonePoint[]): ZonePoint | undefined {
+function zoneBounds(
+  points: readonly ZonePoint[],
+): [number, number, number, number] | undefined {
   if (points.length === 0) return undefined;
-  let lat = 0;
-  let lng = 0;
-  for (const point of points) {
-    lat += point.lat;
-    lng += point.lng;
-  }
-  return { lat: lat / points.length, lng: lng / points.length };
+  const latitudes = points.map((point) => point.lat);
+  const longitudes = points.map((point) => point.lng);
+  return [
+    Math.min(...longitudes),
+    Math.min(...latitudes),
+    Math.max(...longitudes),
+    Math.max(...latitudes),
+  ];
 }
+
+const back = () =>
+  router.canGoBack() ? router.back() : router.replace('/map-layers');
 
 /**
  * Геозона: тап по карте ставит вершины, контур виден сразу. Без `zoneId` —
@@ -47,40 +61,74 @@ function zoneCenter(points: readonly ZonePoint[]): ZonePoint | undefined {
 export function MapZonePage() {
   useTheme();
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const familyId = useCurrentFamily()?.id ?? null;
+  const cachedFamilyId = useCurrentFamily()?.id;
+  const sessionFamilyId = useSessionFamilyId();
+  const familyId = cachedFamilyId ?? sessionFamilyId;
   const params = useLocalSearchParams<{ zoneId?: string }>();
   const zoneId = typeof params.zoneId === 'string' ? params.zoneId : null;
-  const editing = !!zoneId;
+  const zones = useLocationZones(zoneId ? familyId : null);
+  const zone = zones.data?.find((item) => item.id === zoneId);
+  if (zoneId && !zone) {
+    const loading = !!familyId && zones.isFetching;
+    return (
+      <TabScreen activeKey="map">
+        <View style={styles.screen}>
+          <View style={styles.header}>
+            <ScreenHeader title={t('mapZone.editTitle')} onBack={back} />
+          </View>
+          <View style={styles.formContent}>
+            <Text style={styles.hint}>
+              {t(loading ? 'common.loading' : 'mapZone.loadError')}
+            </Text>
+            {!!familyId && !loading && (
+              <PillButton
+                label={t('common.retry')}
+                onPress={() => void zones.refetch()}
+              />
+            )}
+          </View>
+        </View>
+      </TabScreen>
+    );
+  }
+  return (
+    <ZoneEditor
+      key={`${familyId}:${zoneId ?? ''}`}
+      familyId={familyId}
+      zone={zone}
+    />
+  );
+}
 
-  const { data: zones = [] } = useLocationZones(familyId);
-  const zone = zoneId
-    ? (zones.find((item) => item.id === zoneId) ?? null)
-    : null;
-
-  const [name, setName] = useState('');
+function ZoneEditor({
+  familyId,
+  zone,
+}: {
+  familyId: string | null;
+  zone?: MapZone;
+}) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const editing = !!zone;
+  const [initialBounds] = useState(() => zoneBounds(zone?.points ?? []));
+  const [name, setName] = useState(zone?.name ?? '');
+  const [isHome, setIsHome] = useState(zone?.isHome ?? false);
+  const [homeEdited, setHomeEdited] = useState(false);
   const [draft, setDraft] = useState<{
     points: ZonePoint[];
     selected: number | null;
-  }>({ points: [], selected: null });
-  const filled = useRef(false);
-  // Правка: заполняем форму, когда зона пришла (обычно уже из кэша списка).
-  useEffect(() => {
-    if (!zone || filled.current) return;
-    filled.current = true;
-    setName(zone.name);
-    setDraft({ points: zone.points, selected: null });
-  }, [zone]);
-
-  const back = () =>
-    router.canGoBack() ? router.back() : router.replace('/map-layers');
+  }>({ points: zone?.points ?? [], selected: null });
 
   const save = useMutation({
     mutationFn: () => {
       if (!familyId) throw new Error('Нет семьи');
-      const input = { name: name.trim(), points: draft.points };
-      return editing && zoneId
-        ? updateLocationZone(familyId, zoneId, input)
+      const input = {
+        name: name.trim(),
+        points: draft.points,
+        ...(homeEdited ? { isHome } : {}),
+      };
+      return zone
+        ? updateLocationZone(familyId, zone.id, input)
         : createLocationZone(familyId, input);
     },
     onSuccess: () => {
@@ -93,13 +141,23 @@ export function MapZonePage() {
       showToast(t(editing ? 'mapZone.updatedToast' : 'mapZone.savedToast'));
       back();
     },
-    onError: () =>
-      showToast(t(editing ? 'mapZone.updateError' : 'mapZone.saveError')),
+    onError: (error) => {
+      // Домашняя область уже есть: не уходим с экрана, введённый черновик
+      // остаётся на месте — можно выключить переключатель и сохранить снова.
+      if (isApiError(error) && hasApiErrorCode(error, 'HOME_ZONE_EXISTS')) {
+        showToast(t('mapZone.homeZoneExists'), 'error');
+        return;
+      }
+      showToast(
+        t(editing ? 'mapZone.updateError' : 'mapZone.saveError'),
+        'error',
+      );
+    },
   });
 
   const addPoint = (point: ZonePoint) => {
     if (draft.points.length >= MAX_ZONE_POINTS) {
-      showToast(t('mapZone.pointsLimit', { max: MAX_ZONE_POINTS }));
+      showToast(t('mapZone.pointsLimit', { max: MAX_ZONE_POINTS }), 'error');
       return;
     }
     setDraft((current) => {
@@ -135,7 +193,6 @@ export function MapZonePage() {
 
   const canSave =
     !!familyId &&
-    (!editing || !!zone) &&
     name.trim().length > 0 &&
     draft.points.length >= 3 &&
     !save.isPending;
@@ -159,7 +216,7 @@ export function MapZonePage() {
             onAddPoint={addPoint}
             onSelectPoint={selectPoint}
             onMovePoint={movePoint}
-            center={editing && zone ? zoneCenter(zone.points) : undefined}
+            initialBounds={initialBounds}
           />
           <MapAttribution />
         </View>
@@ -185,6 +242,22 @@ export function MapZonePage() {
             accessibilityLabel={t('mapZone.nameLabel')}
             maxLength={100}
           />
+          <View style={styles.homeRow}>
+            <View style={styles.homeText}>
+              <Text style={styles.homeTitle}>{t('mapZone.homeZone')}</Text>
+              <Text style={styles.homeHint}>{t('mapZone.homeZoneHint')}</Text>
+            </View>
+            <Toggle
+              value={isHome}
+              onValueChange={(value) => {
+                setIsHome(value);
+                setHomeEdited(true);
+              }}
+              accessibilityLabel={t('mapZone.homeZone')}
+              tone="blue"
+              disabled={save.isPending}
+            />
+          </View>
           <View style={styles.actions}>
             <PillButton
               label={t('mapZone.removePoint')}
@@ -252,6 +325,35 @@ const styles = createStyles((colors) => ({
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.semibold,
     color: colors.mapAccent,
+  },
+  homeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.prime,
+  },
+  homeText: {
+    flex: 1,
+    minWidth: 0,
+    gap: 3,
+  },
+  homeTitle: {
+    fontSize: 15,
+    letterSpacing: tracking(15),
+    fontFamily: theme.fonts.semibold,
+    color: colors.ink,
+  },
+  homeHint: {
+    fontSize: theme.fontSize.xs,
+    lineHeight: 16,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.medium,
+    color: colors.grey,
   },
   actions: {
     flexDirection: 'row',

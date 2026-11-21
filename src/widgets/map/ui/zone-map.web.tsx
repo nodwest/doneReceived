@@ -21,8 +21,7 @@ type ZoneMapProps = {
   onSelectPoint: (index: number) => void;
   /** Вершину потянули: новые координаты. */
   onMovePoint: (index: number, point: ZonePoint) => void;
-  /** Куда навести карту: при правке — на существующую область. */
-  center?: ZonePoint;
+  initialBounds?: [number, number, number, number];
 };
 
 // Центр Мелитополя — как у большой карты, пока нет координат семьи.
@@ -45,7 +44,7 @@ export function ZoneMap({
   onAddPoint,
   onSelectPoint,
   onMovePoint,
-  center,
+  initialBounds,
 }: ZoneMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -58,9 +57,7 @@ export function ZoneMap({
   const dragIndexRef = useRef<number | null>(null);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const dragMovedRef = useRef(false);
-  // Стартовый центр берём один раз при создании карты: дальше пользователь
-  // двигает её сам, и перерисовка не должна дёргать камеру.
-  const initialCenter = useRef(center);
+  const boundsRef = useRef(initialBounds);
 
   useEffect(() => {
     onAddPointRef.current = onAddPoint;
@@ -78,22 +75,16 @@ export function ZoneMap({
     pointsRef.current = points;
   }, [points]);
 
-  const centerLat = center?.lat;
-  const centerLng = center?.lng;
-  useEffect(() => {
-    if (centerLat === undefined || centerLng === undefined) return;
-    mapRef.current?.jumpTo({ center: [centerLng, centerLat] });
-  }, [centerLat, centerLng]);
-
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const start = initialCenter.current;
+    const bounds = boundsRef.current;
     let map: maplibregl.Map;
     try {
       map = createMap(container, {
-        center: start ? [start.lng, start.lat] : CENTER,
-        zoom: ZOOM,
+        ...(bounds
+          ? { bounds, fitBoundsOptions: { padding: 40, maxZoom: 17 } }
+          : { center: CENTER, zoom: ZOOM }),
         attributionControl: false,
       });
     } catch {
@@ -230,12 +221,12 @@ export function ZoneMap({
     if (!map) return;
 
     const applyDraft = () => {
-      if (!map.isStyleLoaded()) return;
       const data = zoneDraftToGeoJson(points, selectedIndex);
       const source = map.getSource(ZONE_DRAFT_SOURCE);
       if (source && source.type === 'geojson') {
         (source as GeoJSONSource).setData(data);
       } else {
+        if (!map.isStyleLoaded()) return;
         map.addSource(ZONE_DRAFT_SOURCE, { type: 'geojson', data });
       }
       for (const layer of ZONE_DRAFT_LAYERS) {

@@ -13,6 +13,8 @@ export type MapZone = {
   familyId: string;
   name: string;
   points: ZonePoint[];
+  /** Домашняя область семьи: по ней сервер считает atHome у детей. */
+  isHome: boolean;
   /** UUID родителя, создавшего зону. */
   createdBy: string;
   createdAt: string;

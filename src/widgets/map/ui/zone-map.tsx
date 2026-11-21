@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   Camera,
@@ -6,7 +6,6 @@ import {
   Layer,
   Map,
   ViewAnnotation,
-  type CameraRef,
   type StyleSpecification,
 } from '@maplibre/maplibre-react-native';
 
@@ -21,7 +20,7 @@ type ZoneMapProps = {
   onAddPoint: (point: ZonePoint) => void;
   onSelectPoint: (index: number) => void;
   onMovePoint: (index: number, point: ZonePoint) => void;
-  center?: ZonePoint;
+  initialBounds?: [number, number, number, number];
 };
 
 const CENTER: [number, number] = [39.7152, 47.23325];
@@ -38,21 +37,18 @@ export function ZoneMap({
   onAddPoint,
   onSelectPoint,
   onMovePoint,
-  center,
+  initialBounds,
 }: ZoneMapProps) {
-  const cameraRef = useRef<CameraRef>(null);
   const lastVertexPress = useRef(0);
   const data = zoneDraftToGeoJson(points, selectedIndex);
-  const centerLat = center?.lat;
-  const centerLng = center?.lng;
-
-  useEffect(() => {
-    if (centerLat === undefined || centerLng === undefined) return;
-    cameraRef.current?.jumpTo({
-      center: [centerLng, centerLat],
-      zoom: ZOOM,
-    });
-  }, [centerLat, centerLng]);
+  const [initialViewState] = useState(() =>
+    initialBounds
+      ? {
+          bounds: initialBounds,
+          padding: { top: 40, right: 40, bottom: 40, left: 40 },
+        }
+      : { center: CENTER, zoom: ZOOM },
+  );
 
   return (
     <View style={styles.container}>
@@ -71,13 +67,7 @@ export function ZoneMap({
           onAddPoint({ lat, lng });
         }}
       >
-        <Camera
-          ref={cameraRef}
-          initialViewState={{
-            center: center ? [center.lng, center.lat] : CENTER,
-            zoom: ZOOM,
-          }}
-        />
+        <Camera initialViewState={initialViewState} />
 
         <GeoJSONSource id="zone-draft" data={data}>
           <Layer

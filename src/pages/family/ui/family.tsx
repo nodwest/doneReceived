@@ -6,6 +6,11 @@ import { TabScreen } from '@widgets/bottom-nav';
 import { ChildDevices } from '@widgets/child-devices';
 import { useDeleteChild } from '@features/delete-child';
 import { useFamilyTasks } from '@features/family-tasks';
+import {
+  homePresenceFrom,
+  useHomeZoneId,
+  useLocationPresence,
+} from '@features/location';
 import { TransferOwnershipButton } from '@features/transfer-ownership';
 import {
   useCurrentFamily,
@@ -20,7 +25,7 @@ import { MemberCard } from '@entities/user';
 import { formatMoney } from '@entities/wallet';
 import { authorizedImage, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
-import { showToast } from '@shared/lib';
+import { showToast, useNow } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
 import { Icon, ScreenSection, SwipeableRow } from '@shared/ui';
 import { DELETE_ACTION_WIDTH, REVEAL_GAP, styles } from './family.styled';
@@ -54,6 +59,14 @@ export function FamilyPage() {
   const { data: details } = useFamilyDetails(isParent ? familyId : null);
   const { data: members = NO_MEMBERS } = useFamilyMembers(
     isParent ? null : familyId,
+  );
+  // Общий статус «дома»: GET location-presence + live-события сокета.
+  // Устаревшие данные и старый сервер без atHome дают «неизвестно».
+  const now = useNow(60_000);
+  const { data: presence } = useLocationPresence(familyId);
+  const homeZoneId = useHomeZoneId(familyId);
+  const presenceByChild = new Map(
+    (presence?.children ?? []).map((child) => [child.childId, child]),
   );
   const deleteChild = useDeleteChild();
   const isOwner = details?.myRole === 'owner';
@@ -230,6 +243,11 @@ export function FamilyPage() {
               name={child.displayName}
               avatar={photo(child.avatarUrl)}
               role="child"
+              presence={homePresenceFrom(
+                presenceByChild.get(id),
+                now,
+                homeZoneId,
+              )}
               subtitle={t('family.childBalance', {
                 amount: formatMoney(child.balance),
               })}
@@ -265,6 +283,15 @@ export function FamilyPage() {
             avatar={photo(member.avatarUrl)}
             role="child"
             isYou={member.userId === myId}
+            presence={
+              member.childId
+                ? homePresenceFrom(
+                    presenceByChild.get(member.childId),
+                    now,
+                    homeZoneId,
+                  )
+                : undefined
+            }
             subtitle={t('member.childProfile')}
           />
         ));

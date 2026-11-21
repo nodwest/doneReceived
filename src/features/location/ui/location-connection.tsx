@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentFamily } from '@entities/family';
 import { useSessionFamilyId, useSessionStore } from '@entities/session';
 import type { Location } from '@entities/user';
+import { zonesKeys } from '@entities/zone';
 import { useLocationSocket } from '../model/use-location-socket';
 import { useLocationStore } from '../model/location-store';
 import { familyLocationsKeys } from '../model/use-family-locations';
@@ -59,6 +60,18 @@ export function LocationConnection() {
     [queryClient, setLocation],
   );
 
+  const onZonesChanged = useCallback(() => {
+    const currentFamilyId = familyIdRef.current;
+    if (!currentFamilyId) return;
+    for (const queryKey of [
+      zonesKeys.list(currentFamilyId),
+      presenceKeys.list(currentFamilyId),
+      familyLocationsKeys.list(currentFamilyId),
+    ]) {
+      void queryClient.invalidateQueries({ queryKey, exact: true });
+    }
+  }, [queryClient]);
+
   const onAuthenticated = useCallback(() => {
     reset();
     const currentFamilyId = familyIdRef.current;
@@ -69,10 +82,24 @@ export function LocationConnection() {
         queryKey: familyLocationsKeys.list(currentFamilyId),
         exact: true,
       });
+      void queryClient.invalidateQueries({
+        queryKey: zonesKeys.list(currentFamilyId),
+        exact: true,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: presenceKeys.list(currentFamilyId),
+        exact: true,
+      });
     }
   }, [queryClient, reset]);
 
-  useLocationSocket(onLocation, onAccessChanged, onAuthenticated, familyId);
+  useLocationSocket(
+    onLocation,
+    onAccessChanged,
+    onAuthenticated,
+    familyId,
+    onZonesChanged,
+  );
 
   useEffect(() => {
     if (!accessToken) reset();

@@ -12,6 +12,7 @@ const FADE_OUT = 400;
 export function ToastHost() {
   const id = useToastStore((state) => state.id);
   const message = useToastStore((state) => state.message);
+  const isError = useToastStore((state) => state.kind === 'error');
   const hide = useToastStore((state) => state.hide);
   const [opacity] = useState(() => new Animated.Value(0));
 
@@ -43,8 +44,8 @@ export function ToastHost() {
   return (
     <View style={[styles.overlay, { pointerEvents: 'none' }]}>
       <Animated.View style={[styles.toast, { opacity }]}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>✓</Text>
+        <View style={[styles.badge, isError && styles.errorBadge]}>
+          <Text style={styles.badgeText}>{isError ? '×' : '✓'}</Text>
         </View>
         <Text style={styles.message}>{message}</Text>
       </Animated.View>
@@ -82,6 +83,9 @@ const styles = createStyles((colors) => ({
     letterSpacing: tracking(16),
     fontFamily: theme.fonts.bold,
     color: colors.white,
+  },
+  errorBadge: {
+    backgroundColor: colors.danger,
   },
   message: {
     flexShrink: 1,

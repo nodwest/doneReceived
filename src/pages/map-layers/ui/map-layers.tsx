@@ -21,6 +21,8 @@ import {
 } from '@entities/zone';
 import { busRouteKey, useBusesSocket } from '@features/buses';
 import {
+  isLocationPresenceFresh,
+  LOCATION_STALE_MS,
   presenceKeys,
   useLocationPresence,
   useMemberMapSettings,
@@ -280,9 +282,6 @@ function EmptyRow({ text }: { text: string }) {
   return <Text style={styles.empty}>{text}</Text>;
 }
 
-/** Час без координат — уже «нет данных», а не «в школе вчера». */
-const ZONE_STALE_MS = 60 * 60_000;
-
 type ZoneInside = { childId: string; since: string };
 
 type ZoneStatus = {
@@ -318,7 +317,8 @@ function buildZoneStatuses(
     if (onlyChildId && child.childId !== onlyChildId) continue;
     latest = laterTimestamp(latest, child.updatedAt);
     if (!child.updatedAt) continue;
-    if (now.getTime() - Date.parse(child.updatedAt) > ZONE_STALE_MS) continue;
+    if (now.getTime() - Date.parse(child.updatedAt) > LOCATION_STALE_MS)
+      continue;
     for (const zone of child.zones) {
       if (zone.state === 'inside') {
         const list = inside.get(zone.zoneId) ?? [];
@@ -431,27 +431,47 @@ function MemberPresenceText({
   fallback: string;
 }) {
   const { t } = useTranslation();
-  const updatedAt = child?.updatedAt ?? null;
-  if (!child || !updatedAt) {
+  // Нет свежих данных или старый сервер без atHome — статус неизвестен,
+  // показываем прежнюю подпись (роль), а не «дома» или «вне области».
+  if (!child || !isLocationPresenceFresh(child, now)) {
     return (
       <Text style={styles.rowSubtitle} numberOfLines={1}>
         {fallback}
       </Text>
     );
   }
-  const age = now.getTime() - Date.parse(updatedAt);
-  const ago = formatTimeAgo(new Date(updatedAt), now);
-  const insideZone =
-    age <= ZONE_STALE_MS
-      ? child.zones.find((zone) => zone.state === 'inside')
-      : undefined;
-  const zone = insideZone ? zoneName(insideZone.zoneId) : null;
 
-  if (zone) {
+  const updatedAt = child.updatedAt!;
+  const ago = formatTimeAgo(new Date(updatedAt), now);
+  if (child.atHome === true) {
     return (
       <View style={styles.statusLine}>
         <Icon name="home" size={14} color={theme.colors.homeBrown} />
         <Text style={styles.presenceAt} numberOfLines={1}>
+          {child.atHomeSince
+            ? t('mapLayers.memberHome', {
+                ago: formatTimeAgo(new Date(child.atHomeSince), now),
+              })
+            : t('presence.atHome')}
+        </Text>
+      </View>
+    );
+  }
+  if (child.atHome === undefined) {
+    return (
+      <Text style={styles.rowSubtitle} numberOfLines={1}>
+        {fallback}
+      </Text>
+    );
+  }
+
+  const insideZone = child.zones.find((zone) => zone.state === 'inside');
+  const zone = insideZone ? zoneName(insideZone.zoneId) : null;
+  if (zone) {
+    return (
+      <View style={styles.statusLine}>
+        <Icon name="zone" size={14} color={theme.colors.grey} />
+        <Text style={styles.rowSubtitle} numberOfLines={1}>
           {t('mapLayers.memberAt', { zone, ago })}
         </Text>
       </View>

@@ -11,6 +11,10 @@ export type FamilyLocation = {
   /** Время измерения на устройстве; старые ответы его не содержат. */
   recordedAt?: string | null;
   zoneId: string | null;
+  /** Подтверждённо дома; в ответах старого сервера поля нет. */
+  atHome?: boolean;
+  /** Когда пришёл домой или ушёл; null — момент неизвестен. */
+  atHomeSince?: string | null;
   deviceId: string | null;
   deviceLabel: string;
   displayName: string;

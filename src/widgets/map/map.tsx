@@ -48,12 +48,6 @@ type FamilyMarker = {
   color: string;
 };
 
-const later = (a: string | undefined, b: string | undefined) => {
-  if (!a) return b;
-  if (!b) return a;
-  return Date.parse(b) > Date.parse(a) ? b : a;
-};
-
 const MAP_CENTER: [number, number] = [39.7152, 47.23325];
 const MAP_STYLE_JSON = MAP_STYLE as unknown as StyleSpecification;
 const MAP_IMAGES = { bus: require('../../../assets/bus-icon.png') };
@@ -125,6 +119,13 @@ export function MapWeb({
       const member = peopleById.get(userId);
       if (!member?.childId || !location.childId) continue;
       const previous = points.get(userId);
+      const measuredAt = location.recordedAt ?? location.updatedAt;
+      if (
+        previous?.updatedAt &&
+        (!measuredAt ||
+          Date.parse(measuredAt) <= Date.parse(previous.updatedAt))
+      )
+        continue;
       points.set(userId, {
         userId,
         childId: member.childId,
@@ -132,10 +133,7 @@ export function MapWeb({
         lng: location.lng,
         zoneId: location.zoneId,
         deviceLabel: location.deviceLabel || t('map.deviceFallback'),
-        updatedAt: later(
-          previous?.updatedAt,
-          location.recordedAt ?? location.updatedAt,
-        ),
+        updatedAt: measuredAt,
         name: member.displayName,
         avatarUrl: member.avatarUrl,
         color: member.mapColor ?? defaultMapColor('child'),

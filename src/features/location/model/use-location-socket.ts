@@ -15,7 +15,7 @@ const CLOSE_TOKEN_EXPIRED = 4401;
 /** Старый сервер также использует этот код при истечении токена. */
 const CLOSE_POLICY_VIOLATION = 1008;
 
-type Message = { event?: unknown; data?: unknown };
+type Message = { event?: unknown; data?: unknown; zonesRecalculated?: unknown };
 
 const parse = (raw: unknown): Message | null => {
   if (typeof raw !== 'string') return null;
@@ -37,6 +37,7 @@ export const useLocationSocket = (
   onAccessChanged?: (userId: string, visible: boolean) => void,
   onAuthenticated?: () => void,
   familyId?: string | null,
+  onZonesChanged?: () => void,
 ) => {
   const accessToken = useSessionStore((state) => state.session?.accessToken);
   const kind = useSessionKind();
@@ -98,6 +99,12 @@ export const useLocationSocket = (
           onAuthenticated?.();
           return;
         }
+        if (!authenticated) return;
+
+        if (message.event === 'location-zones-changed') {
+          onZonesChanged?.();
+          return;
+        }
 
         if (message.event === 'location-access') {
           const data = message.data as { userId?: unknown; visible?: unknown };
@@ -110,7 +117,8 @@ export const useLocationSocket = (
           return;
         }
 
-        if (message.event !== 'location') return;
+        if (message.event !== 'location' || message.zonesRecalculated === true)
+          return;
         const location = message.data as Location;
         if (!location?.userId || !location.childId) return;
         if (
@@ -171,5 +179,6 @@ export const useLocationSocket = (
     onAccessChanged,
     onAuthenticated,
     onLocation,
+    onZonesChanged,
   ]);
 };

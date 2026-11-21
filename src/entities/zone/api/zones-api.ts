@@ -13,6 +13,8 @@ export type LocationZoneInput = {
   name: string;
   /** Вершины контура по порядку обхода, минимум три. */
   points: ZonePoint[];
+  /** Домашняя область; в семье может быть только одна (иначе 409). */
+  isHome?: boolean;
 };
 
 /**

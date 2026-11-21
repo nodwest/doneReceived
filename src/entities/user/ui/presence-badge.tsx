@@ -32,7 +32,8 @@ export function PresenceBadge({ atHome, since, compact }: PresenceBadgeProps) {
     return (
       <View style={[styles.badge, styles.away]}>
         <Text style={[styles.text, styles.awayText]}>
-          {t('presence.away')} · {ago}
+          {t('presence.away')}
+          {ago ? ` · ${ago}` : ''}
         </Text>
       </View>
     );
@@ -47,7 +48,8 @@ export function PresenceBadge({ atHome, since, compact }: PresenceBadgeProps) {
     >
       <Icon name="home" size={16} color={theme.colors.homeBrown} />
       <Text style={[styles.text, styles.homeText]}>
-        {t('presence.atHome')} · {ago}
+        {t('presence.atHome')}
+        {ago ? ` · ${ago}` : ''}
       </Text>
     </LinearGradient>
   );
@@ -82,16 +84,18 @@ function CompactPresence({ status, ago, atHome }: CompactPresenceProps) {
         )}
         <Text style={textStyle} numberOfLines={1}>
           {status}
-          <Text style={wrapped && styles.hidden}> ·</Text>
+          {!!ago && <Text style={wrapped && styles.hidden}> ·</Text>}
         </Text>
       </View>
-      <Text
-        style={textStyle}
-        numberOfLines={1}
-        onLayout={(event) => setAgoY(y(event))}
-      >
-        {ago}
-      </Text>
+      {!!ago && (
+        <Text
+          style={textStyle}
+          numberOfLines={1}
+          onLayout={(event) => setAgoY(y(event))}
+        >
+          {ago}
+        </Text>
+      )}
     </View>
   );
 }

@@ -22,6 +22,10 @@ export type Location = {
   zoneId?: string | null;
   /** Подтверждённые состояния по зонам — только у ребёнка. */
   zones?: ZonePresence[];
+  /** Ребёнок подтверждённо дома; в старых событиях поля нет. */
+  atHome?: boolean;
+  /** Когда пришёл домой или ушёл; null — момент неизвестен. */
+  atHomeSince?: string | null;
   /** Устройство, с которого получена точка. */
   deviceId?: string | null;
   deviceLabel?: string | null;
