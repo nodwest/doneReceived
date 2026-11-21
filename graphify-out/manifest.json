@@ -384,15 +384,15 @@
     "semantic_hash": ""
   },
   "src/entities/device/ui/device-row.styled.ts": {
-    "mtime": 1795156836.8893468,
-    "seen": 1795162011.5135324,
-    "ast_hash": "573c2c937098d6cf24a67ad4eda44dbc",
+    "mtime": 1795300292.2466123,
+    "seen": 1795300392.6839178,
+    "ast_hash": "69f7776b1cd51c6c216f690efcf570d7",
     "semantic_hash": ""
   },
   "src/entities/device/ui/device-row.tsx": {
-    "mtime": 1794899662.907189,
-    "seen": 1794920449.2371485,
-    "ast_hash": "420fa547a1e44f7ee0e427a5c077bc51",
+    "mtime": 1795300360.0674028,
+    "seen": 1795300392.6839178,
+    "ast_hash": "ed6502a754fff401aee67e9db3e81b01",
     "semantic_hash": ""
   },
   "src/entities/family/api/families-api.ts": {
@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795294809.0946624,
-    "seen": 1795294839.862729,
-    "ast_hash": "6cf41fee88f29c02c5b38b8a506543f3",
+    "mtime": 1795300261.256544,
+    "seen": 1795300392.759499,
+    "ast_hash": "9aabd8b05854ca1d0d94877601d61ca0",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795294787.0579946,
-    "seen": 1795294839.862729,
-    "ast_hash": "4e0b8701588f363a6c9a729d911f24f5",
+    "mtime": 1795300261.2585635,
+    "seen": 1795300392.759499,
+    "ast_hash": "149d252a661c4cefe3cc40b0c7df86e8",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -3162,9 +3162,9 @@
     "semantic_hash": ""
   },
   "src/widgets/child-devices/ui/child-devices.tsx": {
-    "mtime": 1795156395.052922,
-    "seen": 1795162011.5145373,
-    "ast_hash": "b16d4071d40fc5f22b8d2bb552ef9f4e",
+    "mtime": 1795300360.2507975,
+    "seen": 1795300392.7923687,
+    "ast_hash": "bcedfe782c4b093a959a897214219923",
     "semantic_hash": ""
   },
   "src/widgets/children-carousel/index.ts": {
@@ -4518,9 +4518,9 @@
     "semantic_hash": ""
   },
   "src/pages/calendar/ui/calendar.tsx": {
-    "mtime": 1795256528.9128754,
-    "seen": 1795256620.884857,
-    "ast_hash": "6103373c1de88821b1c7ee47a9301b1e",
+    "mtime": 1795300925.8113332,
+    "seen": 1795300958.8778527,
+    "ast_hash": "110557b5ab07180555d815739783612a",
     "semantic_hash": ""
   },
   "src/pages/change-email/index.ts": {
@@ -4722,9 +4722,9 @@
     "semantic_hash": ""
   },
   "src/features/location/model/child-location-task.ts": {
-    "mtime": 1795038174.3830671,
-    "seen": 1795038193.814198,
-    "ast_hash": "84b5326d40c6ddcc152d1c534d595b6c",
+    "mtime": 1795300360.0960908,
+    "seen": 1795300392.726125,
+    "ast_hash": "6e225a4604946527cdd579392375b78a",
     "semantic_hash": ""
   },
   "src/features/location/model/child-location-task.web.ts": {

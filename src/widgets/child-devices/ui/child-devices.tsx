@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import { ConnectDevicePanel } from '@features/connect-device';
 import { useRevokeDevice } from '@features/revoke-device';
+import {
+  useMemberMapSettings,
+  useUpdateMemberMapSettings,
+} from '@features/location';
 import { DeviceRow, useChildDevices, type Device } from '@entities/device';
+import { useFamilyMembers } from '@entities/family';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -52,6 +57,34 @@ export function ChildDevices({
   const { data: devices = NO_DEVICES } = useChildDevices(familyId, childId);
   const hasDevices = devices.length > 0;
   const revoke = useRevokeDevice(familyId ?? '', childId);
+  const showingDevices = expanded && panel === 'list';
+  const members = useFamilyMembers(
+    showingDevices && hasDevices ? familyId : null,
+  );
+  const userId =
+    members.data?.find((member) => member.childId === childId)?.userId ?? null;
+  const settings = useMemberMapSettings(familyId, userId, showingDevices);
+  const updateSettings = useUpdateMemberMapSettings();
+  const busy = revoke.isPending || updateSettings.isPending;
+  const trackedDeviceId = settings.data?.trackedDeviceId;
+
+  const select = (device: Device) => {
+    if (!familyId || busy || device.id === trackedDeviceId) return;
+    if (!userId || !settings.data) {
+      void (userId ? settings.refetch() : members.refetch());
+      showToast(t('devices.trackFailed'), 'error');
+      return;
+    }
+    updateSettings.mutate(
+      { familyId, userId, changes: { trackedDeviceId: device.id } },
+      {
+        onError: () => {
+          void settings.refetch();
+          showToast(t('devices.trackFailed'), 'error');
+        },
+      },
+    );
+  };
 
   // Корзина: устройство отключается — на нём ребёнок выйдет.
   const remove = (device: Device) => {
@@ -67,7 +100,7 @@ export function ChildDevices({
             revoke.mutate(device.id, {
               onSuccess: () =>
                 showToast(t('devices.removed', { name: device.name })),
-              onError: () => showToast(t('devices.removeFailed')),
+              onError: () => showToast(t('devices.removeFailed'), 'error'),
             }),
         },
       ],
@@ -165,6 +198,13 @@ export function ChildDevices({
               <DeviceRow
                 key={device.id}
                 device={device}
+                tracked={device.id === trackedDeviceId}
+                onSelect={() => select(device)}
+                disabled={
+                  busy ||
+                  (members.isFetching && !userId) ||
+                  (settings.isFetching && !settings.data)
+                }
                 onRemove={() => remove(device)}
               />
             ))}

@@ -31,7 +31,7 @@ export function CalendarPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const viewer = useViewerRole();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
   const {

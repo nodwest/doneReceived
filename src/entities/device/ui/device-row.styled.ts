@@ -19,6 +19,19 @@ export const styles = createStyles((colors) => ({
     borderRadius: 10,
     backgroundColor: colors.prime,
   },
+  selection: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    minHeight: 36,
+  },
+  tracked: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 26,
+    height: 34,
+  },
   iconOnline: {
     backgroundColor: colors.violetSoft,
   },

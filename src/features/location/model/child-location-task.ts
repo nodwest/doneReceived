@@ -27,9 +27,7 @@ const wait = (ms: number) =>
 function isTerminal(error: unknown) {
   return (
     error instanceof ApiError &&
-    (error.status === 403 ||
-      hasApiErrorCode(error, 'DEVICE_NOT_TRACKED') ||
-      hasApiErrorCode(error, 'FORBIDDEN_ROLE'))
+    (error.status === 403 || hasApiErrorCode(error, 'FORBIDDEN_ROLE'))
   );
 }
 
@@ -38,6 +36,7 @@ function isIgnored(error: unknown) {
     error instanceof ApiError &&
     (error.status === 401 ||
       error.status === 429 ||
+      hasApiErrorCode(error, 'DEVICE_NOT_TRACKED') ||
       hasApiErrorCode(error, 'STALE_LOCATION') ||
       hasApiErrorCode(error, 'SESSION_CHANGED'))
   );
