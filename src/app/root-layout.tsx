@@ -35,6 +35,7 @@ const FAMILY_SETUP_SCREEN = 'family-setup';
 const APP_SCREENS = [
   'index',
   'tasks',
+  'languages',
   'family',
   'calendar',
   'family-event/[id]',
@@ -66,6 +67,7 @@ const APP_SCREENS = [
 const TAB_SCREENS = new Set([
   'index',
   'tasks',
+  'languages',
   'family',
   'calendar',
   'wallet',

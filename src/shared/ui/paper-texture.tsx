@@ -14,10 +14,6 @@ const PAPERS = {
   missed: require('../../../assets/images/paper/paper-missed.jpg'),
 } as const;
 
-// Тёмная фактура — та же мятая бумага, но переведённая в полупрозрачные
-// тени и блики: она ложится поверх любого фона карточки и не светит белым.
-const DARK_PAPER = require('../../../assets/images/paper/paper-dark.png');
-
 type PaperTextureProps = {
   paper: Paper;
   /** Насколько видна фактура поверх белого фона карточки. */
@@ -29,18 +25,17 @@ type PaperTextureProps = {
  * нужны фон `surface`, скругление и `overflow: 'hidden'`.
  */
 export function PaperTexture({ paper, opacity }: PaperTextureProps) {
-  // В тёмной теме бумага — готовая тёмная фактура: полупрозрачные тени
-  // и блики поверх цвета карточки. Светлые листы в ней выглядели бы как
-  // светлая тема, а их оттенок (крафт, зелёный) в темноте не читается.
+  // В тёмной теме бумаги нет: карточка — просто цвет поверхности.
   const { isDark } = useTheme();
+  if (isDark) return null;
   return (
     <View
-      style={[styles.texture, { opacity: isDark ? 1 : opacity }]}
+      style={[styles.texture, { opacity }]}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
       <Image
-        source={isDark ? DARK_PAPER : PAPERS[paper]}
+        source={PAPERS[paper]}
         resizeMode="cover"
         // Без проявления на Android: бумага — часть карточки, а не картинка.
         fadeDuration={0}
@@ -67,12 +62,6 @@ export function PaperPreload() {
           style={styles.preloadImage}
         />
       ))}
-      <Image
-        source={DARK_PAPER}
-        resizeMode="cover"
-        fadeDuration={0}
-        style={styles.preloadImage}
-      />
     </View>
   );
 }

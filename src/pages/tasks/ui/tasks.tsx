@@ -7,6 +7,7 @@ import {
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { CancelTaskButton } from '@features/cancel-task';
 import { ReviewActions } from '@features/review-task';
+import { ChildWordsTaskRow } from '@features/english-words';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
 import { TaskList } from '@widgets/task-list';
@@ -19,6 +20,7 @@ import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren, useFamilyMembers } from '@entities/family';
 import { filterTasks, TaskCard, TaskRow, type Task } from '@entities/task';
 import { useMyId } from '@entities/session';
+import { isWordsTitle, parseWordsRange } from '@entities/word';
 import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
@@ -121,14 +123,32 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   );
 
   const tasks = tab === 'review' ? reviewTasks : allTasks;
+  // Слова дня проверяются на вкладке Languages: в карточках их нет.
+  const cardTasks = useMemo(
+    () => tasks.filter((task) => !isWordsTitle(task.title)),
+    [tasks],
+  );
+  // Дети, у которых есть слова дня в этом списке: у каждого — одна строка.
+  const wordsChildren = useMemo(() => {
+    const seen = new Map<string, { id: string; name: string }>();
+    for (const task of tasks) {
+      if (parseWordsRange(task.title) && !seen.has(task.assignee.id)) {
+        seen.set(task.assignee.id, {
+          id: task.assignee.id,
+          name: task.assignee.name,
+        });
+      }
+    }
+    return [...seen.values()];
+  }, [tasks]);
   const currentId = currentIds[tab];
   const setCurrentId = (id: string) =>
     setCurrentIds((prev) => ({ ...prev, [tab]: id }));
   const currentIndex = Math.max(
-    tasks.findIndex((task) => task.id === currentId),
+    cardTasks.findIndex((task) => task.id === currentId),
     0,
   );
-  const cards = view === 'cards' && tasks.length > 0;
+  const cards = view === 'cards' && cardTasks.length > 0;
 
   if (scope !== 'all' && !owner) {
     // Дети с сервера ещё грузятся — ждём, а не уводим на главную.
@@ -184,9 +204,9 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
           >
             <TaskCarousel
               fullWidth
-              tasks={tasks}
+              tasks={cardTasks}
               initialIndex={currentIndex}
-              onIndexChange={(index) => setCurrentId(tasks[index].id)}
+              onIndexChange={(index) => setCurrentId(cardTasks[index].id)}
               renderTask={(task, style) => (
                 <TaskCard
                   task={task}
@@ -233,28 +253,55 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
               {isPending ? null : tasks.length === 0 ? (
                 <Text style={styles.empty}>{emptyText}</Text>
               ) : (
-                <TaskList
-                  tasks={tasks}
-                  onSelect={(task) => {
-                    setCurrentId(task.id);
-                    setView('cards');
-                  }}
-                  // Задания одного ребёнка: в шапке плитки — от кого они.
-                  renderTask={
-                    scope === 'child'
-                      ? (task) => (
-                          <TaskRow
-                            task={task}
-                            author={authorOf(task, t('member.parent'))}
-                            onPress={() => {
-                              setCurrentId(task.id);
-                              setView('cards');
-                            }}
-                          />
-                        )
-                      : undefined
-                  }
-                />
+                <>
+                  {/* Слова дня — одна строка на ребёнка, ведёт на Languages:
+                      проверка слов идёт там. */}
+                  {wordsChildren.map((child) => (
+                    <ChildWordsTaskRow
+                      key={child.id}
+                      childId={child.id}
+                      childName={child.name}
+                      familyId={familyId}
+                      tasks={allTasks}
+                      reviewOnly={tab === 'review'}
+                      canCheck={(task) =>
+                        task.canManage ?? task.createdBy === myId
+                      }
+                      onOpen={(checkTaskId) =>
+                        checkTaskId
+                          ? router.push({
+                              pathname: '/languages',
+                              params: { check: checkTaskId },
+                            })
+                          : router.dismissTo('/languages')
+                      }
+                    />
+                  ))}
+                  {cardTasks.length > 0 && (
+                    <TaskList
+                      tasks={cardTasks}
+                      onSelect={(task) => {
+                        setCurrentId(task.id);
+                        setView('cards');
+                      }}
+                      // Задания одного ребёнка: в шапке плитки — от кого они.
+                      renderTask={
+                        scope === 'child'
+                          ? (task) => (
+                              <TaskRow
+                                task={task}
+                                author={authorOf(task, t('member.parent'))}
+                                onPress={() => {
+                                  setCurrentId(task.id);
+                                  setView('cards');
+                                }}
+                              />
+                            )
+                          : undefined
+                      }
+                    />
+                  )}
+                </>
               )}
             </ScrollView>
             <BottomNav activeKey={owner ? 'family' : 'tasks'} />

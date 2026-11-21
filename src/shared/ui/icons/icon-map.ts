@@ -61,6 +61,9 @@ import { GlobeOutlineIcon } from './globe-outline';
 import { MapFoldIcon } from './map-fold';
 import { MoonIcon } from './moon';
 import { SunIcon } from './sun';
+import { SpeakerIcon } from './speaker';
+import { BookIcon } from './book';
+import { SwipeHorizontalIcon, SwipeVerticalIcon } from './swipe';
 
 export const icons = {
   price: PriceIcon,
@@ -126,4 +129,8 @@ export const icons = {
   'map-fold': MapFoldIcon,
   moon: MoonIcon,
   sun: SunIcon,
+  speaker: SpeakerIcon,
+  book: BookIcon,
+  'swipe-horizontal': SwipeHorizontalIcon,
+  'swipe-vertical': SwipeVerticalIcon,
 };

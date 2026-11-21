@@ -20,6 +20,8 @@ export const styles = createStyles((colors) => ({
     flex: 1,
   },
   body: {
+    // Строки слов дня над списком — с тем же шагом, что плитки.
+    gap: 12,
     paddingTop: 12,
     paddingBottom: 24,
     paddingHorizontal: 12,
