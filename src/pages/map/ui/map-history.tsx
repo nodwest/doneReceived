@@ -465,6 +465,8 @@ function HistoryDay({
       </View>
       {expanded && (
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           style={styles.checkpointsScroll}
           contentContainerStyle={styles.checkpointPanel}
           nestedScrollEnabled

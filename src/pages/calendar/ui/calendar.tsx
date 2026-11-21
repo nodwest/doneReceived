@@ -8,26 +8,22 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
-  EventRow,
   EventTile,
+  eventCoversDay,
   FeaturedEventCard,
   type FamilyEvent,
 } from '@entities/family-event';
 import { useViewerRole } from '@entities/user';
 import { useFamilyEvents } from '@features/family-event';
 import { useTranslation } from '@shared/i18n';
-import { formatClock, formatMonthDay, formatWeekdayShort } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
 import { RoundButton, ScreenSection } from '@shared/ui';
 import { TabScreen } from '@widgets/bottom-nav';
 import { FamilyCalendar } from '@widgets/family-calendar';
 import { styles } from './calendar.styled';
 
-const capitalize = (value: string) =>
-  value.charAt(0).toUpperCase() + value.slice(1);
-
 /**
- * Вкладка Calendar: свернутая неделя, ближайшее событие и список следующих.
+ * Вкладка Calendar: месяц, ближайшее событие и список следующих.
  * «+» создаёт событие, тап по событию открывает его карточку.
  */
 export function CalendarPage() {
@@ -35,7 +31,8 @@ export function CalendarPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const viewer = useViewerRole();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
   const {
     today,
@@ -61,29 +58,29 @@ export function CalendarPage() {
       },
     });
 
-  const metaFor = (event: FamilyEvent) => {
-    const names = event.participants.map((person) => person.name);
-    const joined =
-      names.length === 0
-        ? ''
-        : names.length === 1
-          ? names[0]
-          : `${names.slice(0, -1).join(', ')} ${t('common.and')} ${
-              names[names.length - 1]
-            }`;
-    const time = formatClock(event.startsAt);
-    return joined
-      ? t('calendar.meta', { time, names: joined })
-      : t('calendar.metaTime', { time });
-  };
-
   const isParent = viewer !== 'child';
-  const tiles = upcoming.slice(0, 2);
-  const rows = upcoming.slice(2);
+  const tiles = upcoming.slice(0, 4);
+  const dayEvents = selectedDay
+    ? (expanded ? monthEvents : rollingEvents).filter((event) =>
+        eventCoversDay(event, selectedDay),
+      )
+    : [];
+  const loadingDay = !!selectedDay && (expanded ? isMonthPending : isPending);
+  const sectionTitle = selectedDay
+    ? [
+        selectedDay.getDate(),
+        selectedDay.getMonth() + 1,
+        selectedDay.getFullYear(),
+      ]
+        .map((part) => String(part).padStart(2, '0'))
+        .join('.')
+    : t('calendar.upcoming');
 
   return (
     <TabScreen activeKey="calendar">
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         style={styles.scroll}
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
@@ -107,25 +104,22 @@ export function CalendarPage() {
           events={expanded ? monthEvents : rollingEvents}
           expanded={expanded}
           month={month}
-          onMonthChange={(direction) =>
-            setMonthOffset((value) => value + direction)
+          selectedDay={selectedDay}
+          onSelectDay={(day) =>
+            setSelectedDay((previous) =>
+              previous?.getTime() === day.getTime() ? null : day,
+            )
           }
-          onToggle={() => setExpanded((value) => !value)}
+          onMonthChange={(direction) => {
+            setSelectedDay(null);
+            setMonthOffset((value) => value + direction);
+          }}
+          onToggle={() => {
+            setSelectedDay(null);
+            setMonthOffset(0);
+            setExpanded((value) => !value);
+          }}
         />
-
-        {expanded && isMonthPending && (
-          <ActivityIndicator
-            style={styles.loading}
-            color={theme.colors.blueInk}
-          />
-        )}
-
-        {expanded &&
-          !isMonthPending &&
-          !isError &&
-          monthEvents.length === 0 && (
-            <Text style={styles.monthEmpty}>{t('calendar.emptyMonth')}</Text>
-          )}
 
         {isError && (
           <Pressable
@@ -138,86 +132,78 @@ export function CalendarPage() {
           </Pressable>
         )}
 
-        {isPending && (
-          <ActivityIndicator
-            style={styles.loading}
-            color={theme.colors.blueInk}
-          />
-        )}
-
-        {!isPending && featured && (
-          <FeaturedEventCard
-            event={featured}
-            onPress={() => openEvent(featured)}
-          />
-        )}
-
-        {!isPending && !isError && !featured && upcoming.length === 0 && (
-          <View style={styles.emptyCard}>
-            <Text style={styles.emptyTitle}>{t('calendar.emptyTitle')}</Text>
-            <Text style={styles.emptyHint}>{t('calendar.emptyHint')}</Text>
-            {isParent && (
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => router.push('/create-family-event')}
-              >
-                <Text style={styles.emptyAction}>
-                  {t('calendar.createAction')}
-                </Text>
-              </Pressable>
+        <ScreenSection
+          title={sectionTitle}
+          actionLabel={selectedDay ? t('calendar.backToUpcoming') : undefined}
+          onAction={selectedDay ? () => setSelectedDay(null) : undefined}
+        >
+          <View style={styles.sectionList}>
+            {(loadingDay || (isPending && !dayEvents.length)) && (
+              <ActivityIndicator
+                style={styles.loading}
+                color={theme.colors.blueInk}
+              />
             )}
-          </View>
-        )}
-
-        {upcoming.length > 0 && (
-          <ScreenSection title={t('calendar.upcoming')}>
-            <View style={styles.sectionList}>
-              {tiles.length === 2 && (
-                <View style={styles.upcomingRow}>
-                  <EventTile
-                    icon="star"
-                    tone="blue"
-                    dayLabel={capitalize(formatWeekdayShort(tiles[0].startsAt))}
-                    title={tiles[0].title}
-                    meta={metaFor(tiles[0])}
-                    onPress={() => openEvent(tiles[0])}
-                  />
-                  <EventTile
-                    icon="bell"
-                    tone="amber"
-                    dayLabel={formatMonthDay(tiles[1].startsAt)}
-                    title={tiles[1].title}
-                    meta={metaFor(tiles[1])}
-                    onPress={() => openEvent(tiles[1])}
-                  />
-                </View>
-              )}
-              {tiles.length === 1 && (
-                <View style={styles.upcomingRow}>
-                  <EventTile
-                    icon="star"
-                    tone="blue"
-                    dayLabel={capitalize(formatWeekdayShort(tiles[0].startsAt))}
-                    title={tiles[0].title}
-                    meta={metaFor(tiles[0])}
-                    onPress={() => openEvent(tiles[0])}
-                  />
-                </View>
-              )}
-              {rows.map((event) => (
-                <EventRow
-                  key={event.id}
-                  weekday={formatWeekdayShort(event.startsAt).toUpperCase()}
-                  day={event.startsAt.getDate()}
-                  title={event.title}
-                  meta={metaFor(event)}
-                  tag={event.reminderAt ? t('calendar.remindTag') : undefined}
+            {!loadingDay && selectedDay && !dayEvents.length && !isError && (
+              <Text style={styles.emptyHint}>{t('calendar.emptyDay')}</Text>
+            )}
+            {!loadingDay &&
+              dayEvents.map((event) => (
+                <FeaturedEventCard
+                  key={event.id + ':' + event.startsAt.getTime()}
+                  event={event}
                   onPress={() => openEvent(event)}
                 />
               ))}
-            </View>
-          </ScreenSection>
-        )}
+            {!loadingDay && !dayEvents.length && featured && (
+              <>
+                <FeaturedEventCard
+                  event={featured}
+                  onPress={() => openEvent(featured)}
+                />
+                {tiles.length > 0 && (
+                  <View style={styles.upcomingGrid}>
+                    {tiles.map((event) => (
+                      <View
+                        key={event.id + ':' + event.startsAt.getTime()}
+                        style={styles.upcomingCell}
+                      >
+                        <EventTile
+                          event={event}
+                          onPress={() => openEvent(event)}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </>
+            )}
+            {!loadingDay &&
+              !isPending &&
+              !isError &&
+              !featured &&
+              !dayEvents.length && (
+                <View style={styles.emptyCard}>
+                  <Text style={styles.emptyTitle}>
+                    {t('calendar.emptyTitle')}
+                  </Text>
+                  <Text style={styles.emptyHint}>
+                    {t('calendar.emptyHint')}
+                  </Text>
+                  {isParent && (
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={() => router.push('/create-family-event')}
+                    >
+                      <Text style={styles.emptyAction}>
+                        {t('calendar.createAction')}
+                      </Text>
+                    </Pressable>
+                  )}
+                </View>
+              )}
+          </View>
+        </ScreenSection>
       </ScrollView>
     </TabScreen>
   );

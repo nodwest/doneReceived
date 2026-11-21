@@ -344,6 +344,8 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
         )
       ) : list ? (
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           contentContainerStyle={styles.paidList}
           showsVerticalScrollIndicator={false}
         >
@@ -399,6 +401,8 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
         </ScrollView>
       ) : (
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}
         >

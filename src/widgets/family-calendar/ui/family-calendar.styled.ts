@@ -79,6 +79,16 @@ export const styles = createStyles((colors) => ({
     backgroundColor: colors.blue,
     boxShadow: '0px 7px 16px rgba(74, 144, 226, 0.32)',
   },
+  daySelected: {
+    backgroundColor: colors.yellow,
+    borderColor: colors.yellow,
+  },
+  daySelectedText: {
+    color: '#241b0e',
+  },
+  dotSelected: {
+    backgroundColor: '#241b0e',
+  },
   dayWeekday: {
     fontSize: 8,
     letterSpacing: tracking(8),

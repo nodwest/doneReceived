@@ -1,5 +1,7 @@
 import { createStyles, theme, tracking } from '@shared/theme';
 
+const HERO_HEIGHT = 300;
+
 export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
@@ -18,7 +20,7 @@ export const styles = createStyles((colors) => ({
     flex: 1,
   },
   hero: {
-    height: 300,
+    height: HERO_HEIGHT,
     position: 'relative',
     overflow: 'hidden',
     backgroundColor: colors.childDeep,
@@ -26,6 +28,14 @@ export const styles = createStyles((colors) => ({
   heroImage: {
     width: '100%',
     height: '100%',
+  },
+  heroTemplate: {
+    // The 2:1 templates place the subject on the right. Crop the empty left
+    // side when the hero is narrower than the original illustration.
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    minWidth: HERO_HEIGHT * 2,
   },
   heroShade: {
     position: 'absolute',

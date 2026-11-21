@@ -6,7 +6,7 @@ import {
   useFamilyEventsQuery,
   type FamilyEvent,
 } from '@entities/family-event';
-import { addDays, endOfDay, monthGrid, startOfDay, useNow } from '@shared/lib';
+import { addDays, monthGrid, startOfDay, useNow } from '@shared/lib';
 
 const EMPTY_EVENTS: FamilyEvent[] = [];
 
@@ -24,10 +24,10 @@ export function useFamilyEvents(monthOffset = 0, includeMonth = true) {
     [monthOffset, today],
   );
   const rollingFrom = useMemo(() => startOfDay(addDays(today, -30)), [today]);
-  const rollingTo = useMemo(() => endOfDay(addDays(today, 60)), [today]);
+  const rollingTo = useMemo(() => addDays(today, 61), [today]);
   const grid = useMemo(() => monthGrid(month), [month]);
   const monthFrom = useMemo(() => startOfDay(grid.start), [grid.start]);
-  const monthTo = useMemo(() => endOfDay(grid.end), [grid.end]);
+  const monthTo = useMemo(() => addDays(grid.end, 1), [grid.end]);
   // Оба хука вызываем всегда: нельзя пропускать useSessionUser через `??`,
   // иначе порядок хуков меняется, когда семья появляется из GET /families.
   const currentFamily = useCurrentFamily();
@@ -54,7 +54,11 @@ export function useFamilyEvents(monthOffset = 0, includeMonth = true) {
 
   return useMemo(() => {
     const upcoming = rollingEvents
-      .filter((event) => event.endsAt.getTime() >= now.getTime())
+      .filter(
+        (event) =>
+          event.endsAt.getTime() > now.getTime() ||
+          event.startsAt.getTime() === now.getTime(),
+      )
       .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
     const next = upcoming[0];
     const featured = next ? { ...next, featured: true } : null;
@@ -70,9 +74,7 @@ export function useFamilyEvents(monthOffset = 0, includeMonth = true) {
       today,
       month,
       rollingEvents: featured
-        ? rollingEvents.map((event) =>
-            event.id === featured.id ? featured : event,
-          )
+        ? rollingEvents.map((event) => (event === next ? featured : event))
         : rollingEvents,
       monthEvents: monthFeatured
         ? monthEvents.map((event) =>

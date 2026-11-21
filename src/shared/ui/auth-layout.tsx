@@ -52,6 +52,8 @@ export function AuthLayout({
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

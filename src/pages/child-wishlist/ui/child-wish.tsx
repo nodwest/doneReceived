@@ -40,6 +40,8 @@ export function ChildWishPage() {
   return (
     <TabScreen activeKey="family">
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.wishBody}
         showsVerticalScrollIndicator={false}
       >

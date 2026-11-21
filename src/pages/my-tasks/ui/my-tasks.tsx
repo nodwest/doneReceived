@@ -245,6 +245,8 @@ export function MyTasksPage() {
         ) : (
           <>
             <ScrollView
+              bounces={false}
+              overScrollMode="never"
               style={styles.scroll}
               contentContainerStyle={styles.body}
               showsVerticalScrollIndicator={false}

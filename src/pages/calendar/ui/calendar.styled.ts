@@ -25,19 +25,17 @@ export const styles = createStyles((colors) => ({
   sectionList: {
     gap: 10,
   },
-  upcomingRow: {
+  upcomingGrid: {
     flexDirection: 'row',
-    gap: 10,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 10,
+  },
+  upcomingCell: {
+    width: '49%',
   },
   loading: {
     paddingVertical: 24,
-  },
-  monthEmpty: {
-    fontSize: 10,
-    letterSpacing: tracking(10),
-    fontFamily: theme.fonts.medium,
-    color: colors.grey,
-    textAlign: 'center',
   },
   errorCard: {
     padding: 14,

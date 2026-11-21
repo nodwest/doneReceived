@@ -85,6 +85,8 @@ export function ParentProfilePage() {
   return (
     <TabScreen activeKey="family">
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >

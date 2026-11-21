@@ -15,16 +15,13 @@ export const styles = createStyles((colors) => ({
   background: {
     position: 'absolute',
     top: 0,
-    right: 0,
-    bottom: 0,
     left: 0,
-  },
-  backgroundImage: {
     width: '100%',
     height: '100%',
   },
   photoActions: {
     position: 'absolute',
+    zIndex: 1,
     top: 12,
     right: 12,
     flexDirection: 'row',
@@ -122,45 +119,7 @@ export const styles = createStyles((colors) => ({
     backgroundColor: colors.surface,
     boxShadow: '0px 4px 12px rgba(26, 26, 46, 0.035)',
   },
-  tileTop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  iconTile: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconTileBlue: {
-    backgroundColor: colors.childTint,
-  },
-  iconTileAmber: {
-    backgroundColor: colors.yellowSoft,
-  },
-  dayChip: {
-    height: 21,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    justifyContent: 'center',
-    backgroundColor: colors.prime,
-  },
-  dayChipAmber: {
-    backgroundColor: colors.yellowSoft,
-  },
-  dayText: {
-    fontSize: 8.5,
-    letterSpacing: tracking(8.5),
-    fontFamily: theme.fonts.bold,
-    color: colors.inkSoft,
-  },
-  dayTextAmber: {
-    color: colors.reviewText,
-  },
   tileTitle: {
-    marginTop: 10,
     fontSize: 12.5,
     letterSpacing: tracking(12.5),
     lineHeight: 14,
@@ -174,6 +133,11 @@ export const styles = createStyles((colors) => ({
     lineHeight: 13,
     fontFamily: theme.fonts.medium,
     color: colors.grey,
+  },
+  tileAvatars: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   // Строка «Родительское собрание» под карточками.

@@ -97,6 +97,8 @@ export function WishFormSheet({
   return (
     <BottomSheet visible={visible} onClose={onClose} maxHeightRatio={0.94}>
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.body}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}

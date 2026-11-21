@@ -164,6 +164,8 @@ export function MapZonePage() {
           <MapAttribution />
         </View>
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           style={styles.form}
           contentContainerStyle={styles.formContent}
           keyboardShouldPersistTaps="handled"

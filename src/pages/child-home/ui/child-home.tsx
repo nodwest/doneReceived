@@ -96,6 +96,8 @@ export function ChildHomePage() {
     <View style={styles.screen}>
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           style={styles.scroll}
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}

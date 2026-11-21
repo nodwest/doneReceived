@@ -273,6 +273,8 @@ export function FamilyPage() {
     <TabScreen activeKey="family">
       <View ref={viewportRef} style={styles.viewport}>
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           ref={scrollRef}
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}

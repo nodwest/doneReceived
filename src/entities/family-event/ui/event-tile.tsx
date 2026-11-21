@@ -1,65 +1,39 @@
 import { Pressable, Text, View } from 'react-native';
-import { theme } from '@shared/theme';
-import { Icon, type IconName } from '@shared/ui';
+import { formatClock, formatMonthDay } from '@shared/lib';
+import { LetterAvatar } from '@shared/ui';
+import type { FamilyEvent } from '../model/family-event';
 import { styles } from './calendar-event.styled';
 
 type EventTileProps = {
-  icon: IconName;
-  /** amber — врач и другие «тёплые» события, blue — кино и прогулки. */
-  tone?: 'blue' | 'amber';
-  /** «Сб» или «19 ноя» — подпись в правом верхнем углу. */
-  dayLabel: string;
-  title: string;
-  meta: string;
-  onPress?: () => void;
+  event: FamilyEvent;
+  onPress: () => void;
 };
 
-/** Маленькая карточка ближайшего события: иконка, день, название и время. */
-export function EventTile({
-  icon,
-  tone = 'blue',
-  dayLabel,
-  title,
-  meta,
-  onPress,
-}: EventTileProps) {
-  const amber = tone === 'amber';
+export function EventTile({ event, onPress }: EventTileProps) {
+  const date =
+    formatMonthDay(event.startsAt) + ' · ' + formatClock(event.startsAt);
   return (
     <Pressable
-      accessible
-      accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityLabel={`${title}. ${meta}`}
+      accessibilityRole="button"
+      accessibilityLabel={event.title + '. ' + date}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.tile,
-        pressed && onPress ? styles.pressed : null,
-      ]}
+      style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
     >
-      <View style={styles.tileTop}>
-        <View
-          style={[
-            styles.iconTile,
-            amber ? styles.iconTileAmber : styles.iconTileBlue,
-          ]}
-        >
-          <Icon
-            name={icon}
-            size={18}
-            color={amber ? theme.colors.reviewText : theme.colors.blue}
-          />
-        </View>
-        <View style={[styles.dayChip, amber && styles.dayChipAmber]}>
-          <Text style={[styles.dayText, amber && styles.dayTextAmber]}>
-            {dayLabel}
-          </Text>
-        </View>
-      </View>
       <Text style={styles.tileTitle} numberOfLines={2}>
-        {title}
+        {event.title}
       </Text>
-      <Text style={styles.tileMeta} numberOfLines={2}>
-        {meta}
-      </Text>
+      <Text style={styles.tileMeta}>{date}</Text>
+      <View style={styles.tileAvatars}>
+        {event.participants.slice(0, 3).map((person, index) => (
+          <LetterAvatar
+            key={person.id}
+            name={person.name}
+            source={person.avatar}
+            letterSize={11}
+            style={[styles.avatar, index > 0 && styles.avatarOverlap]}
+          />
+        ))}
+      </View>
     </Pressable>
   );
 }

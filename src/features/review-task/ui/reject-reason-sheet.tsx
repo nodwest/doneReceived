@@ -83,6 +83,8 @@ export function RejectReasonSheet({
   return (
     <BottomSheet visible={visible} onClose={onCancel} maxHeightRatio={0.94}>
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.body}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}

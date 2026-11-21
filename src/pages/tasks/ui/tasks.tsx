@@ -246,6 +246,8 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
         ) : (
           <>
             <ScrollView
+              bounces={false}
+              overScrollMode="never"
               style={styles.scroll}
               contentContainerStyle={styles.body}
               showsVerticalScrollIndicator={false}

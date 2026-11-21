@@ -1,4 +1,5 @@
 import type { ImageSourcePropType } from 'react-native';
+import { addDays } from '@shared/lib';
 
 /** Класс события: поездка, мероприятие или праздник. */
 export type FamilyEventKind = 'trip' | 'event' | 'holiday';
@@ -26,7 +27,7 @@ export interface FamilyEventPerson {
 
 /**
  * Событие семейного календаря. Даты — Date в локальной зоне.
- * Приходят из GET /families/:familyId/events; фото пока нет.
+ * Приходят из GET /families/:familyId/events.
  */
 export interface FamilyEvent {
   id: string;
@@ -39,7 +40,7 @@ export interface FamilyEvent {
   /** IANA-зона создателя: нужна для ежегодных дат и правки. */
   timezone: string;
   participants: FamilyEventPerson[];
-  /** Фото обложки; без него карточка рисует синий градиент. */
+  /** Фото обложки; без него используется иллюстрация категории. */
   photo?: ImageSourcePropType;
   /** Когда напомнить; null — напоминание не задано. */
   reminderAt?: Date;
@@ -51,4 +52,12 @@ export interface FamilyEvent {
   canEdit: boolean;
   /** Главное событие недели: показывается большой карточкой. */
   featured?: boolean;
+}
+
+/** A calendar day is a half-open interval in local time. */
+export function eventCoversDay(event: FamilyEvent, day: Date) {
+  return (
+    event.startsAt < addDays(day, 1) &&
+    (event.endsAt > day || event.startsAt.getTime() === day.getTime())
+  );
 }

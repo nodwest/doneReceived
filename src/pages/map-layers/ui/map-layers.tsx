@@ -523,6 +523,8 @@ function TrackedDevicePicker({
 function SectionList({ children }: { children: ReactNode }) {
   return (
     <ScrollView
+      bounces={false}
+      overScrollMode="never"
       style={[styles.sectionList, { maxHeight: SECTION_LIST_MAX_HEIGHT }]}
       nestedScrollEnabled
       showsVerticalScrollIndicator
@@ -763,6 +765,8 @@ export function MapLayersPage() {
           />
         </View>
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}
         >
@@ -997,6 +1001,8 @@ export function MapLayersPage() {
           <Text style={styles.sheetTitle}>{t('mapLayers.addTransport')}</Text>
           {pickerRoutes.length > 0 ? (
             <ScrollView
+              bounces={false}
+              overScrollMode="never"
               style={[
                 styles.sheetList,
                 { maxHeight: Math.max(140, windowHeight * 0.7 - 180) },

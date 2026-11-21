@@ -175,6 +175,8 @@ function TransactionsScreen<
             />
           </View>
           <ScrollView
+            bounces={false}
+            overScrollMode="never"
             contentContainerStyle={styles.body}
             showsVerticalScrollIndicator={false}
           >

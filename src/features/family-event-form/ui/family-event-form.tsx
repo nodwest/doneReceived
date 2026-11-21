@@ -7,7 +7,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useQueryClient } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCurrentFamily, useFamilyMembers } from '@entities/family';
@@ -15,14 +14,12 @@ import {
   EventPersonChip,
   FAMILY_EVENT_KIND_LABELS,
   FeaturedEventCard,
-  removeFamilyEventPhoto,
-  uploadFamilyEventPhoto,
   type FamilyEvent,
   type FamilyEventKind,
   type FamilyEventPerson,
   type FamilyEventRepeat,
 } from '@entities/family-event';
-import { authorizedImage, syncData } from '@shared/api';
+import { authorizedImage } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import {
   choosePhotos,
@@ -52,7 +49,7 @@ type FamilyEventFormProps = {
   /** Событие для правки; null — создаём новое. */
   event: FamilyEvent | null;
   onClose: () => void;
-  onSaved: (event: FamilyEvent) => void;
+  onSaved: (photoFailed: boolean) => void;
 };
 
 /** Следующее наступление ежегодной даты: прошедший день переносится на год. */
@@ -113,7 +110,6 @@ export function FamilyEventForm({
   const familyId = useCurrentFamily()?.id ?? null;
   const { data: members = [] } = useFamilyMembers(familyId);
   const saveEvent = useSaveFamilyEvent();
-  const queryClient = useQueryClient();
   const [now] = useState(() => new Date());
   const [timezone] = useState(() => event?.timezone ?? deviceTimeZone());
   const [initialStart] = useState(defaultStart);
@@ -274,6 +270,7 @@ export function FamilyEventForm({
     saveEvent.mutate(
       {
         eventId: event?.id,
+        cover: cover ?? (event && coverRemoved ? null : undefined),
         payload: {
           title: title.trim(),
           description: description.trim(),
@@ -288,21 +285,7 @@ export function FamilyEventForm({
         },
       },
       {
-        onSuccess: async (saved) => {
-          // Обложка грузится после события: ей нужен id. Если она не
-          // загрузилась, событие всё равно сохранено — сообщаем и закрываем.
-          if (familyId && (cover || coverRemoved)) {
-            try {
-              if (cover)
-                await uploadFamilyEventPhoto(familyId, saved.id, cover);
-              else await removeFamilyEventPhoto(familyId, saved.id);
-              await syncData(queryClient, 'calendar-changed');
-            } catch {
-              showToast(t('calendar.photoError'));
-            }
-          }
-          onSaved(saved);
-        },
+        onSuccess: ({ photoFailed }) => onSaved(photoFailed),
         onError: () => showToast(t('calendar.saveError')),
       },
     );

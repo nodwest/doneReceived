@@ -1,16 +1,18 @@
-import { ImageBackground, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import {
+  formatClock,
   formatDate,
   formatDayRange,
   formatMonthDay,
   isSameDay,
 } from '@shared/lib';
-import { theme } from '@shared/theme';
-import { Icon, LetterAvatar } from '@shared/ui';
+import { theme, useTheme } from '@shared/theme';
+import { ApiImage, Icon, LetterAvatar } from '@shared/ui';
 import type { FamilyEvent } from '../model/family-event';
 import { FAMILY_EVENT_KIND_LABELS } from '../model/family-event';
+import { familyEventCover } from './family-event-cover';
 import { styles } from './calendar-event.styled';
 
 type FeaturedEventCardProps = {
@@ -25,7 +27,7 @@ type FeaturedEventCardProps = {
 
 /**
  * Большая карточка события: фото на всю карточку, тёмный градиент,
- * текст сверху, участники и напоминание снизу. Без фото — синий градиент.
+ * текст сверху, участники и напоминание снизу. Без фото — иллюстрация категории.
  */
 export function FeaturedEventCard({
   event,
@@ -34,6 +36,7 @@ export function FeaturedEventCard({
   onRemovePhoto,
 }: FeaturedEventCardProps) {
   const { t } = useTranslation();
+  const { mode } = useTheme();
   const participants = event.participants.slice(0, 3);
   const range = isSameDay(event.startsAt, event.endsAt)
     ? formatDate(event.startsAt, {
@@ -63,21 +66,11 @@ export function FeaturedEventCard({
         pressed && onPress ? styles.pressed : null,
       ]}
     >
-      {event.photo ? (
-        <ImageBackground
-          source={event.photo}
-          resizeMode="cover"
-          style={styles.background}
-          imageStyle={styles.backgroundImage}
-        />
-      ) : (
-        <LinearGradient
-          colors={[theme.colors.childDeep, theme.colors.blue]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.background}
-        />
-      )}
+      <ApiImage
+        source={familyEventCover(event, mode)}
+        resizeMode="cover"
+        style={styles.background}
+      />
       <LinearGradient
         colors={[
           'rgba(8, 16, 32, 0.72)',
@@ -153,7 +146,10 @@ export function FeaturedEventCard({
           {event.reminderAt && (
             <Text style={styles.reminder} numberOfLines={1}>
               {t('calendar.remindOn', {
-                date: formatMonthDay(event.reminderAt),
+                date:
+                  formatMonthDay(event.reminderAt) +
+                  ', ' +
+                  formatClock(event.reminderAt),
               })}
             </Text>
           )}

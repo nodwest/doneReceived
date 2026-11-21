@@ -37,6 +37,7 @@ export const en = {
     today: 'Today, {{date}}',
     nextSevenDays: 'Next 7 days',
     upcoming: 'Upcoming',
+    backToUpcoming: 'Back to upcoming',
     remindOn: 'Remind {{date}}',
     remindTag: 'Reminder',
     refreshError: 'Could not refresh the calendar. Saved events are shown.',
@@ -47,6 +48,7 @@ export const en = {
     emptyTitle: 'No events yet',
     emptyHint:
       'Create the first family event — a trip, a birthday or a doctor’s visit.',
+    emptyDay: 'No events on this date.',
     emptyMonth: 'No events this month',
     createTitle: 'New event',
     editTitle: 'Edit event',

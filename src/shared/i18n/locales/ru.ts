@@ -32,6 +32,7 @@ export const ru: Dictionary = {
     today: 'Сегодня, {{date}}',
     nextSevenDays: 'Ближайшие 7 дней',
     upcoming: 'Ближайшие',
+    backToUpcoming: 'К ближайшим',
     remindOn: 'Напомним {{date}}',
     remindTag: 'Напомним',
     refreshError:
@@ -43,6 +44,7 @@ export const ru: Dictionary = {
     emptyTitle: 'Событий пока нет',
     emptyHint:
       'Создайте первое семейное событие — поездку, день рождения или визит к врачу.',
+    emptyDay: 'На эту дату событий нет.',
     emptyMonth: 'В этом месяце событий нет',
     createTitle: 'Новое событие',
     editTitle: 'Редактировать событие',

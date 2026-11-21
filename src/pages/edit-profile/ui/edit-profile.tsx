@@ -161,6 +161,8 @@ export function EditProfilePage() {
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

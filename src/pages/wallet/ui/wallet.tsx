@@ -46,6 +46,8 @@ export function WalletPage() {
   return (
     <TabScreen activeKey="wallet">
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >

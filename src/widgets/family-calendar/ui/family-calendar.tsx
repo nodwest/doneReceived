@@ -10,17 +10,15 @@ import {
 import { useTranslation } from '@shared/i18n';
 import {
   addDays,
-  endOfDay,
   formatDate,
   formatMonthYear,
   formatWeekdayShort,
   isSameDay,
   monthGrid,
-  startOfDay,
 } from '@shared/lib';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
-import type { FamilyEvent } from '@entities/family-event';
+import { eventCoversDay, type FamilyEvent } from '@entities/family-event';
 import { DAY_GAP, styles } from './family-calendar.styled';
 
 /** Сколько дней назад и вперёд можно листать неделю. */
@@ -35,6 +33,8 @@ type FamilyCalendarProps = {
   onToggle: () => void;
   /** Месяц, открытый в развернутом виде; по умолчанию текущий. */
   month?: Date;
+  selectedDay?: Date | null;
+  onSelectDay?: (date: Date) => void;
   /** Сдвиг месяца на −1 / +1 в развернутом виде. */
   onMonthChange?: (direction: -1 | 1) => void;
 };
@@ -43,6 +43,8 @@ type DayCellProps = {
   date: Date;
   today: Date;
   width: number;
+  selected: boolean;
+  onPress?: () => void;
   hasBlueEvent: boolean;
   hasOtherEvent: boolean;
   label: string;
@@ -52,22 +54,43 @@ function DayCell({
   date,
   today,
   width,
+  selected,
+  onPress,
   hasBlueEvent,
   hasOtherEvent,
   label,
 }: DayCellProps) {
   const current = isSameDay(date, today);
   return (
-    <View
+    <Pressable
       accessible
+      accessibilityRole="button"
+      onPress={onPress}
       accessibilityLabel={label}
-      accessibilityState={{ selected: current }}
-      style={[styles.day, { width }, current && styles.dayToday]}
+      accessibilityState={{ selected }}
+      style={[
+        styles.day,
+        { width },
+        current && styles.dayToday,
+        selected && styles.daySelected,
+      ]}
     >
-      <Text style={[styles.dayWeekday, current && styles.dayWeekdayToday]}>
+      <Text
+        style={[
+          styles.dayWeekday,
+          current && styles.dayWeekdayToday,
+          selected && styles.daySelectedText,
+        ]}
+      >
         {formatWeekdayShort(date)}
       </Text>
-      <Text style={[styles.dayNumber, current && styles.dayNumberToday]}>
+      <Text
+        style={[
+          styles.dayNumber,
+          current && styles.dayNumberToday,
+          selected && styles.daySelectedText,
+        ]}
+      >
         {date.getDate()}
       </Text>
       {(hasBlueEvent || hasOtherEvent) && (
@@ -76,10 +99,11 @@ function DayCell({
             styles.dot,
             hasBlueEvent && styles.dotBlue,
             current && styles.dotToday,
+            selected && styles.dotSelected,
           ]}
         />
       )}
-    </View>
+    </Pressable>
   );
 }
 
@@ -95,6 +119,8 @@ export function FamilyCalendar({
   onToggle,
   month = today,
   onMonthChange,
+  selectedDay,
+  onSelectDay,
 }: FamilyCalendarProps) {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
@@ -142,17 +168,8 @@ export function FamilyCalendar({
   );
 
   const inFeaturedRange = useCallback(
-    (date: Date) =>
-      !!rangeEvent &&
-      date >= startOfDay(rangeEvent.startsAt) &&
-      date <= endOfDay(rangeEvent.endsAt),
+    (date: Date) => !!rangeEvent && eventCoversDay(rangeEvent, date),
     [rangeEvent],
-  );
-
-  const coversDay = useCallback(
-    (event: FamilyEvent, date: Date) =>
-      date >= startOfDay(event.startsAt) && date <= endOfDay(event.endsAt),
-    [],
   );
 
   const dayLabel = useCallback(
@@ -175,15 +192,26 @@ export function FamilyCalendar({
           date={item}
           today={today}
           width={dayWidth}
+          selected={!!selectedDay && isSameDay(item, selectedDay)}
+          onPress={onSelectDay && (() => onSelectDay(item))}
           hasBlueEvent={inFeaturedRange(item)}
           hasOtherEvent={events.some(
-            (event) => !event.featured && coversDay(event, item),
+            (event) => !event.featured && eventCoversDay(event, item),
           )}
           label={label}
         />
       );
     },
-    [dayLabel, dayWidth, events, inFeaturedRange, coversDay, t, today],
+    [
+      dayLabel,
+      dayWidth,
+      events,
+      inFeaturedRange,
+      t,
+      today,
+      selectedDay,
+      onSelectDay,
+    ],
   );
 
   const keyExtractor = useCallback((date: Date) => date.toISOString(), []);
@@ -254,24 +282,28 @@ export function FamilyCalendar({
             <View key={row[0].toISOString()} style={styles.monthRow}>
               {row.map((date) => {
                 const current = isSameDay(date, today);
+                const selected = !!selectedDay && isSameDay(date, selectedDay);
                 const outside =
                   date.getMonth() !== month.getMonth() ||
                   date.getFullYear() !== month.getFullYear();
                 const inRange = !current && inFeaturedRange(date);
                 const hasBlue = inFeaturedRange(date);
                 const hasOther = events.some(
-                  (event) => !event.featured && coversDay(event, date),
+                  (event) => !event.featured && eventCoversDay(event, date),
                 );
                 return (
-                  <View
+                  <Pressable
                     key={date.toISOString()}
+                    accessibilityRole="button"
+                    onPress={onSelectDay && (() => onSelectDay(date))}
                     accessible
                     accessibilityLabel={dayLabel(date)}
-                    accessibilityState={{ selected: current }}
+                    accessibilityState={{ selected }}
                     style={[
                       styles.monthDay,
                       inRange && styles.monthDayRange,
                       current && styles.monthDayToday,
+                      selected && styles.daySelected,
                     ]}
                   >
                     <Text
@@ -280,6 +312,7 @@ export function FamilyCalendar({
                         outside && styles.monthNumberOutside,
                         inRange && styles.monthNumberRange,
                         current && styles.monthNumberToday,
+                        selected && styles.daySelectedText,
                       ]}
                     >
                       {date.getDate()}
@@ -290,10 +323,11 @@ export function FamilyCalendar({
                           styles.monthDot,
                           hasBlue && styles.monthDotBlue,
                           current && styles.monthDotToday,
+                          selected && styles.dotSelected,
                         ]}
                       />
                     )}
-                  </View>
+                  </Pressable>
                 );
               })}
             </View>

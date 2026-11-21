@@ -73,6 +73,8 @@ export function ChangeEmailPage() {
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={[styles.body, confirming && styles.bodyHero]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

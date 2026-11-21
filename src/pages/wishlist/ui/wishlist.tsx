@@ -69,6 +69,8 @@ export function WishlistPage() {
   return (
     <TabScreen activeKey="wallet">
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.body}
         scrollEnabled={!dragging}
         showsVerticalScrollIndicator={false}

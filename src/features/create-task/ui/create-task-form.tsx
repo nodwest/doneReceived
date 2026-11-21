@@ -159,6 +159,8 @@ export function CreateTaskForm({
     >
       <View ref={viewportRef} style={styles.flex}>
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           ref={scrollRef}
           onScroll={onScroll}
           scrollEventThrottle={16}

@@ -179,6 +179,8 @@ export function TaskSheet({
       </LinearGradient>
       <View ref={viewportRef} style={styles.bodyWrap}>
         <ScrollView
+          bounces={false}
+          overScrollMode="never"
           ref={scrollRef}
           onScroll={(event) => {
             onScroll(event);

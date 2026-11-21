@@ -50,6 +50,8 @@ export function ProfilePage() {
   return (
     <TabScreen activeKey="profile">
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >

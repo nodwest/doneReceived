@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  ImageBackground,
   Pressable,
   ScrollView,
   Text,
@@ -16,6 +15,7 @@ import {
   FAMILY_EVENT_KIND_LABELS,
   type FamilyEvent,
   type FamilyEventResponse,
+  familyEventCover,
 } from '@entities/family-event';
 import {
   useFamilyEvent,
@@ -32,7 +32,13 @@ import {
   showToast,
 } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
-import { BottomSheet, Icon, LetterAvatar, ScreenHeader } from '@shared/ui';
+import {
+  ApiImage,
+  BottomSheet,
+  Icon,
+  LetterAvatar,
+  ScreenHeader,
+} from '@shared/ui';
 import { styles } from './family-event.styled';
 
 /** Минуты до начала, для которых есть подпись в форме. */
@@ -91,7 +97,7 @@ function reminderLeadKey(start: Date, reminderAt: Date) {
  * GET /families/:familyId/events/:eventId.
  */
 export function FamilyEventPage() {
-  useTheme();
+  const { mode } = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -237,21 +243,11 @@ export function FamilyEventPage() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.hero}>
-          {event.photo ? (
-            <ImageBackground
-              source={event.photo}
-              resizeMode="cover"
-              style={styles.heroImage}
-              imageStyle={styles.heroImage}
-            />
-          ) : (
-            <LinearGradient
-              colors={[theme.colors.childDeep, theme.colors.blue]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.heroImage}
-            />
-          )}
+          <ApiImage
+            source={familyEventCover(event, mode)}
+            resizeMode="cover"
+            style={[styles.heroImage, !event.photo && styles.heroTemplate]}
+          />
           <LinearGradient
             colors={[
               'rgba(8, 16, 32, 0.48)',
