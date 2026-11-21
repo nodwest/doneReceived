@@ -12,6 +12,7 @@ import {
   LocationConnection,
   useRegisterParentDevice,
 } from '@features/location';
+import { PushNotificationsConnection } from '@features/push-notifications';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: FRESH_MS } },
@@ -49,6 +50,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <AppEffects />
       <LocationConnection />
       <ChildLocationSharingSync />
+      <PushNotificationsConnection />
       {children}
     </QueryClientProvider>
   );

@@ -8,21 +8,31 @@ import {
   isSameDay,
 } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { LetterAvatar } from '@shared/ui';
+import { Icon, LetterAvatar } from '@shared/ui';
 import type { FamilyEvent } from '../model/family-event';
+import { FAMILY_EVENT_KIND_LABELS } from '../model/family-event';
 import { styles } from './calendar-event.styled';
 
 type FeaturedEventCardProps = {
   event: FamilyEvent;
   /** Тап по карточке — открыть событие. */
   onPress?: () => void;
+  /** Кнопка галереи: показывается только в форме события. */
+  onPickPhoto?: () => void;
+  /** Убрать обложку; кнопка видна, когда фото уже есть. */
+  onRemovePhoto?: () => void;
 };
 
 /**
  * Большая карточка события: фото на всю карточку, тёмный градиент,
  * текст сверху, участники и напоминание снизу. Без фото — синий градиент.
  */
-export function FeaturedEventCard({ event, onPress }: FeaturedEventCardProps) {
+export function FeaturedEventCard({
+  event,
+  onPress,
+  onPickPhoto,
+  onRemovePhoto,
+}: FeaturedEventCardProps) {
   const { t } = useTranslation();
   const participants = event.participants.slice(0, 3);
   const range = isSameDay(event.startsAt, event.endsAt)
@@ -37,7 +47,10 @@ export function FeaturedEventCard({ event, onPress }: FeaturedEventCardProps) {
       ? t('calendar.annualKicker', {
           date: formatMonthDay(event.startsAt),
         })
-      : t('calendar.eventKicker', { range });
+      : t('calendar.kindKicker', {
+          kind: t(FAMILY_EVENT_KIND_LABELS[event.kind]),
+          range,
+        });
 
   return (
     <Pressable
@@ -76,7 +89,38 @@ export function FeaturedEventCard({ event, onPress }: FeaturedEventCardProps) {
         style={styles.overlay}
       />
 
-      <View style={styles.copy}>
+      {onPickPhoto && (
+        // Управление обложкой в форме события: тап по иконке открывает
+        // системную галерею. В календаре кнопок нет.
+        <View style={styles.photoActions}>
+          {onRemovePhoto && event.photo && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('calendar.removePhoto')}
+              onPress={onRemovePhoto}
+              style={({ pressed }) => [
+                styles.photoAction,
+                pressed ? styles.pressed : null,
+              ]}
+            >
+              <Icon name="close" size={14} color={theme.colors.white} />
+            </Pressable>
+          )}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('calendar.photoLibrary')}
+            onPress={onPickPhoto}
+            style={({ pressed }) => [
+              styles.photoAction,
+              pressed ? styles.pressed : null,
+            ]}
+          >
+            <Icon name="image-add" size={16} color={theme.colors.white} />
+          </Pressable>
+        </View>
+      )}
+
+      <View style={[styles.copy, onPickPhoto ? styles.copyWithActions : null]}>
         <View style={styles.text}>
           <Text style={styles.kicker}>{kicker}</Text>
           <Text style={styles.title} numberOfLines={2}>

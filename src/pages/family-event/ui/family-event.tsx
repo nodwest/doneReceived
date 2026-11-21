@@ -13,6 +13,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
+  FAMILY_EVENT_KIND_LABELS,
   type FamilyEvent,
   type FamilyEventResponse,
 } from '@entities/family-event';
@@ -161,18 +162,19 @@ export function FamilyEventPage() {
     );
   }
 
+  const kindLabel = t(FAMILY_EVENT_KIND_LABELS[event.kind]);
   const dateLine =
     event.repeat === 'annual'
-      ? `${t('calendar.annualDateLine', {
+      ? `${kindLabel} · ${t('calendar.annualDateLine', {
           date: formatDate(event.startsAt, {
             day: 'numeric',
             month: 'long',
           }),
         })} · ${timeRangeLabel(event)}`
-      : t('calendar.rangeLine', {
+      : `${kindLabel} · ${t('calendar.rangeLine', {
           range: dateRangeLabel(event.startsAt, event.endsAt),
           time: timeRangeLabel(event),
-        });
+        })}`;
 
   const leadKey = event.reminderAt
     ? (event.reminderLeadMinutes ??
@@ -228,6 +230,8 @@ export function FamilyEventPage() {
     <View style={styles.screen}>
       <StatusBar style="light" />
       <ScrollView
+        bounces={false}
+        overScrollMode="never"
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -336,12 +340,6 @@ export function FamilyEventPage() {
                     </Text>
                   </View>
                 ))}
-                <View style={styles.going}>
-                  <View style={styles.check}>
-                    <Icon name="check" size={13} color={theme.colors.success} />
-                  </View>
-                  <Text style={styles.goingText}>{t('calendar.going')}</Text>
-                </View>
               </View>
             )}
           </View>

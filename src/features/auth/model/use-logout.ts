@@ -1,5 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { logout, useSessionStore } from '@entities/session';
+import {
+  forgetPushTokenForSignOut,
+  logout,
+  useSessionStore,
+} from '@entities/session';
 import { authLog } from './auth-log';
 
 /**
@@ -12,6 +16,9 @@ export function useLogout() {
   const queryClient = useQueryClient();
   return async () => {
     const session = useSessionStore.getState().session;
+    // Push-токен снимаем до очистки сессии: запрос уже несёт access-токен,
+    // а если сети нет — он повторится при следующем входе.
+    forgetPushTokenForSignOut();
     if (session) {
       logout(session.refreshToken)
         .then(() => authLog('Сервер завершил сессию'))

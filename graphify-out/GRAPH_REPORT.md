@@ -1,60 +1,60 @@
-# Graph Report - doneReceived  (2026-11-20)
+# Graph Report - doneReceived  (2026-11-21)
 
 ## Corpus Check
-- 808 files · ~276,691 words
+- 822 files · ~280,024 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 6, .graphify-bak 1, .base 1)
 
 ## Summary
-- 4503 nodes · 11869 edges · 215 communities (170 shown, 45 thin omitted)
+- 4277 nodes · 12494 edges · 210 communities (160 shown, 50 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 314 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2083c445`
+- Built from commit: `3f453c7c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - maplibre-gl-shared.mjs
-- tracking
-- zones.ts
-- react-native
+- theme/index.ts
+- ui/map-zone.tsx
+- server-child-profile.tsx
 - server-tasks-api.ts
 - bar-3d.tsx
-- ui/family-setup.tsx
+- ui/transactions.tsx
 - package.json
-- withAlpha
+- lib/index.ts
 - maplibre-gl-worker.mjs
 - ds
-- useCurrentFamily
-- tasks-header.tsx
-- child-task-card.tsx
+- PickedPhoto
+- theme.ts
+- Icon
 - yt
 - subdividePolygonInternal
 - use-child-location-sharing.ts
-- i18n/index.ts
+- avatar-cropper.tsx
 - fw
 - ui/map-layers.tsx
-- location-sharing-card.tsx
-- ui/tasks.tsx
+- use-push-registration.ts
+- my-tasks.tsx
 - readPackedEnd
 - mvp-full-design-variants.canvas.tsx
-- http.ts
+- task.ts
 - writeTag
-- parent-invite-code.tsx
-- useTheme
 - families-api.ts
-- ui/index.ts
-- ui/change-password.tsx
+- confirm-step.tsx
+- feed-api.ts
+- react-native
+- validation.ts
 - device-api.ts
 - bus-playback.ts
 - evaluate
-- use-child-account.ts
+- ui/rewards-history.tsx
 - oe
 - session/index.ts
-- wallet-query.ts
-- wishlist.tsx
+- ui/transactions.tsx
+- Task
 - map/model/types.ts
 - evaluate
 - populate
@@ -63,103 +63,103 @@
 - devDependencies
 - hx
 - af
-- zones-api.ts
-- ui/family.tsx
-- wallet.ts
+- date-time-picker-sheet.tsx
+- layer-preferences.ts
+- auth-api.ts
 - root-layout.tsx
 - expo
-- operation.ts
-- family-events-api.ts
-- ui/rewards-history.tsx
-- @tanstack/react-query
+- ui/tasks.tsx
+- ui/calendar.tsx
+- family-event-form.tsx
+- session/index.ts
 - mvp-family-premium-mobile.canvas.tsx
 - determineLineBreaks
-- my-tasks.tsx
-- map/map.tsx
-- activity-card.tsx
-- transaction-card.tsx
+- family-event-form-page.tsx
+- map.web.tsx
+- queryIntersectsFeature
+- children-carousel.tsx
 - family-task-app-wireframes.canvas.tsx
 - clone
-- layer-preferences.ts
+- family-event.tsx
 - road-path.ts
 - step1-onboarding-design.canvas.tsx
 - n
 - constructor
-- tasks-header.tsx
+- children-filter.tsx
 - config.ts
 - pe
-- validation.ts
+- isApiError
 - setPaintProperty
 - paths
 - checklist-field.tsx
 - l
-- date-time-picker-sheet.tsx
-- auth/index.ts
-- ui/family-setup.tsx
-- avatar-cropper.tsx
+- FamilySetupPage
+- apiRequest
+- jy
+- ui/family.tsx
 - hasDebugData
-- family-event-form.tsx
-- history-map.tsx
-- zm
-- ui/edit-profile.tsx
-- transaction-row.tsx
-- family-event.tsx
+- maplibre-gl
+- map-history.tsx
+- paint
+- ui/profile.tsx
+- use-cancel-task.ts
+- tasks-query.ts
 - i
-- ui/calendar.tsx
+- Wu
 - Expo Router Navigation
 - React Native Best Practices
-- add-child-sheet.tsx
+- xt
 - keep-in-view.ts
 - scripts
-- eh
+- queryIntersectsFeature
 - en
-- operation/index.ts
+- isApiError
 - T
-- task/index.ts
+- use-review-task.ts
 - loadAndProcessGeoJSON
-- paint
+- providers/index.tsx
 - lib/index.ts
-- family-event-form-page.tsx
-- wish/index.ts
+- Релиз.md
+- api/index.ts
 - Expo Upgrade
-- ui/map-zone.tsx
-- splitTile
-- use-pair-device.ts
-- eh
-- family-color-palettes.canvas.tsx
-- canvases/mvp-c4-business-logic.canvas.tsx
+- featured-event-card.tsx
+- constructor
+- location-connection.tsx
+- wish-row.tsx
+- note-draft-store.ts
+- family-event-form.styled.ts
 - oh
-- ui/rewards-history.tsx
+- bottom-nav.tsx
 - interpolate
 - react-native
-- user/index.ts
+- react-native
 - en
-- obsidian-done/mvp-c4-business-logic.canvas.tsx
-- missed-task-tile.tsx
+- session-refresh-lock.ts
+- queryRadius
 - appendLeaves
 - getColorRampTextures
 - layout
-- ii
-- queryIntersectsFeature
+- react-native-reanimated
+- V
 - DoneReceived Project Guidance
 - metro.config.js
 - Seven-Step Task Definition Form
 - kb
-- family-color-palettes-new.canvas.tsx
+- use-reset-invite-code.ts
 - _refreshViews
 - update
-- jy
-- deposit-sheet.tsx
-- Task Reward Lifecycle
+- use-change-password.ts
+- useTheme
+- ah
 - Gamified Household Task Profile Dashboard
 - Child Device Pairing Codes
 - Retryable Task Rejection
 - wrap
 - CLAUDE.md
-- createIndex
+- dt
 - ot
 - Dp
-- getClustersInternal
+- drag-handle.tsx
 - ov
 - setValue
 - react-compiler-destructure-functions.md
@@ -174,7 +174,7 @@
 - prepareSegment
 - _unit
 - withinInto
-- ui/wallet.tsx
+- swipeable-row.tsx
 - Expo Animation Recipes
 - Native Platform Menus
 - Centered Proportion Guides
@@ -198,20 +198,14 @@
 - ui-image-gallery.md
 - ui-measure-views.md
 - child-location-task.web.ts
-- ref_cursor
-- tab-screen.tsx
-- entities/wallet/index.ts
+- an
+- showToast
+- use-push-registration.ts
 - get
-- Wu
-- activity-card.tsx
+- use-location-socket.ts
 - _h
-- xt
-- src_shared_ui_index_icon
-- use-buses-socket.ts
-- queryRadius
-- icon.tsx
-- photo-viewer.tsx
-- section-header.tsx
+- ui/role-select.tsx
+- ui/index.ts
 - I18n and Accessibility Checklist
 - Apache License 2.0
 - Modern React Native Styling Patterns
@@ -221,32 +215,31 @@
 - User Profile Concept
 - Child Location and Zones
 - Repository Commit Format
-- swipeable-row.tsx
-- reward-kind-toggle.tsx
+- activity-card.tsx
 
 ## God Nodes (most connected - your core abstractions)
-1. `tracking()` - 230 edges
-2. `react-native` - 215 edges
-3. `react` - 214 edges
-4. `theme` - 193 edges
-5. `createStyles()` - 134 edges
-6. `react-native-svg` - 70 edges
-7. `useTheme()` - 68 edges
-8. `apiRequest()` - 58 edges
-9. `Icon()` - 58 edges
-10. `@tanstack/react-query` - 52 edges
+1. `tracking()` - 239 edges
+2. `react-native` - 219 edges
+3. `react` - 218 edges
+4. `theme` - 203 edges
+5. `Icon()` - 158 edges
+6. `createStyles()` - 138 edges
+7. `apiRequest()` - 84 edges
+8. `useTheme()` - 80 edges
+9. `react-native-svg` - 70 edges
+10. `showToast()` - 68 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `SEC-06 — Нет защиты от скриншотов на чувствительных экранах` --references--> `copyText()`  [INFERRED]
   obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/lib/clipboard.ts
-- `Проверено — чисто` --references--> `authorizedImage()`  [INFERRED]
-  obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/api/http.ts
 - `Проверено — чисто` --references--> `themedValue()`  [INFERRED]
   obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/theme/theme.ts
+- `Проверено — чисто` --references--> `authorizedImage()`  [INFERRED]
+  obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/api/http.ts
 - `Проверено — чисто` --references--> `themedArray()`  [INFERRED]
   obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/theme/theme.ts
-- `styles` --calls--> `tracking()`  [EXTRACTED]
-  src/entities/family-event/ui/event-person-chip.tsx → src/shared/theme/typography.ts
+- `EventPersonChip()` --calls--> `LetterAvatar()`  [EXTRACTED]
+  src/entities/family-event/ui/event-person-chip.tsx → src/shared/ui/letter-avatar.tsx
 
 ## Import Cycles
 - None detected.
@@ -256,179 +249,179 @@
 - **React Native Animation Rules** — _claude_skills_vercel_react_native_skills_rules_animation_derived_value_use_derived_value, _claude_skills_vercel_react_native_skills_rules_animation_gesture_detector_press_gesture_press, _claude_skills_vercel_react_native_skills_rules_animation_gpu_properties_gpu_animation [EXTRACTED 1.00]
 - **Task Completion and Reward Flow** — obsidian_done_c4_task_lifecycle, obsidian_done_сделал_получил_mvp_parent_child_reward_flow, obsidian_done_сделал_получил_идеи_retryable_rejection, obsidian_done_сделал_получил_идеи_wallet_reservation_invariant [INFERRED 0.95]
 
-## Communities (215 total, 45 thin omitted)
+## Communities (210 total, 50 thin omitted)
 
 ### Community 0 - "maplibre-gl-shared.mjs"
 Cohesion: 0.01
 Nodes (83): Ag, Ar, As, aT, b_, Bn, bp, BS (+75 more)
 
-### Community 1 - "tracking"
-Cohesion: 0.04
-Nodes (91): styles, styles, styles, styles, styles, styles, styles, styles (+83 more)
+### Community 1 - "theme/index.ts"
+Cohesion: 0.03
+Nodes (94): styles, styles, FamilyEventPerson, EventPersonChip(), EventPersonChipProps, styles, styles, PeriodSelectProps (+86 more)
 
-### Community 2 - "zones.ts"
-Cohesion: 0.07
-Nodes (34): maplibre-gl@6.10.0, @maplibre/maplibre-react-native@^11.4.0, maplibre-gl, @maplibre/maplibre-react-native, OSM_SOURCE, MAP_STYLE, draftFillLayer, draftLineLayer (+26 more)
+### Community 2 - "ui/map-zone.tsx"
+Cohesion: 0.19
+Nodes (13): createLocationZone(), fetchLocationZones(), LocationZoneInput, updateLocationZone(), useLocationZones(), zonesKeys, MapZone, ZonePoint (+5 more)
 
-### Community 3 - "react-native"
-Cohesion: 0.05
-Nodes (34): react-native, styles, EventRowProps, EventTile(), EventTileProps, FeaturedEventCardProps, ChildOverview, ChildCard() (+26 more)
+### Community 3 - "server-child-profile.tsx"
+Cohesion: 0.09
+Nodes (37): KindColors, OPERATION_KIND_COLORS, latestRewards(), sumTotals(), formatAmount(), MissedReason, Operation, OperationChild (+29 more)
 
 ### Community 4 - "server-tasks-api.ts"
-Cohesion: 0.05
-Nodes (56): AssignmentDto, AttachmentDto, attachmentImage(), cancelServerTask(), checklistBody(), ChildDto, createServerTask(), fetchServerTasks() (+48 more)
+Cohesion: 0.10
+Nodes (36): AssignmentDto, AttachmentDto, attachmentImage(), checklistBody(), ChildDto, createServerTask(), fetchServerTasks(), LastRejectionDto (+28 more)
 
 ### Community 5 - "bar-3d.tsx"
-Cohesion: 0.05
-Nodes (52): SEC-01 — Сессия в localStorage на вебе, SEC-02 — DoS через `expo-router` / `query-string`, SEC-03 — Фото детей остаются в кэше после повторной отправки, SEC-04 — Кэши аватаров не очищаются при смене аккаунта, SEC-05 — Почта в dev-логах, SEC-06 — Нет защиты от скриншотов на чувствительных экранах, SEC-07 — Нет certificate pinning, SEC-08 — Веб без CSP и security headers (+44 more)
+Cohesion: 0.11
+Nodes (26): DayTotals, CHART_HEIGHT, COLUMN_GAP, COLUMN_WIDTH, COLUMN_WIDTH_SELECTED, DATE_CHIP_HEIGHT, DAY_SLOT_WIDTH, DEPTH_X (+18 more)
 
-### Community 6 - "ui/family-setup.tsx"
-Cohesion: 0.10
-Nodes (6): ChoiceCard(), ChoiceCardProps, FamilySetupPage(), Mode, SetupField(), SetupFieldProps
+### Community 6 - "ui/transactions.tsx"
+Cohesion: 0.06
+Nodes (55): HomeRoute(), RewardsHistoryRoute(), TasksRoute(), TransactionsRoute(), EventRow(), EventTile(), FeaturedEventCard(), getDayTotals() (+47 more)
 
 ### Community 7 - "package.json"
 Cohesion: 0.05
-Nodes (55): dependencies, @deck.gl/core@^9.4.0, @deck.gl/layers@^9.4.0, @deck.gl/mapbox@^9.4.0, expo-clipboard@~56.0.4, expo-constants@~56.0.27, expo-dev-client@~56.0.27, expo-file-system@~56.0.11 (+47 more)
+Nodes (53): dependencies, @deck.gl/core@^9.4.0, @deck.gl/layers@^9.4.0, @deck.gl/mapbox@^9.4.0, expo-clipboard@~56.0.4, expo-constants@~56.0.27, expo-dev-client@~56.0.27, expo-file-system@~56.0.11 (+45 more)
 
-### Community 8 - "withAlpha"
-Cohesion: 0.15
-Nodes (11): styles, styles, withAlpha(), styles, GRADIENTS, PillButtonProps, PillButtonVariant, styles (+3 more)
+### Community 8 - "lib/index.ts"
+Cohesion: 0.06
+Nodes (32): useChildDevices(), Device, DeviceRow(), DeviceRowProps, styles, styles, ConnectDevicePanel(), ConnectDevicePanelProps (+24 more)
 
 ### Community 9 - "maplibre-gl-worker.mjs"
 Cohesion: 0.05
-Nodes (31): ae(), cn, Db(), et(), I, lb(), li, ln() (+23 more)
+Nodes (16): cn, Db(), et(), I, lb(), li, ln(), Ln (+8 more)
 
 ### Community 10 - "ds"
 Cohesion: 0.07
 Nodes (52): ao(), as(), bo(), bs(), co(), cs(), Do(), ds() (+44 more)
 
-### Community 11 - "useCurrentFamily"
-Cohesion: 0.14
-Nodes (21): ChecklistItem, Task, TASK_PHOTOS_MAX, ChecklistTickPayload, useCancelTask(), CancelTaskButton(), CancelTaskSheet(), NO_PHOTOS (+13 more)
+### Community 11 - "PickedPhoto"
+Cohesion: 0.18
+Nodes (10): expo-file-system, expo-image-manipulator, CropRect, RemoteSource, RemoteSource, PhotoPermissionError, PhotoSource, PickedPhoto (+2 more)
 
-### Community 12 - "tasks-header.tsx"
-Cohesion: 0.17
-Nodes (18): react-native-mmkv@^4.3.2, react-native-mmkv, darkColors, lightColors, palettes, ThemeColors, ThemeMode, currentMode (+10 more)
+### Community 12 - "theme.ts"
+Cohesion: 0.07
+Nodes (36): SEC-01 — Сессия в localStorage на вебе, SEC-02 — DoS через `expo-router` / `query-string`, SEC-03 — Фото детей остаются в кэше после повторной отправки, SEC-04 — Кэши аватаров не очищаются при смене аккаунта, SEC-05 — Почта в dev-логах, SEC-06 — Нет защиты от скриншотов на чувствительных экранах, SEC-07 — Нет certificate pinning, SEC-08 — Веб без CSP и security headers (+28 more)
 
-### Community 13 - "child-task-card.tsx"
-Cohesion: 0.06
-Nodes (56): formatAmount(), Operation, CAPTION, OperationRow(), OperationRowProps, styles, ChildTaskCard(), ChildTaskCardProps (+48 more)
+### Community 13 - "Icon"
+Cohesion: 0.07
+Nodes (62): ChecklistItem, ChildTaskCard(), ChildTaskCardProps, PhotoSource(), PhotoSourceProps, ReportPhotos, RejectionNote(), TaskCard() (+54 more)
 
 ### Community 14 - "yt"
-Cohesion: 0.05
-Nodes (48): A_(), addFeatures(), av(), bv(), Cu(), D_(), detectSdfPatterns(), Dv() (+40 more)
+Cohesion: 0.06
+Nodes (38): A_(), addFeatures(), av(), bv(), D_(), detectSdfPatterns(), Dv(), E_() (+30 more)
 
 ### Community 15 - "subdividePolygonInternal"
 Cohesion: 0.05
 Nodes (48): addCurrentVertex(), addFeature(), addHalfVertex(), addLine(), ap(), Bp(), cm(), cp() (+40 more)
 
 ### Community 16 - "use-child-location-sharing.ts"
-Cohesion: 0.09
-Nodes (31): CHILD_LOCATION_TASK, startChildLocationTask(), stopChildLocationTask(), isLocationSharingEnabled(), locationSharingKey(), setLocationSharingEnabled(), storage, initial (+23 more)
+Cohesion: 0.13
+Nodes (27): useSessionFamilyId(), useSessionKind(), CHILD_LOCATION_TASK, isIgnored(), isTerminal(), startChildLocationTask(), stopChildLocationTask(), isLocationSharingEnabled() (+19 more)
 
-### Community 17 - "i18n/index.ts"
-Cohesion: 0.05
-Nodes (46): TaskShortViewProps, RejectionNoteProps, styles, RewardButton(), RewardButtonProps, RewardVariant, styles, CompactPresence() (+38 more)
+### Community 17 - "avatar-cropper.tsx"
+Cohesion: 0.11
+Nodes (19): expo-status-bar, RewardButton(), RewardButtonProps, RewardVariant, styles, cropPhoto(), AvatarCropperProps, clamp() (+11 more)
 
 ### Community 18 - "fw"
-Cohesion: 0.05
-Nodes (43): Aw(), bw(), _C(), Cw(), decodeDictionary(), du(), Dw(), ew() (+35 more)
+Cohesion: 0.06
+Nodes (41): Aw(), bw(), _C(), Cw(), decodeDictionary(), Dw(), ew(), fw() (+33 more)
 
 ### Community 19 - "ui/map-layers.tsx"
-Cohesion: 0.10
-Nodes (21): AddRow(), buildZoneStatuses(), collectRoutes(), Divider(), EmptyRow(), laterTimestamp(), LayerRow(), LayerRowProps (+13 more)
-
-### Community 20 - "location-sharing-card.tsx"
-Cohesion: 0.10
-Nodes (10): HistoryData, historyDate(), HistoryDay(), HistoryType, MapHistory(), RouteData, styles, timeLabel() (+2 more)
-
-### Community 21 - "ui/tasks.tsx"
 Cohesion: 0.12
-Nodes (8): authorOf(), ChildTasksPage(), NO_TASKS, ParentTasksPage(), CARDS_PADDING_BOTTOM, TasksPage(), TasksScope, ViewOnlyNote()
+Nodes (28): deleteLocationZone(), useBusesSocket(), useMemberMapSettings(), useUpdateMemberMapSettings(), AddRow(), buildZoneStatuses(), collectRoutes(), Divider() (+20 more)
+
+### Community 20 - "use-push-registration.ts"
+Cohesion: 0.19
+Nodes (12): PushPlatform, registerPushToken(), RegisterPushTokenPayload, removePushToken(), forgetPushTokenForSignOut(), addPendingPushRemoval(), clearSavedPushToken(), pendingPushRemovals() (+4 more)
+
+### Community 21 - "my-tasks.tsx"
+Cohesion: 0.11
+Nodes (18): EarnGoalCard(), percent(), authorOf(), NO_TASKS, CARDS_PADDING_BOTTOM, SectionHead(), ACCENT_GRADIENT, Owner (+10 more)
 
 ### Community 22 - "readPackedEnd"
 Cohesion: 0.06
 Nodes (39): bg(), ev(), Fg(), $i(), Ig(), jg(), Lg(), Mg() (+31 more)
 
 ### Community 23 - "mvp-full-design-variants.canvas.tsx"
-Cohesion: 0.16
-Nodes (37): BalanceUpdatedScreen(), BroomIcon(), Btn(), CameraScanArt(), ChildScanScreen(), ChildTasksScreen(), CoinStackArt(), CreateTaskScreen() (+29 more)
+Cohesion: 0.06
+Nodes (79): BASE, FamilyColorPalettes(), FamilyTheme, MiniPhone(), SOFT, Swatch(), ThemeCardClean(), THEMES (+71 more)
 
-### Community 24 - "http.ts"
-Cohesion: 0.05
-Nodes (53): FamilyLocation, familyLocationsKeys, fetchFamilyLocations(), useFamilyLocations(), Message, parse(), RECONNECT_MS, useLocationSocket() (+45 more)
+### Community 24 - "task.ts"
+Cohesion: 0.12
+Nodes (16): TaskFilter, CHECKLIST_ITEM_MAX_LENGTH, RejectReasonKey, TASK_NOTE_MAX_LENGTH, TASK_PHOTOS_MAX, TaskRejection, TaskState, ChecklistStepPayload (+8 more)
 
 ### Community 25 - "writeTag"
 Cohesion: 0.07
 Nodes (37): q_(), realloc(), tv(), writeBoolean(), writeBooleanField(), writeBytes(), writeBytesField(), writeDouble() (+29 more)
 
-### Community 26 - "parent-invite-code.tsx"
-Cohesion: 0.09
-Nodes (33): useFamilyInvitePreview(), formatInviteCode(), INVITE_CODE_TEMPLATE, InviteRole, isCompleteInviteCode(), RoleIcon(), FoundInvite, InviteCodeState (+25 more)
+### Community 26 - "families-api.ts"
+Cohesion: 0.10
+Nodes (31): createChild(), createParentInvite(), deleteChild(), deleteMyChildProfile(), FamilyDetailsDto, fetchFamilyChildren(), fetchFamilyDetails(), fetchFamilyMembers() (+23 more)
 
-### Community 27 - "useTheme"
+### Community 27 - "confirm-step.tsx"
+Cohesion: 0.16
+Nodes (17): confirmEmailChange(), requestEmailChange(), resendEmailChange(), fetchMe(), useCooldown(), ChangeEmailErrorInfo, EMAIL_CHANGE_CHECK_MS, useConfirmEmailChange() (+9 more)
+
+### Community 28 - "feed-api.ts"
+Cohesion: 0.15
+Nodes (17): ActivityDto, ChildDto, fetchClosedAssignments(), fetchFeed(), isLastRejection(), KNOWN, MemberDto, MissedDto (+9 more)
+
+### Community 29 - "react-native"
+Cohesion: 0.03
+Nodes (58): react-native, EventTileProps, INVITE_CODE_TEMPLATE, RejectionNoteProps, styles, TILE_GAP, ChildChipProps, styles (+50 more)
+
+### Community 30 - "validation.ts"
 Cohesion: 0.14
-Nodes (8): expo-router, ChildProfilePage(), ServerChildProfile(), CreateTaskPage(), EditTaskPage(), TaskFormScreen(), TaskFormScreenProps, useTheme()
-
-### Community 28 - "families-api.ts"
-Cohesion: 0.08
-Nodes (43): createFamily(), createParentInvite(), deleteChild(), FamilyDetailsDto, fetchFamilyChildren(), fetchFamilyDetails(), fetchFamilyMembers(), fetchMyFamilies() (+35 more)
-
-### Community 29 - "ui/index.ts"
-Cohesion: 0.04
-Nodes (39): EventPersonChipProps, styles, ConnectDevicePanel(), ConnectDevicePanelProps, formatLeft(), pad(), HERO_COLORS, ProfileHeroProps (+31 more)
-
-### Community 30 - "ui/change-password.tsx"
-Cohesion: 0.05
-Nodes (13): ChangePasswordPage(), EMPTY, Field, goBack(), Login(), EMPTY_FORM, Field, Registration() (+5 more)
+Nodes (16): DISPLAY_NAME_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, VERIFICATION_CODE_LENGTH, checkPasswordRules(), FieldError, LoginErrors, LoginForm (+8 more)
 
 ### Community 31 - "device-api.ts"
-Cohesion: 0.06
-Nodes (35): DeviceDto, fetchChildDevices(), fetchConnectCode(), PreviewDto, previewPairing(), revokeDevice(), codeLeft(), deviceKeys (+27 more)
+Cohesion: 0.09
+Nodes (31): DeviceDto, fetchChildDevices(), fetchConnectCode(), PreviewDto, previewPairing(), revokeDevice(), codeLeft(), deviceKeys (+23 more)
 
 ### Community 32 - "bus-playback.ts"
 Cohesion: 0.13
 Nodes (23): Bus, RoadMovement, VehicleSnapshot, bearingAt(), bearingBetween(), bearingOnSegment(), BusPlayback, catchUpRate() (+15 more)
 
 ### Community 33 - "evaluate"
-Cohesion: 0.08
-Nodes (31): br(), _calculate(), checkSubtype(), concat(), Cr(), dr(), er(), error() (+23 more)
+Cohesion: 0.10
+Nodes (25): br(), checkSubtype(), concat(), Cr(), dr(), error(), fr(), gr() (+17 more)
 
-### Community 34 - "use-child-account.ts"
-Cohesion: 0.20
-Nodes (18): useFeed(), cancelFamilyEvent(), useMe(), useSession(), useSessionUser(), useTasks(), useChildBalance(), useChildWallet() (+10 more)
+### Community 34 - "ui/rewards-history.tsx"
+Cohesion: 0.14
+Nodes (33): useOperations(), sortByNewest(), useMe(), useMyAvatar(), useSession(), countChildTasks(), countTasks(), useWishlistProgress() (+25 more)
 
 ### Community 35 - "oe"
-Cohesion: 0.15
-Nodes (29): b(), C(), D(), E(), ee(), emplaceBack(), f(), g() (+21 more)
+Cohesion: 0.16
+Nodes (25): b(), C(), D(), E(), emplaceBack(), f(), g(), gg() (+17 more)
 
 ### Community 36 - "session/index.ts"
-Cohesion: 0.10
-Nodes (38): refreshSession(), useSessionFamilyId(), lockFile, release(), tryAcquire(), wait(), withRefreshLock(), Session (+30 more)
+Cohesion: 0.15
+Nodes (28): refreshSession(), Session, bumpSessionEpoch(), epochStorage, loadSession(), pendingLock, pendingWrite, readSessionForRefresh() (+20 more)
 
-### Community 37 - "wallet-query.ts"
-Cohesion: 0.14
-Nodes (20): ChildWalletDto, fetchAllEntries(), fetchServerChildWallet(), MemberDto, fetchParentFunds(), ChildDto, fetchAllTransactions(), fetchParentPaidTotal() (+12 more)
+### Community 37 - "ui/transactions.tsx"
+Cohesion: 0.05
+Nodes (63): fetchOperations(), operationKeys, operationsQueryOptions(), ChildDto, fetchMissed(), fetchServerOperations(), MissedDto, MissedItemDto (+55 more)
 
-### Community 38 - "wishlist.tsx"
-Cohesion: 0.06
-Nodes (16): useFamilyChildren(), useTaskFamilyId(), useWishlistChild(), WishlistChild, ChildWishPage(), ChildWishlistPage(), styles, MyWishPage() (+8 more)
+### Community 38 - "Task"
+Cohesion: 0.34
+Nodes (9): Task, actionError(), useTaskActions(), TasksSnapshot, tick(), useTickChecklistItem(), DoneButton(), TaskFooterAction() (+1 more)
 
 ### Community 39 - "map/model/types.ts"
 Cohesion: 0.09
 Nodes (18): backgroundLayer, buildings3dLayer, buildingLayer, houseNumbersLayer, landcoverLayer, landuseLayer, parkLayer, citiesMajorLayer (+10 more)
 
 ### Community 40 - "evaluate"
-Cohesion: 0.13
-Nodes (28): aa(), Ba(), ca(), da(), ea(), fa(), ga(), Gi() (+20 more)
+Cohesion: 0.10
+Nodes (34): aa(), Ba(), ca(), _calculate(), da(), ea(), er(), evaluate() (+26 more)
 
 ### Community 41 - "populate"
-Cohesion: 0.08
-Nodes (28): addLineDashDependencies(), calculateGlyphDependencies(), _convertFromCellCoord(), _convertToCellCoord(), ed(), es(), _forEachCell(), getId() (+20 more)
+Cohesion: 0.09
+Nodes (26): addLineDashDependencies(), calculateGlyphDependencies(), _convertFromCellCoord(), _convertToCellCoord(), es(), _forEachCell(), getId(), Gp() (+18 more)
 
 ### Community 42 - "react"
 Cohesion: 0.04
-Nodes (67): react, react-native-svg, ArrowLeftIcon(), ArrowRightIcon(), BadgeCheckIcon(), BagCheckIcon(), BellIcon(), BusIcon() (+59 more)
+Nodes (66): react, react-native-svg, ArrowLeftIcon(), ArrowRightIcon(), BadgeCheckIcon(), BagCheckIcon(), BellIcon(), BusIcon() (+58 more)
 
 ### Community 43 - "mvp-apple-premium.canvas.tsx"
 Cohesion: 0.19
@@ -446,41 +439,41 @@ Nodes (26): ax(), bx(), cx(), dx(), ex(), fx(), gx(), hx() (+18 more)
 Cohesion: 0.12
 Nodes (25): af(), bf(), cf(), df(), ff(), Gf(), Hf(), If() (+17 more)
 
-### Community 47 - "zones-api.ts"
-Cohesion: 0.23
-Nodes (9): createLocationZone(), deleteLocationZone(), fetchLocationZones(), LocationZoneInput, updateLocationZone(), useLocationZones(), zonesKeys, MapZone (+1 more)
-
-### Community 48 - "ui/family.tsx"
-Cohesion: 0.12
-Nodes (6): FamilyPage(), NO_MEMBERS, NO_TASKS, photo(), DELETE_ACTION_WIDTH, REVEAL_GAP
-
-### Community 49 - "wallet.ts"
+### Community 47 - "date-time-picker-sheet.tsx"
 Cohesion: 0.18
-Nodes (16): AnyTransaction, balanceAfter(), CardTransaction, ChildTransaction, ChildWithdrawal, groupByDay(), isIncome(), PayoutPayload (+8 more)
+Nodes (15): clampDate(), is24HourClock(), DateTimePickerSheetProps, HOURS_12, HOURS_24, MINUTES, pad(), PERIODS (+7 more)
+
+### Community 48 - "layer-preferences.ts"
+Cohesion: 0.09
+Nodes (27): zustand@^5.0.14, zustand, MapPage(), styles, asBoolean(), asIds(), DEFAULT_CHILD_MARKER_COLOR, DEFAULT_PARENT_MARKER_COLOR (+19 more)
+
+### Community 49 - "auth-api.ts"
+Cohesion: 0.16
+Nodes (17): deleteMyAvatar(), updateMe(), uploadMyAvatar(), meKeys, ChangePasswordPayload, LoginPayload, MessageResponse, PairDevicePayload (+9 more)
 
 ### Community 50 - "root-layout.tsx"
-Cohesion: 0.10
-Nodes (16): expo-font@~56.0.7, @expo-google-fonts/inter@^0.4.2, expo-status-bar@~56.0.4, expo-font, @expo-google-fonts/inter, expo-status-bar, Providers(), APP_SCREENS (+8 more)
+Cohesion: 0.13
+Nodes (16): APP_SCREENS, AUTH_SCREENS, restoreSession(), RootLayout(), Screens(), ScreensProps, screensStyles, TAB_OPTIONS (+8 more)
 
 ### Community 51 - "expo"
 Cohesion: 0.09
 Nodes (22): backgroundColor, backgroundImage, foregroundImage, monochromeImage, adaptiveIcon, package, permissions, predictiveBackGestureEnabled (+14 more)
 
-### Community 52 - "operation.ts"
-Cohesion: 0.13
-Nodes (19): fetchOperations(), operationKeys, operationsQueryOptions(), useOperations(), ChildDto, fetchMissed(), fetchServerOperations(), MissedDto (+11 more)
+### Community 52 - "ui/tasks.tsx"
+Cohesion: 0.22
+Nodes (11): useFamilyMembers(), filterTasks(), authorOf(), ChildTasksPage(), NO_TASKS, ParentTasksPage(), CARDS_PADDING_BOTTOM, TasksPage() (+3 more)
 
-### Community 53 - "family-events-api.ts"
-Cohesion: 0.12
-Nodes (24): bodyOf(), createFamilyEvent(), FamilyEventDto, FamilyEventPayload, FamilyEventPersonDto, fetchFamilyEvent(), fetchFamilyEvents(), respondToFamilyEvent() (+16 more)
+### Community 53 - "ui/calendar.tsx"
+Cohesion: 0.11
+Nodes (19): bodyOf(), createFamilyEvent(), FamilyEventDto, FamilyEventPayload, FamilyEventPersonDto, fetchFamilyEvent(), fetchFamilyEvents(), toFamilyEvent() (+11 more)
 
-### Community 54 - "ui/rewards-history.tsx"
-Cohesion: 0.08
-Nodes (22): getDayTotals(), getHistoryDays(), isSameDay(), sumTotals(), operationsInPeriod(), PERIOD_DAYS, SUMMARY_PERIODS, SummaryPeriod (+14 more)
+### Community 54 - "family-event-form.tsx"
+Cohesion: 0.10
+Nodes (9): createRequestId(), defaultReminderLead(), defaultStart(), FamilyEventForm(), FamilyEventFormProps, KIND_OPTIONS, nextAnnual(), REMINDER_OPTIONS (+1 more)
 
-### Community 55 - "@tanstack/react-query"
-Cohesion: 0.07
-Nodes (39): @tanstack/react-query, FRESH_MS, listenAppFocus(), useRefreshOnNavigate(), useServerEvents(), AppEffects(), queryClient, changePassword() (+31 more)
+### Community 55 - "session/index.ts"
+Cohesion: 0.18
+Nodes (16): login(), logout(), register(), resendVerification(), verifyEmail(), authLog(), forgetSignUp(), rememberSignUp() (+8 more)
 
 ### Community 56 - "mvp-family-premium-mobile.canvas.tsx"
 Cohesion: 0.20
@@ -490,33 +483,33 @@ Nodes (20): base, Btn(), Field(), Hero(), Img(), MvpFamilyPremiumMobile(), Phone
 Cohesion: 0.12
 Nodes (21): addImageSection(), addTextSection(), _appendSection(), determineAverageLineWidth(), determineLineBreaks(), f_(), g_(), getMaxImageSize() (+13 more)
 
-### Community 58 - "my-tasks.tsx"
-Cohesion: 0.06
-Nodes (17): react-native-safe-area-context@~5.7.0, react-native-safe-area-context, authorOf(), ChildHomePage(), greetingKey(), NO_TASKS, EarnGoalCard(), percent() (+9 more)
+### Community 58 - "family-event-form-page.tsx"
+Cohesion: 0.18
+Nodes (8): react-native-safe-area-context, CreateFamilyEventPage(), EditFamilyEventPage(), FamilyEventFormPage(), FamilyEventFormPageProps, styles, styles, TabScreenProps
 
-### Community 59 - "map/map.tsx"
+### Community 59 - "map.web.tsx"
 Cohesion: 0.10
-Nodes (18): vehicleIcon, createVehiclesLayer(), zonesToGeoJson(), FamilyMarker, later(), MAP_CENTER, MAP_IMAGES, MAP_STYLE_JSON (+10 more)
+Nodes (26): busRouteKey(), vehicleIcon, createVehiclesLayer(), draftFillLayer, draftLineLayer, draftPointsLayer, ZONE_DRAFT_LAYER_IDS, ZONE_LAYER_IDS (+18 more)
 
-### Community 60 - "activity-card.tsx"
-Cohesion: 0.06
-Nodes (23): ActivityCard(), ActivityCardProps, ActivityStatus, ActivityTone, CONNECTORS, GRADIENTS, REWARD_STYLES, STATUS_STYLES (+15 more)
+### Community 60 - "queryIntersectsFeature"
+Cohesion: 0.17
+Nodes (12): du(), gm(), Gu(), Hm(), Ju(), Ku(), _m(), qu() (+4 more)
 
-### Community 61 - "transaction-card.tsx"
-Cohesion: 0.29
-Nodes (15): formatBalance(), formatTransactionTotal(), transactionCode(), BalanceNote(), ChildTransactionCard(), ChildTransactionCardProps, Details(), fullDate() (+7 more)
+### Community 61 - "children-carousel.tsx"
+Cohesion: 0.23
+Nodes (9): ChildCard(), SnapCarouselOptions, useSnapCarousel(), ChildrenCarousel(), ChildrenCarouselProps, CAROUSEL_GAP, CAROUSEL_GUTTER, CAROUSEL_PEEK (+1 more)
 
 ### Community 62 - "family-task-app-wireframes.canvas.tsx"
 Cohesion: 0.25
 Nodes (18): ChildAvatar(), CoinBadge(), FamilyIllustration(), FamilyTaskAppWireframes(), GoalProgress(), KidBalanceCard(), KidTaskRow(), ParentBalanceCard() (+10 more)
 
 ### Community 63 - "clone"
-Cohesion: 0.11
-Nodes (19): add(), clone(), div(), divByPoint(), filter(), getAndRemove(), _getAndRemoveByKey(), has() (+11 more)
+Cohesion: 0.08
+Nodes (29): add(), clone(), Cu(), div(), divByPoint(), emplace(), filter(), getAndRemove() (+21 more)
 
-### Community 64 - "layer-preferences.ts"
-Cohesion: 0.13
-Nodes (18): asBoolean(), asIds(), DEFAULT_CHILD_MARKER_COLOR, DEFAULT_PARENT_MARKER_COLOR, DEFAULT_SECTIONS, DEFAULT_SETTINGS, HIDDEN_FIELD, HiddenLayerKey (+10 more)
+### Community 64 - "family-event.tsx"
+Cohesion: 0.12
+Nodes (7): capitalize(), dateRangeLabel(), FamilyEventPage(), REMINDER_KEYS, REMINDER_LEADS, reminderLeadKey(), timeRangeLabel()
 
 ### Community 65 - "road-path.ts"
 Cohesion: 0.15
@@ -527,28 +520,28 @@ Cohesion: 0.29
 Nodes (16): AddChildScreenBody(), ChildCard(), ChildScanQrScreenBody(), FamilyIllustration(), Field(), GhostBtn(), ModeTabs(), notes (+8 more)
 
 ### Community 67 - "n"
-Cohesion: 0.13
-Nodes (17): A(), an(), n(), fy(), gy(), hy(), ji(), k() (+9 more)
+Cohesion: 0.20
+Nodes (12): A(), n(), fy(), gy(), hy(), ji(), k(), ki() (+4 more)
 
 ### Community 68 - "constructor"
 Cohesion: 0.12
 Nodes (17): addImages(), calculateScaledKey(), cc(), constructor(), cv(), _down(), Fu(), initializeIndex() (+9 more)
 
-### Community 69 - "tasks-header.tsx"
-Cohesion: 0.14
-Nodes (13): ACCENT_GRADIENT, Owner, OwnerTitle(), SegmentLabel(), SegmentLabelProps, Segments(), SegmentsProps, styles (+5 more)
+### Community 69 - "children-filter.tsx"
+Cohesion: 0.29
+Nodes (6): ChildFilterValue, ChildrenFilter(), ChildrenFilterProps, FilterChild, Segment(), SegmentProps
 
 ### Community 70 - "config.ts"
-Cohesion: 0.10
-Nodes (26): i18next@^26.5.8, i18next, LanguageMenu(), LanguageMenuProps, OPTIONS, detectLanguage(), i18n, resources (+18 more)
+Cohesion: 0.11
+Nodes (25): expo-localization@~56.0.6, i18next@^26.5.8, react-i18next@^17.1.6, react-native-mmkv@^4.3.2, expo-localization, i18next, react-i18next, react-native-mmkv (+17 more)
 
 ### Community 71 - "pe"
-Cohesion: 0.23
-Nodes (16): me(), y_(), b(), be(), d(), _e(), f(), ge() (+8 more)
+Cohesion: 0.22
+Nodes (17): me(), y_(), b(), be(), d(), _e(), f(), ge() (+9 more)
 
-### Community 72 - "validation.ts"
-Cohesion: 0.15
-Nodes (15): DISPLAY_NAME_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, VERIFICATION_CODE_LENGTH, FieldError, LoginErrors, LoginForm, PASSWORD_RULES (+7 more)
+### Community 72 - "isApiError"
+Cohesion: 0.12
+Nodes (25): requestError(), validateLogin(), FieldHint(), HintTone, PasswordRules(), ChangePasswordErrorInfo, RequestStep(), ChangePasswordPage() (+17 more)
 
 ### Community 73 - "setPaintProperty"
 Cohesion: 0.14
@@ -563,68 +556,68 @@ Cohesion: 0.18
 Nodes (15): ChecklistField(), ChecklistFieldProps, ChecklistHintIcon(), ChecklistPlusIcon(), HANDLE_DOTS, StepHandleIcon(), StepRemoveIcon(), Controller (+7 more)
 
 ### Community 76 - "l"
-Cohesion: 0.14
-Nodes (14): ad(), anchorPoint(), bm(), dt(), getTilePoint(), l(), loadGeometry(), lt() (+6 more)
-
-### Community 77 - "date-time-picker-sheet.tsx"
 Cohesion: 0.15
-Nodes (18): clampDate(), endOfDay(), formatCountdown(), is24HourClock(), pad(), DateTimePickerSheet(), DateTimePickerSheetProps, HOURS_12 (+10 more)
+Nodes (13): ac(), anchorPoint(), bm(), ed(), getTilePoint(), ic(), l(), map() (+5 more)
 
-### Community 78 - "auth/index.ts"
+### Community 77 - "FamilySetupPage"
+Cohesion: 0.12
+Nodes (18): createFamily(), useFamilyInvitePreview(), formatInviteCode(), InviteRole, isCompleteInviteCode(), FoundInvite, InviteCodeState, InviteCodeStatus (+10 more)
+
+### Community 78 - "apiRequest"
+Cohesion: 0.16
+Nodes (21): errorFrom(), LocationSessionBinding, publishChildLocation(), PublishLocationPoint, send(), sessionMatches(), ApiError, apiRequest() (+13 more)
+
+### Community 79 - "jy"
+Cohesion: 0.12
+Nodes (17): ai(), by(), Di(), eb(), ey(), ii(), iy(), jy() (+9 more)
+
+### Community 80 - "ui/family.tsx"
 Cohesion: 0.20
-Nodes (15): login(), logout(), register(), resendVerification(), verifyEmail(), useViewerRoleStore, authLog(), forgetSignUp() (+7 more)
-
-### Community 79 - "ui/family-setup.tsx"
-Cohesion: 0.11
-Nodes (27): RequestError, requestError(), attemptsLeft(), ChangeEmailError, ChangeEmailErrorInfo, commonError(), confirmEmailChangeError(), info() (+19 more)
-
-### Community 80 - "avatar-cropper.tsx"
-Cohesion: 0.19
-Nodes (12): AvatarCropper(), AvatarCropperProps, clamp(), CropperContent(), Offset, styles, touchDistance(), View2D (+4 more)
+Nodes (9): TransferOwnershipButton(), FamilyPage(), NO_MEMBERS, NO_TASKS, photo(), DELETE_ACTION_WIDTH, REVEAL_GAP, styles (+1 more)
 
 ### Community 82 - "hasDebugData"
 Cohesion: 0.17
 Nodes (13): _addCollisionDebugVertex(), addCollisionDebugVertices(), addDebugCollisionBoxes(), destroy(), destroyDebugData(), generateCollisionDebugBuffers(), getVertexAttributes(), hasDebugData() (+5 more)
 
-### Community 83 - "family-event-form.tsx"
-Cohesion: 0.19
-Nodes (10): createRequestId(), defaultReminderLead(), defaultStart(), FamilyEventForm(), FamilyEventFormProps, nextAnnual(), REMINDER_OPTIONS, timeLabel() (+2 more)
+### Community 83 - "maplibre-gl"
+Cohesion: 0.13
+Nodes (18): maplibre-gl@6.10.0, maplibre-gl, OSM_SOURCE, MAP_STYLE, ZONE_DRAFT_LAYERS, ZONE_DRAFT_SOURCE, zoneDraftToGeoJson(), createMap() (+10 more)
 
-### Community 84 - "history-map.tsx"
-Cohesion: 0.31
-Nodes (8): HistoryMapLayer(), HISTORY_GAP_COLOR, HistoryMapProps, HistoryMarker, HistoryPoint, routeSegments(), styles, HistoryMapLayer()
+### Community 84 - "map-history.tsx"
+Cohesion: 0.11
+Nodes (27): @maplibre/maplibre-react-native@^11.4.0, @maplibre/maplibre-react-native, HistoryData, historyDate(), HistoryDay(), HistoryType, MapHistory(), RouteData (+19 more)
 
-### Community 85 - "zm"
-Cohesion: 0.20
-Nodes (12): Am(), Dm(), em(), fm(), jm(), km(), Lm(), nm() (+4 more)
-
-### Community 86 - "ui/edit-profile.tsx"
+### Community 85 - "paint"
 Cohesion: 0.06
-Nodes (7): ChangeEmailPage(), goBack(), EditProfilePage(), PhotoChoice, ProfileHero(), ProfilePage(), ProfileHeaderProps
+Nodes (41): addTileFeatures(), Am(), cluster(), createIndex(), createTree(), Dm(), em(), fm() (+33 more)
 
-### Community 87 - "transaction-row.tsx"
-Cohesion: 0.22
-Nodes (11): formatTransactionAmount(), AMOUNT_STYLES, CardIcon(), ChildTransactionRow(), RowFrame(), RowFrameProps, RowLook, TransactionRow() (+3 more)
+### Community 86 - "ui/profile.tsx"
+Cohesion: 0.15
+Nodes (15): joinError(), JoinFamilyPanel(), LanguageMenu(), LanguageMenuProps, OPTIONS, ProfileHero(), ProfilePage(), useLanguage() (+7 more)
 
-### Community 88 - "family-event.tsx"
-Cohesion: 0.20
-Nodes (7): capitalize(), dateRangeLabel(), FamilyEventPage(), REMINDER_KEYS, REMINDER_LEADS, reminderLeadKey(), timeRangeLabel()
+### Community 87 - "use-cancel-task.ts"
+Cohesion: 0.43
+Nodes (5): cancelServerTask(), cancelTask(), useCancelTask(), CancelTaskButton(), CancelTaskSheet()
+
+### Community 88 - "tasks-query.ts"
+Cohesion: 0.36
+Nodes (7): TaskViewer, fetchTasks(), taskKeys, useTasks(), group(), sortTasksByUrgency(), time()
 
 ### Community 89 - "i"
-Cohesion: 0.22
-Nodes (11): ac(), ay(), cy(), ic(), id(), ly(), oy(), sy() (+3 more)
+Cohesion: 0.24
+Nodes (10): ay(), cy(), ee(), id(), ly(), oy(), sy(), updatePaintArrays() (+2 more)
 
-### Community 90 - "ui/calendar.tsx"
-Cohesion: 0.10
-Nodes (11): CalendarPage(), capitalize(), formatMonthYear(), formatWeekdayShort(), isSameDay(), locale(), DayCell(), DayCellProps (+3 more)
+### Community 90 - "Wu"
+Cohesion: 0.33
+Nodes (7): cd(), fd(), ld(), pd(), sd(), ud(), Wu()
 
 ### Community 91 - "Expo Router Navigation"
 Cohesion: 0.22
 Nodes (10): Expo Router Data Loaders, Offline Support and Cancellation, Expo Networking Guidance, Form Sheet Presentation, Route Structure, Native Header Search, Native Tabs, Native Toolbars and Headers (+2 more)
 
-### Community 93 - "add-child-sheet.tsx"
-Cohesion: 0.09
-Nodes (22): expo-file-system, expo-image-manipulator, createChild(), setChildAvatar(), CHILD_NAME_MAX_LENGTH, NewChild, useCreateChild(), AddChildSheet() (+14 more)
+### Community 93 - "xt"
+Cohesion: 0.29
+Nodes (7): dn(), jn(), off(), On(), once(), transitioned(), xt()
 
 ### Community 94 - "keep-in-view.ts"
 Cohesion: 0.32
@@ -634,81 +627,77 @@ Nodes (7): currentOffset(), KeepInView, KeepInViewContext, keepInViewScrollStyle
 Cohesion: 0.20
 Nodes (10): scripts, android, format, format:check, ios, lint, lint:fix, lint:fsd (+2 more)
 
-### Community 96 - "eh"
-Cohesion: 0.20
-Nodes (10): ah(), eh(), ih(), jh(), Mh(), nh(), qm(), rh() (+2 more)
+### Community 96 - "queryIntersectsFeature"
+Cohesion: 0.14
+Nodes (16): ad(), dd(), Dp(), eh(), ih(), loadGeometry(), nh(), od() (+8 more)
 
 ### Community 97 - "en"
 Cohesion: 0.27
 Nodes (10): bc(), completeTask(), process(), processTask(), receive(), Sc(), sendAsync(), vc() (+2 more)
 
-### Community 98 - "operation/index.ts"
-Cohesion: 0.21
-Nodes (10): KindColors, OPERATION_KIND_COLORS, OperationKind, KindCube(), BARS, styles, DaySummary(), DaySummaryProps (+2 more)
+### Community 98 - "isApiError"
+Cohesion: 0.30
+Nodes (12): RequestError, attemptsLeft(), ChangeEmailError, commonError(), confirmEmailChangeError(), info(), requestEmailChangeError(), ChangePasswordError (+4 more)
 
 ### Community 99 - "T"
 Cohesion: 0.29
 Nodes (10): Y, z, _finishRequestTiming(), _getEtagUnmodifiedResult(), _getExpiryData(), loadData(), loadTile(), _parseWorkerTile() (+2 more)
 
-### Community 100 - "task/index.ts"
-Cohesion: 0.14
-Nodes (22): reviewServerSubmission(), approveTask(), rejectTask(), formatRewardShort(), TILE_GAP, isCommentRequired(), isDeadlinePassed(), REJECT_COMMENT_MAX_LENGTH (+14 more)
+### Community 100 - "use-review-task.ts"
+Cohesion: 0.36
+Nodes (7): isDeadlinePassed(), REJECT_COMMENT_MAX_LENGTH, RejectDecision, rejectReasons, reviewError(), useReviewTask(), ReviewActions()
 
 ### Community 101 - "loadAndProcessGeoJSON"
 Cohesion: 0.25
 Nodes (9): dy(), r(), cn(), ln(), _filterGeoJSON(), _getFilterPredicate(), loadAndProcessGeoJSON(), oe() (+1 more)
 
-### Community 102 - "paint"
-Cohesion: 0.22
-Nodes (9): gC(), Hc(), hp(), nb(), ng(), paint(), qx(), Vd() (+1 more)
+### Community 102 - "providers/index.tsx"
+Cohesion: 0.33
+Nodes (10): FRESH_MS, listenAppFocus(), useRefreshOnNavigate(), useServerEvents(), AppEffects(), Providers(), queryClient, ChildLocationSharingSync() (+2 more)
 
 ### Community 103 - "lib/index.ts"
-Cohesion: 0.10
-Nodes (30): TaskAssignee, AssigneeAvatar(), AssigneeAvatarProps, styles, ChildReviewRow(), ChildReviewRowProps, ChildTaskTile(), ChildTaskTileProps (+22 more)
+Cohesion: 0.11
+Nodes (39): TaskAssignee, AssigneeAvatar(), AssigneeAvatarProps, ChildReviewRow(), ChildReviewRowProps, ChildTaskTile(), ChildTaskTileProps, TaskRow() (+31 more)
 
-### Community 104 - "family-event-form-page.tsx"
-Cohesion: 0.23
-Nodes (5): CreateFamilyEventPage(), EditFamilyEventPage(), FamilyEventFormPage(), FamilyEventFormPageProps, styles
+### Community 104 - "Релиз.md"
+Cohesion: 0.50
+Nodes (4): Family Wallet MVP Architecture, Task Reward Lifecycle, Task Creator Mockup, Parent Child Reward MVP Flow
 
-### Community 105 - "wish/index.ts"
-Cohesion: 0.08
-Nodes (44): base(), createServerWish(), deleteServerWish(), fetchServerWishes(), httpsUrl(), reorderServerWishes(), saveServerWishPhotos(), toBody() (+36 more)
+### Community 105 - "api/index.ts"
+Cohesion: 0.06
+Nodes (63): @tanstack/react-query, useCurrentFamily(), cancelFamilyEvent(), respondToFamilyEvent(), familyEventsKeys, useSessionUser(), base(), createServerWish() (+55 more)
 
 ### Community 106 - "Expo Upgrade"
 Cohesion: 0.25
 Nodes (8): expo-audio Migration, expo-video Migration, Native Tabs Migration, New Architecture, React 19, React Compiler, Expo Router Migration, Expo Upgrade
 
-### Community 107 - "ui/map-zone.tsx"
-Cohesion: 0.18
-Nodes (3): MapZonePage(), styles, zoneCenter()
+### Community 108 - "constructor"
+Cohesion: 0.20
+Nodes (11): ae(), R, re(), constructor(), _getAvailableImages(), _getDEMWorkerSource(), _getGlobalState(), _getLayerIndex() (+3 more)
 
-### Community 108 - "splitTile"
+### Community 109 - "location-connection.tsx"
+Cohesion: 0.10
+Nodes (26): Location, ZonePresence, ZonePresenceState, deviceLabel(), later(), LiveLocation, LocationStore, useLiveHiddenAccess() (+18 more)
+
+### Community 110 - "wish-row.tsx"
+Cohesion: 0.22
+Nodes (7): WishProgress, FILLS, styles, WishRowProps, WishThumb(), styles, WishlistPreviewProps
+
+### Community 111 - "note-draft-store.ts"
 Cohesion: 0.36
-Nodes (8): addTileFeatures(), getTile(), Hh(), initialize(), invalidateTiles(), kh(), splitTile(), updateIndex()
+Nodes (8): NO_PHOTOS, NoteDraftState, useNoteDraft(), useNoteDraftStore, usePhotoDraft(), without(), MyTaskCard(), choosePhotos()
 
-### Community 109 - "use-pair-device.ts"
-Cohesion: 0.26
-Nodes (8): pairChildDevice(), usePairDevice(), capitalize(), deviceLabel(), webLabel(), installationId(), storage, uuid()
-
-### Community 110 - "eh"
-Cohesion: 0.25
-Nodes (8): ch(), im(), lh(), sh(), Sm(), wm(), xm(), zh()
-
-### Community 111 - "family-color-palettes.canvas.tsx"
-Cohesion: 0.35
-Nodes (10): BASE, FamilyColorPalettes(), FamilyTheme, MiniPhone(), SOFT, Swatch(), ThemeCardClean(), THEMES (+2 more)
-
-### Community 112 - "canvases/mvp-c4-business-logic.canvas.tsx"
-Cohesion: 0.42
-Nodes (9): Arrow(), C4Kind, C4Node(), ContainerDiagram(), ContextDiagram(), EntityTable(), FlowDiagram(), MvpC4BusinessLogic() (+1 more)
+### Community 112 - "family-event-form.styled.ts"
+Cohesion: 0.27
+Nodes (4): styles, EventRowProps, styles, webInputReset
 
 ### Community 113 - "oh"
-Cohesion: 0.33
-Nodes (7): dh(), fh(), filterUpdate(), oh(), ph(), uh(), updateData()
+Cohesion: 0.20
+Nodes (11): ch(), dh(), fh(), filterUpdate(), lh(), oh(), ph(), sh() (+3 more)
 
-### Community 114 - "ui/rewards-history.tsx"
-Cohesion: 0.06
-Nodes (9): NO_OPERATIONS, NO_TASKS, NO_OPERATIONS, NO_TASKS, openReward(), ParentProfilePage(), NO_OPERATIONS, NO_OPERATIONS (+1 more)
+### Community 114 - "bottom-nav.tsx"
+Cohesion: 0.36
+Nodes (5): BottomNavItem, NAV_ITEMS, BottomNavProps, NAV_PADDING_VERTICAL, styles
 
 ### Community 115 - "interpolate"
 Cohesion: 0.33
@@ -716,23 +705,23 @@ Nodes (7): hg(), hr(), interpolate(), mr(), Or(), pr(), _r()
 
 ### Community 116 - "react-native"
 Cohesion: 0.09
-Nodes (42): ChildChip(), ChipChild, REWARD_PRESETS, buildCreateTaskPayload(), ChecklistDraftStep, checklistPayload(), FormActions, FormState (+34 more)
+Nodes (43): CHECKLIST_MAX_ITEMS, ChildChip(), ChipChild, REWARD_PRESETS, buildCreateTaskPayload(), ChecklistDraftStep, checklistPayload(), FormActions (+35 more)
 
-### Community 117 - "user/index.ts"
-Cohesion: 0.06
-Nodes (42): ROLE_COLORS, RoleColors, Child, ChildProfile, Location, ZonePresence, ZonePresenceState, ParentProfile (+34 more)
+### Community 117 - "react-native"
+Cohesion: 0.05
+Nodes (49): expo-linear-gradient, BadgeSize, GRADIENTS, ICON_SIZE, styles, TaskIconBadgeProps, ROLE_COLORS, RoleColors (+41 more)
 
 ### Community 118 - "en"
 Cohesion: 0.24
 Nodes (10): Cn(), en(), hn(), mn(), nn(), qt(), rn(), Sn() (+2 more)
 
-### Community 119 - "obsidian-done/mvp-c4-business-logic.canvas.tsx"
-Cohesion: 0.42
-Nodes (9): Arrow(), C4Kind, C4Node(), ContainerDiagram(), ContextDiagram(), EntityTable(), FlowDiagram(), MvpC4BusinessLogic() (+1 more)
+### Community 119 - "session-refresh-lock.ts"
+Cohesion: 0.53
+Nodes (5): lockFile, release(), tryAcquire(), wait(), withRefreshLock()
 
-### Community 120 - "missed-task-tile.tsx"
-Cohesion: 0.15
-Nodes (11): FeaturedEventCard(), formatDayRange(), formatMonthDay(), MissedTaskTile(), MissedTaskTileProps, sameDay(), styles, PaidTaskTile() (+3 more)
+### Community 120 - "queryRadius"
+Cohesion: 0.50
+Nodes (4): cg(), nd(), queryRadius(), rd()
 
 ### Community 121 - "appendLeaves"
 Cohesion: 0.33
@@ -746,13 +735,13 @@ Nodes (6): _colorRampChanged(), _createColorRamp(), getColorRampTextures(), getU
 Cohesion: 0.33
 Nodes (6): eg(), hd(), layout(), pp(), qy(), um()
 
-### Community 124 - "ii"
-Cohesion: 0.33
-Nodes (6): ai(), Di(), ii(), ni(), oi(), ti()
+### Community 124 - "react-native-reanimated"
+Cohesion: 0.40
+Nodes (4): react-native-reanimated@^4.3.1, react-native-reanimated, EASE_IN_OUT, EASE_OUT
 
-### Community 125 - "queryIntersectsFeature"
-Cohesion: 0.20
-Nodes (12): dd(), gm(), Gu(), Hm(), Ju(), Ku(), _m(), qu() (+4 more)
+### Community 125 - "V"
+Cohesion: 0.40
+Nodes (5): H(), replace(), U(), update(), V()
 
 ### Community 126 - "DoneReceived Project Guidance"
 Cohesion: 0.40
@@ -770,9 +759,9 @@ Nodes (5): Reward and Penalty Configuration, Deadline and Recurrence Configurati
 Cohesion: 0.40
 Nodes (5): Ab(), Fb(), jb(), kb(), ob()
 
-### Community 130 - "family-color-palettes-new.canvas.tsx"
-Cohesion: 0.44
-Nodes (8): FamilyColorPalettesNew(), FamilyTheme, MiniPhone(), Swatch(), ThemePreview(), THEMES, tint(), WelcomeBlock()
+### Community 130 - "use-reset-invite-code.ts"
+Cohesion: 0.67
+Nodes (3): revokeParentInvite(), familiesKeys, useResetInviteCode()
 
 ### Community 131 - "_refreshViews"
 Cohesion: 0.40
@@ -782,17 +771,13 @@ Nodes (5): freeBufferAfterUpload(), _refreshViews(), reserve(), resize(), _trim(
 Cohesion: 0.40
 Nodes (5): update(), _updateDomImage(), _updateRawData(), _uploadDomImage(), _uploadRawData()
 
-### Community 133 - "jy"
-Cohesion: 0.20
-Nodes (11): by(), eb(), ey(), iy(), jy(), ny(), ry(), ty() (+3 more)
+### Community 134 - "useTheme"
+Cohesion: 0.08
+Nodes (40): expo-router, WalletRoute(), useFamilyChildren(), depositFunds(), fetchParentFunds(), ParentWalletDto, toFunds(), fetchParentPaidTotal() (+32 more)
 
-### Community 134 - "deposit-sheet.tsx"
-Cohesion: 0.31
-Nodes (7): walletKeys, formatMoney(), useDeposit(), createRequestId(), DepositSheet(), DepositSheetProps, PRESETS
-
-### Community 135 - "Task Reward Lifecycle"
-Cohesion: 0.50
-Nodes (4): Family Wallet MVP Architecture, Task Reward Lifecycle, Task Creator Mockup, Parent Child Reward MVP Flow
+### Community 135 - "ah"
+Cohesion: 0.67
+Nodes (3): ah(), jh(), Mh()
 
 ### Community 136 - "Gamified Household Task Profile Dashboard"
 Cohesion: 0.67
@@ -810,21 +795,17 @@ Nodes (3): Retryable Task Rejection, Task Submission Comment, Per-Assignment Tas
 Cohesion: 0.50
 Nodes (4): bt(), distance(), pointOnLine(), wrap()
 
-### Community 141 - "createIndex"
-Cohesion: 0.50
-Nodes (4): cluster(), createIndex(), createTree(), load()
+### Community 141 - "dt"
+Cohesion: 0.67
+Nodes (3): dt(), lt(), ut()
 
 ### Community 142 - "ot"
 Cohesion: 0.50
 Nodes (4): de(), ot(), pe(), ve()
 
 ### Community 143 - "Dp"
-Cohesion: 0.50
-Nodes (4): Dp(), geometry(), projectLine(), projectPoint()
-
-### Community 144 - "getClustersInternal"
-Cohesion: 0.50
-Nodes (4): getClusters(), getClustersInternal(), limitZoom(), wh()
+Cohesion: 0.67
+Nodes (3): geometry(), projectLine(), projectPoint()
 
 ### Community 145 - "ov"
 Cohesion: 0.50
@@ -874,89 +855,61 @@ Nodes (3): _div(), mag(), _unit()
 Cohesion: 0.67
 Nodes (3): within(), withinInto(), xh()
 
-### Community 160 - "ui/wallet.tsx"
-Cohesion: 0.12
-Nodes (15): HomeRoute(), RewardsHistoryRoute(), TasksRoute(), TransactionsRoute(), WalletRoute(), useViewerRole(), ChildRewardsHistoryPage(), RewardsHistoryPage() (+7 more)
+### Community 160 - "swipeable-row.tsx"
+Cohesion: 0.50
+Nodes (3): rubberBand(), styles, SwipeableRowProps
 
-### Community 186 - "ref_cursor"
-Cohesion: 0.36
-Nodes (6): MainScreensComparison(), Phone(), Theme, ThemeRow(), THEMES, tint()
+### Community 187 - "showToast"
+Cohesion: 0.08
+Nodes (28): useChildBalance(), WishRow(), isChildHasBalanceError(), useDeleteMyProfile(), DeleteAccountSheet(), DeleteAccountStep, WishFormSheet(), ChangeEmailPage() (+20 more)
 
-### Community 187 - "tab-screen.tsx"
-Cohesion: 0.47
-Nodes (4): BottomNav(), styles, TabScreen(), TabScreenProps
-
-### Community 188 - "entities/wallet/index.ts"
-Cohesion: 0.46
-Nodes (5): depositFunds(), ParentWalletDto, toFunds(), getParentFunds(), ParentFunds
+### Community 188 - "use-push-registration.ts"
+Cohesion: 0.09
+Nodes (13): expo-notifications@~56.0.26, expo-notifications, expoProjectId(), pushLog(), requestExpoToken(), retryPendingRemovals(), syncPushRegistration(), syncPushToken() (+5 more)
 
 ### Community 190 - "get"
 Cohesion: 0.29
 Nodes (8): backfillBorder(), get(), _getByteView(), getPixels(), _idx(), sampleBilinear(), unpack(), _unpackAtIndex()
 
-### Community 191 - "Wu"
-Cohesion: 0.33
-Nodes (7): cd(), fd(), ld(), pd(), sd(), ud(), Wu()
-
-### Community 192 - "activity-card.tsx"
-Cohesion: 0.13
-Nodes (15): ActivityDto, ChildDto, fetchClosedAssignments(), fetchFeed(), isLastRejection(), KNOWN, MemberDto, MissedDto (+7 more)
+### Community 192 - "use-location-socket.ts"
+Cohesion: 0.08
+Nodes (34): isSnapshot(), connect(), VehiclesMessage, Message, parse(), RECONNECT_MS, useLocationSocket(), connect() (+26 more)
 
 ### Community 193 - "_h"
 Cohesion: 0.40
 Nodes (5): bh(), finish(), _h(), vh(), yh()
 
-### Community 194 - "xt"
-Cohesion: 0.29
-Nodes (7): dn(), jn(), off(), On(), once(), transitioned(), xt()
+### Community 194 - "ui/role-select.tsx"
+Cohesion: 0.22
+Nodes (7): ChildAccountFound(), styles, ChildCodeField(), ChildCodeFieldProps, styles, Role, ROLES
 
-### Community 195 - "src_shared_ui_index_icon"
-Cohesion: 0.10
-Nodes (14): PeriodSelectProps, CancelTaskSheetProps, styles, ResetInviteCodeRowProps, styles, ResetInviteCodeSheetProps, styles, styles (+6 more)
+### Community 195 - "ui/index.ts"
+Cohesion: 0.05
+Nodes (47): formatRewardShort(), FundsBar(), FundsBarProps, FundsLegendItem(), FundsLegendItemProps, FundsSegment, styles, AddChildSheet() (+39 more)
 
-### Community 196 - "use-buses-socket.ts"
-Cohesion: 0.40
-Nodes (5): isSnapshot(), useBusesSocket(), connect(), VehiclesMessage, WS_URL
-
-### Community 197 - "queryRadius"
-Cohesion: 0.50
-Nodes (4): cg(), nd(), queryRadius(), rd()
-
-### Community 206 - "photo-viewer.tsx"
-Cohesion: 0.18
-Nodes (13): ChildChipProps, styles, ApiImage(), HeaderSource, headerSource(), PhotoCarousel(), PhotoCarouselProps, styles (+5 more)
-
-### Community 207 - "section-header.tsx"
-Cohesion: 0.32
-Nodes (6): ScreenSection(), ScreenSectionProps, styles, SectionHeader(), SectionHeaderProps, styles
-
-### Community 223 - "swipeable-row.tsx"
-Cohesion: 0.50
-Nodes (4): rubberBand(), styles, SwipeableRow(), SwipeableRowProps
-
-### Community 256 - "reward-kind-toggle.tsx"
-Cohesion: 0.06
-Nodes (23): expo-linear-gradient, BadgeSize, GRADIENTS, ICON_SIZE, styles, TaskIconBadgeProps, FILLS, WishRow() (+15 more)
+### Community 256 - "activity-card.tsx"
+Cohesion: 0.12
+Nodes (17): ActivityCard(), ActivityCardProps, ActivityStatus, ActivityTone, CONNECTORS, GRADIENTS, REWARD_STYLES, STATUS_STYLES (+9 more)
 
 ## Knowledge Gaps
-- **45 isolated node(s):** `Cancelled`, `Done`, `Pending`, `expo/tsconfig.base`, `expo-audio Migration` (+40 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1276 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **45 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **45 isolated node(s):** `Cancelled`, `Done`, `Pending`, `expo/tsconfig.base`, `Family Wallet MVP Architecture` (+40 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1100 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **50 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `reward-kind-toggle.tsx`, `tracking`, `family-color-palettes-new.canvas.tsx`, `react-native`, `zones.ts`, `bar-3d.tsx`, `deposit-sheet.tsx`, `package.json`, `ui/family-setup.tsx`, `withAlpha`, `useCurrentFamily`, `tasks-header.tsx`, `child-task-card.tsx`, `use-child-location-sharing.ts`, `i18n/index.ts`, `ui/map-layers.tsx`, `location-sharing-card.tsx`, `ui/tasks.tsx`, `mvp-full-design-variants.canvas.tsx`, `http.ts`, `parent-invite-code.tsx`, `useTheme`, `ui/index.ts`, `ui/change-password.tsx`, `device-api.ts`, `ui/wallet.tsx`, `use-child-account.ts`, `session/index.ts`, `wishlist.tsx`, `mvp-apple-premium.canvas.tsx`, `ui/family.tsx`, `root-layout.tsx`, `family-events-api.ts`, `ui/rewards-history.tsx`, `@tanstack/react-query`, `mvp-family-premium-mobile.canvas.tsx`, `ref_cursor`, `my-tasks.tsx`, `activity-card.tsx`, `tab-screen.tsx`, `family-task-app-wireframes.canvas.tsx`, `map/map.tsx`, `transaction-card.tsx`, `step1-onboarding-design.canvas.tsx`, `src_shared_ui_index_icon`, `use-buses-socket.ts`, `tasks-header.tsx`, `icon.tsx`, `checklist-field.tsx`, `date-time-picker-sheet.tsx`, `photo-viewer.tsx`, `ui/family-setup.tsx`, `avatar-cropper.tsx`, `section-header.tsx`, `family-event-form.tsx`, `history-map.tsx`, `ui/edit-profile.tsx`, `transaction-row.tsx`, `family-event.tsx`, `ui/calendar.tsx`, `add-child-sheet.tsx`, `keep-in-view.ts`, `swipeable-row.tsx`, `operation/index.ts`, `task/index.ts`, `lib/index.ts`, `wish/index.ts`, `ui/map-zone.tsx`, `family-color-palettes.canvas.tsx`, `canvases/mvp-c4-business-logic.canvas.tsx`, `ui/rewards-history.tsx`, `react-native`, `user/index.ts`, `obsidian-done/mvp-c4-business-logic.canvas.tsx`?**
-  _High betweenness centrality (0.115) - this node is a cross-community bridge._
+- **Why does `react` connect `react` to `activity-card.tsx`, `theme/index.ts`, `ui/map-zone.tsx`, `server-child-profile.tsx`, `bar-3d.tsx`, `ui/transactions.tsx`, `package.json`, `useTheme`, `lib/index.ts`, `theme.ts`, `Icon`, `use-child-location-sharing.ts`, `avatar-cropper.tsx`, `drag-handle.tsx`, `ui/map-layers.tsx`, `my-tasks.tsx`, `mvp-full-design-variants.canvas.tsx`, `confirm-step.tsx`, `react-native`, `device-api.ts`, `swipeable-row.tsx`, `ui/rewards-history.tsx`, `ui/transactions.tsx`, `mvp-apple-premium.canvas.tsx`, `date-time-picker-sheet.tsx`, `layer-preferences.ts`, `root-layout.tsx`, `ui/tasks.tsx`, `ui/calendar.tsx`, `family-event-form.tsx`, `session/index.ts`, `mvp-family-premium-mobile.canvas.tsx`, `family-event-form-page.tsx`, `showToast`, `use-push-registration.ts`, `children-carousel.tsx`, `family-task-app-wireframes.canvas.tsx`, `map.web.tsx`, `use-location-socket.ts`, `family-event.tsx`, `step1-onboarding-design.canvas.tsx`, `ui/index.ts`, `ui/role-select.tsx`, `children-filter.tsx`, `isApiError`, `checklist-field.tsx`, `FamilySetupPage`, `ui/family.tsx`, `maplibre-gl`, `map-history.tsx`, `ui/profile.tsx`, `use-cancel-task.ts`, `keep-in-view.ts`, `use-review-task.ts`, `providers/index.tsx`, `lib/index.ts`, `api/index.ts`, `location-connection.tsx`, `wish-row.tsx`, `react-native`, `react-native`, `react-native-reanimated`?**
+  _High betweenness centrality (0.098) - this node is a cross-community bridge._
 - **What connects `Cancelled`, `Done`, `Pending` to the rest of the system?**
   _45 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `maplibre-gl-shared.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.005952380952380952 - nodes in this community are weakly interconnected._
-- **Why does `react-native` connect `react-native` to `reward-kind-toggle.tsx`, `tracking`, `zones.ts`, `server-tasks-api.ts`, `bar-3d.tsx`, `deposit-sheet.tsx`, `package.json`, `ui/family-setup.tsx`, `withAlpha`, `useCurrentFamily`, `tasks-header.tsx`, `child-task-card.tsx`, `use-child-location-sharing.ts`, `i18n/index.ts`, `ui/map-layers.tsx`, `location-sharing-card.tsx`, `ui/tasks.tsx`, `http.ts`, `parent-invite-code.tsx`, `useTheme`, `ui/index.ts`, `ui/change-password.tsx`, `device-api.ts`, `ui/wallet.tsx`, `wishlist.tsx`, `ui/family.tsx`, `wallet.ts`, `root-layout.tsx`, `operation.ts`, `family-events-api.ts`, `ui/rewards-history.tsx`, `@tanstack/react-query`, `my-tasks.tsx`, `tab-screen.tsx`, `activity-card.tsx`, `map/map.tsx`, `transaction-card.tsx`, `activity-card.tsx`, `src_shared_ui_index_icon`, `tasks-header.tsx`, `checklist-field.tsx`, `date-time-picker-sheet.tsx`, `photo-viewer.tsx`, `ui/family-setup.tsx`, `avatar-cropper.tsx`, `section-header.tsx`, `family-event-form.tsx`, `history-map.tsx`, `ui/edit-profile.tsx`, `transaction-row.tsx`, `family-event.tsx`, `ui/calendar.tsx`, `add-child-sheet.tsx`, `keep-in-view.ts`, `swipeable-row.tsx`, `operation/index.ts`, `task/index.ts`, `lib/index.ts`, `family-event-form-page.tsx`, `wish/index.ts`, `ui/map-zone.tsx`, `use-pair-device.ts`, `ui/rewards-history.tsx`, `react-native`, `user/index.ts`, `missed-task-tile.tsx`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
-- **Should `tracking` be split into smaller, more focused modules?**
-  _Cohesion score 0.03647754959972155 - nodes in this community are weakly interconnected._
-- **Why does `theme` connect `tracking` to `reward-kind-toggle.tsx`, `react-native`, `bar-3d.tsx`, `deposit-sheet.tsx`, `ui/family-setup.tsx`, `withAlpha`, `tasks-header.tsx`, `child-task-card.tsx`, `use-child-location-sharing.ts`, `i18n/index.ts`, `ui/map-layers.tsx`, `location-sharing-card.tsx`, `ui/index.ts`, `device-api.ts`, `wishlist.tsx`, `ui/family.tsx`, `ui/rewards-history.tsx`, `my-tasks.tsx`, `map/map.tsx`, `activity-card.tsx`, `transaction-card.tsx`, `src_shared_ui_index_icon`, `checklist-field.tsx`, `date-time-picker-sheet.tsx`, `photo-viewer.tsx`, `section-header.tsx`, `avatar-cropper.tsx`, `family-event-form.tsx`, `history-map.tsx`, `ui/edit-profile.tsx`, `transaction-row.tsx`, `family-event.tsx`, `ui/calendar.tsx`, `add-child-sheet.tsx`, `operation/index.ts`, `task/index.ts`, `lib/index.ts`, `family-event-form-page.tsx`, `ui/map-zone.tsx`, `ui/rewards-history.tsx`, `react-native`, `user/index.ts`, `missed-task-tile.tsx`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Should `zones.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.06767676767676768 - nodes in this community are weakly interconnected._
+- **Why does `react-native` connect `react-native` to `activity-card.tsx`, `theme/index.ts`, `ui/map-zone.tsx`, `server-child-profile.tsx`, `bar-3d.tsx`, `ui/transactions.tsx`, `package.json`, `lib/index.ts`, `useTheme`, `PickedPhoto`, `theme.ts`, `Icon`, `use-child-location-sharing.ts`, `avatar-cropper.tsx`, `ui/map-layers.tsx`, `my-tasks.tsx`, `task.ts`, `confirm-step.tsx`, `feed-api.ts`, `validation.ts`, `device-api.ts`, `swipeable-row.tsx`, `ui/rewards-history.tsx`, `ui/transactions.tsx`, `date-time-picker-sheet.tsx`, `layer-preferences.ts`, `auth-api.ts`, `root-layout.tsx`, `ui/tasks.tsx`, `ui/calendar.tsx`, `family-event-form.tsx`, `session/index.ts`, `family-event-form-page.tsx`, `showToast`, `use-push-registration.ts`, `children-carousel.tsx`, `family-event.tsx`, `use-location-socket.ts`, `ui/role-select.tsx`, `ui/index.ts`, `children-filter.tsx`, `isApiError`, `checklist-field.tsx`, `ui/family.tsx`, `maplibre-gl`, `map-history.tsx`, `ui/profile.tsx`, `keep-in-view.ts`, `use-review-task.ts`, `providers/index.tsx`, `lib/index.ts`, `api/index.ts`, `featured-event-card.tsx`, `wish-row.tsx`, `note-draft-store.ts`, `family-event-form.styled.ts`, `bottom-nav.tsx`, `react-native`, `react-native`?**
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Should `theme/index.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.031234950120399035 - nodes in this community are weakly interconnected._
+- **Why does `theme` connect `theme/index.ts` to `activity-card.tsx`, `ui/map-zone.tsx`, `server-child-profile.tsx`, `bar-3d.tsx`, `ui/transactions.tsx`, `lib/index.ts`, `theme.ts`, `Icon`, `use-child-location-sharing.ts`, `avatar-cropper.tsx`, `ui/map-layers.tsx`, `my-tasks.tsx`, `confirm-step.tsx`, `react-native`, `ui/rewards-history.tsx`, `ui/transactions.tsx`, `date-time-picker-sheet.tsx`, `layer-preferences.ts`, `family-event-form-page.tsx`, `showToast`, `ui/role-select.tsx`, `ui/index.ts`, `isApiError`, `checklist-field.tsx`, `ui/family.tsx`, `map-history.tsx`, `lib/index.ts`, `api/index.ts`, `wish-row.tsx`, `bottom-nav.tsx`, `react-native`, `react-native`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Should `server-child-profile.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.08974358974358974 - nodes in this community are weakly interconnected._

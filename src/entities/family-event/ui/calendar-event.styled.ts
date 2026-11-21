@@ -23,6 +23,25 @@ export const styles = createStyles((colors) => ({
     width: '100%',
     height: '100%',
   },
+  photoActions: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  photoAction: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(8, 16, 32, 0.45)',
+  },
+  /** В форме над карточкой есть кнопки: текст начинается ниже, без наложения. */
+  copyWithActions: {
+    paddingTop: 52,
+  },
   overlay: {
     position: 'absolute',
     top: 0,
