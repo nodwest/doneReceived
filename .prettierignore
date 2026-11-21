@@ -12,3 +12,8 @@ data/english-words/
 .claude/skills/expo-*/
 .claude/skills/vercel-react-native-skills/
 .claude/skills/security-best-practices/
+
+# Сгенерировано: граф graphify, его навык (копия из внешнего репозитория) и сборка maplibre
+graphify-out/
+.claude/skills/graphify/
+public/maplibre/
