@@ -60,10 +60,8 @@ const APP_SCREENS = [
   'wishlist/[id]',
 ];
 
-// Нижние вкладки: переключаются кнопками навбара. Свайпа у них нет — экран и навбар
-// одинаковые, поэтому плавное растворение выглядит как смена одного содержимого:
-// кнопки остаются на месте. Вложенные экраны (профили, вишлисты) открываются как
-// раньше — сдвигом.
+// Каждый экран рисует свой навбар. Переключаем вкладки без анимации стека,
+// чтобы обе копии панели не накладывались друг на друга при переходе.
 const TAB_SCREENS = new Set([
   'index',
   'tasks',
@@ -75,7 +73,7 @@ const TAB_SCREENS = new Set([
   'profile',
 ]);
 
-const TAB_OPTIONS = { animation: 'fade' } as const;
+const TAB_OPTIONS = { animation: 'none' } as const;
 
 const restoreSession = async () => {
   await useSessionStore.getState().restore();

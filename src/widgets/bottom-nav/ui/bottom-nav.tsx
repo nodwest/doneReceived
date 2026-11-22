@@ -41,7 +41,7 @@ export function BottomNav({
             key={key}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
-            style={({ pressed }) => [styles.item, pressed && styles.pressed]}
+            style={styles.item}
             onPress={() => {
               if (onNavigate) return onNavigate(key);
               // Вкладка уже в истории (Family → Tasks → Family) — откатываемся
@@ -52,11 +52,7 @@ export function BottomNav({
             }}
           >
             <Icon name={icon} size={24} color={color} />
-            <Text
-              style={[styles.label, active && styles.labelActive, { color }]}
-            >
-              {t(`nav.${key}`)}
-            </Text>
+            <Text style={[styles.label, { color }]}>{t(`nav.${key}`)}</Text>
           </Pressable>
         );
       })}
