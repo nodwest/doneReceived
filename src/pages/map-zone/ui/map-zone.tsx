@@ -185,9 +185,14 @@ function ZoneEditor({
   const removePoint = () =>
     setDraft((current) => {
       if (current.selected === null) return current;
+      const points = current.points.filter(
+        (_, index) => index !== current.selected,
+      );
+      // Дальше выбрана последняя добавленная из оставшихся (точки только
+      // дописываются в конец): нажимая «Удалить точку», можно убрать все.
       return {
-        points: current.points.filter((_, index) => index !== current.selected),
-        selected: null,
+        points,
+        selected: points.length > 0 ? points.length - 1 : null,
       };
     });
 
