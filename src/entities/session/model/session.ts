@@ -107,3 +107,27 @@ export type PairedDevice = Session & {
 export type MessageResponse = {
   message: string;
 };
+
+/**
+ * Условия удаления аккаунта родителя: GET /users/me/deletion-preview.
+ * `confirmation` — подтверждение текущего состояния, его нужно
+ * вернуть в DELETE /users/me. 409 ACCOUNT_DELETION_CHANGED — состояние
+ * изменилось, preview нужно перечитать и подтвердить заново.
+ */
+export type AccountDeletionPreview = {
+  confirmation: string;
+  /** Семья удалится вместе с аккаунтом. */
+  deleteFamily: boolean;
+  /** Семья останется, владение перейдёт другому родителю. */
+  transferOwnership: boolean;
+  /** Виртуальные баллы на счету родителя, десятичная строка. */
+  parentPoints: string;
+  /** Баллы детей семьи, десятичные строки. */
+  children: { childId: string; points: string }[];
+};
+
+/** Удаление своего аккаунта: DELETE /users/me (только родитель). */
+export type DeleteAccountPayload = {
+  currentPassword: string;
+  confirmation: string;
+};

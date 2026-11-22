@@ -510,15 +510,15 @@
     "semantic_hash": ""
   },
   "src/entities/session/api/auth-api.ts": {
-    "mtime": 1794899663.1302295,
-    "seen": 1794920449.2381568,
-    "ast_hash": "8c2a323b70a66137b670b186a2eb50e7",
+    "mtime": 1795346196.4069715,
+    "seen": 1795346222.3623443,
+    "ast_hash": "1233258fe141661936cf57820489993b",
     "semantic_hash": ""
   },
   "src/entities/session/api/me-query.ts": {
-    "mtime": 1795082519.6058855,
-    "seen": 1795089062.3736954,
-    "ast_hash": "bfda8ae737a605ebbf806bbd848c41ad",
+    "mtime": 1795345646.6035655,
+    "seen": 1795345939.0250316,
+    "ast_hash": "99c9c5cc34d4fc4f39236b16a62592db",
     "semantic_hash": ""
   },
   "src/entities/session/index.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "src/entities/session/model/session.ts": {
-    "mtime": 1794917497.1650286,
-    "seen": 1794920449.2381568,
-    "ast_hash": "69bc5a1c8893de3b22fc7fccb63f588e",
+    "mtime": 1795346196.4056628,
+    "seen": 1795346222.3648548,
+    "ast_hash": "31dfdaa7f96c87596727b02ecd440270",
     "semantic_hash": ""
   },
   "src/entities/task/api/server-tasks-api.ts": {
@@ -2046,9 +2046,9 @@
     "semantic_hash": ""
   },
   "src/pages/profile/ui/profile.tsx": {
-    "mtime": 1795256528.9256365,
-    "seen": 1795256620.8919063,
-    "ast_hash": "bcf080b085860a6f69c2dd503bd23ed5",
+    "mtime": 1795345732.5436316,
+    "seen": 1795345939.0757935,
+    "ast_hash": "fe8dcbc2a9082b18e68beb66f7d2667c",
     "semantic_hash": ""
   },
   "src/pages/registration/index.ts": {
@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795338442.9608452,
-    "seen": 1795338463.1755931,
-    "ast_hash": "a0b6e22c4cc093a4444b295e1695f74b",
+    "mtime": 1795345760.420902,
+    "seen": 1795345939.0813015,
+    "ast_hash": "dbf23bc87a33245d5a09c75287a01ff5",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795338442.961853,
-    "seen": 1795338463.1755931,
-    "ast_hash": "5e148b9b36f0584dd96b5bb44b2a0028",
+    "mtime": 1795345760.488241,
+    "seen": 1795345939.0813015,
+    "ast_hash": "86cc823533b56e3aefe9d4be43297d2d",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -4170,9 +4170,9 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1795256525.7824762,
-    "seen": 1795256620.9425647,
-    "ast_hash": "0c3642b6d75a571ce46fd0cb170cd9ed",
+    "mtime": 1795340648.2205226,
+    "seen": 1795345939.139873,
+    "ast_hash": "3c9bf290bb7ef0f2382cbe54b70bd8d7",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -4968,9 +4968,9 @@
     "semantic_hash": ""
   },
   "src/pages/delete-account/ui/delete-account.tsx": {
-    "mtime": 1795338442.9582026,
-    "seen": 1795338463.157252,
-    "ast_hash": "d248b807b35b5af7eb38fe7f8761d58b",
+    "mtime": 1795345723.0596375,
+    "seen": 1795345939.0706892,
+    "ast_hash": "81855cb3a41dce27379edb706e009881",
     "semantic_hash": ""
   },
   "src/entities/session/api/push-tokens-api.ts": {
@@ -5280,9 +5280,39 @@
     "semantic_hash": ""
   },
   "AGENTS.override.md": {
-    "mtime": 1795338874.762989,
-    "seen": 1795339587.0504596,
-    "ast_hash": "a7f0899be9dbde7d4eb87f34558b4f17",
+    "mtime": 1795340648.2205226,
+    "seen": 1795345939.139873,
+    "ast_hash": "70dd7c61da90fe7326b5e39cf248f280",
+    "semantic_hash": ""
+  },
+  "src/features/delete-parent-account/index.ts": {
+    "mtime": 1795346185.9497037,
+    "seen": 1795346222.4012954,
+    "ast_hash": "e66e0fc7c53cf9366cd42546b771e2c3",
+    "semantic_hash": ""
+  },
+  "src/features/delete-parent-account/ui/delete-parent-account-sheet.tsx": {
+    "mtime": 1795345663.6581576,
+    "seen": 1795345939.0512748,
+    "ast_hash": "f72e535c15bef82c98ea8e4ab6e9b8dd",
+    "semantic_hash": ""
+  },
+  "src/pages/delete-account/ui/child-delete-account.tsx": {
+    "mtime": 1795345678.924301,
+    "seen": 1795345939.0700686,
+    "ast_hash": "0e010fdede34da1378d3bc538e189edb",
+    "semantic_hash": ""
+  },
+  "src/pages/delete-account/ui/parent-delete-account.styled.ts": {
+    "mtime": 1795345983.3809538,
+    "seen": 1795346021.6806617,
+    "ast_hash": "1ddc0177c69578e0e43aa4f922e99c14",
+    "semantic_hash": ""
+  },
+  "src/pages/delete-account/ui/parent-delete-account.tsx": {
+    "mtime": 1795346198.3080306,
+    "seen": 1795346222.4358668,
+    "ast_hash": "c621a959e78d39063604b1651bb3e5e9",
     "semantic_hash": ""
   },
   "package-lock.json": {

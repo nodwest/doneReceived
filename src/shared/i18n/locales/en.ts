@@ -1269,6 +1269,35 @@ export const en = {
       'This profile can’t be deleted while its balance is positive.',
     deleted: 'Account deleted',
     failed: 'Couldn’t delete the account. Please try again.',
+    parent: {
+      consequencesTitle: 'What happens when you delete your account',
+      accessEnded:
+        'You’ll be signed out everywhere. Your account can’t be restored.',
+      deleteFamily:
+        'Your family, child profiles, tasks, rewards and history will be permanently deleted.',
+      transferOwnership: 'The family stays. Another parent becomes the owner.',
+      leaveFamily: 'The family stays with the other parents and children.',
+      pointsDeletedTitle: 'Virtual points that will be deleted',
+      pointsStayingTitle: 'Virtual points',
+      parentBalance: 'Your balance',
+      childBalance: '{{name}}’s balance',
+      childFallback: 'Child profile',
+      pointsDeleted: 'All virtual points shown here will be lost permanently.',
+      pointsParentLost:
+        'Your virtual points will be lost. Children keep their balances in the family.',
+      passwordTitle: 'Confirm your password',
+      passwordMessage:
+        'Enter your current password to delete your account. This can’t be undone.',
+      passwordLabel: 'Current password',
+      passwordPlaceholder: 'Your password',
+      confirm: 'Delete my account',
+      changed:
+        'Account details changed. Review the updated information and confirm again.',
+      wrongPassword: 'Wrong current password.',
+      loadingFailed: 'Couldn’t load deletion details.',
+      tooManyAttempts: 'Too many attempts. Try again later.',
+      deleteFailed: 'Couldn’t delete the account. Please try again.',
+    },
   },
   words: {
     title: 'English',

@@ -1,7 +1,9 @@
 import { apiRequest } from '@shared/api';
 import { appendPhoto, type PickedPhoto } from '@shared/lib';
 import type {
+  AccountDeletionPreview,
   ChangePasswordPayload,
+  DeleteAccountPayload,
   LoginPayload,
   MessageResponse,
   PairDevicePayload,
@@ -179,4 +181,26 @@ export async function uploadMyAvatar(photo: PickedPhoto) {
 /** DELETE /users/me/avatar — убрать своё фото (вместо него — буква). */
 export function deleteMyAvatar() {
   return apiRequest<null>('/users/me/avatar', { method: 'DELETE' });
+}
+
+/**
+ * GET /users/me/deletion-preview — последствия удаления аккаунта родителя:
+ * что случится с семьёй, сколько виртуальных баллов спишется и
+ * подтверждение `confirmation` для DELETE /users/me.
+ */
+export function fetchAccountDeletionPreview() {
+  return apiRequest<AccountDeletionPreview>('/users/me/deletion-preview');
+}
+
+/**
+ * DELETE /users/me — удалить аккаунт родителя. Пароль подтверждает действие,
+ * `confirmation` — значение из GET /users/me/deletion-preview. 400
+ * `INVALID_CURRENT_PASSWORD` — пароль не тот; 409 ACCOUNT_DELETION_CHANGED —
+ * условия изменились, нужен новый preview и новое подтверждение.
+ */
+export function deleteMyAccount(payload: DeleteAccountPayload) {
+  return apiRequest<null>('/users/me', {
+    method: 'DELETE',
+    body: payload,
+  });
 }
