@@ -120,7 +120,7 @@
           "reminderLeadMinutes": {
             "description": "За сколько минут напомнить. null — без напоминания.",
             "example": 1440,
-            "maximum": 10080,
+            "maximum": 20160,
             "minimum": 1,
             "nullable": true,
             "type": "integer"
@@ -211,7 +211,7 @@
           },
           "reminderLeadMinutes": {
             "description": "За сколько минут напомнить; null — без напоминания.",
-            "maximum": 10080,
+            "maximum": 20160,
             "minimum": 1,
             "nullable": true,
             "type": "integer"
@@ -504,7 +504,7 @@
           },
           "reminderLeadMinutes": {
             "description": "null убирает напоминание.",
-            "maximum": 10080,
+            "maximum": 20160,
             "minimum": 1,
             "nullable": true,
             "type": "integer"

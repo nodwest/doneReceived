@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795380718.6912858,
-    "seen": 1795380944.6204355,
-    "ast_hash": "e0b2f4b4b14653ed8ad62c08cb862885",
+    "mtime": 1795382611.0922668,
+    "seen": 1795382718.2502763,
+    "ast_hash": "73b1e26e0eb116afb227c15a85087211",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795380718.5532675,
-    "seen": 1795380944.6204355,
-    "ast_hash": "96720ce0a0155ebe28d84b3068d62012",
+    "mtime": 1795382610.8708851,
+    "seen": 1795382718.2502763,
+    "ast_hash": "5a1cd68d8ed367ddc2204991de3dd8b5",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -4674,9 +4674,9 @@
     "semantic_hash": ""
   },
   "src/pages/family-event/ui/family-event.tsx": {
-    "mtime": 1795380718.387691,
-    "seen": 1795380944.5990167,
-    "ast_hash": "9aa263b411083f2a6cda8b212bf41809",
+    "mtime": 1795382610.7883875,
+    "seen": 1795382718.1591623,
+    "ast_hash": "f05ee04e4acf6c6631ba3d39594a444a",
     "semantic_hash": ""
   },
   "src/entities/family-event/api/family-events-api.ts": {
@@ -5328,9 +5328,9 @@
     "semantic_hash": ""
   },
   "openapi/calendar.json": {
-    "mtime": 1795380789.4358277,
-    "seen": 1795380944.4957905,
-    "ast_hash": "efb6ee78182d5d350f77ef9d551290e6",
+    "mtime": 1795382685.670627,
+    "seen": 1795382717.8698359,
+    "ast_hash": "44fc255cfdb0c1132acf19e8dd61cc0e",
     "semantic_hash": ""
   },
   "src/entities/family-event/api/family-event-mapper.test.ts": {
@@ -5346,8 +5346,8 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/api/generated/calendar.ts": {
-    "mtime": 1795380804.884079,
-    "seen": 1795380944.5030758,
+    "mtime": 1795382687.195955,
+    "seen": 1795382717.895467,
     "ast_hash": "c0ef7edf9f3f765c43864587e64fb260",
     "semantic_hash": ""
   },
@@ -5382,9 +5382,9 @@
     "semantic_hash": ""
   },
   "src/features/family-event-form/ui/reminder-picker.tsx": {
-    "mtime": 1795380436.4082623,
-    "seen": 1795380944.566302,
-    "ast_hash": "35127b015c6e54550ce27e3fecdb6cc0",
+    "mtime": 1795382655.4636486,
+    "seen": 1795382718.0601857,
+    "ast_hash": "36ca5ada44b7f4dfe86f08598f562514",
     "semantic_hash": ""
   },
   "package-lock.json": {

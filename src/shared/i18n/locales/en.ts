@@ -107,6 +107,7 @@ export const en = {
     selectedAudience: 'Selected family members',
     hiddenParticipants: 'Some participants cannot see this event',
     reminderCustom: 'Custom',
+    reminderCustomWeeks: '{{count}} wk before',
     reminderCustomDays: '{{count}} d before',
     reminderCustomHours: '{{count}} hr before',
     reminderCustomMinutes: '{{count}} min before',

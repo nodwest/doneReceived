@@ -1,7 +1,7 @@
-# Graph Report - doneReceived  (2026-11-22)
+# Graph Report - doneReceived  (2026-11-23)
 
 ## Corpus Check
-- 883 files · ~428,002 words
+- 883 files · ~428,041 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 10 file(s) not represented in the graph (top: (none) 7, .graphify-bak 1, .csv 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `85a1c8c7`
+- Built from commit: `82a8baa3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -254,16 +254,16 @@
 10. `showToast()` - 70 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Проверено — чисто` --references--> `themedArray()`  [INFERRED]
-  obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/theme/theme.ts
-- `Проверено — чисто` --references--> `themedValue()`  [INFERRED]
-  obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/theme/theme.ts
 - `SEC-06 — Нет защиты от скриншотов на чувствительных экранах` --references--> `copyText()`  [INFERRED]
   obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/lib/clipboard.ts
+- `Проверено — чисто` --references--> `themedArray()`  [INFERRED]
+  obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/theme/theme.ts
 - `Проверено — чисто` --references--> `authorizedImage()`  [INFERRED]
   obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/api/http.ts
-- `mapEvent()` --indirect_call--> `authorizedImage()`  [INFERRED]
-  src/entities/family-event/api/family-events-api.ts → src/shared/api/http.ts
+- `Проверено — чисто` --references--> `themedValue()`  [INFERRED]
+  obsidian-done/Сделал-получил/Уязвимости/Аудит клиента 2026-11-20.md → src/shared/theme/theme.ts
+- `WordsPortion` --references--> `Word`  [EXTRACTED]
+  src/entities/word/api/words-api.ts → src/entities/word/model/word.ts
 
 ## Import Cycles
 - None detected.
@@ -1016,16 +1016,16 @@ Nodes (4): zustand@^5.0.14, zustand, ToastKind, ToastState
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `react` to `use-family-events.ts`, `theme/index.ts`, `ui/tasks.tsx`, `feed-query.ts`, `my-tasks.tsx`, `family-color-palettes.canvas.tsx`, `package.json`, `root-layout.tsx`, `tasks-query.ts`, `child-home.tsx`, `bar-3d.tsx`, `lib/index.ts`, `family-event-form.tsx`, `theme.ts`, `child-devices.tsx`, `english-words/index.ts`, `ui/index.ts`, `mvp-full-design-variants.canvas.tsx`, `ui/wallet.tsx`, `words-overview.ts`, `ui/calendar.tsx`, `child-words-card.tsx`, `ui/role-select.tsx`, `canvases/mvp-c4-business-logic.canvas.tsx`, `lib/index.ts`, `map/map.tsx`, `mvp-apple-premium.canvas.tsx`, `showToast`, `use-task-actions.ts`, `ApiImage`, `location-connection.tsx`, `words-check.tsx`, `layer-preferences.ts`, `useTheme`, `mvp-family-premium-mobile.canvas.tsx`, `word-viewer.tsx`, `task-short-view.tsx`, `home-summary.tsx`, `family-task-app-wireframes.canvas.tsx`, `apiRequest`, `step1-onboarding-design.canvas.tsx`, `obsidian-done/mvp-c4-business-logic.canvas.tsx`, `use-push-registration.ts`, `family-color-palettes-new.canvas.tsx`, `GradientButton`, `wish-form-sheet.tsx`, `ref_cursor`, `task-sheet.tsx`, `task-sheet.tsx`, `word-card.tsx`, `Icon`, `map-page.tsx`, `word/index.ts`, `react-native`, `day-summary.tsx`, `user/index.ts`, `ui/map-layers.tsx`, `maplibre-gl`, `history-map.tsx`, `family-event.tsx`, `ui/family.tsx`, `activity-card.tsx`, `swipe.tsx`, `transaction-card.tsx`, `ui/rewards-history.tsx`, `maplibre-gl`, `checklist-field.tsx`, `ui/edit-profile.tsx`, `avatar-cropper.tsx`, `child-languages.tsx`, `create-task-form.tsx`, `children-carousel.tsx`, `api-image.web.tsx`, `use-child-location-sharing.ts`, `use-review-task.ts`, `task/index.ts`?**
-  _High betweenness centrality (0.130) - this node is a cross-community bridge._
+  _High betweenness centrality (0.123) - this node is a cross-community bridge._
 - **What connects `Cancelled`, `Done`, `Pending` to the rest of the system?**
   _45 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `maplibre-gl-shared.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.005952380952380952 - nodes in this community are weakly interconnected._
 - **Why does `react-native` connect `react-native` to `theme/index.ts`, `ui/tasks.tsx`, `feed-query.ts`, `calendar-event.styled.ts`, `my-tasks.tsx`, `child-home.tsx`, `package.json`, `root-layout.tsx`, `bar-3d.tsx`, `bottom-nav.tsx`, `lib/index.ts`, `family-event-form.tsx`, `featured-event-card.tsx`, `theme.ts`, `child-devices.tsx`, `ui/index.ts`, `ui/wallet.tsx`, `ui/calendar.tsx`, `child-words-card.tsx`, `ui/role-select.tsx`, `lib/index.ts`, `map/map.tsx`, `showToast`, `use-task-actions.ts`, `withAlpha`, `ApiImage`, `words-check.tsx`, `layer-preferences.ts`, `useTheme`, `word-viewer.tsx`, `task-short-view.tsx`, `session/index.ts`, `home-summary.tsx`, `operation/index.ts`, `apiRequest`, `use-push-registration.ts`, `transaction-card.tsx`, `GradientButton`, `wish-form-sheet.tsx`, `task-sheet.tsx`, `task-sheet.tsx`, `word-card.tsx`, `Icon`, `map-page.tsx`, `word/index.ts`, `day-summary.tsx`, `profile-hero.tsx`, `user/index.ts`, `ui/map-layers.tsx`, `history-map.tsx`, `wishlist-preview.tsx`, `family-event.tsx`, `ui/family.tsx`, `activity-card.tsx`, `ui/rewards-history.tsx`, `maplibre-gl`, `checklist-field.tsx`, `ui/edit-profile.tsx`, `avatar-cropper.tsx`, `child-languages.tsx`, `speak-button.tsx`, `use-pair-device.ts`, `create-task-form.tsx`, `children-carousel.tsx`, `api-image.web.tsx`, `server-tasks-api.ts`, `PickedPhoto`, `use-child-location-sharing.ts`, `use-review-task.ts`, `task/index.ts`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+  _High betweenness centrality (0.057) - this node is a cross-community bridge._
 - **Should `theme/index.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.035584988962472405 - nodes in this community are weakly interconnected._
-- **Why does `maplibre-gl` connect `maplibre-gl` to `map/map.tsx`, `map/model/types.ts`, `maplibre-gl`, `package.json`, `lib/index.ts`, `history-map.tsx`, `road-path.ts`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **Why does `theme` connect `theme/index.ts` to `ui/tasks.tsx`, `calendar-event.styled.ts`, `my-tasks.tsx`, `child-home.tsx`, `bar-3d.tsx`, `lib/index.ts`, `theme.ts`, `child-devices.tsx`, `ui/index.ts`, `ui/wallet.tsx`, `child-words-card.tsx`, `ui/role-select.tsx`, `lib/index.ts`, `showToast`, `withAlpha`, `ApiImage`, `words-check.tsx`, `layer-preferences.ts`, `useTheme`, `word-viewer.tsx`, `home-summary.tsx`, `operation/index.ts`, `transaction-card.tsx`, `react-native`, `GradientButton`, `wish-form-sheet.tsx`, `task-sheet.tsx`, `task-sheet.tsx`, `Icon`, `history-map.tsx`, `map-page.tsx`, `word/index.ts`, `wishlist-preview.tsx`, `profile-hero.tsx`, `user/index.ts`, `ui/map-layers.tsx`, `ui/family.tsx`, `activity-card.tsx`, `ui/rewards-history.tsx`, `checklist-field.tsx`, `ui/edit-profile.tsx`, `avatar-cropper.tsx`, `child-languages.tsx`, `speak-button.tsx`, `create-task-form.tsx`, `use-child-location-sharing.ts`, `use-review-task.ts`, `task/index.ts`?**
+  _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **Should `ui/tasks.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.07682926829268293 - nodes in this community are weakly interconnected._

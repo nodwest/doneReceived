@@ -104,6 +104,7 @@ export const ru: Dictionary = {
     selectedAudience: 'Выбранные члены семьи',
     hiddenParticipants: 'Некоторые участники не увидят событие',
     reminderCustom: 'Своё',
+    reminderCustomWeeks: 'За {{count}} нед.',
     reminderCustomDays: 'За {{count}} дн.',
     reminderCustomHours: 'За {{count}} ч',
     reminderCustomMinutes: 'За {{count}} мин',

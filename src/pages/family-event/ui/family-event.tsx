@@ -187,6 +187,9 @@ export function FamilyEventPage() {
       reminderLeadKey(event.startsAt, event.reminderAt))
     : null;
   const customLead = (minutes: number) => {
+    if (minutes % 10080 === 0) {
+      return t('calendar.reminderCustomWeeks', { count: minutes / 10080 });
+    }
     if (minutes % 1440 === 0) {
       return t('calendar.reminderCustomDays', { count: minutes / 1440 });
     }

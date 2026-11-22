@@ -4,11 +4,10 @@ import { useTranslation } from '@shared/i18n';
 import { createStyles } from '@shared/theme';
 import { BottomSheet, Wheel } from '@shared/ui';
 
-const MAX_MINUTES = 10080;
 const UNITS = [
-  { value: 60, key: 'reminderHours' },
-  { value: 1440, key: 'reminderDays' },
-  { value: 10080, key: 'reminderWeeks' },
+  { value: 60, max: 24, key: 'reminderHours' },
+  { value: 1440, max: 7, key: 'reminderDays' },
+  { value: 10080, max: 2, key: 'reminderWeeks' },
 ] as const;
 
 type ReminderPickerProps = {
@@ -23,23 +22,28 @@ export function ReminderPicker({
   onConfirm,
 }: ReminderPickerProps) {
   const { t } = useTranslation();
-  const [unit, setUnit] = useState<number>(
-    () =>
-      [...UNITS].reverse().find(({ value }) => minutes && minutes % value === 0)
-        ?.value ?? 60,
+  const [unitIndex, setUnitIndex] = useState(() =>
+    UNITS.reduce(
+      (selected, { value, max }, index) =>
+        minutes !== null && minutes % value === 0 && minutes / value <= max
+          ? index
+          : selected,
+      0,
+    ),
   );
+  const unit = UNITS[unitIndex];
   const [count, setCount] = useState(() =>
     Math.max(
       1,
-      Math.min(MAX_MINUTES / unit, Math.round((minutes ?? unit) / unit)),
+      Math.min(unit.max, Math.round((minutes ?? unit.value) / unit.value)),
     ),
   );
-  const numbers = Array.from({ length: MAX_MINUTES / unit }, (_, index) => ({
+  const numbers = Array.from({ length: unit.max }, (_, index) => ({
     label: String(index + 1),
     value: index + 1,
   }));
-  const units = UNITS.map(({ value, key }) => ({
-    value,
+  const units = UNITS.map(({ key }, index) => ({
+    value: index,
     label: t(`calendar.${key}`),
   }));
 
@@ -49,6 +53,7 @@ export function ReminderPicker({
         <Text style={styles.title}>{t('calendar.reminderCustom')}</Text>
         <View style={styles.wheels}>
           <Wheel
+            key={unitIndex}
             items={numbers}
             value={count}
             onChange={setCount}
@@ -57,10 +62,10 @@ export function ReminderPicker({
           />
           <Wheel
             items={units}
-            value={unit}
+            value={unitIndex}
             onChange={(value) => {
-              setUnit(value);
-              setCount((current) => Math.min(current, MAX_MINUTES / value));
+              setUnitIndex(value);
+              setCount((current) => Math.min(current, UNITS[value].max));
             }}
             visibleRows={3}
             width={140}
@@ -72,7 +77,7 @@ export function ReminderPicker({
           </Pressable>
           <Pressable
             accessibilityRole="button"
-            onPress={() => onConfirm(Math.min(count * unit, MAX_MINUTES))}
+            onPress={() => onConfirm(count * unit.value)}
           >
             <Text style={styles.action}>{t('common.done')}</Text>
           </Pressable>
