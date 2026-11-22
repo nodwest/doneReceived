@@ -1,9 +1,11 @@
 export * from './model/words-overview';
-export * from './model/use-give-words';
+export * from './model/use-words-overview';
+export * from './model/use-words-settings';
 export * from './ui/words-study';
 export * from './ui/words-check';
 export * from './ui/words-parts';
 export * from './model/settings-store';
+export { hasWordsStudyProgress } from './model/study-store';
 export * from './ui/words-intro';
 export * from './ui/words-reward-setup';
 export * from './ui/child-words-task-row';

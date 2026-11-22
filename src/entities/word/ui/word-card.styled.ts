@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+import { withAlpha } from '@shared/lib';
 import { createStyles, theme, tracking } from '@shared/theme';
 
 export const styles = createStyles((colors) => ({
@@ -124,20 +126,21 @@ export const styles = createStyles((colors) => ({
     fontFamily: theme.fonts.bold,
     color: colors.ink,
   },
-  hiddenTranslation: {
-    height: 48,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    borderColor: colors.placeholder,
-    alignItems: 'center',
-    justifyContent: 'center',
+  // Перевод на проверке: тот же текст на своём месте, но размыт — карточка
+  // не меняет высоту, когда перевод открывают. Сам текст прозрачный, видна
+  // только размытая тень; выделить и скопировать его нельзя.
+  blurred: {
+    color: 'transparent',
+    textShadowColor: colors.grey,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+    ...Platform.select({ web: { userSelect: 'none' } as object }),
   },
-  hiddenText: {
-    fontSize: theme.fontSize.sm,
-    letterSpacing: tracking(theme.fontSize.sm),
-    fontFamily: theme.fonts.semibold,
-    color: colors.grey,
+  // Крупный жирный перевод под размытием темнее и пятнистее мелкого: тень
+  // светлее и шире — по цвету и ровности как размытые пример и сочетания.
+  blurredLarge: {
+    textShadowColor: withAlpha(colors.grey, 0.72),
+    textShadowRadius: 18,
   },
   footer: {
     flexDirection: 'row',

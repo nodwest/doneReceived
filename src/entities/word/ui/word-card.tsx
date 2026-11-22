@@ -13,13 +13,24 @@ type WordCardProps = {
   badge?: ReactNode;
   /**
    * Переводы скрыты (проверка): ребёнок смотрит на слово и отвечает сам,
-   * родитель открывает перевод, чтобы сверить.
+   * родитель открывает перевод, чтобы сверить. Скрытые переводы размыты на
+   * своих местах — карточка не меняет высоту, когда их открывают.
    */
   hidden?: boolean;
   /** Кнопки внизу карточки. */
   footer?: ReactNode;
   style?: StyleProp<ViewStyle>;
 };
+
+/** Размытый текст скрыт и от экранного диктора: иначе он прочитает перевод. */
+const hiddenProps = (hidden: boolean) =>
+  hidden
+    ? ({
+        accessibilityElementsHidden: true,
+        importantForAccessibility: 'no-hide-descendants',
+        'aria-hidden': true,
+      } as const)
+    : null;
 
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -105,35 +116,44 @@ export function WordCard({
             accessibilityLabel={t('words.sayExample')}
           />
         </View>
-        {hidden ? null : (
-          <Text style={styles.exampleTranslation}>
-            {word.exampleTranslation}
-          </Text>
-        )}
+        <Text
+          style={[styles.exampleTranslation, hidden && styles.blurred]}
+          {...hiddenProps(hidden)}
+        >
+          {word.exampleTranslation}
+        </Text>
       </View>
 
       <View style={styles.divider} />
       <View style={styles.translationBlock}>
         <Text style={styles.label}>{t('words.translation')}</Text>
-        {hidden ? (
-          <View style={styles.hiddenTranslation}>
-            <Text style={styles.hiddenText}>
-              {t('words.translationHidden')}
-            </Text>
-          </View>
-        ) : (
-          <Text style={styles.translation}>{word.translation}</Text>
-        )}
+        <Text
+          style={[
+            styles.translation,
+            hidden && styles.blurred,
+            hidden && styles.blurredLarge,
+          ]}
+          {...(hidden
+            ? { accessibilityLabel: t('words.translationHidden') }
+            : null)}
+        >
+          {word.translation}
+        </Text>
       </View>
 
-      {/* Сочетания — с переводом, поэтому на проверке скрыты вместе с ним. */}
-      {!hidden && word.collocations.length > 0 ? (
+      {/* Сочетания: на проверке перевод размыт вместе с переводом слова. */}
+      {word.collocations.length > 0 ? (
         <View style={styles.collocations}>
           <Text style={styles.label}>{t('words.collocations')}</Text>
           {word.collocations.map((item) => (
-            <Text key={item.en} style={styles.collocation}>
+            <Text
+              key={item.en}
+              style={styles.collocation}
+              {...(hidden ? { accessibilityLabel: item.en } : null)}
+            >
               <Text style={styles.collocationEn}>{item.en}</Text>
-              {` — ${item.ru}`}
+              {' — '}
+              <Text style={hidden ? styles.blurred : undefined}>{item.ru}</Text>
             </Text>
           ))}
         </View>

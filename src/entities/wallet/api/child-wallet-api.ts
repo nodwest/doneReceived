@@ -20,6 +20,10 @@ type ChildWalletDto = {
     approvedBy: string | null;
     /** Когда сдан одобренный отчёт. */
     submittedAt: string | null;
+    /** Слова дня: награда за порцию слов. */
+    taskKind?: 'words' | null;
+    /** Слова дня: номера первого и последнего слова порции. */
+    words?: { from: number; to: number } | null;
   }[];
   next?: string | null;
 };
@@ -78,6 +82,7 @@ export async function fetchServerChildWallet(
       // Та же награда в истории (Rewards history) — с тем же id.
       operationId: entry.id,
       taskDoneAt: entry.submittedAt,
+      words: entry.taskKind === 'words' ? (entry.words ?? null) : null,
       from: (() => {
         const member = entry.approvedBy ? byId.get(entry.approvedBy) : null;
         return {

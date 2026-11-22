@@ -21,7 +21,11 @@ type WordsDeckListProps = {
   start: number;
   /** Сегодняшние слова — выделены. */
   today: WordsRange | null;
+  /** Не вспомнил на проверке — цветом «Не вспомнил», на своих местах. */
+  missed?: ReadonlySet<number>;
 };
+
+const NO_MISSED: ReadonlySet<number> = new Set();
 
 const getItemLayout = (_: unknown, index: number) => ({
   length: ITEM_HEIGHT,
@@ -35,7 +39,11 @@ const getItemLayout = (_: unknown, index: number) => ({
  * вниз — до последнего. Тап — карточка слова поверх списка; закрыли — список
  * стоит на слове, до которого долистали: оно первое сверху.
  */
-export function WordsDeckList({ start, today }: WordsDeckListProps) {
+export function WordsDeckList({
+  start,
+  today,
+  missed = NO_MISSED,
+}: WordsDeckListProps) {
   const listRef = useRef<FlatList<Word>>(null);
   const [open, setOpen] = useState<number | null>(null);
   // Последнее просмотренное слово обведено: видно, где остановились.
@@ -84,11 +92,12 @@ export function WordsDeckList({ start, today }: WordsDeckListProps) {
         today={
           today !== null && item.rank >= today.from && item.rank <= today.to
         }
+        missed={missed.has(item.rank)}
         selected={item.rank === selected}
         onOpen={openWord}
       />
     ),
-    [today, selected, openWord],
+    [today, missed, selected, openWord],
   );
 
   return (
@@ -100,7 +109,7 @@ export function WordsDeckList({ start, today }: WordsDeckListProps) {
         data={WORDS}
         keyExtractor={(word) => String(word.rank)}
         renderItem={renderItem}
-        extraData={selected}
+        extraData={[selected, missed]}
         getItemLayout={getItemLayout}
         initialScrollIndex={Math.min(Math.max(start - 1, 0), WORDS_TOTAL - 1)}
         initialNumToRender={14}
@@ -116,11 +125,13 @@ export function WordsDeckList({ start, today }: WordsDeckListProps) {
 const DeckRow = memo(function DeckRow({
   word,
   today,
+  missed,
   selected,
   onOpen,
 }: {
   word: Word;
   today: boolean;
+  missed: boolean;
   selected: boolean;
   onOpen: (rank: number) => void;
 }) {
@@ -134,6 +145,7 @@ const DeckRow = memo(function DeckRow({
           styles.wordRow,
           styles.deckRow,
           today && styles.deckRowToday,
+          missed && styles.wordRowMissed,
           selected && styles.deckRowSelected,
         ]}
       >
@@ -149,7 +161,13 @@ const DeckRow = memo(function DeckRow({
             pressed && styles.deckRowPressed,
           ]}
         >
-          <Text style={[styles.wordRowRank, today && styles.deckRowTodayRank]}>
+          <Text
+            style={[
+              styles.wordRowRank,
+              today && styles.deckRowTodayRank,
+              missed && styles.deckRowMissedRank,
+            ]}
+          >
             {t('words.rank', { rank: word.rank })}
           </Text>
           <View style={styles.wordRowText}>

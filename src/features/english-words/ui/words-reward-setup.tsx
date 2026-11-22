@@ -10,17 +10,20 @@ type WordsRewardSetupProps = {
   /** Текущая награда; null — родитель выбирает впервые. */
   initial: number | null;
   onSave: (reward: number) => void;
+  /** Сохраняется на сервере: спиннер на кнопке. */
+  saving?: boolean;
   /** Правка (есть Cancel); при первом выборе отменить нельзя. */
   onCancel?: () => void;
 };
 
 /**
- * Сколько родитель платит за сданный день (10 слов): сумма целыми долларами. При первом входе на вкладку и по карандашу в
- * шапке.
+ * Сколько родитель платит ребёнку за сданный день (10 слов): сумма целыми
+ * долларами. При включении слов и по «Изменить» в карточке ребёнка.
  */
 export function WordsRewardSetup({
   initial,
   onSave,
+  saving = false,
   onCancel,
 }: WordsRewardSetupProps) {
   const { t } = useTranslation();
@@ -74,13 +77,15 @@ export function WordsRewardSetup({
               ? t('words.reward.save')
               : t('words.reward.start', { amount: valid ? `$${value}` : '' })
           }
-          disabled={!valid}
+          disabled={!valid || saving}
+          loading={saving}
           onPress={() => onSave(value)}
         />
         {onCancel ? (
           <Pressable
             accessibilityRole="button"
             style={styles.link}
+            disabled={saving}
             onPress={onCancel}
           >
             <Text style={styles.linkText}>{t('common.cancel')}</Text>

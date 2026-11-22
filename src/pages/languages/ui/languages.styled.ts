@@ -8,6 +8,10 @@ export const styles = createStyles((colors) => ({
     paddingBottom: 32,
   },
   // Ребёнок не учит: сверху состояние, ниже на всю высоту — список слов.
+  // Кнопка в колонке экрана: в ряду, чтобы не растягивалась по высоте.
+  deckAction: {
+    flexDirection: 'row',
+  },
   deckScreen: {
     flex: 1,
     gap: 16,
@@ -194,6 +198,13 @@ export const styles = createStyles((colors) => ({
     borderRadius: 12,
     backgroundColor: colors.violetChip,
   },
+  // Учит или повторяет — голубые, как плашка и плитки карточки.
+  chipLearning: {
+    backgroundColor: colors.childChip,
+  },
+  chipTextLearning: {
+    color: colors.childInk,
+  },
   chipDone: {
     backgroundColor: colors.readySoft,
   },
@@ -229,6 +240,32 @@ export const styles = createStyles((colors) => ({
   },
   actions: {
     gap: 8,
+  },
+  // Не вспомнил на проверке — оранжевым, как строки «Не вспомнил» в проверке.
+  chipMissed: {
+    backgroundColor: colors.reviewChip,
+  },
+  chipTextMissed: {
+    color: colors.reviewChipText,
+  },
+  rewardLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  rewardLineText: {
+    flexShrink: 1,
+    fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
+    fontFamily: theme.fonts.semibold,
+    color: colors.ink,
+  },
+  rewardLineLink: {
+    fontSize: theme.fontSize.inputName,
+    letterSpacing: tracking(theme.fontSize.inputName),
+    fontFamily: theme.fonts.bold,
+    color: colors.parentInk,
   },
   empty: {
     textAlign: 'center',

@@ -134,7 +134,7 @@ export function WordLine({
   tone = 'child',
 }: {
   word: Word;
-  /** Не вспомнил на проверке: красноватая строка. */
+  /** Не вспомнил на проверке: оранжевая строка. */
   missed?: boolean;
   tone?: 'child' | 'parent';
 }) {

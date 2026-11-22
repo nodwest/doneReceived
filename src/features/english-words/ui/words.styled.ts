@@ -70,28 +70,6 @@ export const styles = createStyles((colors) => ({
     fontFamily: theme.fonts.medium,
     color: colors.grey,
   },
-  sentBack: {
-    gap: 4,
-    padding: 14,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.sentBackBorder,
-    backgroundColor: colors.sentBackBg,
-  },
-  sentBackTitle: {
-    fontSize: theme.fontSize.sm,
-    letterSpacing: tracking(theme.fontSize.sm),
-    fontFamily: theme.fonts.bold,
-    color: colors.sentBack,
-  },
-  sentBackText: {
-    fontSize: theme.fontSize.inputName,
-    lineHeight: 18,
-    letterSpacing: tracking(theme.fontSize.inputName),
-    fontFamily: theme.fonts.medium,
-    color: colors.inkSoft,
-  },
-
   // Карточка состояния: иконка, заголовок, текст и кнопки.
   state: {
     alignItems: 'center',
@@ -291,9 +269,10 @@ export const styles = createStyles((colors) => ({
     borderColor: colors.line,
     backgroundColor: colors.surface,
   },
+  // Не вспомнил на проверке — оранжевым, как плашка «Слова вернули на повтор».
   wordRowMissed: {
-    borderColor: colors.dangerSoft,
-    backgroundColor: colors.dangerTint,
+    borderColor: colors.reviewBorder,
+    backgroundColor: colors.noteReviewBg,
   },
   wordRowRank: {
     minWidth: 40,
@@ -342,6 +321,9 @@ export const styles = createStyles((colors) => ({
   },
   deckRowTodayRank: {
     color: colors.childInk,
+  },
+  deckRowMissedRank: {
+    color: colors.reviewChipText,
   },
   deckRowSelected: {
     borderWidth: 1.5,
@@ -474,8 +456,10 @@ export const styles = createStyles((colors) => ({
     borderRadius: 10,
     backgroundColor: colors.childChip,
   },
+  // Пройденное слово на проверке — нейтральная плашка: оранжевый у нас
+  // значит «на проверке» и «ошибка».
   badgeReview: {
-    backgroundColor: colors.reviewChip,
+    backgroundColor: colors.line,
   },
   badgeText: {
     fontSize: theme.fontSize.xs,
@@ -484,6 +468,12 @@ export const styles = createStyles((colors) => ({
     color: colors.childInk,
   },
   badgeTextReview: {
+    color: colors.inkSoft,
+  },
+  badgeMissed: {
+    backgroundColor: colors.reviewChip,
+  },
+  badgeTextMissed: {
     color: colors.reviewChipText,
   },
   scrollBody: {

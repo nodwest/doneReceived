@@ -63,6 +63,11 @@ export interface RewardTransaction
   operationId: string | null;
   /** Родитель, который дал и подтвердил задание; имя может быть пустым. */
   from: TransactionPerson;
+  /**
+   * Награда за слова дня: номера первого и последнего слова порции; у
+   * обычных заданий — null или нет.
+   */
+  words?: { from: number; to: number } | null;
 }
 
 /** Вывод ребёнком денег на карту. */

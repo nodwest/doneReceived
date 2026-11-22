@@ -1272,7 +1272,6 @@ export const en = {
     sayWord: 'Say “{{word}}”',
     sayExample: 'Say the sentence',
     taskTitle: 'Words {{from}}–{{to}}',
-    taskDescription: 'Learn the new words in the Languages tab: {{words}}',
     rejectComment: 'Didn’t remember: {{words}}',
     rowLearning: 'Learning',
     rowReview: 'To check',
@@ -1319,7 +1318,7 @@ export const en = {
       inputLabel: 'Reward for a day, in dollars',
       perDay: 'a day',
       changeLater:
-        'You can change the amount later with the pencil at the top. It applies from the next words.',
+        'You can change the amount later on the child’s card. It applies from the next words.',
       invalid: 'Whole dollars from 1 to {{max}}',
       start: 'Start · {{amount}} a day',
       save: 'Save',
@@ -1334,14 +1333,16 @@ export const en = {
       lastWordHint:
         'The last word — remember it and the words go to a parent to check.',
       learned: 'Words learned',
-      sentBackTitle: 'Let’s repeat!',
-      sentBackText:
-        'Not every word was right. Learn them again — then a parent will check once more.',
       submitting: 'Sending the words to check…',
       submitFailedTitle: 'Couldn’t send to check',
       submitFailedText:
         'Check the connection and try again — your words are remembered.',
       retry: 'Try again',
+      redoTitle: 'Words are back to repeat',
+      redoText:
+        'Repeat the words marked orange and the rest — then they go to check again.',
+      repeat: 'Repeat the words',
+      missedBadge: 'Repeat',
       noneTitle: 'No words yet',
       noneText:
         'Ask a parent to start English — {{count}} new words a day and a reward for learning them.',
@@ -1353,15 +1354,17 @@ export const en = {
       finishedTitle: 'You learned every word!',
       finishedText:
         'All {{total}} words are learned. New words are coming soon.',
+      waitTitle: 'New words are on the way',
+      waitText:
+        'A parent will give them soon — repeat the words below for now.',
     },
     parent: {
-      hint: 'Every day a child learns {{count}} new words. In the evening you check them here — all right means {{amount}} goes to the child.',
+      hint: 'Every day a child learns {{count}} new words — they are given automatically at 4 am. In the evening you check them here: all right means the reward goes to the child.',
       card: {
         learnedCount: '{{count}} of {{total}} words learned',
-        noneTitle: 'No words yet',
+        noneTitle: 'English is off',
         noneText:
-          'Give the first {{count}} words — {{amount}} for a day without mistakes.',
-        noneNext: 'Give the next words: {{from}}–{{to}}.',
+          'Turn it on — {{count}} new words a day and a reward for every day without mistakes.',
         learningTitle: 'Learning words {{from}}–{{to}}',
         learningText:
           'When {{name}} learns them all, the words come to you for checking.',
@@ -1374,15 +1377,22 @@ export const en = {
         doneText: '{{amount}} paid to {{name}}. New words tomorrow.',
         finishedTitle: 'The whole dictionary is done',
         finishedText: 'All {{total}} words learned.',
+        noFundsTitle: 'Not enough money for new words',
+        noFundsText:
+          'The next words for {{name}} need {{amount}} in the wallet. They are given as soon as there is enough.',
+        noFundsOther:
+          'The reward is paid from the wallet of the parent who turned the words on.',
+        deposit: 'Go to Wallet',
+        rewardLine: 'Reward: {{amount}} a day',
+        changeReward: 'Change',
         dictionary: 'Dictionary',
         streak: 'Days in a row',
         days: 'Days in total',
         earned: 'Earned',
       },
-      give: 'Give {{count}} words · {{amount}}',
+      enable: 'Turn on English',
       giveHint: 'The reward is reserved in your wallet until the check.',
       check: 'Check the words',
-      checksAuthor: '{{name}} will check these words',
       todayWords: 'Today’s words',
       noChildren: 'Add a child on the Family tab to start.',
       checkGone: 'This check is already done.',
@@ -1408,8 +1418,6 @@ export const en = {
       sendBack: 'Send back to repeat',
       missed: 'Didn’t remember',
       changeLast: 'Change the last answer',
-      sentBackTitle: 'Words are back with {{name}}',
-      sentBackText: 'When {{name}} repeats them, the check appears here again.',
       done: 'Done',
     },
     errors: {
@@ -1418,14 +1426,6 @@ export const en = {
       noFunds:
         'Not enough money in your wallet for the reward. Deposit on the Wallet tab.',
       alreadyChecked: 'These words are already checked.',
-      next: {
-        failed:
-          'The reward is paid, but the next words weren’t given. Give them on the Languages tab.',
-        network:
-          'The reward is paid, but the next words weren’t given: no connection. Give them on the Languages tab.',
-        noFunds:
-          'The reward is paid. Not enough money for the next words — deposit and give them on the Languages tab.',
-      },
     },
   },
   push: {

@@ -13,18 +13,17 @@ import {
   useFamilyFeed,
   useChildTasks,
   useMyChildBalance,
-  useMyChildWallet,
   useMyWishlistOwner,
 } from '@features/family-tasks';
-import { getWordsOverview, rewardsOf } from '@features/english-words';
 import {
   ChildTaskTile,
   countTasks,
+  isWordsTask,
   sortTasksByUrgency,
   type Task,
 } from '@entities/task';
 import { useMe, useMyAvatar } from '@entities/session';
-import { isWordsTitle, WordsTaskRow } from '@entities/word';
+import { WordsTaskRow } from '@entities/word';
 import { useWishlistProgress } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
 import { theme, useTheme } from '@shared/theme';
@@ -71,15 +70,14 @@ export function ChildHomePage() {
     () =>
       sortTasksByUrgency(
         myTasks.filter(
-          (task) => task.status === 'active' && !isWordsTitle(task.title),
+          (task) => task.status === 'active' && !isWordsTask(task),
         ),
       ),
     [myTasks],
   );
-  const { data: wallet } = useMyChildWallet();
-  const words = useMemo(
-    () => getWordsOverview(myTasks, rewardsOf(wallet)),
-    [myTasks, wallet],
+  // Слова дня, которые ребёнок сейчас учит: над каруселью — строка.
+  const wordsTask = myTasks.find(
+    (task) => isWordsTask(task) && task.status === 'active',
   );
   const counts = countTasks(myTasks);
   // Баланс — из кошелька ребёнка: после подтверждения задания он растёт.
@@ -128,14 +126,14 @@ export function ChildHomePage() {
                   router.push({ pathname: '/tasks', params: { tab: 'review' } })
                 }
               />
-              {words.status === 'learning' && words.task && (
+              {wordsTask && (
                 <WordsTaskRow
                   tone="child"
                   status="active"
-                  reward={words.task.reward}
+                  reward={wordsTask.reward}
                   title={t('words.homeBanner')}
                   subtitle={t('words.rowChildLearn', {
-                    count: words.words.length,
+                    count: wordsTask.words?.ranks.length ?? 0,
                   })}
                   onPress={() => router.dismissTo('/languages')}
                 />

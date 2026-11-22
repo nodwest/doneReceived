@@ -15,6 +15,7 @@ export const queryRoots = {
   devices: ['devices'],
   me: ['me'],
   calendar: ['calendar'],
+  words: ['words'],
 } as const;
 
 type DataArea = keyof typeof queryRoots;
@@ -40,6 +41,7 @@ export type DataChange =
   | 'profile-changed'
   | 'email-changed'
   | 'calendar-changed'
+  | 'words-changed'
   | 'task-expired';
 
 /**
@@ -48,22 +50,44 @@ export type DataChange =
  */
 const AFFECTS: Record<DataChange, readonly DataArea[]> = {
   // Награда резервируется и возвращается — кошелёк родителя меняется.
-  'task-created': ['tasks', 'wallet', 'activity'],
-  'task-updated': ['tasks', 'wallet', 'activity'],
-  'task-cancelled': ['tasks', 'wallet', 'activity'],
-  'task-submitted': ['tasks', 'activity'],
-  'task-withdrawn': ['tasks', 'activity'],
+  'task-created': ['tasks', 'wallet', 'activity', 'words'],
+  'task-updated': ['tasks', 'wallet', 'activity', 'words'],
+  'task-cancelled': ['tasks', 'wallet', 'activity', 'words'],
+  'task-submitted': ['tasks', 'activity', 'words'],
+  'task-withdrawn': ['tasks', 'activity', 'words'],
   'checklist-ticked': ['tasks'],
   // Деньги из резерва — ребёнку: кошельки, история наград, баланс в Family.
-  'task-approved': ['tasks', 'wallet', 'operations', 'activity', 'families'],
+  'task-approved': [
+    'tasks',
+    'wallet',
+    'operations',
+    'activity',
+    'families',
+    'words',
+  ],
   // На переделку — резерв остаётся, закрыть — возвращается.
-  'task-rejected': ['tasks', 'wallet', 'operations', 'activity'],
+  'task-rejected': ['tasks', 'wallet', 'operations', 'activity', 'words'],
   'wish-changed': ['wishes', 'activity'],
-  'funds-deposited': ['wallet', 'activity'],
+  // Хватило денег — сервер сразу выдаёт порцию слов, ждавшую пополнения.
+  'funds-deposited': ['wallet', 'activity', 'words', 'tasks'],
   // Имя и фото ребёнка видны в заданиях и истории.
-  'child-changed': ['families', 'devices', 'tasks', 'wallet', 'operations'],
+  'child-changed': [
+    'families',
+    'devices',
+    'tasks',
+    'wallet',
+    'operations',
+    'words',
+  ],
   'device-changed': ['devices', 'families'],
-  'family-changed': ['families', 'tasks', 'wallet', 'operations', 'activity'],
+  'family-changed': [
+    'families',
+    'tasks',
+    'wallet',
+    'operations',
+    'activity',
+    'words',
+  ],
   // Своё имя и фото — в шапках, заданиях, ленте и истории.
   'profile-changed': [
     'me',
@@ -77,6 +101,9 @@ const AFFECTS: Record<DataChange, readonly DataArea[]> = {
   'email-changed': ['me'],
   // События календаря семьи.
   'calendar-changed': ['calendar', 'activity'],
+  // Слова дня включили, выключили или сменили награду: сервер мог выдать
+  // или отменить порцию (резерв у родителя).
+  'words-changed': ['words', 'tasks', 'wallet', 'activity'],
   // Срок прошёл, задание не сдано: резерв возвращается, награда — в упущенные.
   'task-expired': ['tasks', 'wallet', 'operations', 'activity'],
 };
