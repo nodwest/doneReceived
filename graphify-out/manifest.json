@@ -990,9 +990,9 @@
     "semantic_hash": ""
   },
   "src/entities/wish/model/wish.ts": {
-    "mtime": 1794899663.758387,
-    "seen": 1794920449.2381568,
-    "ast_hash": "e62f85d8acc9ce5959de049471cbe09e",
+    "mtime": 1795378920.8267193,
+    "seen": 1795378972.877904,
+    "ast_hash": "47c0fd5c9e5466ad6c7bf3ee7939486a",
     "semantic_hash": ""
   },
   "src/entities/wish/ui/wish-details.styled.ts": {
@@ -1206,9 +1206,9 @@
     "semantic_hash": ""
   },
   "src/features/complete-task/model/use-task-actions.ts": {
-    "mtime": 1795374677.220217,
-    "seen": 1795374758.0184362,
-    "ast_hash": "2c33039b2042c142670f64463759a55e",
+    "mtime": 1795378920.8729672,
+    "seen": 1795378972.8879628,
+    "ast_hash": "11d5ccbda59b31deda21eef7546e1f68",
     "semantic_hash": ""
   },
   "src/features/complete-task/model/use-tick-checklist-item.ts": {
@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795374823.279845,
-    "seen": 1795374907.2050922,
-    "ast_hash": "c1509463a9deea214397e2682c78838d",
+    "mtime": 1795378920.9906375,
+    "seen": 1795378972.938261,
+    "ast_hash": "859f4c86f7472b265ccdaed075cd246d",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795374823.4099574,
-    "seen": 1795374907.2050922,
-    "ast_hash": "80874936688b3f4652b32906720b185f",
+    "mtime": 1795378920.9397888,
+    "seen": 1795378972.938261,
+    "ast_hash": "cd429eeafc3cedce21394c4e4c41cdc7",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -2412,9 +2412,9 @@
     "semantic_hash": ""
   },
   "src/shared/lib/photo/photo-upload-error.ts": {
-    "mtime": 1794899666.184194,
-    "seen": 1794920449.2381568,
-    "ast_hash": "e115621e0019093d16cb36915d944646",
+    "mtime": 1795378920.838424,
+    "seen": 1795378972.9418385,
+    "ast_hash": "9ac32b0cf128b3393014b6dd0838ff39",
     "semantic_hash": ""
   },
   "src/shared/lib/photo/pick-photos.ts": {
@@ -4632,9 +4632,9 @@
     "semantic_hash": ""
   },
   "src/features/family-event-form/ui/family-event-form.tsx": {
-    "mtime": 1795256528.9088578,
-    "seen": 1795256620.8717673,
-    "ast_hash": "f276d881fe8bab1f1ae9d8532f63a743",
+    "mtime": 1795378637.0453458,
+    "seen": 1795378841.291191,
+    "ast_hash": "e362a5c51a5ce61703178644605259f8",
     "semantic_hash": ""
   },
   "src/features/family-event/index.ts": {
@@ -5328,9 +5328,9 @@
     "semantic_hash": ""
   },
   "openapi/calendar.json": {
-    "mtime": 1795373536.8081799,
-    "seen": 1795373648.895947,
-    "ast_hash": "c470deef0dc2c31ac576ec8cf5d3772c",
+    "mtime": 1795378707.5529027,
+    "seen": 1795378841.2412543,
+    "ast_hash": "1a4c6a1d706a2ffa9a91652c53113642",
     "semantic_hash": ""
   },
   "src/entities/family-event/api/family-event-mapper.test.ts": {
@@ -5346,9 +5346,9 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/api/generated/calendar.ts": {
-    "mtime": 1795373580.801919,
-    "seen": 1795373648.90098,
-    "ast_hash": "b765a1be48242c05089e7663ea016219",
+    "mtime": 1795378778.950641,
+    "seen": 1795378841.2463837,
+    "ast_hash": "489c9fc12b039986600fb50531a0a7bb",
     "semantic_hash": ""
   },
   "vitest.config.mts": {

@@ -19,7 +19,7 @@ import {
   type FamilyEventPerson,
   type FamilyEventRepeat,
 } from '@entities/family-event';
-import { authorizedImage } from '@shared/api';
+import { apiErrorCode, authorizedImage, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import {
   choosePhotos,
@@ -286,7 +286,13 @@ export function FamilyEventForm({
       },
       {
         onSuccess: ({ photoFailed }) => onSaved(photoFailed),
-        onError: () => showToast(t('calendar.saveError')),
+        onError: (error) =>
+          showToast(
+            isApiError(error) &&
+              apiErrorCode(error) === 'FAMILY_EVENT_LIMIT_REACHED'
+              ? t('calendar.eventLimit')
+              : t('calendar.saveError'),
+          ),
       },
     );
   };

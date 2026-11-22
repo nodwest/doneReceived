@@ -57,6 +57,8 @@ export const en = {
     nextPage: 'Next page',
     loadError: 'Could not load the event',
     saveError: 'Could not save the event',
+    eventLimit:
+      'Your family already has 60 current and upcoming events. Delete one to add a new event.',
     responseError: 'Could not save the response',
     emptyTitle: 'No events yet',
     emptyHint:
@@ -1042,6 +1044,9 @@ export const en = {
     uploadFailed: "Couldn't upload the photos. Try again.",
     tooLarge: 'The photo is too large — choose a smaller one.',
     busy: 'The server is busy with photos. Try again in a minute.',
+    rateLimited: 'Too many photo uploads. Wait a little and try again.',
+    taskQuota:
+      'Your task photo storage is full. You can submit your report without photos.',
   },
   wishCard: {
     myWish: 'My wish',

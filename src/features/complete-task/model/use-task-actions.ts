@@ -5,7 +5,7 @@ import {
   type Task,
   type TaskStatusPayload,
 } from '@entities/task';
-import { isApiError, syncData } from '@shared/api';
+import { apiErrorCode, isApiError, syncData } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { photoUploadError, showToast } from '@shared/lib';
 import { useNoteDraftStore } from './note-draft-store';
@@ -47,7 +47,9 @@ export function useTaskActions(taskId?: string) {
   );
   const onError = (error: unknown) =>
     showToast(
-      isApiError(error) && (error.status === 413 || error.status === 503)
+      isApiError(error) &&
+        ([413, 429, 503].includes(error.status) ||
+          apiErrorCode(error) === 'TASK_PHOTO_QUOTA_REACHED')
         ? t(`photos.${photoUploadError(error)}`)
         : t(`completeTask.errors.${actionError(error)}`),
     );

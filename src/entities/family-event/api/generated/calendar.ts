@@ -520,6 +520,21 @@ export interface operations {
                     "application/json": components["schemas"]["HttpErrorDto"];
                 };
             };
+            /** @description Достигнут лимит 60 текущих и будущих событий или событие с этим ключом отменено. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "Достигнут лимит 60 текущих и будущих событий или событие с этим ключом отменено.",
+                     *       "statusCode": 409
+                     *     }
+                     */
+                    "application/json": components["schemas"]["HttpErrorDto"];
+                };
+            };
         };
     };
     FamilyEventsController_manage: {
@@ -829,6 +844,21 @@ export interface operations {
                      * @example {
                      *       "message": "Событие не найдено или отменено.",
                      *       "statusCode": 404
+                     *     }
+                     */
+                    "application/json": components["schemas"]["HttpErrorDto"];
+                };
+            };
+            /** @description Перенос превысит лимит 60 текущих и будущих событий. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "Перенос превысит лимит 60 текущих и будущих событий.",
+                     *       "statusCode": 409
                      *     }
                      */
                     "application/json": components["schemas"]["HttpErrorDto"];

@@ -45,7 +45,7 @@ export const isWishlistLimitError = (error: unknown) =>
   (error.data as { code?: unknown } | null)?.code === 'WISHLIST_LIMIT_REACHED';
 
 /** Сколько фото можно у желания: столько принимает сервер. */
-export const WISH_PHOTOS_MAX = 3;
+export const WISH_PHOTOS_MAX = 1;
 
 /**
  * Фото в форме желания: уже загруженное (`file: null`, `source` — с сервера)
