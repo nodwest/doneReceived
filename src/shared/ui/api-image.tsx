@@ -35,7 +35,13 @@ function headerSource(source: ImageProps['source']): HeaderSource | null {
  *
  * В вебе — своя версия (`api-image.web.tsx`).
  */
-export function ApiImage({ source, ...props }: ImageProps) {
+type ApiImageProps = ImageProps & { retainInMemory?: boolean };
+
+export function ApiImage({
+  source,
+  retainInMemory = true,
+  ...props
+}: ApiImageProps) {
   const scope = usePrivateReadScope();
   const token = currentAccessToken();
   const remote = headerSource(source);
@@ -48,6 +54,7 @@ export function ApiImage({ source, ...props }: ImageProps) {
           cache: 'reload',
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(!retainInMemory ? { 'Cache-Control': 'no-store' } : {}),
           },
         },
       ] satisfies ImageSourcePropType[])

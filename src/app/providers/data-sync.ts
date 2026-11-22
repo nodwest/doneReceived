@@ -56,8 +56,10 @@ export function useServerEvents(queryClient: QueryClient) {
     if (!userId) return;
     let disconnect: (() => void) | undefined;
     let openedBefore = false;
-    const refresh = () =>
+    const refresh = () => {
+      void syncData(queryClient, 'calendar-changed', { clearCalendar: true });
       void queryClient.invalidateQueries({ predicate: syncable });
+    };
     const updateConnection = (active: boolean) => {
       if (!active) {
         disconnect?.();
@@ -66,7 +68,8 @@ export function useServerEvents(queryClient: QueryClient) {
       }
       if (disconnect) return;
       disconnect = connectServerEvents({
-        onChange: (change) => void syncData(queryClient, change),
+        onChange: (change) =>
+          void syncData(queryClient, change, { clearCalendar: true }),
         onReconnect: refresh,
       });
       if (openedBefore) refresh();

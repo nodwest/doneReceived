@@ -132,7 +132,7 @@ export function useFamilyEvent(eventId: string | null, year?: number | null) {
     null;
   const query = useFamilyEventQuery(familyId, eventId, year);
   return {
-    event: query.data ?? null,
+    event: query.isError ? null : (query.data ?? null),
     isPending: !!familyId && !!eventId && query.isPending,
     isError: query.isError,
     error: query.error,

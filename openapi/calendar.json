@@ -68,6 +68,15 @@
       },
       "CreateFamilyEventDto": {
         "properties": {
+          "audienceUserIds": {
+            "description": "Кто видит событие и получает напоминание. null или отсутствие — вся семья; массив — только перечисленные активные участники плюс активный автор. Пустой массив — только автор.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
           "clientRequestId": {
             "description": "Ключ одного создания. Повтор с тем же ключом вернёт уже созданное событие.",
             "example": "1719325200000-a1b2c3",
@@ -154,6 +163,15 @@
       },
       "FamilyEventDto": {
         "properties": {
+          "audienceUserIds": {
+            "description": "Кто видит событие: null — вся активная семья, массив — только эти пользователи. Активный автор всегда входит в массив.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -237,6 +255,7 @@
           "photoUrl",
           "reminderLeadMinutes",
           "participants",
+          "audienceUserIds",
           "viewer",
           "createdAt",
           "updatedAt"
@@ -446,6 +465,15 @@
       },
       "UpdateFamilyEventDto": {
         "properties": {
+          "audienceUserIds": {
+            "description": "Новая аудитория. Отсутствие поля сохраняет текущую; null открывает событие всей семье; массив ограничивает активными участниками и активным автором. Пустой массив — только автор.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
           "description": {
             "description": "null очищает описание.",
             "maxLength": 2000,
@@ -523,7 +551,7 @@
   "paths": {
     "/families/{familyId}/events": {
       "get": {
-        "description": "Возвращает события, пересекающиеся с периодом, и ежегодные события, попадающие в него. Диапазон не шире 92 дней, не больше 500 событий. Доступен всем активным участникам семьи; править может только owner/admin.",
+        "description": "Возвращает события, пересекающиеся с периодом, и ежегодные события, попадающие в него. Диапазон не шире 92 дней, не больше 500 событий. Доступен активным участникам семьи: событие с ограниченной аудиторией видно только ей; править может только owner/admin из аудитории.",
         "operationId": "FamilyEventsController_list",
         "parameters": [
           {
@@ -622,7 +650,7 @@
         ]
       },
       "post": {
-        "description": "Только owner/admin. participants — активные пользователи этой семьи; они могут не быть родителями. Напоминание хранится как число минут до начала.",
+        "description": "Только owner/admin. participants — активные пользователи этой семьи; они могут не быть родителями. audienceUserIds ограничивает видимость и напоминания; отсутствие поля или null — вся семья, массив — указанные активные участники плюс активный автор, пустой массив — только автор. Напоминание хранится как число минут до начала.",
         "operationId": "FamilyEventsController_create",
         "parameters": [
           {
@@ -662,7 +690,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Неверное тело, часовой пояс, диапазон дат или участник не из семьи (PARTICIPANT_NOT_IN_FAMILY).",
+                  "message": "Неверное тело, часовой пояс, диапазон дат, участник не из семьи (PARTICIPANT_NOT_IN_FAMILY) или аудитория с неактивным/чужим пользователем (AUDIENCE_NOT_IN_FAMILY, DUPLICATE_AUDIENCE_MEMBER).",
                   "statusCode": 400
                 },
                 "schema": {
@@ -670,7 +698,7 @@
                 }
               }
             },
-            "description": "Неверное тело, часовой пояс, диапазон дат или участник не из семьи (PARTICIPANT_NOT_IN_FAMILY)."
+            "description": "Неверное тело, часовой пояс, диапазон дат, участник не из семьи (PARTICIPANT_NOT_IN_FAMILY) или аудитория с неактивным/чужим пользователем (AUDIENCE_NOT_IN_FAMILY, DUPLICATE_AUDIENCE_MEMBER)."
           },
           "401": {
             "content": {
@@ -728,7 +756,7 @@
     },
     "/families/{familyId}/events/manage": {
       "get": {
-        "description": "Только owner/admin. Исходные неотменённые события, включая прошедшие и ежегодные, без ограничения календарным периодом.",
+        "description": "Только owner/admin. Исходные неотменённые события, включая прошедшие и ежегодные, без ограничения календарным периодом. owner/admin вне аудитории события его не видит.",
         "operationId": "FamilyEventsController_manage",
         "parameters": [
           {
@@ -1030,7 +1058,7 @@
         ]
       },
       "patch": {
-        "description": "Только owner/admin. Переданные поля заменяются; участники заменяются целиком, если поле передано.",
+        "description": "Только owner/admin из аудитории события. Переданные поля заменяются; участники и аудитория заменяются целиком, если поле передано. audienceUserIds: отсутствие сохраняет аудиторию, null открывает всей семье, массив ограничивает.",
         "operationId": "FamilyEventsController_update",
         "parameters": [
           {
@@ -1081,7 +1109,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Неверное тело, диапазон дат или участник не из семьи.",
+                  "message": "Неверное тело, диапазон дат, участник не из семьи или аудитория с неактивным/чужим пользователем.",
                   "statusCode": 400
                 },
                 "schema": {
@@ -1089,7 +1117,7 @@
                 }
               }
             },
-            "description": "Неверное тело, диапазон дат или участник не из семьи."
+            "description": "Неверное тело, диапазон дат, участник не из семьи или аудитория с неактивным/чужим пользователем."
           },
           "401": {
             "content": {
@@ -1161,7 +1189,7 @@
     },
     "/families/{familyId}/events/{eventId}/photo": {
       "delete": {
-        "description": "Только owner/admin. Повторное удаление не ошибка.",
+        "description": "Только owner/admin из аудитории события. Повторное удаление не ошибка.",
         "operationId": "FamilyEventPhotosController_remove",
         "parameters": [
           {
@@ -1259,7 +1287,7 @@
         ]
       },
       "put": {
-        "description": "Только owner/admin. Один файл PNG, JPEG или WebP до 2 МиБ; прежняя обложка заменяется. Обложка одна на событие.",
+        "description": "Только owner/admin из аудитории события. Один файл PNG, JPEG или WebP до 2 МиБ; прежняя обложка заменяется. Обложка одна на событие.",
         "operationId": "FamilyEventPhotosController_replace",
         "parameters": [
           {
@@ -1413,7 +1441,7 @@
     },
     "/families/{familyId}/events/{eventId}/photo/{photoId}": {
       "get": {
-        "description": "Доступна всем активным участникам семьи. Передайте Bearer-токен, затем прочитайте ответ как Blob.",
+        "description": "Доступна активным участникам семьи из аудитории события. Сначала проверяются сессия и доступ, потом состояние события. Ответ не кешируется. Передайте Bearer-токен, затем прочитайте ответ как Blob.",
         "operationId": "FamilyEventPhotosController_read",
         "parameters": [
           {
@@ -1521,7 +1549,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Фотография не найдена или событие отменено.",
+                  "message": "Фотография не найдена, событие отменено или смотрящий вне аудитории.",
                   "statusCode": 404
                 },
                 "schema": {
@@ -1529,7 +1557,7 @@
                 }
               }
             },
-            "description": "Фотография не найдена или событие отменено."
+            "description": "Фотография не найдена, событие отменено или смотрящий вне аудитории."
           }
         },
         "security": [

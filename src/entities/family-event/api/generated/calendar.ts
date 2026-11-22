@@ -13,13 +13,13 @@ export interface paths {
         };
         /**
          * События семьи за период
-         * @description Возвращает события, пересекающиеся с периодом, и ежегодные события, попадающие в него. Диапазон не шире 92 дней, не больше 500 событий. Доступен всем активным участникам семьи; править может только owner/admin.
+         * @description Возвращает события, пересекающиеся с периодом, и ежегодные события, попадающие в него. Диапазон не шире 92 дней, не больше 500 событий. Доступен активным участникам семьи: событие с ограниченной аудиторией видно только ей; править может только owner/admin из аудитории.
          */
         get: operations["FamilyEventsController_list"];
         put?: never;
         /**
          * Создать событие
-         * @description Только owner/admin. participants — активные пользователи этой семьи; они могут не быть родителями. Напоминание хранится как число минут до начала.
+         * @description Только owner/admin. participants — активные пользователи этой семьи; они могут не быть родителями. audienceUserIds ограничивает видимость и напоминания; отсутствие поля или null — вся семья, массив — указанные активные участники плюс активный автор, пустой массив — только автор. Напоминание хранится как число минут до начала.
          */
         post: operations["FamilyEventsController_create"];
         delete?: never;
@@ -37,7 +37,7 @@ export interface paths {
         };
         /**
          * Управление событиями семьи
-         * @description Только owner/admin. Исходные неотменённые события, включая прошедшие и ежегодные, без ограничения календарным периодом.
+         * @description Только owner/admin. Исходные неотменённые события, включая прошедшие и ежегодные, без ограничения календарным периодом. owner/admin вне аудитории события его не видит.
          */
         get: operations["FamilyEventsController_manage"];
         put?: never;
@@ -71,7 +71,7 @@ export interface paths {
         head?: never;
         /**
          * Изменить событие
-         * @description Только owner/admin. Переданные поля заменяются; участники заменяются целиком, если поле передано.
+         * @description Только owner/admin из аудитории события. Переданные поля заменяются; участники и аудитория заменяются целиком, если поле передано. audienceUserIds: отсутствие сохраняет аудиторию, null открывает всей семье, массив ограничивает.
          */
         patch: operations["FamilyEventsController_update"];
         trace?: never;
@@ -86,13 +86,13 @@ export interface paths {
         get?: never;
         /**
          * Загрузить или заменить обложку события
-         * @description Только owner/admin. Один файл PNG, JPEG или WebP до 2 МиБ; прежняя обложка заменяется. Обложка одна на событие.
+         * @description Только owner/admin из аудитории события. Один файл PNG, JPEG или WebP до 2 МиБ; прежняя обложка заменяется. Обложка одна на событие.
          */
         put: operations["FamilyEventPhotosController_replace"];
         post?: never;
         /**
          * Удалить обложку события
-         * @description Только owner/admin. Повторное удаление не ошибка.
+         * @description Только owner/admin из аудитории события. Повторное удаление не ошибка.
          */
         delete: operations["FamilyEventPhotosController_remove"];
         options?: never;
@@ -109,7 +109,7 @@ export interface paths {
         };
         /**
          * Получить обложку события
-         * @description Доступна всем активным участникам семьи. Передайте Bearer-токен, затем прочитайте ответ как Blob.
+         * @description Доступна активным участникам семьи из аудитории события. Сначала проверяются сессия и доступ, потом состояние события. Ответ не кешируется. Передайте Bearer-токен, затем прочитайте ответ как Blob.
          */
         get: operations["FamilyEventPhotosController_read"];
         put?: never;
@@ -182,6 +182,8 @@ export interface components {
             statusCode: number;
         };
         CreateFamilyEventDto: {
+            /** @description Кто видит событие и получает напоминание. null или отсутствие — вся семья; массив — только перечисленные активные участники плюс активный автор. Пустой массив — только автор. */
+            audienceUserIds?: string[] | null;
             /**
              * @description Ключ одного создания. Повтор с тем же ключом вернёт уже созданное событие.
              * @example 1719325200000-a1b2c3
@@ -234,6 +236,8 @@ export interface components {
             title: string;
         };
         FamilyEventDto: {
+            /** @description Кто видит событие: null — вся активная семья, массив — только эти пользователи. Активный автор всегда входит в массив. */
+            audienceUserIds: string[] | null;
             /** Format: date-time */
             createdAt: string;
             /** @example Выезжаем утром, вернёмся в воскресенье. */
@@ -354,6 +358,8 @@ export interface components {
             response: "going" | "not_going";
         };
         UpdateFamilyEventDto: {
+            /** @description Новая аудитория. Отсутствие поля сохраняет текущую; null открывает событие всей семье; массив ограничивает активными участниками и активным автором. Пустой массив — только автор. */
+            audienceUserIds?: string[] | null;
             /** @description null очищает описание. */
             description?: string | null;
             /** Format: date-time */
@@ -475,7 +481,7 @@ export interface operations {
                     "application/json": components["schemas"]["FamilyEventDto"];
                 };
             };
-            /** @description Неверное тело, часовой пояс, диапазон дат или участник не из семьи (PARTICIPANT_NOT_IN_FAMILY). */
+            /** @description Неверное тело, часовой пояс, диапазон дат, участник не из семьи (PARTICIPANT_NOT_IN_FAMILY) или аудитория с неактивным/чужим пользователем (AUDIENCE_NOT_IN_FAMILY, DUPLICATE_AUDIENCE_MEMBER). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -483,7 +489,7 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "message": "Неверное тело, часовой пояс, диапазон дат или участник не из семьи (PARTICIPANT_NOT_IN_FAMILY).",
+                     *       "message": "Неверное тело, часовой пояс, диапазон дат, участник не из семьи (PARTICIPANT_NOT_IN_FAMILY) или аудитория с неактивным/чужим пользователем (AUDIENCE_NOT_IN_FAMILY, DUPLICATE_AUDIENCE_MEMBER).",
                      *       "statusCode": 400
                      *     }
                      */
@@ -789,7 +795,7 @@ export interface operations {
                     "application/json": components["schemas"]["FamilyEventDto"];
                 };
             };
-            /** @description Неверное тело, диапазон дат или участник не из семьи. */
+            /** @description Неверное тело, диапазон дат, участник не из семьи или аудитория с неактивным/чужим пользователем. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -797,7 +803,7 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "message": "Неверное тело, диапазон дат или участник не из семьи.",
+                     *       "message": "Неверное тело, диапазон дат, участник не из семьи или аудитория с неактивным/чужим пользователем.",
                      *       "statusCode": 400
                      *     }
                      */
@@ -1142,7 +1148,7 @@ export interface operations {
                     "application/json": components["schemas"]["HttpErrorDto"];
                 };
             };
-            /** @description Фотография не найдена или событие отменено. */
+            /** @description Фотография не найдена, событие отменено или смотрящий вне аудитории. */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -1150,7 +1156,7 @@ export interface operations {
                 content: {
                     /**
                      * @example {
-                     *       "message": "Фотография не найдена или событие отменено.",
+                     *       "message": "Фотография не найдена, событие отменено или смотрящий вне аудитории.",
                      *       "statusCode": 404
                      *     }
                      */

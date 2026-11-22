@@ -67,6 +67,7 @@ export function FeaturedEventCard({
       ]}
     >
       <ApiImage
+        retainInMemory={false}
         source={familyEventCover(event, mode)}
         resizeMode="cover"
         style={styles.background}

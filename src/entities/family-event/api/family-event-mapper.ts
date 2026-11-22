@@ -44,6 +44,7 @@ export function toFamilyEvent(
       toPerson(person, toImage),
     ),
     photo: dto.photoUrl ? toImage(dto.photoUrl) : undefined,
+    audienceUserIds: dto.audienceUserIds,
     reminderLeadMinutes: dto.reminderLeadMinutes ?? undefined,
     reminderAt:
       dto.reminderLeadMinutes == null

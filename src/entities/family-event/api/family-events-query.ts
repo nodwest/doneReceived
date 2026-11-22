@@ -62,7 +62,7 @@ export function useFamilyEventsQuery(
       ),
     queryFn:
       familyId && enabled
-        ? () => fetchFamilyEvents(familyId, from, to)
+        ? ({ signal }) => fetchFamilyEvents(familyId, from, to, signal)
         : skipToken,
     // Пока грузится новый период, показываем предыдущий — без пустого экрана.
     // Но только внутри той же семьи: иначе при смене семьи на секунду
@@ -85,8 +85,8 @@ export function useFamilyEventQuery(
     queryKey: familyEventsKeys.detail(familyId, eventId ?? '', year),
     queryFn:
       familyId && eventId
-        ? () => fetchFamilyEvent(familyId, eventId, year)
+        ? ({ signal }) => fetchFamilyEvent(familyId, eventId, year, signal)
         : skipToken,
-    retry: 1,
+    retry: privateReadOptions.retry,
   });
 }

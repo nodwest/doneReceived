@@ -19,6 +19,7 @@ import {
   type FamilyEventPerson,
   type FamilyEventRepeat,
 } from '@entities/family-event';
+import { useSession, useSessionStore } from '@entities/session';
 import { apiErrorCode, authorizedImage, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import {
@@ -31,17 +32,15 @@ import {
 import { theme } from '@shared/theme';
 import { DateTimePickerSheet, Icon, Input, RoundButton } from '@shared/ui';
 import { useSaveFamilyEvent } from '../model/use-save-family-event';
+import { ReminderPicker } from './reminder-picker';
 import { styles } from './family-event-form.styled';
 
 const HOUR_MS = 60 * 60 * 1000;
 const MINUTE_MS = 60 * 1000;
 const KIND_OPTIONS = ['trip', 'event', 'holiday'] as const;
 const REMINDER_OPTIONS = [
-  { minutes: null, key: 'none' },
   { minutes: 60, key: 'h1' },
-  { minutes: 180, key: 'h3' },
   { minutes: 1440, key: 'd1' },
-  { minutes: 4320, key: 'd3' },
   { minutes: 10080, key: 'w1' },
 ] as const;
 
@@ -78,7 +77,6 @@ const defaultReminderLead = (start: Date, now: Date) => {
   const diff = start.getTime() - now.getTime();
   if (diff >= 10080 * MINUTE_MS) return 10080;
   if (diff >= 1440 * MINUTE_MS) return 1440;
-  if (diff >= 180 * MINUTE_MS) return 180;
   if (diff >= 60 * MINUTE_MS) return 60;
   return null;
 };
@@ -95,11 +93,6 @@ const timeLabel = (date: Date) =>
     minute: '2-digit',
   });
 
-/**
- * Форма события: превью, разовое/ежегодное, название, даты, описание,
- * участники и напоминание. Сохраняет событие в локальный стор: серверного
- * календаря пока нет.
- */
 export function FamilyEventForm({
   event,
   onClose,
@@ -108,7 +101,19 @@ export function FamilyEventForm({
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const familyId = useCurrentFamily()?.id ?? null;
-  const { data: members = [] } = useFamilyMembers(familyId);
+  const {
+    data: members,
+    isError: membersFailed,
+    refetch: refetchMembers,
+  } = useFamilyMembers(familyId);
+  const session = useSession();
+  const viewerId = session?.user.id;
+  const [audience, setAudience] = useState<string[] | null>(
+    event?.audienceUserIds ?? null,
+  );
+  const [audienceChanged, setAudienceChanged] = useState(false);
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customSelected, setCustomSelected] = useState(false);
   const saveEvent = useSaveFamilyEvent();
   const [now] = useState(() => new Date());
   const [timezone] = useState(() => event?.timezone ?? deviceTimeZone());
@@ -156,7 +161,7 @@ export function FamilyEventForm({
 
   const familyPeople = useMemo<FamilyEventPerson[]>(
     () =>
-      members.map((member) => ({
+      (members ?? []).map((member) => ({
         id: member.userId,
         name: member.displayName,
         avatar: member.avatarUrl ? authorizedImage(member.avatarUrl) : null,
@@ -174,6 +179,21 @@ export function FamilyEventForm({
   }, [event?.participants, familyPeople]);
 
   const selectedParticipants = participants ?? familyPeople;
+  const customReminder =
+    reminderLead !== null &&
+    (customSelected ||
+      !REMINDER_OPTIONS.some(({ minutes }) => minutes === reminderLead));
+  const audienceCount =
+    audience === null
+      ? familyPeople.length
+      : familyPeople.filter(
+          ({ id }) => audience.includes(id) || (!event && id === viewerId),
+        ).length;
+  const hasHiddenParticipants =
+    audience !== null &&
+    selectedParticipants.some(
+      ({ id }) => !audience.includes(id) && (event || id !== viewerId),
+    );
 
   const effectiveStart =
     repeat === 'annual' ? nextAnnual(startsAt, now) : startsAt;
@@ -205,6 +225,7 @@ export function FamilyEventForm({
     !!familyId &&
     title.trim().length > 0 &&
     selectedParticipants.length > 0 &&
+    !(audienceChanged && audience !== null && !members) &&
     !saveEvent.isPending;
 
   const changeRepeat = (next: FamilyEventRepeat) => {
@@ -258,17 +279,16 @@ export function FamilyEventForm({
     setCoverRemoved(true);
   };
 
-  const save = () => {
-    if (!familyId) {
-      showToast(t('calendar.formInvalid'));
-      return;
-    }
+  const save = async () => {
     if (!canSave) {
       showToast(t('calendar.formInvalid'));
       return;
     }
-    saveEvent.mutate(
-      {
+    const stillInSession = () =>
+      useSessionStore.getState().session?.storageEpoch ===
+      session?.storageEpoch;
+    try {
+      const { photoFailed } = await saveEvent.mutateAsync({
         eventId: event?.id,
         cover: cover ?? (event && coverRemoved ? null : undefined),
         payload: {
@@ -280,21 +300,25 @@ export function FamilyEventForm({
           repeat,
           kind,
           reminderLeadMinutes: reminderLead,
+          audienceUserIds: audienceChanged
+            ? (audience?.filter((id) =>
+                familyPeople.some((person) => person.id === id),
+              ) ?? null)
+            : undefined,
           participants: selectedParticipants.map((person) => person.id),
           clientRequestId: event ? undefined : clientRequestId,
         },
-      },
-      {
-        onSuccess: ({ photoFailed }) => onSaved(photoFailed),
-        onError: (error) =>
-          showToast(
-            isApiError(error) &&
-              apiErrorCode(error) === 'FAMILY_EVENT_LIMIT_REACHED'
-              ? t('calendar.eventLimit')
-              : t('calendar.saveError'),
-          ),
-      },
-    );
+      });
+      if (stillInSession()) onSaved(photoFailed);
+    } catch (error) {
+      if (!stillInSession()) return;
+      showToast(
+        isApiError(error) &&
+          apiErrorCode(error) === 'FAMILY_EVENT_LIMIT_REACHED'
+          ? t('calendar.eventLimit')
+          : t('calendar.saveError'),
+      );
+    }
   };
 
   const headerAction = canSave
@@ -549,7 +573,8 @@ export function FamilyEventForm({
               <Text style={styles.label}>{t('calendar.reminderLabel')}</Text>
               <View style={styles.reminderOptions}>
                 {REMINDER_OPTIONS.map((option) => {
-                  const selected = reminderLead === option.minutes;
+                  const selected =
+                    !customReminder && reminderLead === option.minutes;
                   return (
                     <Pressable
                       key={option.key}
@@ -559,7 +584,10 @@ export function FamilyEventForm({
                         styles.reminderOption,
                         selected && styles.reminderOptionOn,
                       ]}
-                      onPress={() => setReminderLead(option.minutes)}
+                      onPress={() => {
+                        setCustomSelected(false);
+                        setReminderLead(selected ? null : option.minutes);
+                      }}
                     >
                       <Text
                         style={[
@@ -572,26 +600,121 @@ export function FamilyEventForm({
                     </Pressable>
                   );
                 })}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: customReminder }}
+                  style={[
+                    styles.reminderOption,
+                    customReminder && styles.reminderOptionOn,
+                  ]}
+                  onPress={() => setCustomOpen(true)}
+                >
+                  <Text
+                    style={[
+                      styles.reminderText,
+                      customReminder && styles.reminderTextOn,
+                    ]}
+                  >
+                    {t('calendar.reminderCustom')}
+                  </Text>
+                </Pressable>
               </View>
+              {customReminder && (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setReminderLead(null)}
+                >
+                  <Text style={styles.reminderText}>
+                    {t('calendar.reminderClear')}
+                  </Text>
+                </Pressable>
+              )}
             </View>
 
             <View style={styles.field}>
               <Text style={styles.label}>{t('calendar.visibilityLabel')}</Text>
-              <View style={styles.visibility}>
-                <View style={styles.eye}>
-                  <Icon name="eye" size={16} color={theme.colors.childInk} />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ expanded: audience !== null }}
+                disabled={!members}
+                accessibilityHint={
+                  !members
+                    ? t('calendar.audienceMembersUnavailable')
+                    : undefined
+                }
+                style={styles.visibility}
+                onPress={() => {
+                  setAudienceChanged(true);
+                  setAudience(
+                    audience === null ? (viewerId ? [viewerId] : []) : null,
+                  );
+                }}
+              >
+                <View
+                  style={[styles.eye, audience !== null && styles.eyeInactive]}
+                >
+                  <Icon
+                    name="eye"
+                    size={16}
+                    color={
+                      audience === null
+                        ? theme.colors.childInk
+                        : theme.colors.inkSoft
+                    }
+                  />
                 </View>
                 <Text style={styles.visibilityTitle}>
-                  {t('calendar.allFamily')}
+                  {t(
+                    audience === null
+                      ? 'calendar.allFamily'
+                      : 'calendar.selectedAudience',
+                  )}
                 </Text>
-                {availablePeople.length > 0 && (
+                {members && (
                   <Text style={styles.visibilityHint}>
-                    {t('calendar.peopleCount', {
-                      count: availablePeople.length,
-                    })}
+                    {t('calendar.peopleCount', { count: audienceCount })}
                   </Text>
                 )}
-              </View>
+              </Pressable>
+              {membersFailed && !members && (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void refetchMembers()}
+                >
+                  <Text style={styles.emptyPeople}>
+                    {t('calendar.audienceMembersUnavailable')}{' '}
+                    {t('common.retry')}
+                  </Text>
+                </Pressable>
+              )}
+              {audience !== null && (
+                <View style={styles.people}>
+                  {familyPeople.map((person) => (
+                    <EventPersonChip
+                      key={person.id}
+                      person={person}
+                      selected={
+                        audience.includes(person.id) ||
+                        (!event && person.id === viewerId)
+                      }
+                      disabled={person.id === viewerId}
+                      onPress={() => {
+                        setAudienceChanged(true);
+                        setAudience(
+                          audience.includes(person.id)
+                            ? audience.filter((id) => id !== person.id)
+                            : [...audience, person.id],
+                        );
+                      }}
+                    />
+                  ))}
+                </View>
+              )}
+              {hasHiddenParticipants && (
+                <Text style={styles.emptyPeople}>
+                  {t('calendar.hiddenParticipants')}
+                </Text>
+              )}
             </View>
           </ScrollView>
 
@@ -616,6 +739,17 @@ export function FamilyEventForm({
         </KeyboardAvoidingView>
       </View>
 
+      {customOpen && (
+        <ReminderPicker
+          minutes={reminderLead}
+          onClose={() => setCustomOpen(false)}
+          onConfirm={(minutes) => {
+            setCustomSelected(true);
+            setReminderLead(minutes);
+            setCustomOpen(false);
+          }}
+        />
+      )}
       <DateTimePickerSheet
         visible={picker !== null}
         value={picker === 'end' ? endsAt : effectiveStart}

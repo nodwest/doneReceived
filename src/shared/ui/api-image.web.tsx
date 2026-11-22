@@ -90,7 +90,13 @@ const withHeaders = (source: ImageProps['source']): HeaderSource | null =>
     ? (source as HeaderSource)
     : null;
 
-export function ApiImage({ source, ...props }: ImageProps) {
+type ApiImageProps = ImageProps & { retainInMemory?: boolean };
+
+export function ApiImage({
+  source,
+  retainInMemory = true,
+  ...props
+}: ApiImageProps) {
   const remote = withHeaders(source);
   const uri = remote?.uri;
   const scope = usePrivateReadScope();
@@ -99,20 +105,31 @@ export function ApiImage({ source, ...props }: ImageProps) {
     uri: string;
     url: string;
   } | null>(null);
-  const cached = scope && uri ? ready.get(uri) : undefined;
+  const cached = retainInMemory && scope && uri ? ready.get(uri) : undefined;
 
   useEffect(() => {
-    if (!scope || !uri || ready.has(uri)) return;
+    if (!scope || !uri || (retainInMemory && ready.has(uri))) return;
     let alive = true;
-    load(uri)
+    let objectUrl: string | undefined;
+    const controller = new AbortController();
+    const pending = retainInMemory
+      ? load(uri)
+      : download(uri, controller.signal).then((data) => {
+          if (!alive) throw new Error('Image request cancelled');
+          objectUrl = URL.createObjectURL(data);
+          return objectUrl;
+        });
+    pending
       .then((url) => {
         if (alive) setBlob({ scope, uri, url });
       })
       .catch(() => {});
     return () => {
       alive = false;
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [uri, scope]);
+  }, [uri, scope, retainInMemory]);
 
   if (!remote) return <Image source={source} {...props} />;
   const url =
