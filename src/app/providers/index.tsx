@@ -18,6 +18,7 @@ import {
   LocationConnection,
   useRegisterParentDevice,
 } from '@features/location';
+import { resetTaskDrafts } from '@features/complete-task';
 import { PushNotificationsConnection } from '@features/push-notifications';
 
 const queryClient = new QueryClient({
@@ -53,6 +54,7 @@ useSessionStore.subscribe((state, prev) => {
   if (!prev.session) return;
   if (privateScope(state.session) !== privateScope(prev.session)) {
     queryClient.clear();
+    resetTaskDrafts();
     clearPrivateImageCache();
   }
 });

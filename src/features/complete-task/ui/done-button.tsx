@@ -6,7 +6,7 @@ import { useTaskActions } from '../model/use-task-actions';
 /** Голубая кнопка I did it! в плитке задания (главная, список «To do»). */
 export function DoneButton({ task }: { task: Task }) {
   const { t } = useTranslation();
-  const { markDone, isPending } = useTaskActions();
+  const { markDone, isPending } = useTaskActions(task.id);
 
   return (
     <CardButton

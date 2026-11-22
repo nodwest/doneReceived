@@ -80,10 +80,18 @@ export function useReviewTask() {
     onError,
   });
 
+  const refreshMissingReport = () => {
+    showToast(t('reviewTask.errors.staleReport'));
+    void syncData(queryClient, 'task-approved');
+  };
+
   return {
-    approve: approve.mutate,
+    approve: (task: Task) =>
+      task.submissionId ? approve.mutate(task) : refreshMissingReport(),
     reject: (task: Task, decision: RejectDecision) =>
-      reject.mutate({ task, decision }),
+      task.submissionId
+        ? reject.mutate({ task, decision })
+        : refreshMissingReport(),
     isPending: approve.isPending || reject.isPending,
   };
 }

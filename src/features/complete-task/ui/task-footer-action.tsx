@@ -9,7 +9,7 @@ import { useTaskActions } from '../model/use-task-actions';
  */
 export function TaskFooterAction({ task }: { task: Task }) {
   const { t } = useTranslation();
-  const { markDone, redo, isPending } = useTaskActions();
+  const { markDone, redo, isPending } = useTaskActions(task.id);
 
   return task.status === 'review' ? (
     <CardButton

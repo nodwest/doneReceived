@@ -1,9 +1,15 @@
-import type { ChecklistItem, Task } from '@entities/task';
-import { isApiError } from '@shared/api';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  taskKeys,
+  type ChecklistItem,
+  type Task,
+  type TaskStatusPayload,
+} from '@entities/task';
+import { isApiError, syncData } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { photoUploadError, showToast } from '@shared/lib';
 import { useNoteDraftStore } from './note-draft-store';
-import { useSetTaskStatus } from './use-set-task-status';
+import { isAmbiguousTaskError, useSetTaskStatus } from './use-set-task-status';
 import { useTickChecklistItem } from './use-tick-checklist-item';
 
 /** Ключ ошибки: `completeTask.errors.*`. */
@@ -16,6 +22,8 @@ function actionError(error: unknown) {
       : null;
   if (code === 'SUBMISSION_ALREADY_REVIEWED') return 'alreadyReviewed' as const;
   if (code === 'TASK_DEADLINE_PASSED') return 'deadlinePassed' as const;
+  if (code === 'SUBMISSION_NOT_PENDING') return 'notPending' as const;
+  if (code === 'SUBMISSION_REQUEST_MISMATCH') return 'requestMismatch' as const;
   if (code === 'TASK_CANCELLED') return 'cancelled' as const;
   if (code === 'ASSIGNMENT_NOT_ACTIVE') return 'notActive' as const;
   // 10 попыток сдачи на задание (отозванные тоже считаются).
@@ -29,59 +37,121 @@ function actionError(error: unknown) {
  * активно, а отправленный комментарий возвращается в поле; toggleStep
  * отмечает шаг чеклиста или снимает отметку.
  */
-export function useTaskActions() {
+export function useTaskActions(taskId?: string) {
   const { t } = useTranslation();
-  const { mutate, isPending } = useSetTaskStatus();
+  const queryClient = useQueryClient();
+  const { mutateAsync } = useSetTaskStatus();
   const { mutate: tick } = useTickChecklistItem();
+  const isPending = useNoteDraftStore(
+    (state) => taskId !== undefined && !!state.actions[taskId],
+  );
   const onError = (error: unknown) =>
     showToast(
-      // Фото не приняли (велико или сервер занят) — фото-ошибкой.
       isApiError(error) && (error.status === 413 || error.status === 503)
         ? t(`photos.${photoUploadError(error)}`)
         : t(`completeTask.errors.${actionError(error)}`),
     );
 
-  const { setDraft, clearDraft } = useNoteDraftStore.getState();
+  const run = async (task: Task, status: TaskStatusPayload['status']) => {
+    const { id } = task;
+    const store = useNoteDraftStore;
+    const state = store.getState();
+    if (state.actions[id]) return;
+    if (status === 'active' && !task.submissionId) {
+      showToast(t('completeTask.errors.notPending'));
+      await syncData(queryClient, 'task-withdrawn');
+      return;
+    }
+    const signalOwner = new AbortController();
+    store.setState({ actions: { ...state.actions, [id]: signalOwner } });
 
-  const markDone = (task: Task) => {
-    const draft = useNoteDraftStore.getState();
-    const note = draft.drafts[task.id]?.trim();
-    const photos = draft.photos[task.id] ?? [];
-    mutate(
-      {
-        id: task.id,
-        serverTaskId: task.serverTaskId,
-        status: 'review',
-        ...(note ? { note } : {}),
-        ...(photos.length > 0 ? { photos } : {}),
-      },
-      {
-        onSuccess: () => {
-          clearDraft(task.id);
-          showToast(t('completeTask.sentToast'));
+    const note = state.drafts[id]?.trim() || undefined;
+    const photos = state.photos[id];
+    const submission =
+      status === 'review'
+        ? (state.submissions[id] ?? {
+            key: `submission-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            note,
+            photos,
+          })
+        : undefined;
+    if (submission) {
+      store.setState({
+        submissions: { ...state.submissions, [id]: submission },
+      });
+    }
+
+    const forgetSubmission = () =>
+      store.setState(({ submissions }) => {
+        const remaining = { ...submissions };
+        delete remaining[id];
+        return { submissions: remaining };
+      });
+
+    try {
+      const result = await mutateAsync({
+        payload: {
+          id,
+          status,
+          submissionId: task.submissionId,
+          clientRequestId: submission?.key,
+          note: submission?.note,
+          photos: submission?.photos,
         },
-        onError,
-      },
-    );
+        signal: signalOwner.signal,
+      });
+      if (signalOwner.signal.aborted) return;
+      const current = store.getState();
+      forgetSubmission();
+      if (submission) {
+        if (
+          (current.drafts[id]?.trim() || undefined) === submission.note &&
+          current.photos[id] === submission.photos
+        )
+          current.clearDraft(id);
+        showToast(t('completeTask.sentToast'));
+      } else {
+        const active = queryClient
+          .getQueryCache()
+          .findAll({ queryKey: taskKeys.all, type: 'active' })
+          .some(
+            ({ state }) =>
+              state.status === 'success' &&
+              !state.isInvalidated &&
+              Array.isArray(state.data) &&
+              (state.data as Task[]).some(
+                (latest) => latest.id === id && latest.status === 'active',
+              ),
+          );
+        if (
+          active &&
+          result?.note &&
+          current.drafts[id] === state.drafts[id] &&
+          !current.drafts[id]
+        )
+          current.setDraft(id, result.note);
+        showToast(t('completeTask.redoToast'));
+      }
+    } catch (error) {
+      if (signalOwner.signal.aborted) return;
+      if (isAmbiguousTaskError(error)) {
+        showToast(t('completeTask.errors.unconfirmed'));
+      } else {
+        if (submission) forgetSubmission();
+        onError(error);
+      }
+    } finally {
+      store.setState(({ actions }) => {
+        if (actions[id] !== signalOwner) return {};
+        const remaining = { ...actions };
+        delete remaining[id];
+        return { actions: remaining };
+      });
+    }
   };
 
-  const redo = (task: Task) =>
-    mutate(
-      {
-        id: task.id,
-        serverTaskId: task.serverTaskId,
-        submissionId: task.submissionId,
-        status: 'active',
-      },
-      {
-        onSuccess: () => {
-          // Отчёт отозван, а комментарий не пропадает: снова в поле.
-          if (task.note) setDraft(task.id, task.note);
-          showToast(t('completeTask.redoToast'));
-        },
-        onError,
-      },
-    );
+  const markDone = (task: Task) => void run(task, 'review');
+  const redo = (task: Task) => void run(task, 'active');
 
   const toggleStep = (task: Task, item: ChecklistItem) =>
     tick(

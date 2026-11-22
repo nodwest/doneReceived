@@ -314,18 +314,27 @@ export async function submitServerTask(
   assignmentId: string,
   note?: string,
   photos: readonly PickedPhoto[] = [],
+  clientRequestId?: string,
+  signal?: AbortSignal,
 ) {
   const path = `/families/${familyId}/task-assignments/${assignmentId}/submissions`;
   if (photos.length === 0) {
-    return apiRequest<unknown>(path, {
+    return apiRequest<{ id: string }>(path, {
       method: 'POST',
-      body: note ? { note } : {},
+      body: { note, clientRequestId },
+      signal,
     });
   }
   const form = new FormData();
   if (note) form.append('note', note);
+  if (clientRequestId) form.append('clientRequestId', clientRequestId);
   for (const photo of photos) await appendPhoto(form, 'photos', photo);
-  return apiRequest<unknown>(path, { method: 'POST', body: form });
+  if (signal?.aborted) throw new Error('Task action cancelled');
+  return apiRequest<{ id: string }>(path, {
+    method: 'POST',
+    body: form,
+    signal,
+  });
 }
 
 /**
@@ -345,11 +354,6 @@ export function tickServerChecklist(
   );
 }
 
-type SubmissionDto = {
-  submission: { id: string; withdrawnAt: string | null };
-  review: unknown | null;
-};
-
 /**
  * Redo: ребёнок забирает непроверенный отчёт — DELETE
  * /families/:id/task-submissions/:submissionId, назначение снова активно,
@@ -360,11 +364,12 @@ type SubmissionDto = {
 export async function withdrawServerSubmission(
   familyId: string,
   assignment: PendingRef,
+  signal?: AbortSignal,
 ) {
-  const submissionId = await pendingSubmissionId(familyId, assignment);
+  const submissionId = requireSubmissionId(assignment);
   return apiRequest<{ note: string | null }>(
     `/families/${familyId}/task-submissions/${submissionId}`,
-    { method: 'DELETE' },
+    { method: 'DELETE', signal },
   );
 }
 
@@ -389,7 +394,7 @@ export async function reviewServerSubmission(
         retry: boolean;
       },
 ) {
-  const submissionId = await pendingSubmissionId(familyId, assignment);
+  const submissionId = requireSubmissionId(assignment);
   await apiRequest<unknown>(
     `/families/${familyId}/task-submissions/${submissionId}/review`,
     { method: 'POST', body: review },
@@ -399,22 +404,7 @@ export async function reviewServerSubmission(
 /** Назначение и его отчёт на проверке, если он уже есть в списке заданий. */
 export type PendingRef = { id: string; submissionId?: string };
 
-/**
- * Отчёт, который ждёт проверки: обычно уже пришёл в списке заданий
- * (`pendingSubmission`). Если список ещё не перечитан после сдачи — ищем
- * в отчётах назначения (отозванные сервер скрывает).
- */
-async function pendingSubmissionId(
-  familyId: string,
-  { id, submissionId }: PendingRef,
-) {
-  if (submissionId) return submissionId;
-  const submissions = await apiRequest<SubmissionDto[]>(
-    `/families/${familyId}/task-assignments/${id}/submissions`,
-  );
-  const pending = submissions.find(
-    ({ submission, review }) => review === null && !submission.withdrawnAt,
-  );
-  if (!pending) throw new Error('No pending submission');
-  return pending.submission.id;
+function requireSubmissionId({ submissionId }: PendingRef) {
+  if (!submissionId) throw new Error('Missing pending submission ID');
+  return submissionId;
 }

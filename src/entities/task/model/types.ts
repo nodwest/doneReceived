@@ -65,6 +65,7 @@ export interface TaskStatusPayload {
   serverTaskId?: string;
   /** Redo задания с сервера: отчёт, который отзываем. */
   submissionId?: string;
+  clientRequestId?: string;
   status: Exclude<TaskState, 'done'>;
   /** Комментарий ребёнка к сдаче (только на проверку); пустой — без него. */
   note?: string;

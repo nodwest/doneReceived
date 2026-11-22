@@ -8,6 +8,13 @@ type NoteDraftState = {
   drafts: Record<string, string>;
   /** Выбранные, но ещё не отправленные фото-отчёта по id задания. */
   photos: Record<string, PickedPhoto[]>;
+  sessionGeneration: number;
+  actions: Record<string, AbortController>;
+  submissions: Record<
+    string,
+    { key: string; note?: string; photos?: PickedPhoto[] }
+  >;
+  reset: () => void;
   setDraft: (taskId: string, value: string) => void;
   clearDraft: (taskId: string) => void;
   addPhotos: (taskId: string, photos: readonly PickedPhoto[]) => void;
@@ -26,6 +33,20 @@ const without = <T>(record: Record<string, T>, key: string) => {
  */
 export const useNoteDraftStore = create<NoteDraftState>((set) => ({
   drafts: {},
+  sessionGeneration: 0,
+  actions: {},
+  submissions: {},
+  reset: () =>
+    set((state) => {
+      for (const action of Object.values(state.actions)) action.abort();
+      return {
+        sessionGeneration: state.sessionGeneration + 1,
+        drafts: {},
+        photos: {},
+        actions: {},
+        submissions: {},
+      };
+    }),
   photos: {},
   setDraft: (taskId, value) =>
     set((state) => ({ drafts: { ...state.drafts, [taskId]: value } })),
@@ -54,6 +75,8 @@ export const useNoteDraftStore = create<NoteDraftState>((set) => ({
     })),
 }));
 
+export const resetTaskDrafts = () => useNoteDraftStore.getState().reset();
+
 /** Поле комментария задания: значение и смена — для `ChildTaskCard`. */
 export function useNoteDraft(taskId: string) {
   const value = useNoteDraftStore((state) => state.drafts[taskId] ?? '');
@@ -71,12 +94,14 @@ export function usePhotoDraft(taskId: string) {
   const picked = useNoteDraftStore(
     (state) => state.photos[taskId] ?? NO_PHOTOS,
   );
-  const { addPhotos, removePhoto } = useNoteDraftStore.getState();
-  const add = async (source: PhotoSource) =>
-    addPhotos(
-      taskId,
-      await choosePhotos(source, TASK_PHOTOS_MAX - picked.length),
-    );
+  const { removePhoto } = useNoteDraftStore.getState();
+  const add = async (source: PhotoSource) => {
+    const generation = useNoteDraftStore.getState().sessionGeneration;
+    const photos = await choosePhotos(source, TASK_PHOTOS_MAX - picked.length);
+    const current = useNoteDraftStore.getState();
+    if (generation === current.sessionGeneration && photos.length > 0)
+      current.addPhotos(taskId, photos);
+  };
   return {
     items: picked.map((photo): ImageSourcePropType => ({ uri: photo.uri })),
     canAdd: picked.length < TASK_PHOTOS_MAX,

@@ -925,6 +925,7 @@ export const en = {
       other: 'Other',
     },
     errors: {
+      staleReport: 'The task has changed. Open the report again.',
       withdrawn: 'The report was taken back — nothing to review',
       deadlinePassed: 'The deadline has passed — the task can only be closed',
       alreadyReviewed: 'This report has already been reviewed',
@@ -1088,6 +1089,11 @@ export const en = {
       alreadyReviewed: 'A parent has already checked this task.',
       deadlinePassed: 'The deadline has passed, the task can no longer change.',
       cancelled: 'This task was cancelled.',
+      unconfirmed:
+        'Could not confirm the result. Reconnect and check the task or retry.',
+      notPending: 'The report is no longer awaiting review.',
+      requestMismatch:
+        'The submission changed. Refresh the task and try again.',
       notActive: 'The task is already on review — steps can’t change now.',
       tooManyAttempts:
         'Too many attempts to hand in this task. Ask a parent to check it.',

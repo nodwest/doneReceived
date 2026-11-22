@@ -1,4 +1,8 @@
-export { useNoteDraft, usePhotoDraft } from './model/note-draft-store';
+export {
+  resetTaskDrafts,
+  useNoteDraft,
+  usePhotoDraft,
+} from './model/note-draft-store';
 export * from './model/use-set-task-status';
 export * from './model/use-task-actions';
 export * from './model/use-tick-checklist-item';

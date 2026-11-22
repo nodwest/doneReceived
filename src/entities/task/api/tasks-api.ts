@@ -68,20 +68,20 @@ export async function cancelTask(
 export async function setTaskStatus(
   payload: TaskStatusPayload,
   familyId: string | null,
-): Promise<void> {
+  signal?: AbortSignal,
+) {
   if (payload.status === 'review') {
     await submitServerTask(
       family(familyId),
       payload.id,
       payload.note,
       payload.photos,
+      payload.clientRequestId,
+      signal,
     );
-    return;
+    return null;
   }
-  await withdrawServerSubmission(family(familyId), {
-    id: payload.id,
-    submissionId: payload.submissionId,
-  });
+  return withdrawServerSubmission(family(familyId), payload, signal);
 }
 
 /** Ребёнок отметил шаг чеклиста или снял отметку (`id` — назначение). */
