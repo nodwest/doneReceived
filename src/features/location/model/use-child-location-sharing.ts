@@ -51,18 +51,18 @@ async function syncTask(enabled: boolean) {
   }
 }
 
-async function checkSharing(
-  userId: string,
-  familyId: string,
-  enabled: boolean,
-) {
+async function checkSharing(userId: string, familyId: string) {
   if (Platform.OS === 'web') return;
   const store = useLocationSharingStore.getState();
   store.setChecking(true);
   try {
     const status = await readStatus();
     store.setStatus(status);
-    if (!enabled) {
+    const session = useSessionStore.getState().session;
+    if (session?.user.id !== userId || session.user.family?.id !== familyId) {
+      return;
+    }
+    if (!isLocationSharingEnabled(userId, familyId)) {
       await syncTask(false);
       store.setError(null);
       return;
@@ -109,7 +109,7 @@ export async function enableLocationSharing(userId: string, familyId: string) {
   }
   setLocationSharingEnabled(userId, familyId, true);
   useLocationSharingStore.getState().setEnabled(true);
-  await checkSharing(userId, familyId, true);
+  await checkSharing(userId, familyId);
   return true;
 }
 
@@ -145,18 +145,14 @@ export function useChildLocationSharingSync() {
 
   useEffect(() => {
     if (kind !== 'child' || !userId || !familyId) return;
-    void checkSharing(userId, familyId, enabled);
+    void checkSharing(userId, familyId);
   }, [enabled, familyId, kind, userId]);
 
   useEffect(() => {
     if (kind !== 'child' || !userId || !familyId) return;
     const subscription = AppState.addEventListener('change', (state) => {
       if (state === 'active') {
-        void checkSharing(
-          userId,
-          familyId,
-          useLocationSharingStore.getState().enabled,
-        );
+        void checkSharing(userId, familyId);
       }
     });
     return () => subscription.remove();

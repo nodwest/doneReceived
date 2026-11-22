@@ -19,8 +19,23 @@ type FamilyEventResponseDto = components['schemas']['FamilyEventResponseDto'];
 type FamilyEventPhotoDto = components['schemas']['FamilyEventPhotoDto'];
 type CreateFamilyEventRequestBody =
   components['schemas']['CreateFamilyEventDto'];
+export type ManagedFamilyEvent = components['schemas']['ManagedFamilyEventDto'];
+type ManagedFamilyEventsPage =
+  components['schemas']['ManagedFamilyEventsPageDto'];
 
 const mapEvent = (dto: FamilyEventDto) => toFamilyEvent(dto, authorizedImage);
+
+export function fetchManagedFamilyEvents(
+  familyId: string,
+  cursor: string | null,
+  signal: AbortSignal,
+) {
+  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : '';
+  return apiRequest<ManagedFamilyEventsPage>(
+    `/families/${familyId}/events/manage${query}`,
+    { signal },
+  );
+}
 
 export type FamilyEventPayload = {
   title: string;

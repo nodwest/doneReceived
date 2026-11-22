@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Новое задание · DoneReceived</title>
+<style>
+:root{font:16px system-ui,sans-serif;color:#19192d;background:#e8e9f1;--surface:#fff;--page:#f3f4f9;--border:#e6e7ef;--muted:#8d91a7;--placeholder:#c8ccda;--violet:#6b58e6;--gold:#ffb224;--green:#1b9c69}
+*{box-sizing:border-box}
+body{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
+[hidden]{display:none!important}
+.screen{width:min(100%,420px);min-height:100dvh;margin:auto;background:var(--page)}
+header{position:relative;display:grid;place-items:center;height:43px;margin:0 13px}
+h1{margin:0;font-size:16px;font-weight:750}
+.close{position:absolute;right:0;top:3px;width:39px;height:39px;border:0;border-radius:50%;background:white;box-shadow:0 8px 22px #19192d13;font-size:26px;font-weight:350;line-height:1}
+form{padding:17px 14px 13px;display:grid;gap:18px}
+.field{display:grid;gap:8px;min-width:0}
+label,legend,.label{font-size:12px;font-weight:700}
+.optional{color:var(--muted);font-weight:600;margin-left:4px}
+input,textarea{min-width:0;width:100%;border:1px solid var(--border);border-radius:14px;background:var(--surface);padding:13px 15px;font-size:14px;font-weight:650}
+input::placeholder,textarea::placeholder{color:var(--placeholder);opacity:1}
+fieldset{margin:0;padding:0;border:0;min-inline-size:0}
+legend{padding:0;margin-bottom:8px}
+.chips{display:grid;gap:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.chip{border:1px solid var(--border);background:white;color:var(--muted);min-height:33px;border-radius:13px;font-size:12px;font-weight:800;padding:4px}
+.chip[aria-pressed=true]{background:var(--violet);border-color:var(--violet);color:white}
+.date{margin-top:8px}
+.amount{position:relative;display:flex;align-items:center;min-width:0}
+.amount input{border:1.5px solid var(--gold);background:linear-gradient(105deg,#fff8e9,white);border-radius:13px;height:48px;padding:6px 38px;font-size:25px;font-weight:800}
+.amount span{position:absolute;left:15px;font-weight:800;font-size:21px;color:var(--gold);pointer-events:none}
+.coin{position:absolute;right:15px;width:16px;height:11px;border:2px solid var(--gold);border-radius:50%;background:linear-gradient(var(--gold) 0 59%,transparent 59%);pointer-events:none}
+.budget{padding:12px 13px;border:1px solid var(--border);border-radius:14px;background:white;display:grid;gap:8px}
+.budget-top{display:flex;justify-content:space-between;align-items:baseline;gap:4px 8px;flex-wrap:wrap;font-size:11px;color:var(--muted);font-weight:650}
+.budget-top strong{color:var(--green);font-size:14px}
+.budget-top .budget-name{color:#19192d;font-size:12px}
+.wallet{color:var(--violet);margin-right:6px}
+.bar{height:10px;border-radius:10px;background:var(--green);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);border-right:1px solid white}
+.key{display:flex;flex-wrap:wrap;gap:3px 10px;color:var(--muted);font-size:10.5px;font-weight:600}
+.key b{color:#19192d;margin-left:3px}.key .left b{color:var(--green)}
+.key span::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#b7bbd1;margin-right:4px}
+.key .uses::before{background:var(--gold)}.key .left::before{background:var(--green)}
+textarea{min-height:78px;resize:vertical}
+.checklist{margin-top:2px;display:flex;gap:10px;align-items:center;text-align:left;background:white;border:1px dashed #cfc8ff;border-radius:14px;min-height:56px;padding:8px 12px;color:var(--violet);font-size:13px;font-weight:700}
+.checklist small{display:block;color:var(--muted);font-size:10.5px;font-weight:650}
+.plus{display:grid;place-items:center;border-radius:8px;background:#eeebff;width:24px;height:24px;flex:none;font-size:23px;line-height:1}
+.steps:empty{display:none}.steps{display:grid;gap:7px}.step{display:flex;gap:6px}.step button{border:1px solid var(--border);border-radius:10px;background:white}
+.photo-report{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:12px;background:white;cursor:pointer}
+.photo-report input{width:18px;height:18px;margin:0;accent-color:var(--violet);cursor:pointer}
+.child{justify-self:start;display:flex;align-items:center;gap:9px;border:2px solid var(--violet);border-radius:20px;background:white;padding:8px;font-size:13px;font-weight:800}
+.avatar{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#333541;color:white;font-size:12px}
+.submit{min-height:42px;margin-top:16px;border:0;border-radius:12px;background:linear-gradient(105deg,#7760ec,#4e9beb);color:white;font-size:14px;font-weight:800;box-shadow:0 5px 14px #544cc018}
+.submit:disabled{opacity:.52}
+.result{margin:0;font-size:12px;color:var(--green)}
+.reopen{display:block;margin:20px auto;padding:10px;border:1px solid var(--border);border-radius:12px;background:white}
+</style>
+</head>
+<body>
+<main class="screen">
+  <div id="sheet">
+    <header><h1>Новое задание</h1><button class="close" type="button" aria-label="Закрыть">×</button></header>
+    <form>
+      <div class="field"><label for="title">Название</label><input id="title" placeholder="Убрать в комнате" required></div>
+      <fieldset>
+        <legend>Срок выполнения <span class="optional">(необязательно)</span></legend>
+        <div class="chips" id="deadlines">
+          <button class="chip" type="button" aria-pressed="true">Без срока</button>
+          <button class="chip" type="button" aria-pressed="false">1 час</button>
+          <button class="chip" type="button" aria-pressed="false">2 часа</button>
+          <button class="chip" type="button" aria-pressed="false">Сегодня</button>
+          <button class="chip" type="button" aria-pressed="false">Завтра</button>
+          <button class="chip" type="button" aria-pressed="false" data-custom>Своё</button>
+        </div>
+        <div class="field date" hidden><label for="date">Дата и время</label><input id="date" type="datetime-local"></div>
+      </fieldset>
+      <div class="field">
+        <label for="reward">Награда</label>
+        <div class="amount"><span aria-hidden="true">$</span><input id="reward" inputmode="decimal" type="number" min="0.01" max="2391" step="0.01" value="5" required><i class="coin" aria-hidden="true"></i></div>
+        <div class="budget">
+          <div class="budget-top"><b class="budget-name"><span class="wallet" aria-hidden="true">▣</span>Доступно на награды</b><span><strong id="balance">$2,386</strong> останется</span></div>
+          <div class="bar" aria-hidden="true"><i></i></div>
+          <div class="key"><span>В резерве <b>$0</b></span><span class="uses">Это задание <b id="allocated">$5</b></span><span class="left">Останется <b id="remainder">$2,386</b></span></div>
+        </div>
+      </div>
+      <div class="field"><label for="description">Описание <span class="optional">(необязательно)</span></label><textarea id="description" placeholder="Заправить кровать, убрать игрушки и пропылесосить пол."></textarea></div>
+      <div class="field">
+        <div class="steps"></div>
+        <button type="button" class="checklist"><span class="plus" aria-hidden="true">+</span><span><span id="checklist-label">Добавить чеклист</span><small>Шаги, которые Михалыч отметит по одному</small></span></button>
+      </div>
+      <label class="photo-report"><input id="photo-required" type="checkbox">Фотоотчет обязателен</label>
+      <div class="field"><span class="label">Кому</span><button type="button" class="child" aria-pressed="true"><span class="avatar" aria-hidden="true">М</span>Михалыч</button></div>
+      <button class="submit" disabled>Создать задание</button>
+      <p class="result" role="status" hidden></p>
+    </form>
+  </div>
+  <button class="reopen" type="button" hidden>Новое задание</button>
+</main>
+<script>
+const form = document.querySelector('form');
+const title = document.querySelector('#title');
+const reward = document.querySelector('#reward');
+const date = document.querySelector('#date');
+const submit = document.querySelector('.submit');
+const result = document.querySelector('.result');
+const deadlines = [...document.querySelectorAll('#deadlines button')];
+const available = 2391;
+const money = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+
+function refresh() {
+  const amount = reward.valueAsNumber || 0;
+  const left = Math.max(0, available - amount);
+  const custom = deadlines.some(button => button.hasAttribute('data-custom') && button.getAttribute('aria-pressed') === 'true');
+  date.closest('.date').hidden = !custom;
+  date.required = custom;
+  date.disabled = !custom;
+  date.setCustomValidity(custom && date.value && new Date(date.value) <= new Date() ? 'Выберите время в будущем.' : '');
+  document.querySelector('#allocated').textContent = '$' + money.format(amount);
+  document.querySelector('#balance').textContent = '$' + money.format(left);
+  document.querySelector('#remainder').textContent = '$' + money.format(left);
+  document.querySelector('.bar i').style.width = amount > 0 ? 'max(6px, ' + Math.min(100, amount / available * 100) + '%)' : '0';
+  submit.disabled = !title.value.trim() || !form.checkValidity();
+  submit.textContent = amount > available ? 'Не хватает $' + money.format(amount - available) : 'Создать задание';
+  result.hidden = true;
+}
+
+for (const button of deadlines) button.addEventListener('click', () => {
+  for (const option of deadlines) option.setAttribute('aria-pressed', String(option === button));
+  refresh();
+  if (!date.disabled) date.focus();
+});
+form.addEventListener('input', refresh);
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  result.textContent = 'Задание заполнено в макете.';
+  result.hidden = false;
+});
+
+const checklist = document.querySelector('.checklist');
+const steps = document.querySelector('.steps');
+const checklistLabel = document.querySelector('#checklist-label');
+checklist.addEventListener('click', () => {
+  const row = document.createElement('div');
+  row.className = 'step';
+  const input = document.createElement('input');
+  input.placeholder = 'Название шага';
+  input.setAttribute('aria-label', 'Название шага');
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.textContent = '×';
+  remove.setAttribute('aria-label', 'Удалить шаг');
+  remove.addEventListener('click', () => {
+    row.remove();
+    if (!steps.children.length) checklistLabel.textContent = 'Добавить чеклист';
+    checklist.focus();
+  });
+  row.append(input, remove);
+  steps.append(row);
+  checklistLabel.textContent = 'Добавить шаг';
+  input.focus();
+});
+
+const sheet = document.querySelector('#sheet');
+const close = document.querySelector('.close');
+const reopen = document.querySelector('.reopen');
+close.addEventListener('click', () => {
+  sheet.hidden = true;
+  reopen.hidden = false;
+  reopen.focus();
+});
+reopen.addEventListener('click', () => {
+  reopen.hidden = true;
+  sheet.hidden = false;
+  close.focus();
+});
+refresh();
+</script>
+</body>
+</html>

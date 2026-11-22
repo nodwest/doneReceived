@@ -1,6 +1,71 @@
 {
   "components": {
     "schemas": {
+      "CalendarListErrorDto": {
+        "properties": {
+          "attemptsLeft": {
+            "example": 3,
+            "type": "integer"
+          },
+          "availablePoints": {
+            "description": "Доступные баллы в кошельке автора.",
+            "example": "1",
+            "type": "string"
+          },
+          "code": {
+            "example": "FAMILY_FULL",
+            "type": "string"
+          },
+          "error": {
+            "example": "Bad Request",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Жёсткий лимит элементов (например, желаний).",
+            "example": 10,
+            "type": "integer"
+          },
+          "message": {
+            "description": "Сообщение об ошибке или список ошибок валидации.",
+            "example": [
+              "title must be shorter than or equal to 160 characters"
+            ],
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "reason": {
+            "description": "Причина CALENDAR_TOO_MANY_EVENTS.",
+            "enum": [
+              "annual_series",
+              "range_occurrences"
+            ],
+            "type": "string"
+          },
+          "requiredPoints": {
+            "description": "Баллы, необходимые для изменения резерва задания.",
+            "example": "4",
+            "type": "string"
+          },
+          "statusCode": {
+            "example": 400,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statusCode",
+          "message"
+        ],
+        "type": "object"
+      },
       "CreateFamilyEventDto": {
         "properties": {
           "clientRequestId": {
@@ -315,6 +380,54 @@
         ],
         "type": "object"
       },
+      "ManagedFamilyEventDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "repeat": {
+            "enum": [
+              "once",
+              "annual"
+            ],
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "startsAt",
+          "repeat"
+        ],
+        "type": "object"
+      },
+      "ManagedFamilyEventsPageDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ManagedFamilyEventDto"
+            },
+            "type": "array"
+          },
+          "nextCursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object"
+      },
       "RespondFamilyEventDto": {
         "properties": {
           "response": {
@@ -462,16 +575,12 @@
           "400": {
             "content": {
               "application/json": {
-                "example": {
-                  "message": "Некорректный from/to, from не раньше to, диапазон шире 92 дней или событий больше 500.",
-                  "statusCode": 400
-                },
                 "schema": {
-                  "$ref": "#/components/schemas/HttpErrorDto"
+                  "$ref": "#/components/schemas/CalendarListErrorDto"
                 }
               }
             },
-            "description": "Некорректный from/to, from не раньше to, диапазон шире 92 дней или событий больше 500."
+            "description": "Некорректный диапазон, больше 500 ежегодных записей или больше 500 наступлений за период."
           },
           "401": {
             "content": {
@@ -598,6 +707,109 @@
           }
         ],
         "summary": "Создать событие",
+        "tags": [
+          "Семейный календарь"
+        ]
+      }
+    },
+    "/families/{familyId}/events/manage": {
+      "get": {
+        "description": "Только owner/admin. Исходные неотменённые события, включая прошедшие и ежегодные, без ограничения календарным периодом.",
+        "operationId": "FamilyEventsController_manage",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Курсор nextCursor из предыдущей страницы.",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "maxLength": 101,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagedFamilyEventsPageDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Некорректный курсор или размер страницы.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Некорректный курсор или размер страницы."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нужна роль owner или admin.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нужна роль owner или admin."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Управление событиями семьи",
         "tags": [
           "Семейный календарь"
         ]

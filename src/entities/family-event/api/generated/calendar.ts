@@ -28,6 +28,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/families/{familyId}/events/manage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Управление событиями семьи
+         * @description Только owner/admin. Исходные неотменённые события, включая прошедшие и ежегодные, без ограничения календарным периодом.
+         */
+        get: operations["FamilyEventsController_manage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/families/{familyId}/events/{eventId}": {
         parameters: {
             query?: never;
@@ -124,6 +144,43 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        CalendarListErrorDto: {
+            /** @example 3 */
+            attemptsLeft?: number;
+            /**
+             * @description Доступные баллы в кошельке автора.
+             * @example 1
+             */
+            availablePoints?: string;
+            /** @example FAMILY_FULL */
+            code?: string;
+            /** @example Bad Request */
+            error?: string;
+            /**
+             * @description Жёсткий лимит элементов (например, желаний).
+             * @example 10
+             */
+            limit?: number;
+            /**
+             * @description Сообщение об ошибке или список ошибок валидации.
+             * @example [
+             *       "title must be shorter than or equal to 160 characters"
+             *     ]
+             */
+            message: string | string[];
+            /**
+             * @description Причина CALENDAR_TOO_MANY_EVENTS.
+             * @enum {string}
+             */
+            reason?: "annual_series" | "range_occurrences";
+            /**
+             * @description Баллы, необходимые для изменения резерва задания.
+             * @example 4
+             */
+            requiredPoints?: string;
+            /** @example 400 */
+            statusCode: number;
+        };
         CreateFamilyEventDto: {
             /**
              * @description Ключ одного создания. Повтор с тем же ключом вернёт уже созданное событие.
@@ -276,6 +333,19 @@ export interface components {
             /** @example 400 */
             statusCode: number;
         };
+        ManagedFamilyEventDto: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            repeat: "once" | "annual";
+            /** Format: date-time */
+            startsAt: string;
+            title: string;
+        };
+        ManagedFamilyEventsPageDto: {
+            items: components["schemas"]["ManagedFamilyEventDto"][];
+            nextCursor: string | null;
+        };
         RespondFamilyEventDto: {
             /**
              * @example going
@@ -340,19 +410,13 @@ export interface operations {
                     "application/json": components["schemas"]["FamilyEventDto"][];
                 };
             };
-            /** @description Некорректный from/to, from не раньше to, диапазон шире 92 дней или событий больше 500. */
+            /** @description Некорректный диапазон, больше 500 ежегодных записей или больше 500 наступлений за период. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    /**
-                     * @example {
-                     *       "message": "Некорректный from/to, from не раньше to, диапазон шире 92 дней или событий больше 500.",
-                     *       "statusCode": 400
-                     *     }
-                     */
-                    "application/json": components["schemas"]["HttpErrorDto"];
+                    "application/json": components["schemas"]["CalendarListErrorDto"];
                 };
             };
             /** @description Отсутствует действующая сессия. */
@@ -420,6 +484,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "message": "Неверное тело, часовой пояс, диапазон дат или участник не из семьи (PARTICIPANT_NOT_IN_FAMILY).",
+                     *       "statusCode": 400
+                     *     }
+                     */
+                    "application/json": components["schemas"]["HttpErrorDto"];
+                };
+            };
+            /** @description Отсутствует действующая сессия. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "Отсутствует действующая сессия.",
+                     *       "statusCode": 401
+                     *     }
+                     */
+                    "application/json": components["schemas"]["HttpErrorDto"];
+                };
+            };
+            /** @description Нужна роль owner или admin. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "Нужна роль owner или admin.",
+                     *       "statusCode": 403
+                     *     }
+                     */
+                    "application/json": components["schemas"]["HttpErrorDto"];
+                };
+            };
+        };
+    };
+    FamilyEventsController_manage: {
+        parameters: {
+            query?: {
+                /** @description Курсор nextCursor из предыдущей страницы. */
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description UUID семьи из GET /families. */
+                familyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedFamilyEventsPageDto"];
+                };
+            };
+            /** @description Некорректный курсор или размер страницы. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "Некорректный курсор или размер страницы.",
                      *       "statusCode": 400
                      *     }
                      */

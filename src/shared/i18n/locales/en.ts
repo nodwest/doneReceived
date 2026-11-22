@@ -42,6 +42,19 @@ export const en = {
     remindTag: 'Reminder',
     refreshError: 'Could not refresh the calendar. Saved events are shown.',
     retry: 'Retry',
+    monthView: 'Month',
+    manage: 'Manage events',
+    overflowManage:
+      'There are too many events to show. Open Manage events to cancel events you no longer need.',
+    overflowAskParent:
+      'There are too many events to show. Ask a parent to manage family events.',
+    manageLoadError: 'Could not load family events.',
+    manageEmpty: 'No events on this page.',
+    manageCancelError: 'Could not cancel the event. Try again.',
+    cancelSeriesMessage:
+      'This cancels the entire series, including future years.',
+    previousPage: 'Previous page',
+    nextPage: 'Next page',
     loadError: 'Could not load the event',
     saveError: 'Could not save the event',
     responseError: 'Could not save the response',

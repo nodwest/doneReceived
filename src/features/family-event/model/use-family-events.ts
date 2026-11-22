@@ -88,6 +88,10 @@ export function useFamilyEvents(monthOffset = 0, includeMonth = true) {
       isError: rolling.isError || (includeMonth && monthQuery.isError),
       isFetching: rolling.isFetching || (includeMonth && monthQuery.isFetching),
       error: rolling.error ?? (includeMonth ? monthQuery.error : null),
+      rollingError: rolling.error,
+      monthError: includeMonth ? monthQuery.error : null,
+      refetchRolling,
+      refetchMonth,
       refetch: async () => {
         await Promise.all([
           refetchRolling(),

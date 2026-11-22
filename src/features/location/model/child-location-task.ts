@@ -1,5 +1,6 @@
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
+import { Platform } from 'react-native';
 
 import { ApiError, apiRequest, hasApiErrorCode } from '@shared/api';
 import { i18n } from '@shared/i18n';
@@ -14,6 +15,10 @@ import {
 } from './publish-location';
 
 export const CHILD_LOCATION_TASK = 'done-received-child-location';
+
+const LOCATION_INTERVAL_MS = 60_000;
+let startedInRuntime = false;
+let lastIosPoint: { sessionKey: string; timestamp: number } | undefined;
 
 /** Свежее этого возраста точки ещё имеют смысл для карты. */
 const MAX_POINT_AGE_MS = 10 * 60_000;
@@ -95,6 +100,23 @@ if (!TaskManager.isTaskDefined(CHILD_LOCATION_TASK)) {
       recordedAt: new Date(location.timestamp).toISOString(),
     };
 
+    // Core Location не поддерживает timeInterval. Ограничиваем отправку
+    // по времени измерения, сохраняя первую свежую точку после запуска.
+    if (Platform.OS === 'ios') {
+      const sessionKey = JSON.stringify([
+        userId,
+        familyId,
+        binding.storageEpoch,
+      ]);
+      if (
+        lastIosPoint?.sessionKey === sessionKey &&
+        location.timestamp - lastIosPoint.timestamp < LOCATION_INTERVAL_MS
+      ) {
+        return;
+      }
+      lastIosPoint = { sessionKey, timestamp: location.timestamp };
+    }
+
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
       if (!isLocationSharingEnabled(userId, familyId)) return;
       try {
@@ -117,15 +139,21 @@ if (!TaskManager.isTaskDefined(CHILD_LOCATION_TASK)) {
 }
 
 export async function startChildLocationTask() {
-  if (await Location.hasStartedLocationUpdatesAsync(CHILD_LOCATION_TASK)) {
+  if (
+    startedInRuntime &&
+    (await Location.hasStartedLocationUpdatesAsync(CHILD_LOCATION_TASK))
+  ) {
     return;
   }
+  // Expo может восстановить регистрацию Android до открытия Activity,
+  // когда foreground service запускать нельзя. Применяем параметры снова
+  // при первом открытии, чтобы Expo запустил сервис и обновил старый интервал.
   await Location.startLocationUpdatesAsync(CHILD_LOCATION_TASK, {
     accuracy: Location.Accuracy.High,
-    distanceInterval: 50,
-    timeInterval: 30_000,
-    deferredUpdatesInterval: 30_000,
-    deferredUpdatesDistance: 50,
+    distanceInterval: 0,
+    timeInterval: LOCATION_INTERVAL_MS,
+    deferredUpdatesInterval: 0,
+    deferredUpdatesDistance: 0,
     pausesUpdatesAutomatically: false,
     activityType: Location.ActivityType.Other,
     showsBackgroundLocationIndicator: true,
@@ -136,9 +164,12 @@ export async function startChildLocationTask() {
       killServiceOnDestroy: true,
     },
   });
+  startedInRuntime = true;
 }
 
 export async function stopChildLocationTask() {
+  startedInRuntime = false;
+  lastIosPoint = undefined;
   if (await Location.hasStartedLocationUpdatesAsync(CHILD_LOCATION_TASK)) {
     await Location.stopLocationUpdatesAsync(CHILD_LOCATION_TASK);
   }

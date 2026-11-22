@@ -1,6 +1,15 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
-import { queryRoots } from '@shared/api';
-import { fetchFamilyEvent, fetchFamilyEvents } from './family-events-api';
+import {
+  apiErrorCode,
+  isApiError,
+  privateReadOptions,
+  queryRoots,
+} from '@shared/api';
+import {
+  fetchFamilyEvent,
+  fetchFamilyEvents,
+  fetchManagedFamilyEvents,
+} from './family-events-api';
 
 /**
  * Ключи календаря. Диапазон входит в ключ: смена периода — отдельный запрос,
@@ -8,6 +17,8 @@ import { fetchFamilyEvent, fetchFamilyEvents } from './family-events-api';
  */
 export const familyEventsKeys = {
   all: queryRoots.calendar,
+  manage: (familyId: string, scope: string, cursor: string | null) =>
+    [...familyEventsKeys.all, familyId, 'manage', scope, cursor] as const,
   list: (familyId: string | null, from: string, to: string) =>
     [...familyEventsKeys.all, familyId, 'list', from, to] as const,
   detail: (familyId: string | null, eventId: string, year?: number | null) =>
@@ -19,6 +30,18 @@ export const familyEventsKeys = {
       year ?? 'nearest',
     ] as const,
 };
+
+export function useManagedFamilyEventsQuery(
+  familyId: string,
+  scope: string,
+  cursor: string | null,
+) {
+  return useQuery({
+    ...privateReadOptions,
+    queryKey: familyEventsKeys.manage(familyId, scope, cursor),
+    queryFn: ({ signal }) => fetchManagedFamilyEvents(familyId, cursor, signal),
+  });
+}
 
 /** События на видимый период календаря. Без семьи запроса нет. */
 export function useFamilyEventsQuery(
@@ -32,6 +55,11 @@ export function useFamilyEventsQuery(
   const toIso = to.toISOString();
   return useQuery({
     queryKey: familyEventsKeys.list(familyId, fromIso, toIso),
+    retry: (failureCount, error) =>
+      failureCount < 3 &&
+      !(
+        isApiError(error) && apiErrorCode(error) === 'CALENDAR_TOO_MANY_EVENTS'
+      ),
     queryFn:
       familyId && enabled
         ? () => fetchFamilyEvents(familyId, from, to)

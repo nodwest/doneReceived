@@ -25,6 +25,16 @@ export const styles = createStyles((colors) => ({
   sectionList: {
     gap: 10,
   },
+  linkButton: {
+    minHeight: 44,
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+  },
+  managementActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
   upcomingGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
