@@ -2262,9 +2262,9 @@
     "semantic_hash": ""
   },
   "src/shared/api/http.ts": {
-    "mtime": 1795348658.9473011,
-    "seen": 1795348824.3348722,
-    "ast_hash": "a706249fab459602e3e189973216fdc8",
+    "mtime": 1795355112.4911218,
+    "seen": 1795355190.421768,
+    "ast_hash": "045fbf47f02cc04a4b5b2d76e365be1c",
     "semantic_hash": ""
   },
   "src/shared/api/index.ts": {
@@ -4176,9 +4176,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1795338442.7330244,
-    "seen": 1795338463.2579236,
-    "ast_hash": "e3f383f7a19bcd00be9cf14125587f15",
+    "mtime": 1795355112.4882438,
+    "seen": 1795355190.4894361,
+    "ast_hash": "6c4cd4265bb44f020c3707f5636bcf0a",
     "semantic_hash": ""
   },
   "obsidian-done/C4.md": {
@@ -4680,9 +4680,9 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/api/family-events-api.ts": {
-    "mtime": 1795352468.7783058,
-    "seen": 1795353177.0137777,
-    "ast_hash": "6b4cdcb4504d0bdb7d61f372e41c3360",
+    "mtime": 1795353456.118992,
+    "seen": 1795355190.3252878,
+    "ast_hash": "396f29c6f67ed9972420bb1691739328",
     "semantic_hash": ""
   },
   "src/entities/family-event/api/family-events-query.ts": {
@@ -5130,9 +5130,9 @@
     "semantic_hash": ""
   },
   "src/features/english-words/model/words-overview.ts": {
-    "mtime": 1795338442.788266,
-    "seen": 1795338463.131878,
-    "ast_hash": "986cdfb83e93ec453e6a7b91378f4fb4",
+    "mtime": 1795355112.4891121,
+    "seen": 1795355190.3704863,
+    "ast_hash": "e102447902ea339501a11f57a5356deb",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/child-words-task-row.tsx": {
@@ -5250,9 +5250,9 @@
     "semantic_hash": ""
   },
   "src/entities/word/api/words-api.ts": {
-    "mtime": 1795338442.774195,
-    "seen": 1795338463.110523,
-    "ast_hash": "c8b53096c89884e6919733d11a4c1e62",
+    "mtime": 1795355112.4891121,
+    "seen": 1795355190.3514779,
+    "ast_hash": "9994703eabb9f6355e41dbcac634140f",
     "semantic_hash": ""
   },
   "src/entities/word/api/words-query.ts": {
