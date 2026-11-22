@@ -12,6 +12,12 @@ export const styles = createStyles((colors) => ({
     maxWidth: 480,
     alignSelf: 'center',
   },
+  childrenStatus: { color: colors.blueInk },
+  childrenRetry: {
+    color: colors.blueInk,
+    textDecorationLine: 'underline',
+    paddingVertical: 8,
+  },
   scroll: {
     flex: 1,
   },

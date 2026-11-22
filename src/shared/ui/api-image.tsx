@@ -1,5 +1,8 @@
 import { Image, type ImageProps, type ImageSourcePropType } from 'react-native';
-import { currentAccessToken } from '../api';
+import { currentAccessToken, usePrivateReadScope } from '../api';
+
+/** Native images use the server's private, no-store cache policy. */
+export function clearPrivateImageCache() {}
 
 type HeaderSource = { uri: string; headers: Record<string, string> };
 
@@ -33,18 +36,21 @@ function headerSource(source: ImageProps['source']): HeaderSource | null {
  * В вебе — своя версия (`api-image.web.tsx`).
  */
 export function ApiImage({ source, ...props }: ImageProps) {
+  const scope = usePrivateReadScope();
   const token = currentAccessToken();
   const remote = headerSource(source);
+  if (remote && (!token || !scope)) return <Image {...props} />;
   const fresh: ImageProps['source'] = remote
     ? ([
         {
           uri: remote.uri,
+          // Native decoded-image caches can be keyed by URL alone.
+          cache: 'reload',
           headers: {
-            ...remote.headers,
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         },
       ] satisfies ImageSourcePropType[])
     : source;
-  return <Image source={fresh} {...props} />;
+  return <Image key={remote ? scope : undefined} source={fresh} {...props} />;
 }

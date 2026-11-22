@@ -13,6 +13,7 @@ module.exports = defineConfig([
       'node_modules/*',
       'obsidian-done/**',
       'canvases/**',
+      'src/entities/family-event/api/generated/**',
     ],
   },
 ]);

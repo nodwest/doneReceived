@@ -28,9 +28,12 @@ function family(familyId: string | null) {
 }
 
 /** Задания семьи (ребёнку — только свои); без семьи — пусто. */
-export async function fetchTasks(viewer: TaskViewer | null): Promise<Task[]> {
+export async function fetchTasks(
+  viewer: TaskViewer | null,
+  signal?: AbortSignal,
+): Promise<Task[]> {
   if (!viewer) return [];
-  return fetchServerTasks(viewer);
+  return fetchServerTasks(viewer, signal);
 }
 
 /** Создать задание ребёнку семьи: награда резервируется у автора. */

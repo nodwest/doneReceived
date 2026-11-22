@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useCurrentFamily } from '@entities/family';
 import { useSessionUser } from '@entities/session';
 import { useTasks, type TaskViewer } from '@entities/task';
+import { useFamilyLabels, useRecheckFamilyAccess } from './use-family-labels';
 
 /**
  * Кто смотрит задания: семья (у родителя — из GET /families, у ребёнка — из
@@ -31,7 +32,16 @@ export function useTaskViewer(): TaskViewer | null {
  * устаревшее (`useRefreshOnNavigate` в `app/providers`).
  */
 export function useFamilyTasks() {
-  return useTasks(useTaskViewer());
+  const viewer = useTaskViewer();
+  const { children, members, accessDenied } = useFamilyLabels(viewer);
+  const query = useTasks(viewer, children, members);
+  const denied = accessDenied || query.accessDenied;
+  useRecheckFamilyAccess(denied, !!viewer && viewer.childName === undefined);
+  return {
+    ...query,
+    accessDenied: denied,
+    data: denied ? undefined : query.data,
+  };
 }
 
 /** Семья для запросов заданий (создание, правка, отмена). */

@@ -61,6 +61,7 @@ type RequestOptions = {
   skipRefresh?: boolean;
   /** Свой таймаут; по умолчанию GET — 15 с, изменения — 60 с, файлы — 120 с. */
   timeoutMs?: number;
+  signal?: AbortSignal;
 };
 
 // Зависший запрос не должен оставлять экран в вечной загрузке: обрываем
@@ -202,7 +203,7 @@ export async function refreshAccessToken(stale: string) {
  */
 export async function apiRequest<T>(
   path: string,
-  { method = 'GET', body, skipRefresh, timeoutMs }: RequestOptions = {},
+  { method = 'GET', body, skipRefresh, timeoutMs, signal }: RequestOptions = {},
 ): Promise<T> {
   const send = async (token: string | null) => {
     const headers: Record<string, string> = { Accept: 'application/json' };
@@ -220,9 +221,12 @@ export async function apiRequest<T>(
           ? GET_TIMEOUT_MS
           : MUTATION_TIMEOUT_MS);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
+    const abort = () => controller.abort();
+    if (signal?.aborted) abort();
+    signal?.addEventListener('abort', abort, { once: true });
+    const timer = setTimeout(abort, timeout);
     try {
-      return await fetch(`${API_URL}${path}`, {
+      const response = await fetch(`${API_URL}${path}`, {
         method,
         headers,
         signal: controller.signal,
@@ -232,18 +236,21 @@ export async function apiRequest<T>(
             ? undefined
             : JSON.stringify(body),
       });
+      return { response, text: await response.text() };
     } catch {
       throw new ApiError(0, []);
     } finally {
       clearTimeout(timer);
+      signal?.removeEventListener('abort', abort);
     }
   };
 
   const token = getAccessToken();
   const scope = getSessionScope();
-  let response = await send(token);
+  let result = await send(token);
   if (
-    response.status === 401 &&
+    result.response.status === 401 &&
+    !signal?.aborted &&
     token &&
     !skipRefresh &&
     refreshTokens &&
@@ -253,11 +260,13 @@ export async function apiRequest<T>(
     const fresh =
       getAccessToken() !== token || (await refreshOnce(refreshTokens, scope));
     const next = getAccessToken();
-    if (fresh && next && getSessionScope() === scope)
-      response = await send(next);
+    if (fresh && next && !signal?.aborted && getSessionScope() === scope)
+      result = await send(next);
   }
 
-  const text = await response.text();
+  const { response, text } = result;
+  if (signal?.aborted || (token && getSessionScope() !== scope))
+    throw new ApiError(0, []);
   const data: unknown = text ? safeParse(text) : null;
   // Тела ответов могут содержать токены, коды и персональные данные.
   if (__DEV__) {
@@ -271,8 +280,6 @@ export async function apiRequest<T>(
       parseRetryAfter(response.headers.get('Retry-After')),
     );
   }
-  // Ответ предыдущего аккаунта может прийти уже после очистки кэша при выходе.
-  if (token && getSessionScope() !== scope) throw new ApiError(0, []);
   return data as T;
 }
 

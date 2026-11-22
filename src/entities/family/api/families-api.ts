@@ -96,8 +96,10 @@ export async function fetchFamilyDetails(
 }
 
 /** GET /families/:id/children — профили детей семьи. */
-export function fetchFamilyChildren(familyId: string) {
-  return apiRequest<FamilyChild[]>(`/families/${familyId}/children`);
+export function fetchFamilyChildren(familyId: string, signal?: AbortSignal) {
+  return apiRequest<FamilyChild[]>(`/families/${familyId}/children`, {
+    signal,
+  });
 }
 
 /**
@@ -161,10 +163,12 @@ export function deleteMyChildProfile(
 
 /**
  * GET /families/:id/members — участники с активным членством (родители и
- * дети). Только родителям: ребёнку 403 (Идеи.md п. 8).
+ * дети). Доступно активным участникам семьи.
  */
-export function fetchFamilyMembers(familyId: string) {
-  return apiRequest<FamilyMember[]>(`/families/${familyId}/members`);
+export function fetchFamilyMembers(familyId: string, signal?: AbortSignal) {
+  return apiRequest<FamilyMember[]>(`/families/${familyId}/members`, {
+    signal,
+  });
 }
 
 /**

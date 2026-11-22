@@ -8,7 +8,12 @@ import {
   fetchMyFamilies,
   previewFamilyInvite,
 } from './families-api';
-import { queryRoots } from '@shared/api';
+import {
+  isAccessDenied,
+  privateReadOptions,
+  queryRoots,
+  usePrivateReadScope,
+} from '@shared/api';
 
 /** Ключи кэша семей с сервера (не путать с моковыми `familyKeys`). */
 export const familiesKeys = {
@@ -16,10 +21,10 @@ export const familiesKeys = {
   mine: () => [...familiesKeys.all, 'mine'] as const,
   parentInvite: (familyId: string | null) =>
     [...familiesKeys.all, familyId, 'parent-invite'] as const,
-  children: (familyId: string | null) =>
-    [...familiesKeys.all, familyId, 'children'] as const,
-  members: (familyId: string | null) =>
-    [...familiesKeys.all, familyId, 'members'] as const,
+  children: (familyId: string | null, scope: string | null) =>
+    [...familiesKeys.all, familyId, 'children', scope] as const,
+  members: (familyId: string | null, scope: string | null) =>
+    [...familiesKeys.all, familyId, 'members', scope] as const,
   /** Всё о семье: дети, участники, детали — сбрасывать после изменений. */
   family: (familyId: string | null) => [...familiesKeys.all, familyId] as const,
   details: (familyId: string | null) =>
@@ -87,10 +92,21 @@ export function useParentInvite(familyId: string | null, enabled: boolean) {
  * Доступно активным участникам, включая ребёнка.
  */
 export function useFamilyMembers(familyId: string | null) {
-  return useQuery({
-    queryKey: familiesKeys.members(familyId),
-    queryFn: familyId ? () => fetchFamilyMembers(familyId) : skipToken,
+  const scope = usePrivateReadScope();
+  const query = useQuery({
+    ...privateReadOptions,
+    queryKey: familiesKeys.members(familyId, scope),
+    queryFn:
+      familyId && scope
+        ? ({ signal }) => fetchFamilyMembers(familyId, signal)
+        : skipToken,
   });
+  const accessDenied = isAccessDenied(query.error);
+  return {
+    ...query,
+    accessDenied,
+    data: accessDenied ? undefined : query.data,
+  };
 }
 
 /**
@@ -106,10 +122,21 @@ export function useFamilyDetails(familyId: string | null) {
 
 /** Дети семьи с сервера; без семьи (null) запроса нет. */
 export function useFamilyChildren(familyId: string | null) {
-  return useQuery({
-    queryKey: familiesKeys.children(familyId),
-    queryFn: familyId ? () => fetchFamilyChildren(familyId) : skipToken,
+  const scope = usePrivateReadScope();
+  const query = useQuery({
+    ...privateReadOptions,
+    queryKey: familiesKeys.children(familyId, scope),
+    queryFn:
+      familyId && scope
+        ? ({ signal }) => fetchFamilyChildren(familyId, signal)
+        : skipToken,
   });
+  const accessDenied = isAccessDenied(query.error);
+  return {
+    ...query,
+    accessDenied,
+    data: accessDenied ? undefined : query.data,
+  };
 }
 
 /**

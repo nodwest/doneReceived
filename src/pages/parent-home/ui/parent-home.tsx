@@ -1,4 +1,4 @@
-import { ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskButton } from '@features/create-task';
@@ -7,8 +7,12 @@ import { ChildrenCarousel } from '@widgets/children-carousel';
 import { HomeHeader } from '@widgets/home-header';
 import { HomeSummary } from '@widgets/home-summary';
 import { RecentActivity } from '@widgets/recent-activity';
-import { useFamilyFeed, useFamilyTasks } from '@features/family-tasks';
-import { useCurrentFamily, useFamilyChildren } from '@entities/family';
+import {
+  useFamilyFeed,
+  useFamilyTasks,
+  useTaskFamilyId,
+} from '@features/family-tasks';
+import { useFamilyChildren } from '@entities/family';
 import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
 import type { ChildOverview } from '@entities/user';
@@ -35,7 +39,8 @@ export function ParentHomePage() {
   const myAvatar = useMyAvatar();
   // Счётчики заданий — из того же запроса, что и экран Tasks и профиль
   // ребёнка: цифры везде совпадают, созданная задача сразу видна на плитке.
-  const { data: tasks } = useFamilyTasks();
+  const tasksQuery = useFamilyTasks();
+  const { data: tasks } = tasksQuery;
   // Лента — события семьи с сервера.
   const feedQuery = useFamilyFeed();
   const { data: feed = [] } = feedQuery;
@@ -43,11 +48,16 @@ export function ParentHomePage() {
   const total = tasks && countTasks(tasks, { createdBy: myId });
   // Выплачено вошедшим родителем за всё время — серверный агрегат, а не
   // обрезанная страница истории.
-  const familyId = useCurrentFamily()?.id ?? null;
+  const familyId = useTaskFamilyId();
   const { data: paidTotal } = useParentPaidTotal(familyId, myId);
   const rewardsPaid = paidTotal ? Number(paidTotal.points) : 0;
   // Дети семьи с сервера. Статус «дома» к геозонам пока не подключён.
-  const { data: serverChildren } = useFamilyChildren(familyId);
+  const childrenQuery = useFamilyChildren(familyId);
+  const familyAccessDenied =
+    childrenQuery.accessDenied ||
+    tasksQuery.accessDenied ||
+    feedQuery.accessDenied;
+  const serverChildren = familyAccessDenied ? undefined : childrenQuery.data;
   const children: ChildOverview[] = (serverChildren ?? []).map((child) => {
     const { active, review } = countChildTasks(tasks ?? [], child.id, myId);
     return {
@@ -76,9 +86,9 @@ export function ParentHomePage() {
             avatar={myAvatar}
           />
           <HomeSummary
-            amount={rewardsPaid}
-            activeTasks={total?.active ?? 0}
-            tasksToReview={total?.review ?? 0}
+            amount={familyAccessDenied ? 0 : rewardsPaid}
+            activeTasks={familyAccessDenied ? 0 : (total?.active ?? 0)}
+            tasksToReview={familyAccessDenied ? 0 : (total?.review ?? 0)}
             onActiveTasksPress={() =>
               router.push({ pathname: '/tasks', params: { tab: 'all' } })
             }
@@ -86,30 +96,62 @@ export function ParentHomePage() {
               router.push({ pathname: '/tasks', params: { tab: 'review' } })
             }
           />
-          <ChildrenCarousel
-            items={children}
-            onSelect={(child) =>
-              router.push({
-                pathname: '/child/[id]',
-                params: { id: child.id },
-              })
-            }
-            onTasksPress={(child, tab) =>
-              router.push({
-                pathname: '/child/[id]/tasks',
-                params: { id: child.id, tab },
-              })
-            }
-          />
+          {children.length > 0 ? (
+            <ChildrenCarousel
+              items={children}
+              onSelect={(child) =>
+                router.push({
+                  pathname: '/child/[id]',
+                  params: { id: child.id },
+                })
+              }
+              onTasksPress={(child, tab) =>
+                router.push({
+                  pathname: '/child/[id]/tasks',
+                  params: { id: child.id, tab },
+                })
+              }
+            />
+          ) : familyAccessDenied || childrenQuery.isError ? (
+            <View>
+              <Text
+                style={styles.childrenStatus}
+                accessibilityLiveRegion="polite"
+              >
+                {t('home.childrenLoadError')}
+              </Text>
+              {!familyAccessDenied && (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() =>
+                    void childrenQuery.refetch({ cancelRefetch: false })
+                  }
+                >
+                  <Text style={styles.childrenRetry}>{t('common.retry')}</Text>
+                </Pressable>
+              )}
+            </View>
+          ) : familyId ? (
+            <Text
+              style={styles.childrenStatus}
+              accessibilityLiveRegion="polite"
+            >
+              {t(
+                childrenQuery.isPending ? 'common.loading' : 'home.noChildren',
+              )}
+            </Text>
+          ) : null}
           <CreateTaskButton onPress={() => router.push('/create-task')} />
           <RecentActivity
-            events={feed}
+            events={familyAccessDenied ? [] : feed}
             viewer="parent"
             isLoading={feedQuery.isPending}
-            isError={feedQuery.isError}
-            onRetry={() => {
-              void feedQuery.refetch();
-            }}
+            isError={familyAccessDenied || feedQuery.isError}
+            onRetry={
+              familyAccessDenied
+                ? undefined
+                : () => void feedQuery.refetch({ cancelRefetch: false })
+            }
           />
         </ScrollView>
         <BottomNav activeKey="home" />

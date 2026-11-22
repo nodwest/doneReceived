@@ -300,6 +300,8 @@ export const ru: Dictionary = {
     hide: 'Скрыть пароль',
   },
   home: {
+    noChildren: 'В семье пока нет детей.',
+    childrenLoadError: 'Не удалось загрузить список детей.',
     greetingMorning: 'Доброе утро 👋',
     greetingAfternoon: 'Добрый день 👋',
     greetingEvening: 'Добрый вечер 👋',

@@ -1,0 +1,1431 @@
+{
+  "components": {
+    "schemas": {
+      "CreateFamilyEventDto": {
+        "properties": {
+          "clientRequestId": {
+            "description": "Ключ одного создания. Повтор с тем же ключом вернёт уже созданное событие.",
+            "example": "1719325200000-a1b2c3",
+            "maxLength": 80,
+            "minLength": 8,
+            "type": "string"
+          },
+          "description": {
+            "example": "Выезжаем утром, вернёмся в воскресенье.",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "endsAt": {
+            "description": "Конец в ISO 8601 с часовым поясом. Не раньше начала.",
+            "example": "2026-11-22T15:00:00.000Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Класс события: поездка, мероприятие или праздник. По умолчанию event.",
+            "enum": [
+              "trip",
+              "event",
+              "holiday"
+            ],
+            "example": "trip",
+            "type": "string"
+          },
+          "participants": {
+            "description": "Пользователи семьи, которые едут. Пустой массив — состав ещё не выбран.",
+            "example": [
+              "550e8400-e29b-41d4-a716-446655440000"
+            ],
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "reminderLeadMinutes": {
+            "description": "За сколько минут напомнить. null — без напоминания.",
+            "example": 1440,
+            "maximum": 10080,
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "repeat": {
+            "description": "По умолчанию once.",
+            "enum": [
+              "once",
+              "annual"
+            ],
+            "example": "once",
+            "type": "string"
+          },
+          "startsAt": {
+            "description": "Начало в ISO 8601 с часовым поясом.",
+            "example": "2026-11-21T06:00:00.000Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "IANA-зона создателя. По ней считается ежегодная дата.",
+            "example": "Europe/Moscow",
+            "type": "string"
+          },
+          "title": {
+            "example": "К бабушке на выходные",
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "startsAt",
+          "endsAt",
+          "timezone",
+          "participants"
+        ],
+        "type": "object"
+      },
+      "FamilyEventDto": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "description": {
+            "example": "Выезжаем утром, вернёмся в воскресенье.",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Класс события.",
+            "enum": [
+              "trip",
+              "event",
+              "holiday"
+            ],
+            "example": "trip",
+            "type": "string"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyEventPersonDto"
+            },
+            "type": "array"
+          },
+          "photoUrl": {
+            "description": "Ссылка на обложку события; null — фото нет.",
+            "nullable": true,
+            "type": "string"
+          },
+          "reminderLeadMinutes": {
+            "description": "За сколько минут напомнить; null — без напоминания.",
+            "maximum": 10080,
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "repeat": {
+            "enum": [
+              "once",
+              "annual"
+            ],
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "timezone": {
+            "example": "Europe/Moscow",
+            "type": "string"
+          },
+          "title": {
+            "example": "К бабушке на выходные",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "viewer": {
+            "$ref": "#/components/schemas/FamilyEventViewerDto"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "startsAt",
+          "endsAt",
+          "timezone",
+          "repeat",
+          "kind",
+          "photoUrl",
+          "reminderLeadMinutes",
+          "participants",
+          "viewer",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "FamilyEventPersonDto": {
+        "properties": {
+          "avatarUrl": {
+            "description": "Путь к аватару относительно адреса API; null, если аватара нет. Запрашивается с Bearer-токеном.",
+            "example": "/users/avatars/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+            "nullable": true,
+            "type": "string"
+          },
+          "displayName": {
+            "example": "Эмма",
+            "type": "string"
+          },
+          "userId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "displayName",
+          "avatarUrl"
+        ],
+        "type": "object"
+      },
+      "FamilyEventPhotoDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "url": {
+            "description": "Ссылка на обложку.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url"
+        ],
+        "type": "object"
+      },
+      "FamilyEventResponseDto": {
+        "properties": {
+          "response": {
+            "enum": [
+              "going",
+              "not_going"
+            ],
+            "example": "going",
+            "type": "string"
+          }
+        },
+        "required": [
+          "response"
+        ],
+        "type": "object"
+      },
+      "FamilyEventViewerDto": {
+        "properties": {
+          "canEdit": {
+            "description": "Родитель этой семьи может править событие.",
+            "example": true,
+            "type": "boolean"
+          },
+          "response": {
+            "description": "Личный ответ вошедшего; null — ответа ещё нет.",
+            "enum": [
+              "going",
+              "not_going"
+            ],
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "canEdit",
+          "response"
+        ],
+        "type": "object"
+      },
+      "HttpErrorDto": {
+        "properties": {
+          "attemptsLeft": {
+            "example": 3,
+            "type": "integer"
+          },
+          "availablePoints": {
+            "description": "Доступные баллы в кошельке автора.",
+            "example": "1",
+            "type": "string"
+          },
+          "code": {
+            "example": "FAMILY_FULL",
+            "type": "string"
+          },
+          "error": {
+            "example": "Bad Request",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Жёсткий лимит элементов (например, желаний).",
+            "example": 10,
+            "type": "integer"
+          },
+          "message": {
+            "description": "Сообщение об ошибке или список ошибок валидации.",
+            "example": [
+              "title must be shorter than or equal to 160 characters"
+            ],
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ]
+          },
+          "requiredPoints": {
+            "description": "Баллы, необходимые для изменения резерва задания.",
+            "example": "4",
+            "type": "string"
+          },
+          "statusCode": {
+            "example": 400,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statusCode",
+          "message"
+        ],
+        "type": "object"
+      },
+      "RespondFamilyEventDto": {
+        "properties": {
+          "response": {
+            "enum": [
+              "going",
+              "not_going"
+            ],
+            "example": "going",
+            "type": "string"
+          }
+        },
+        "required": [
+          "response"
+        ],
+        "type": "object"
+      },
+      "UpdateFamilyEventDto": {
+        "properties": {
+          "description": {
+            "description": "null очищает описание.",
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Класс события.",
+            "enum": [
+              "trip",
+              "event",
+              "holiday"
+            ],
+            "type": "string"
+          },
+          "participants": {
+            "description": "Новый состав. Отсутствие поля не меняет состав.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "reminderLeadMinutes": {
+            "description": "null убирает напоминание.",
+            "maximum": 10080,
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "repeat": {
+            "enum": [
+              "once",
+              "annual"
+            ],
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "timezone": {
+            "example": "Europe/Moscow",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "contact": {},
+    "description": "Передавайте JSON в теле запроса, если для операции не указан другой формат.\nДля закрытых операций нажмите **Authorize** и вставьте accessToken. Swagger добавит заголовок Authorization: Bearer <accessToken>.\n\n### WebSocket\nКанал **/events** принимает тот же authenticate в течение 5 секунд. После authenticated: true сервер отправляет change с data.type и идентификаторами затронутых ресурсов, если они применимы. Перечитайте данные через REST.\nОтправляйте {\"event\":\"ping\"} каждые 25 секунд и ожидайте {\"event\":\"pong\"}. 4401 означает отклонённый или истёкший access-токен, 4403 — недействительную сессию. После подключения перечитайте актуальные данные. События за время обрыва не досылаются.\nПриватная геолокация доступна на пути **/location**. За 5 секунд отправьте JSON:\n```json\n{\"event\":\"authenticate\",\"data\":{\"accessToken\":\"<accessToken>\"}}\n```\nДождитесь ответа с событием authenticated и значением data: true. Затем отправляйте координаты:\n```json\n{\"event\":\"location\",\"data\":{\"lat\":55.75,\"lng\":37.62}}\n```\nДругие родители той же семьи получают событие location с полями userId, lat и lng в data. При смене токена переподключитесь.\nПубличный поток транспорта на пути **/** отправляет событие vehicles. В data приходит массив с полями type, route, longitude, latitude, speed, bearing и vehicle.",
+    "title": "Done Received API",
+    "version": "1.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/families/{familyId}/events": {
+      "get": {
+        "description": "Возвращает события, пересекающиеся с периодом, и ежегодные события, попадающие в него. Диапазон не шире 92 дней, не больше 500 событий. Доступен всем активным участникам семьи; править может только owner/admin.",
+        "operationId": "FamilyEventsController_list",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Начало периода, ISO 8601 с часовым поясом.",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Конец периода. Диапазон не больше 92 дней.",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FamilyEventDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "События по возрастанию начала."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Некорректный from/to, from не раньше to, диапазон шире 92 дней или событий больше 500.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Некорректный from/to, from не раньше to, диапазон шире 92 дней или событий больше 500."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нет активного членства в этой семье.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нет активного членства в этой семье."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "События семьи за период",
+        "tags": [
+          "Семейный календарь"
+        ]
+      },
+      "post": {
+        "description": "Только owner/admin. participants — активные пользователи этой семьи; они могут не быть родителями. Напоминание хранится как число минут до начала.",
+        "operationId": "FamilyEventsController_create",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFamilyEventDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyEventDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Неверное тело, часовой пояс, диапазон дат или участник не из семьи (PARTICIPANT_NOT_IN_FAMILY).",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Неверное тело, часовой пояс, диапазон дат или участник не из семьи (PARTICIPANT_NOT_IN_FAMILY)."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нужна роль owner или admin.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нужна роль owner или admin."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Создать событие",
+        "tags": [
+          "Семейный календарь"
+        ]
+      }
+    },
+    "/families/{familyId}/events/{eventId}": {
+      "delete": {
+        "description": "Только owner/admin. Событие исключается из выдачи, но остаётся в БД.",
+        "operationId": "FamilyEventsController_cancel",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID события из списка.",
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Событие отменено."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нужна роль owner или admin.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нужна роль owner или admin."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Событие не найдено или уже отменено.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Событие не найдено или уже отменено."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Отменить событие",
+        "tags": [
+          "Семейный календарь"
+        ]
+      },
+      "get": {
+        "description": "Для ежегодного события возвращается ближайшее наступление; параметр year выбирает конкретный год.",
+        "operationId": "FamilyEventsController_get",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID события из списка.",
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Для ежегодного события — год наступления. Без него возвращается ближайшее.",
+            "in": "query",
+            "name": "year",
+            "required": false,
+            "schema": {
+              "example": 2028,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyEventDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Некорректный year.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Некорректный year."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нет доступа к семье.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нет доступа к семье."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Событие не найдено или отменено.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Событие не найдено или отменено."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Событие по id",
+        "tags": [
+          "Семейный календарь"
+        ]
+      },
+      "patch": {
+        "description": "Только owner/admin. Переданные поля заменяются; участники заменяются целиком, если поле передано.",
+        "operationId": "FamilyEventsController_update",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID события из списка.",
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFamilyEventDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyEventDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Неверное тело, диапазон дат или участник не из семьи.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Неверное тело, диапазон дат или участник не из семьи."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нужна роль owner или admin.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нужна роль owner или admin."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Событие не найдено или отменено.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Событие не найдено или отменено."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Изменить событие",
+        "tags": [
+          "Семейный календарь"
+        ]
+      }
+    },
+    "/families/{familyId}/events/{eventId}/photo": {
+      "delete": {
+        "description": "Только owner/admin. Повторное удаление не ошибка.",
+        "operationId": "FamilyEventPhotosController_remove",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID события из списка.",
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Некорректный UUID, variant или файл.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Некорректный UUID, variant или файл."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нужна роль owner или admin.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нужна роль owner или admin."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Событие не найдено или отменено.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Событие не найдено или отменено."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Удалить обложку события",
+        "tags": [
+          "Семейный календарь"
+        ]
+      },
+      "put": {
+        "description": "Только owner/admin. Один файл PNG, JPEG или WebP до 2 МиБ; прежняя обложка заменяется. Обложка одна на событие.",
+        "operationId": "FamilyEventPhotosController_replace",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID события из списка.",
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "photo": {
+                    "format": "binary",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "photo"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyEventPhotoDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Некорректный UUID, variant или файл.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Некорректный UUID, variant или файл."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нужна роль owner или admin.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нужна роль owner или admin."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Событие или фотография не найдены.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Событие или фотография не найдены."
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Файл больше 2 МиБ.",
+                  "statusCode": 413
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Файл больше 2 МиБ."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Сервер занят обработкой фото.",
+                  "statusCode": 503
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Сервер занят обработкой фото."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Загрузить или заменить обложку события",
+        "tags": [
+          "Семейный календарь"
+        ]
+      }
+    },
+    "/families/{familyId}/events/{eventId}/photo/{photoId}": {
+      "get": {
+        "description": "Доступна всем активным участникам семьи. Передайте Bearer-токен, затем прочитайте ответ как Blob.",
+        "operationId": "FamilyEventPhotosController_read",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID события из списка.",
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID фотографии из поля photoUrl.",
+            "in": "path",
+            "name": "photoId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Полная версия по умолчанию, preview для списка.",
+            "in": "query",
+            "name": "variant",
+            "required": false,
+            "schema": {
+              "enum": [
+                "full",
+                "preview"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/webp": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Бинарное содержимое изображения."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Некорректный UUID, variant или файл.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Некорректный UUID, variant или файл."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нет доступа к этой семье.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нет доступа к этой семье."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Фотография не найдена или событие отменено.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Фотография не найдена или событие отменено."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Получить обложку события",
+        "tags": [
+          "Семейный календарь"
+        ]
+      }
+    },
+    "/families/{familyId}/events/{eventId}/response": {
+      "post": {
+        "description": "Личный ответ любого активного участника семьи. Не меняет состав «Кто едет» и не отменяет событие.",
+        "operationId": "FamilyEventsController_respond",
+        "parameters": [
+          {
+            "description": "UUID семьи из GET /families.",
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "UUID события из списка.",
+            "in": "path",
+            "name": "eventId",
+            "required": true,
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RespondFamilyEventDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyEventResponseDto"
+                }
+              }
+            },
+            "description": "Сохранённый ответ."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "response должен быть going или not_going.",
+                  "statusCode": 400
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "response должен быть going или not_going."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Отсутствует действующая сессия.",
+                  "statusCode": 401
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Отсутствует действующая сессия."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Нет доступа к семье.",
+                  "statusCode": 403
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Нет доступа к семье."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Событие не найдено или отменено.",
+                  "statusCode": 404
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorDto"
+                }
+              }
+            },
+            "description": "Событие не найдено или отменено."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ответить на событие",
+        "tags": [
+          "Семейный календарь"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "description": "Текущий API-сервер",
+      "url": "."
+    }
+  ],
+  "tags": []
+}

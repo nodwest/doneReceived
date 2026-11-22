@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCurrentFamily } from '@entities/family';
+import { useSessionUser } from '@entities/session';
 import { setTaskStatus, taskKeys, type Task } from '@entities/task';
 import { wordKeys, type WordsState } from '@entities/word';
-import { syncData } from '@shared/api';
+import { syncData, usePrivateReadScope } from '@shared/api';
 import { useWordsFamilyId } from './use-words-family-id';
 
 /**
@@ -12,19 +14,40 @@ import { useWordsFamilyId } from './use-words-family-id';
 export function useSubmitWords() {
   const queryClient = useQueryClient();
   const familyId = useWordsFamilyId();
+  const family = useCurrentFamily();
+  const user = useSessionUser();
+  const scope = usePrivateReadScope();
+  const taskKey = taskKeys.list(
+    familyId,
+    user?.id,
+    family?.role ?? user?.family?.role,
+    scope,
+  );
   return useMutation({
     mutationFn: (task: Task) =>
       setTaskStatus({ id: task.id, status: 'review' }, familyId),
-    onSuccess: (_, task) => {
-      queryClient.setQueryData<Task[]>(taskKeys.list(familyId), (tasks) =>
+    onMutate: (task) => {
+      const wordKey = wordKeys.state(familyId, task.assignee.id);
+      return {
+        wordKey,
+        wordQuery: queryClient.getQueryCache().find({ queryKey: wordKey }),
+      };
+    },
+    onSuccess: (_, task, context) => {
+      queryClient.setQueryData<Task[]>(taskKey, (tasks) =>
         tasks?.map((item) =>
           item.id === task.id ? { ...item, status: 'review' } : item,
         ),
       );
-      queryClient.setQueryData<WordsState>(
-        wordKeys.state(familyId, task.assignee.id),
-        (state) => (state ? { ...state, status: 'review' } : state),
-      );
+      if (
+        context?.wordQuery &&
+        context.wordQuery ===
+          queryClient.getQueryCache().find({ queryKey: context.wordKey })
+      ) {
+        queryClient.setQueryData<WordsState>(context.wordKey, (state) =>
+          state ? { ...state, status: 'review' } : state,
+        );
+      }
     },
     onSettled: () => syncData(queryClient, 'task-submitted'),
   });

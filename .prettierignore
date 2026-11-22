@@ -17,3 +17,6 @@ data/english-words/
 graphify-out/
 .claude/skills/graphify/
 public/maplibre/
+
+# Сгенерировано openapi-typescript из openapi/calendar.json
+src/entities/family-event/api/generated/

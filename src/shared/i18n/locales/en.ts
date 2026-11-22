@@ -297,6 +297,8 @@ export const en = {
     hide: 'Hide password',
   },
   home: {
+    noChildren: 'No children in this family yet.',
+    childrenLoadError: 'Could not load the children.',
     greetingMorning: 'Good morning 👋',
     greetingAfternoon: 'Good afternoon 👋',
     greetingEvening: 'Good evening 👋',

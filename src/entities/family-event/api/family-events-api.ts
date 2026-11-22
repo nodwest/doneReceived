@@ -3,34 +3,24 @@ import { appendPhoto, type PickedPhoto } from '@shared/lib';
 import type {
   FamilyEvent,
   FamilyEventKind,
-  FamilyEventPerson,
   FamilyEventResponse,
   FamilyEventRepeat,
 } from '../model/family-event';
+import { toFamilyEvent } from './family-event-mapper';
+import type { components } from './generated/calendar';
 
-type FamilyEventPersonDto = {
-  userId: string;
-  displayName: string;
-  avatarUrl: string | null;
-};
+/**
+ * DTO ответа генерируется из `openapi/calendar.json` (календарный срез
+ * Swagger бэкенда). Руками форму ответа здесь больше не описываем: при
+ * переименовании поля ломается `tsc`, а не экран.
+ */
+type FamilyEventDto = components['schemas']['FamilyEventDto'];
+type FamilyEventResponseDto = components['schemas']['FamilyEventResponseDto'];
+type FamilyEventPhotoDto = components['schemas']['FamilyEventPhotoDto'];
+type CreateFamilyEventRequestBody =
+  components['schemas']['CreateFamilyEventDto'];
 
-type FamilyEventDto = {
-  id: string;
-  title: string;
-  description: string;
-  startsAt: string;
-  endsAt: string;
-  timezone: string;
-  repeat: FamilyEventRepeat;
-  kind: FamilyEventKind;
-  photoUrl: string | null;
-  reminderLeadMinutes: number | null;
-  participants: FamilyEventPersonDto[];
-  viewer: {
-    canEdit: boolean;
-    response: FamilyEventResponse | null;
-  };
-};
+const mapEvent = (dto: FamilyEventDto) => toFamilyEvent(dto, authorizedImage);
 
 export type FamilyEventPayload = {
   title: string;
@@ -46,38 +36,7 @@ export type FamilyEventPayload = {
   clientRequestId?: string;
 };
 
-const toPerson = (person: FamilyEventPersonDto): FamilyEventPerson => ({
-  id: person.userId,
-  name: person.displayName,
-  avatar: person.avatarUrl ? authorizedImage(person.avatarUrl) : null,
-});
-
-/** DTO сервера → модель экрана: даты становятся Date, ответ — личным. */
-function toFamilyEvent(dto: FamilyEventDto): FamilyEvent {
-  const startsAt = new Date(dto.startsAt);
-  const endsAt = new Date(dto.endsAt);
-  return {
-    id: dto.id,
-    kind: dto.kind ?? 'event',
-    title: dto.title,
-    description: dto.description,
-    startsAt,
-    endsAt,
-    repeat: dto.repeat,
-    timezone: dto.timezone,
-    participants: (dto.participants ?? []).map(toPerson),
-    photo: dto.photoUrl ? authorizedImage(dto.photoUrl) : undefined,
-    reminderLeadMinutes: dto.reminderLeadMinutes ?? undefined,
-    reminderAt:
-      dto.reminderLeadMinutes == null
-        ? undefined
-        : new Date(startsAt.getTime() - dto.reminderLeadMinutes * 60_000),
-    response: dto.viewer?.response ?? undefined,
-    canEdit: dto.viewer?.canEdit === true,
-  };
-}
-
-const bodyOf = (payload: FamilyEventPayload) => ({
+const bodyOf = (payload: FamilyEventPayload): CreateFamilyEventRequestBody => ({
   title: payload.title,
   description: payload.description,
   startsAt: payload.startsAt.toISOString(),
@@ -102,7 +61,7 @@ export async function fetchFamilyEvents(
   const events = await apiRequest<FamilyEventDto[]>(
     `/families/${familyId}/events?${query.toString()}`,
   );
-  return events.map(toFamilyEvent);
+  return events.map(mapEvent);
 }
 
 /** GET /families/:id/events/:eventId — для deep link и формы правки. */
@@ -112,7 +71,7 @@ export async function fetchFamilyEvent(
   year?: number | null,
 ): Promise<FamilyEvent> {
   const query = year ? `?year=${encodeURIComponent(String(year))}` : '';
-  return toFamilyEvent(
+  return mapEvent(
     await apiRequest<FamilyEventDto>(
       `/families/${familyId}/events/${eventId}${query}`,
     ),
@@ -124,7 +83,7 @@ export async function createFamilyEvent(
   familyId: string,
   payload: FamilyEventPayload,
 ): Promise<FamilyEvent> {
-  return toFamilyEvent(
+  return mapEvent(
     await apiRequest<FamilyEventDto>(`/families/${familyId}/events`, {
       method: 'POST',
       body: payload.clientRequestId
@@ -140,7 +99,7 @@ export async function updateFamilyEvent(
   eventId: string,
   payload: FamilyEventPayload,
 ): Promise<FamilyEvent> {
-  return toFamilyEvent(
+  return mapEvent(
     await apiRequest<FamilyEventDto>(
       `/families/${familyId}/events/${eventId}`,
       { method: 'PATCH', body: bodyOf(payload) },
@@ -157,7 +116,7 @@ export function respondToFamilyEvent(
   eventId: string,
   response: FamilyEventResponse,
 ) {
-  return apiRequest<{ response: FamilyEventResponse }>(
+  return apiRequest<FamilyEventResponseDto>(
     `/families/${familyId}/events/${eventId}/response`,
     { method: 'POST', body: { response } },
   );
@@ -181,7 +140,7 @@ export async function uploadFamilyEventPhoto(
 ) {
   const form = new FormData();
   await appendPhoto(form, 'photo', photo);
-  return apiRequest<{ id: string; url: string }>(
+  return apiRequest<FamilyEventPhotoDto>(
     `/families/${familyId}/events/${eventId}/photo`,
     { method: 'PUT', body: form },
   );

@@ -1,5 +1,5 @@
 import { apiRequest, authorizedImage } from '@shared/api';
-import { appendPhoto, withTimeout, type PickedPhoto } from '@shared/lib';
+import { appendPhoto, type PickedPhoto } from '@shared/lib';
 import type {
   RejectReasonKey,
   Task,
@@ -117,13 +117,16 @@ export const REJECT_REASON_CODES: Record<RejectReasonKey, RejectReasonCode> = {
   other: 'other',
 };
 
-type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
+export type TaskChildLabel = {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
 
-type MemberDto = {
+export type TaskMemberLabel = {
   userId: string;
   displayName: string;
   avatarUrl: string | null;
-  role: 'owner' | 'admin' | 'member';
 };
 
 /** Статус назначения → статус задачи в приложении. */
@@ -155,12 +158,8 @@ const attachmentImage = (familyId: string, id: string) =>
 function toTask(
   task: TaskDto,
   assignment: OpenAssignmentDto,
-  children: readonly ChildDto[],
-  members: readonly MemberDto[],
   viewer: TaskViewer,
 ): Task {
-  const child = children.find((item) => item.id === assignment.childId);
-  const author = members.find((member) => member.userId === task.createdBy);
   const pending = assignment.pendingSubmission ?? null;
   const attachments = pending?.attachments ?? [];
   const rejected = assignment.lastRejection ?? null;
@@ -173,15 +172,11 @@ function toTask(
     status: STATES[assignment.status],
     assignee: {
       id: assignment.childId,
-      name: child?.displayName ?? viewer.childName ?? '—',
-      avatar: child?.avatarUrl ? authorizedImage(child.avatarUrl) : null,
+      name: viewer.childName ?? '—',
+      avatar: null,
     },
     createdBy: task.createdBy,
-    canManage:
-      task.createdBy === viewer.userId ||
-      (viewer.familyRole === 'owner' && author === undefined),
-    authorName: author?.displayName,
-    authorAvatar: author?.avatarUrl ? authorizedImage(author.avatarUrl) : null,
+    canManage: task.createdBy === viewer.userId,
     createdAt: task.createdAt,
     expiresAt: task.deadlineAt,
     // Отчёт на проверке: когда сдано, фото и комментарий ребёнка.
@@ -210,34 +205,19 @@ function toTask(
 
 /**
  * GET /families/:id/tasks — назначения семьи (ребёнку — только свои), до 100
- * последних, и имена детей (GET /families/:id/children). Ребёнку список
- * детей закрыт (403), его не спрашиваем: имя — из сессии. Отменённые,
+ * последних. Отменённые,
  * подтверждённые, истёкшие и закрытые отказом (`rejected` без `retryableRejection`)
  * в список не идут.
  */
-export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
-  const { familyId } = viewer;
-  // Ребёнку список детей закрыт (403) — не спрашиваем. Участников семьи
-  // ребёнок видит (Идеи.md п. 8): из них имя родителя («Task from Sarah»).
-  // Не ответили — автор «Родитель».
-  const parent = viewer.childName === undefined;
-  const [items, children, members] = await Promise.all([
-    apiRequest<{ task: TaskDto; assignment: AssignmentDto }[]>(
-      `/families/${familyId}/tasks?status=assigned,submitted,rejected`,
-    ),
-    parent
-      ? withTimeout(
-          apiRequest<ChildDto[]>(`/families/${familyId}/children`),
-          [] as ChildDto[],
-        )
-      : ([] as ChildDto[]),
-    // Имя автора — подпись, а не сами задания: зависший /members не должен
-    // держать список. Не ответил — показываем «Родитель».
-    withTimeout(
-      apiRequest<MemberDto[]>(`/families/${familyId}/members`),
-      [] as MemberDto[],
-    ),
-  ]);
+export async function fetchServerTasks(
+  viewer: TaskViewer,
+  signal?: AbortSignal,
+): Promise<Task[]> {
+  const items = await apiRequest<
+    { task: TaskDto; assignment: AssignmentDto }[]
+  >(`/families/${viewer.familyId}/tasks?status=assigned,submitted,rejected`, {
+    signal,
+  });
   const visible = items.filter(
     (item): item is { task: TaskDto; assignment: OpenAssignmentDto } =>
       item.task.cancelledAt === null &&
@@ -250,7 +230,7 @@ export async function fetchServerTasks(viewer: TaskViewer): Promise<Task[]> {
       ),
   );
   return visible.map(({ task, assignment }) =>
-    toTask(task, assignment, children, members, viewer),
+    toTask(task, assignment, viewer),
   );
 }
 

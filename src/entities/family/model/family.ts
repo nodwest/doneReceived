@@ -55,7 +55,7 @@ export interface FamilyChild {
 }
 
 /**
- * Участник семьи: GET /families/:id/members (только родителям). `id` —
+ * Участник семьи: GET /families/:id/members. `id` —
  * членство (для передачи владения), `userId` — аккаунт (автор заданий).
  */
 export interface FamilyMember {

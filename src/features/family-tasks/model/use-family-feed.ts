@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useFeed, type FeedViewer } from '@entities/activity';
 import { useMe, useSession } from '@entities/session';
 import { useChildAccount } from './use-child-account';
+import { useFamilyLabels, useRecheckFamilyAccess } from './use-family-labels';
 import { useTaskViewer } from './use-family-tasks';
 
 /**
@@ -32,5 +33,17 @@ export function useFamilyFeed() {
       },
     };
   }, [viewer, childSession, childId, session, me?.avatarUrl]);
-  return { feedViewer, ...useFeed(feedViewer) };
+  const { children, members, accessDenied } = useFamilyLabels(
+    feedViewer ? viewer : null,
+  );
+  const query = useFeed(feedViewer, children, members);
+  const denied = accessDenied || query.accessDenied;
+  useRecheckFamilyAccess(denied, !!feedViewer && !childSession);
+  return {
+    feedViewer,
+    ...query,
+    accessDenied: denied,
+    isError: denied || query.isError,
+    data: denied ? undefined : query.data,
+  };
 }

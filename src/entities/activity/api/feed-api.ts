@@ -1,5 +1,4 @@
-import { ApiError, apiRequest, authorizedImage } from '@shared/api';
-import { withTimeout } from '@shared/lib';
+import { apiRequest, authorizedImage } from '@shared/api';
 import type { FeedEvent, FeedEventType, FeedViewer } from '../model/feed';
 
 type ActivityDto = {
@@ -15,13 +14,17 @@ type ActivityDto = {
   }[];
 };
 
-type MemberDto = {
+export type FeedMemberLabel = {
   userId: string;
   displayName: string;
   avatarUrl: string | null;
 };
 
-type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
+export type FeedChildLabel = {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
 
 type MissedDto = {
   items: { assignmentId: string; reason: 'expired' | 'rejected' }[];
@@ -35,6 +38,7 @@ type MissedDto = {
 async function fetchClosedAssignments(
   familyId: string,
   items: ActivityDto['items'],
+  signal: AbortSignal,
 ): Promise<Set<string>> {
   const childIds = [
     ...new Set(
@@ -47,6 +51,7 @@ async function fetchClosedAssignments(
     childIds.map((childId) =>
       apiRequest<MissedDto>(
         `/families/${familyId}/children/${childId}/missed-tasks`,
+        { signal, timeoutMs: 5_000 },
       ).catch(() => ({ items: [] }) as MissedDto),
     ),
   );
@@ -87,52 +92,34 @@ const isLastRejection = (
       other.createdAt > item.createdAt,
   );
 
-/**
- * GET /families/:id/activity — последние события семьи (ребёнку — только
- * его), новые первыми. Имена: родители — из участников семьи, дети — из
- * списка детей (ребёнку он закрыт: его имя и фото из профиля); фото — с
- * токеном, нет фото — буква. Незнакомые типы событий пропускаем.
- */
 export async function fetchFeed(
-  viewer: FeedViewer,
+  familyId: string,
   limit: number,
-): Promise<FeedEvent[]> {
-  const { familyId } = viewer;
-  const [activity, members, children] = await Promise.all([
-    // Сервер иногда «подвисает» на ленте: не ждём бесконечно, иначе главная
-    // навсегда остаётся без истории. Не ответил — запрос падает, и виджет
-    // показывает «Повторить».
-    withTimeout<ActivityDto | null>(
-      apiRequest<ActivityDto>(`/families/${familyId}/activity?limit=${limit}`),
-      null,
-      15_000,
-    ),
-    // Имена и фото — необязательная подпись. Зависший /members не должен
-    // держать всю ленту: не ответил за отведённое время — показываем без имён.
-    withTimeout(
-      apiRequest<MemberDto[]>(`/families/${familyId}/members`),
-      [] as MemberDto[],
-    ),
-    viewer.child
-      ? ([
-          {
-            id: viewer.child.id,
-            displayName: viewer.child.name,
-            avatarUrl: viewer.child.avatarUrl,
-          },
-        ] as ChildDto[])
-      : withTimeout(
-          apiRequest<ChildDto[]>(`/families/${familyId}/children`),
-          [] as ChildDto[],
-        ),
-  ]);
-  if (!activity) throw new ApiError(0, []);
-  // Закрытые отказом без переделки — только уточнение статуса; без него
-  // показываем отказ как возврат на доработку.
-  const closed = await withTimeout(
-    fetchClosedAssignments(familyId, activity.items),
-    new Set<string>(),
+  signal: AbortSignal,
+) {
+  const activity = await apiRequest<ActivityDto>(
+    `/families/${familyId}/activity?limit=${limit}`,
+    { signal },
   );
+  const closed = await fetchClosedAssignments(familyId, activity.items, signal);
+  return { activity, closed: [...closed] };
+}
+
+export function presentFeed(
+  { activity, closed }: Awaited<ReturnType<typeof fetchFeed>>,
+  viewer: FeedViewer,
+  members: readonly FeedMemberLabel[] = [],
+  children: readonly FeedChildLabel[] = [],
+): FeedEvent[] {
+  const visibleChildren = viewer.child
+    ? [
+        {
+          id: viewer.child.id,
+          displayName: viewer.child.name,
+          avatarUrl: viewer.child.avatarUrl,
+        },
+      ]
+    : children;
   const photo = (url: string | null | undefined) =>
     url ? authorizedImage(url) : null;
   const result = activity.items
@@ -140,7 +127,7 @@ export async function fetchFeed(
     .map((item) => {
       const member = members.find((entry) => entry.userId === item.actorId);
       const byMe = item.actorId === viewer.userId;
-      const child = children.find((entry) => entry.id === item.childId);
+      const child = visibleChildren.find((entry) => entry.id === item.childId);
       return {
         id: item.id,
         // Закрывающий отказ — последний по назначению: после него событий
@@ -148,7 +135,7 @@ export async function fetchFeed(
         type:
           item.type === 'task_rejected' &&
           item.assignmentId &&
-          closed.has(item.assignmentId) &&
+          closed.includes(item.assignmentId) &&
           isLastRejection(activity.items, item)
             ? ('task_closed' as const)
             : item.type,

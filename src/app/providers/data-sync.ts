@@ -37,11 +37,10 @@ export function useRefreshOnNavigate(queryClient: QueryClient) {
   useEffect(() => {
     if (previous.current === pathname) return;
     previous.current = pathname;
-    queryClient.refetchQueries({
-      type: 'active',
-      stale: true,
-      predicate: syncable,
-    });
+    queryClient.refetchQueries(
+      { type: 'active', stale: true, predicate: syncable },
+      { cancelRefetch: false },
+    );
   }, [pathname, queryClient]);
 }
 
