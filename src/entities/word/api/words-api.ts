@@ -14,7 +14,7 @@ import type { Word } from '../model/word';
 export type WordsServerStatus =
   | 'off'
   | 'learning'
-  /** Проверка не прошла, ребёнок повторяет слова (п. 38, когда сделают). */
+  /** Проверка не прошла, ребёнок повторяет слова (п. 38). */
   | 'redo'
   | 'review'
   | 'done_today'
@@ -47,7 +47,7 @@ export interface WordsState {
   nextPortionAt: string | null;
   /** Порция при learning / review, иначе null. */
   portion: WordsPortion | null;
-  /** Слова, которые не вспомнил на последней проверке (п. 38, когда сделают). */
+  /** Слова, которые не вспомнил на последней проверке (п. 38). */
   missedRanks?: number[];
 }
 
