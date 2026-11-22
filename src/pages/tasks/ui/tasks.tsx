@@ -18,9 +18,14 @@ import {
 } from '@widgets/tasks-header';
 import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
 import { useFamilyChildren, useFamilyMembers } from '@entities/family';
-import { filterTasks, TaskCard, TaskRow, type Task } from '@entities/task';
+import {
+  filterTasks,
+  isWordsTask,
+  TaskCard,
+  TaskRow,
+  type Task,
+} from '@entities/task';
 import { useMyId } from '@entities/session';
-import { isWordsTitle, parseWordsRange } from '@entities/word';
 import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import { CardButton } from '@shared/ui';
@@ -65,7 +70,8 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   // Чей список: ребёнок семьи (id профиля) или второй родитель (userId).
   const familyId = useTaskFamilyId();
   const { data: serverChildren, isPending: childrenPending } =
-    useFamilyChildren(scope === 'child' ? familyId : null);
+    // На вкладке Tasks — для строк слов дня: по строке на ребёнка.
+    useFamilyChildren(scope === 'parent' ? null : familyId);
   const { data: members, isPending: membersPending } = useFamilyMembers(
     scope === 'parent' ? familyId : null,
   );
@@ -125,14 +131,21 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   const tasks = tab === 'review' ? reviewTasks : allTasks;
   // Слова дня проверяются на вкладке Languages: в карточках их нет.
   const cardTasks = useMemo(
-    () => tasks.filter((task) => !isWordsTitle(task.title)),
+    () => tasks.filter((task) => !isWordsTask(task)),
     [tasks],
   );
-  // Дети, у которых есть слова дня в этом списке: у каждого — одна строка.
+  // Строки слов дня — по одной на ребёнка: на вкладке Tasks — все дети семьи
+  // (строка сама решает, показываться ли), иначе — у кого порция в списке.
   const wordsChildren = useMemo(() => {
+    if (scope === 'all' && serverChildren) {
+      return serverChildren.map((child) => ({
+        id: child.id,
+        name: child.displayName,
+      }));
+    }
     const seen = new Map<string, { id: string; name: string }>();
     for (const task of tasks) {
-      if (parseWordsRange(task.title) && !seen.has(task.assignee.id)) {
+      if (isWordsTask(task) && !seen.has(task.assignee.id)) {
         seen.set(task.assignee.id, {
           id: task.assignee.id,
           name: task.assignee.name,
@@ -140,7 +153,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
       }
     }
     return [...seen.values()];
-  }, [tasks]);
+  }, [tasks, scope, serverChildren]);
   const currentId = currentIds[tab];
   const setCurrentId = (id: string) =>
     setCurrentIds((prev) => ({ ...prev, [tab]: id }));
@@ -266,9 +279,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                       familyId={familyId}
                       tasks={allTasks}
                       reviewOnly={tab === 'review'}
-                      canCheck={(task) =>
-                        task.canManage ?? task.createdBy === myId
-                      }
+                      payerId={scope === 'all' ? myId : null}
                       onOpen={(checkTaskId) =>
                         checkTaskId
                           ? router.push({

@@ -1,19 +1,23 @@
 import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import Animated, { FadeInRight } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import type { Task } from '@entities/task';
-import { getWord, WordCard, type Word } from '@entities/word';
+import { WordCard, type Word } from '@entities/word';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { CardButton } from '@shared/ui';
 import { useWordsStudy } from '../model/study-store';
 import { useSubmitWords } from '../model/use-submit-words';
 import { WordsProgress, WordsState } from './words-parts';
+import { cardEntering, cardExiting } from './card-entering';
 import { styles } from './words.styled';
 
 type WordsStudyProps = {
   task: Task;
+  /** Слова по порядку очереди: при повторении невыученные — первыми. */
   words: readonly Word[];
+  /** Повторение после проверки: эти слова не вспомнил — на карточке пометка. */
+  missed?: ReadonlySet<number>;
 };
 
 /**
@@ -21,12 +25,17 @@ type WordsStudyProps = {
  * «Напомнить» — оно уходит в конец очереди и покажется снова. Запомнил все —
  * задание само уходит родителю на проверку.
  */
-export function WordsStudy({ task, words }: WordsStudyProps) {
+export function WordsStudy({ task, words, missed }: WordsStudyProps) {
   const { t } = useTranslation();
   const ranks = useMemo(() => words.map((word) => word.rank), [words]);
+  const byRank = useMemo(
+    () => new Map(words.map((word) => [word.rank, word])),
+    [words],
+  );
   const study = useWordsStudy(task.id, ranks);
   const submit = useSubmitWords();
-  const current = study.queue.length > 0 ? getWord(study.queue[0]) : null;
+  const current =
+    study.queue.length > 0 ? (byRank.get(study.queue[0]) ?? null) : null;
   const finished = study.queue.length === 0 && ranks.length > 0;
 
   // Все слова запомнены — сразу на проверку. Ошибка — кнопка повтора ниже.
@@ -68,20 +77,22 @@ export function WordsStudy({ task, words }: WordsStudyProps) {
         value={study.remembered.length}
         total={ranks.length}
       />
-      {task.rejection ? (
-        <View style={styles.sentBack}>
-          <Text style={styles.sentBackTitle}>
-            {t('words.child.sentBackTitle')}
-          </Text>
-          <Text style={styles.sentBackText}>
-            {task.rejection.comment || t('words.child.sentBackText')}
-          </Text>
-        </View>
-      ) : null}
-      {/* Новое слово въезжает справа: видно, что карточка сменилась. */}
-      <Animated.View key={current.rank} entering={FadeInRight.duration(220)}>
+      <Animated.View
+        key={current.rank}
+        entering={cardEntering}
+        exiting={cardExiting}
+      >
         <WordCard
           word={current}
+          badge={
+            missed?.has(current.rank) ? (
+              <View style={[styles.badge, styles.badgeMissed]}>
+                <Text style={[styles.badgeText, styles.badgeTextMissed]}>
+                  {t('words.child.missedBadge')}
+                </Text>
+              </View>
+            ) : undefined
+          }
           footer={
             <>
               <CardButton

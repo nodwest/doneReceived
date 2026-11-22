@@ -17,6 +17,35 @@ export interface TaskRejection {
   comment: string;
   /** id родителя, который вернул задание. */
   by: string;
+  /**
+   * Слова дня: какие слова ребёнок не вспомнил на проверке (номера в
+   * словаре); у обычных заданий — нет.
+   */
+  missedRanks?: number[];
+}
+
+/** Слово порции с сервера — карточка целиком (как `Word` в `@entities/word`). */
+export interface TaskWord {
+  rank: number;
+  word: string;
+  transcription: string;
+  translation: string;
+  forms?: string;
+  collocations: readonly { en: string; ru: string }[];
+  example: string;
+  exampleTranslation: string;
+}
+
+/**
+ * Порция слов дня: задание, которое сервер выдаёт ребёнку сам (п. 37).
+ * `ranks` — новые слова по порядку словаря, `reviewRanks` — пройденные для
+ * проверки (одни и те же на обоих телефонах), `items` — все эти слова целиком.
+ */
+export interface TaskWordsPortion {
+  portionId: string;
+  ranks: number[];
+  reviewRanks: number[];
+  items: TaskWord[];
 }
 
 /** Шаг чеклиста задания: ребёнок отмечает его по ходу дела. */
@@ -100,7 +129,15 @@ export interface Task {
   rejection: TaskRejection | null;
   /** Чеклист по порядку; пустой — задание без чеклиста. */
   checklist: ChecklistItem[];
+  /** Слова дня: порция слов; у обычных заданий — null или нет. */
+  words?: TaskWordsPortion | null;
 }
+
+/**
+ * Задание со словами дня. Обычными заданиями оно не показывается: в списках
+ * у слов своя строка, учат и проверяют их на вкладке Languages.
+ */
+export const isWordsTask = (task: Pick<Task, 'words'>) => !!task.words;
 
 /** Награда в формате карточек: «$5.00». */
 export const formatReward = (reward: number) => `$${reward.toFixed(2)}`;

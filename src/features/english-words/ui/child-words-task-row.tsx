@@ -1,31 +1,32 @@
-import { useMemo } from 'react';
 import type { Task } from '@entities/task';
-import { useChildWallet } from '@entities/wallet';
 import { WordsTaskRow } from '@entities/word';
 import { useTranslation } from '@shared/i18n';
-import { getWordsOverview, rewardsOf } from '../model/words-overview';
+import { useWordsOverview } from '../model/use-words-overview';
 
 type ChildWordsTaskRowProps = {
   childId: string;
   childName: string;
   familyId: string | null;
-  /** Задания ребёнка (из них — его слова). */
+  /** Задания, которые видит список (из них — порция слов этого ребёнка). */
   tasks: readonly Task[];
   /** Только когда слова ждут проверки (вкладка To review). */
   reviewOnly?: boolean;
   /**
-   * Тап по строке: `checkTaskId` — слова ждут проверки и проверяет этот
-   * родитель (сразу проверка), иначе — вкладка Languages.
+   * id вошедшего родителя: «сдано · выплачено» показываем плательщику — его
+   * это задание, как у остальных строк вкладки Tasks. null — не показываем.
+   */
+  payerId?: string | null;
+  /**
+   * Тап по строке: `checkTaskId` — слова ждут проверки (сразу проверка),
+   * иначе — вкладка Languages.
    */
   onOpen: (checkTaskId: string | null) => void;
-  /** Может ли этот родитель проверять задание (автор). */
-  canCheck: (task: Task) => boolean;
 };
 
 /**
- * Слова ребёнка в списке заданий родителя — всегда одна строка, сколько бы
- * порций ни было: учит, ждёт проверки или «сдано, выплачено» (новые слова
- * завтра).
+ * Слова ребёнка в списке заданий родителя — одна строка: учит, ждёт
+ * проверки или «сдано, выплачено» (новые слова завтра). Учит и на проверке —
+ * только если задание порции есть в списке.
  */
 export function ChildWordsTaskRow({
   childId,
@@ -33,29 +34,29 @@ export function ChildWordsTaskRow({
   familyId,
   tasks,
   reviewOnly = false,
+  payerId = null,
   onOpen,
-  canCheck,
 }: ChildWordsTaskRowProps) {
   const { t } = useTranslation();
-  const { data: wallet } = useChildWallet(childId, familyId);
-  const overview = useMemo(
-    () =>
-      getWordsOverview(
-        tasks.filter((task) => task.assignee.id === childId),
-        rewardsOf(wallet),
-      ),
-    [tasks, wallet, childId],
-  );
-  const { status, task, range, words } = overview;
-  if (!task || !range) return null;
+  const { overview } = useWordsOverview(familyId, childId, tasks);
+  if (!overview) return null;
+  const { status, task, range, words, reward } = overview;
   if (status !== 'review' && reviewOnly) return null;
-  if (status !== 'review' && status !== 'learning' && status !== 'tomorrow') {
+
+  const name = childName;
+  const done =
+    status === 'tomorrow' && payerId !== null && overview.payerId === payerId;
+  if (!done && (!task || !range)) return null;
+  if (
+    !done &&
+    status !== 'review' &&
+    status !== 'learning' &&
+    status !== 'redo'
+  ) {
     return null;
   }
 
-  const name = childName;
-  const rowStatus =
-    status === 'review' ? 'review' : status === 'tomorrow' ? 'done' : 'active';
+  const rowStatus = status === 'review' ? 'review' : done ? 'done' : 'active';
   const title =
     status === 'review'
       ? t('words.rowParentReview', { name })
@@ -63,23 +64,21 @@ export function ChildWordsTaskRow({
   const subtitle =
     status === 'review'
       ? t('words.rowParentReviewHint', { name })
-      : status === 'tomorrow'
+      : done
         ? t('words.rowParentDone')
         : t('words.rowParentLearning', {
-            from: range.from,
-            to: range.to,
+            from: range?.from ?? 0,
+            to: range?.to ?? 0,
             count: words.length,
           });
 
   return (
     <WordsTaskRow
       status={rowStatus}
-      reward={task.reward}
+      reward={task?.reward ?? reward ?? 0}
       title={title}
       subtitle={subtitle}
-      onPress={() =>
-        onOpen(status === 'review' && canCheck(task) ? task.id : null)
-      }
+      onPress={() => onOpen(status === 'review' && task ? task.id : null)}
     />
   );
 }

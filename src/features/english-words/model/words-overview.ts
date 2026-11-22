@@ -1,109 +1,156 @@
-import type { Task } from '@entities/task';
+import { isWordsTask, type Task } from '@entities/task';
 import type { ChildWallet } from '@entities/wallet';
 import {
-  learnedWordsCount,
-  WORDS_PER_DAY,
-  parseWordsRange,
+  rangeOfRanks,
   WORDS_TOTAL,
-  wordsDay,
-  wordsOfTask,
   type Word,
   type WordsRange,
+  type WordsState,
 } from '@entities/word';
 
 /**
- * Где ребёнок в словах:
- * none — слов не выдали (родитель ещё не начал);
- * learning — учит слова задания;
+ * Где ребёнок в словах (по состоянию с сервера):
+ * off — родитель ещё не включил слова;
+ * learning — учит слова порции;
+ * redo — проверка не прошла: повторяет слова порции, невыученные помечены;
  * review — выучил, ждёт вечерней проверки;
- * tomorrow — сегодня уже проверили и заплатили, следующие слова откроются завтра;
+ * tomorrow — сегодня уже проверили и заплатили, следующие слова завтра;
+ * noFunds — пора дать новые слова, а у родителя не хватает денег на награду;
  * finished — весь словарь пройден.
  */
 export type WordsStatus =
-  | 'none'
+  | 'off'
   | 'learning'
+  | 'redo'
   | 'review'
   | 'tomorrow'
+  | 'noFunds'
   | 'finished';
+
+const STATUSES: Record<WordsState['status'], WordsStatus> = {
+  off: 'off',
+  learning: 'learning',
+  redo: 'redo',
+  review: 'review',
+  done_today: 'tomorrow',
+  no_funds: 'noFunds',
+  finished: 'finished',
+};
+
+/** Награда за слова из кошелька ребёнка: когда, сколько и какие слова. */
+export type WordsReward = { at: string; amount: number; range: WordsRange };
+
+/** Награды за слова дня из кошелька ребёнка; не загружен — пусто. */
+export const wordsRewardsOf = (
+  wallet: ChildWallet | undefined,
+): WordsReward[] =>
+  (wallet?.transactions ?? []).flatMap((item) =>
+    item.kind === 'reward' && item.words
+      ? [{ at: item.at, amount: item.amount, range: item.words }]
+      : [],
+  );
 
 export interface WordsOverview {
   status: WordsStatus;
-  /** Сколько слов выучено (по принятым заданиям). */
+  /** Сколько слов выучено. */
   learned: number;
-  /** Текущее задание со словами (учит или на проверке). */
+  /** Сколько слов в словаре для детей. */
+  total: number;
+  /** Награда за сданный день; null — слова ещё не настроены. */
+  reward: number | null;
+  /** Родитель, из чьего кошелька платим. */
+  payerId: string | null;
+  /** Задание текущей порции (учит или на проверке); список ещё не пришёл — null. */
   task: Task | null;
-  range: WordsRange | null;
+  /** Новые слова порции по порядку. */
   words: Word[];
-  /** За слова сегодня (день — с 4:00) уже заплатили. */
-  paidToday: boolean;
+  /** Не вспомнил на проверке (новые и пройденные), по порядку словаря. */
+  missed: Word[];
+  range: WordsRange | null;
+  /** Последняя оплаченная порция (из кошелька ребёнка). */
+  lastRange: WordsRange | null;
 }
 
-/** Награда из кошелька ребёнка: название задания и когда начислена. */
-type Reward = { task: string; at: string };
-
-/** Награды из кошелька ребёнка (выводы не нужны); не загружен — пусто. */
-export const rewardsOf = (wallet: ChildWallet | undefined): Reward[] =>
-  (wallet?.transactions ?? []).flatMap((item) =>
-    item.kind === 'reward' ? [{ task: item.task, at: item.at }] : [],
-  );
+/**
+ * Статус порции сверяем с её заданием: назначение — то, что сервер точно
+ * обновил. Сдано — на проверке; снова активно после отказа — повторяет
+ * (`GET …/words` после неудачной проверки отдаёт review, п. 38); активно без
+ * отказа — учит.
+ */
+function portionStatus(status: WordsStatus, task: Task | null): WordsStatus {
+  if (!task) return status;
+  if (task.status === 'review') return 'review';
+  if (task.status === 'active') return task.rejection ? 'redo' : 'learning';
+  return status;
+}
 
 /**
- * Состояние слов одного ребёнка из его заданий и наград. Слова в день одни:
- * если сегодня за слова уже заплатили, следующая порция (её создают сразу
- * после проверки) ждёт завтрашнего дня — он начинается в 4:00.
+ * Слова одного ребёнка: состояние с сервера, задание порции из его заданий
+ * (по `portionId`) и последняя оплаченная порция из наград в кошельке.
  */
 export function getWordsOverview(
+  state: WordsState,
   tasks: readonly Task[],
-  rewards: readonly Reward[],
-  now = new Date(),
+  rewards: readonly WordsReward[] = [],
 ): WordsOverview {
-  // Если заданий со словами вдруг несколько — сначала самое раннее по словам.
-  const wordsTasks = tasks
-    .filter((task) => parseWordsRange(task.title) !== null)
-    .sort(
-      (a, b) =>
-        (parseWordsRange(a.title)?.from ?? 0) -
-        (parseWordsRange(b.title)?.from ?? 0),
-    );
+  const portion = state.portion;
+  const wordsTasks = tasks.filter(isWordsTask);
   const task =
-    wordsTasks.find((item) => item.status === 'review') ??
-    wordsTasks.find((item) => item.status === 'active') ??
+    (portion
+      ? wordsTasks.find((item) => item.words?.portionId === portion.portionId)
+      : undefined) ??
+    (state.status === 'learning' || state.status === 'review'
+      ? (wordsTasks.find((item) => item.status === 'review') ??
+        wordsTasks.find((item) => item.status === 'active'))
+      : undefined) ??
     null;
-  const wordsRewards = rewards.filter(
-    (reward) => parseWordsRange(reward.task) !== null,
+  const source = task?.words ?? portion;
+  const newRanks = new Set(source?.ranks ?? []);
+  const words = (source?.items ?? [])
+    .filter((word) => newRanks.has(word.rank))
+    .sort((a, b) => a.rank - b.rank);
+  const latest = [...rewards].sort((a, b) => b.at.localeCompare(a.at))[0];
+  const missedRanks = new Set(
+    state.missedRanks ?? task?.rejection?.missedRanks ?? [],
   );
-  const learned = learnedWordsCount(wordsRewards.map((reward) => reward.task));
-  const today = wordsDay(now);
-  const paidToday = wordsRewards.some(
-    (reward) => wordsDay(reward.at) === today,
-  );
-  const range = task ? parseWordsRange(task.title) : null;
-  const words = task ? wordsOfTask(task.title, task.checklist) : [];
+  const missed = (source?.items ?? [])
+    .filter((word) => missedRanks.has(word.rank))
+    .sort((a, b) => a.rank - b.rank);
 
-  let status: WordsStatus;
-  if (task?.status === 'review') status = 'review';
-  else if (task)
-    status = paidToday && !task.rejection ? 'tomorrow' : 'learning';
-  else status = learned >= WORDS_TOTAL ? 'finished' : 'none';
-
-  return { status, learned, task, range, words, paidToday };
+  return {
+    status: portionStatus(STATUSES[state.status] ?? 'off', task),
+    learned: state.learnedCount,
+    total: state.totalCount || WORDS_TOTAL,
+    reward: state.rewardPoints,
+    payerId: state.payerId,
+    task,
+    words,
+    missed,
+    range: rangeOfRanks(source?.ranks ?? []),
+    lastRange: latest?.range ?? null,
+  };
 }
 
 /**
  * С какого слова открыть полный список и какие слова в нём сегодняшние:
- * на проверке — слова задания, сдано — последняя выученная порция, слов ещё
- * не дали — следующее слово, без выделения.
+ * учит или на проверке — слова порции, сдано — последняя оплаченная порция,
+ * иначе — слово после последней порции, без выделения.
  */
-export function deckFocus({ status, range, learned }: WordsOverview): {
+export function deckFocus({ status, range, lastRange }: WordsOverview): {
   start: number;
   today: WordsRange | null;
 } {
-  if ((status === 'review' || status === 'learning') && range) {
+  if (
+    (status === 'review' || status === 'learning' || status === 'redo') &&
+    range
+  ) {
     return { start: range.from, today: range };
   }
-  if ((status === 'tomorrow' || status === 'finished') && learned > 0) {
-    const from = Math.floor((learned - 1) / WORDS_PER_DAY) * WORDS_PER_DAY + 1;
-    return { start: from, today: { from, to: learned } };
+  if ((status === 'tomorrow' || status === 'finished') && lastRange) {
+    return { start: lastRange.from, today: lastRange };
   }
-  return { start: Math.min(learned + 1, WORDS_TOTAL), today: null };
+  return {
+    start: Math.min((lastRange?.to ?? 0) + 1, WORDS_TOTAL),
+    today: null,
+  };
 }

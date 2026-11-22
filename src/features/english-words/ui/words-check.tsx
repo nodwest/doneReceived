@@ -1,22 +1,33 @@
 import { useState } from 'react';
 import { ScrollView, Pressable, Text, View } from 'react-native';
-import Animated, { FadeInRight } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import type { Task } from '@entities/task';
-import { buildCheckDeck, WordCard, type Word } from '@entities/word';
+import { shuffled, WordCard, type Word } from '@entities/word';
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { CardButton, GradientButton, Icon, RoundButton } from '@shared/ui';
 import { useCheckWords } from '../model/use-check-words';
 import { WordLine, WordsState } from './words-parts';
+import { cardEntering, cardExiting } from './card-entering';
 import { styles } from './words.styled';
 
 type WordsCheckProps = {
+  /** Задание порции на проверке (с полем `words`). */
   task: Task;
-  words: readonly Word[];
   onClose: () => void;
 };
 
-type Result = 'sent-back' | null;
+/**
+ * Колода проверки — слова порции с сервера: новые и пройденные
+ * (`reviewRanks`), вперемешку. Наборы одни и те же на телефонах ребёнка и
+ * родителя.
+ */
+function checkDeck(task: Task): Word[] {
+  const portion = task.words;
+  if (!portion) return [];
+  const ranks = new Set([...portion.ranks, ...portion.reviewRanks]);
+  return shuffled(portion.items.filter((word) => ranks.has(word.rank)));
+}
 
 /**
  * Вечерняя проверка: родитель по одной карточке называет слово, ребёнок
@@ -24,19 +35,33 @@ type Result = 'sent-back' | null;
  * слова задания и несколько пройденных раньше, вперемешку. Всё верно —
  * награда выплачивается и экран закрывается; есть ошибки — слова возвращаются на повтор.
  */
-export function WordsCheck({ task, words, onClose }: WordsCheckProps) {
+export function WordsCheck({ task, onClose }: WordsCheckProps) {
   const { t } = useTranslation();
   const name = task.assignee.name;
   const amount = `$${task.reward}`;
   // Колода собирается один раз: перечитывание списка не перемешивает её.
-  const [deck] = useState(() => buildCheckDeck(words));
-  const newRanks = new Set(words.map((word) => word.rank));
+  const [deck] = useState(() => checkDeck(task));
+  const newRanks = new Set(task.words?.ranks ?? []);
   const [answers, setAnswers] = useState<boolean[]>([]);
   // Перевод открыт на карточке с этим номером: сначала ребёнок отвечает сам.
   const [revealedIndex, setRevealedIndex] = useState(-1);
-  const [result, setResult] = useState<Result>(null);
-  const { approve, reject } = useCheckWords();
-  const busy = approve.isPending || reject.isPending;
+  const check = useCheckWords();
+  const busy = check.isPending;
+  // Итог на сервер: ответ на каждую карточку. Всё верно — награда ушла,
+  // назад к карточке ребёнка; есть ошибки — слова вернулись на повтор.
+  const send = () =>
+    check.mutate(
+      {
+        task,
+        answers: deck.map((word, i) => ({
+          rank: word.rank,
+          correct: answers[i] === true,
+        })),
+      },
+      {
+        onSuccess: onClose,
+      },
+    );
 
   const answer = (right: boolean) =>
     setAnswers((prev) => (prev.length < deck.length ? [...prev, right] : prev));
@@ -70,26 +95,11 @@ export function WordsCheck({ task, words, onClose }: WordsCheckProps) {
       <RoundButton
         icon="undo"
         accessibilityLabel={t('words.check.undo')}
-        disabled={index === 0 || result !== null || busy}
+        disabled={index === 0 || busy}
         onPress={undo}
       />
     </View>
   );
-
-  if (result === 'sent-back') {
-    return (
-      <View style={styles.check}>
-        <WordsState
-          icon="undo"
-          tone="review"
-          title={t('words.check.sentBackTitle', { name })}
-          text={t('words.check.sentBackText', { name })}
-        >
-          <GradientButton label={t('words.check.done')} onPress={onClose} />
-        </WordsState>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.check}>
@@ -131,7 +141,8 @@ export function WordsCheck({ task, words, onClose }: WordsCheckProps) {
             </View>
             <Animated.View
               key={current.rank}
-              entering={FadeInRight.duration(220)}
+              entering={cardEntering}
+              exiting={cardExiting}
             >
               <WordCard
                 word={current}
@@ -189,13 +200,9 @@ export function WordsCheck({ task, words, onClose }: WordsCheckProps) {
           >
             <GradientButton
               label={t('words.check.pay', { amount })}
-              loading={approve.isPending}
+              loading={busy}
               disabled={busy}
-              onPress={() =>
-                // Выплатили — сразу назад к карточке ребёнка: там видно, что
-                // сегодня проверено и оплачено.
-                approve.mutate(task, { onSuccess: onClose })
-              }
+              onPress={send}
             />
           </WordsState>
         ) : (
@@ -212,14 +219,9 @@ export function WordsCheck({ task, words, onClose }: WordsCheckProps) {
               <GradientButton
                 label={t('words.check.sendBack')}
                 icon="undo"
-                loading={reject.isPending}
+                loading={busy}
                 disabled={busy}
-                onPress={() =>
-                  reject.mutate(
-                    { task, missed: missed.map((word) => word.word) },
-                    { onSuccess: () => setResult('sent-back') },
-                  )
-                }
+                onPress={send}
               />
             </WordsState>
             <View style={styles.list}>

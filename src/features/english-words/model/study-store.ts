@@ -56,6 +56,14 @@ function load(key: string, ranks: readonly number[]): WordsStudy {
   return { queue: [...ranks], remembered: [] };
 }
 
+/** Ребёнок уже начал учить эти слова (что-то запомнил): продолжить карточками. */
+export function hasWordsStudyProgress(
+  taskId: string,
+  ranks: readonly number[],
+) {
+  return load(`${taskId}:${ranks.join(',')}`, ranks).remembered.length > 0;
+}
+
 /**
  * Учёба слов задания `taskId`: текущее слово — первое в очереди.
  * «Запомнил» убирает его в запомненные, «Напомнить» — в конец очереди.

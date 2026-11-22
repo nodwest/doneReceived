@@ -22,19 +22,18 @@ import {
 import {
   useChildTasks,
   useMyChildBalance,
-  useMyChildWallet,
   useMyWishlistOwner,
 } from '@features/family-tasks';
-import { getWordsOverview, rewardsOf } from '@features/english-words';
 import {
   ChildReviewRow,
   ChildTaskCard,
   ChildTaskTile,
+  isWordsTask,
   sortTasksByUrgency,
   type Task,
 } from '@entities/task';
 import { useWishlistProgress } from '@entities/wish';
-import { isWordsTitle, WordsTaskRow } from '@entities/word';
+import { WordsTaskRow } from '@entities/word';
 import { useTranslation } from '@shared/i18n';
 import { useIsCompact } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
@@ -83,24 +82,7 @@ export function MyTasksPage() {
   const { toggleStep } = useTaskActions();
   // Порядок как в списке: активные по сроку, затем на проверке — карточки
   // листаются в том же порядке.
-  // Слова дня: следующая порция создаётся сразу после проверки, но
-  // открывается завтра — до тех пор её не показываем.
-  const { data: wallet } = useMyChildWallet();
-  const words = useMemo(
-    () => getWordsOverview(data, rewardsOf(wallet)),
-    [data, wallet],
-  );
-  const allTasks = useMemo(
-    () =>
-      sortTasksByUrgency(
-        data.filter(
-          (task) =>
-            // Слова, сданные сегодня, — не показываем.
-            !(words.status === 'tomorrow' && task.id === words.task?.id),
-        ),
-      ),
-    [data, words],
-  );
+  const allTasks = useMemo(() => sortTasksByUrgency(data), [data]);
   const activeTasks = useMemo(
     () => allTasks.filter((task) => task.status === 'active'),
     [allTasks],
@@ -133,7 +115,7 @@ export function MyTasksPage() {
   const tasks = tab === 'review' ? reviewTasks : allTasks;
   // Слова дня учат на вкладке Languages: в карточках их нет.
   const cardTasks = useMemo(
-    () => tasks.filter((task) => !isWordsTitle(task.title)),
+    () => tasks.filter((task) => !isWordsTask(task)),
     [tasks],
   );
   const currentId = currentIds[tab];
@@ -166,7 +148,7 @@ export function MyTasksPage() {
       subtitle={
         task.status === 'review'
           ? t('words.rowChildReview')
-          : t('words.rowChildLearn', { count: task.checklist.length })
+          : t('words.rowChildLearn', { count: task.words?.ranks.length ?? 0 })
       }
       onPress={() => router.dismissTo('/languages')}
     />
@@ -181,7 +163,7 @@ export function MyTasksPage() {
         hint={t('myTasks.waitingParent')}
       />
       {reviewTasks.map((task) =>
-        isWordsTitle(task.title) ? (
+        isWordsTask(task) ? (
           wordsRow(task)
         ) : (
           <ChildReviewRow
@@ -288,7 +270,7 @@ export function MyTasksPage() {
                         hint={t('myTasks.soonestFirst')}
                       />
                       {activeTasks.map((task) =>
-                        isWordsTitle(task.title) ? (
+                        isWordsTask(task) ? (
                           wordsRow(task)
                         ) : (
                           <ChildTaskTile

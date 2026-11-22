@@ -1,6 +1,11 @@
 import { apiRequest, authorizedImage } from '@shared/api';
 import { appendPhoto, withTimeout, type PickedPhoto } from '@shared/lib';
-import type { RejectReasonKey, Task, TaskState } from '../model/task';
+import type {
+  RejectReasonKey,
+  Task,
+  TaskState,
+  TaskWordsPortion,
+} from '../model/task';
 import type {
   ChecklistStepPayload,
   CreateTaskPayload,
@@ -37,7 +42,36 @@ type AssignmentDto = {
   pendingSubmission?: PendingSubmissionDto | null;
   /** Последний отказ по назначению; null — отказов не было. */
   lastRejection?: LastRejectionDto | null;
+  /** Порция слов дня; у обычных заданий — null. */
+  words?: WordsPortionDto | null;
 };
+
+type WordsPortionDto = {
+  portionId: string;
+  ranks: number[];
+  reviewRanks: number[];
+  items: {
+    rank: number;
+    word: string;
+    transcription: string;
+    translation: string;
+    forms: string | null;
+    collocations: { en: string; ru: string }[];
+    example: string;
+    exampleTranslation: string;
+  }[];
+};
+
+/** Порция слов с сервера → в приложении (формы без null). */
+const toWordsPortion = (words: WordsPortionDto): TaskWordsPortion => ({
+  portionId: words.portionId,
+  ranks: words.ranks,
+  reviewRanks: words.reviewRanks,
+  items: words.items.map(({ forms, ...item }) => ({
+    ...item,
+    forms: forms ?? undefined,
+  })),
+});
 
 type PendingSubmissionDto = {
   id: string;
@@ -51,21 +85,30 @@ type PendingSubmissionDto = {
 type AttachmentDto = { id: string; contentType: string };
 
 type LastRejectionDto = {
-  reasonCode: 'not_done_properly' | 'not_finished' | 'other';
+  /** words_missed — слова дня: не все слова верно (сервер, words-check). */
+  reasonCode: 'not_done_properly' | 'not_finished' | 'other' | 'words_missed';
+  /** Слова дня: номера слов, которые ребёнок не вспомнил. */
+  missedRanks?: number[];
   comment: string | null;
   /** id аккаунта родителя, который отклонил. */
   reviewedBy: string;
   reviewedAt: string;
 };
 
-type RejectReasonCode = LastRejectionDto['reasonCode'];
+type RejectReasonCode = Exclude<LastRejectionDto['reasonCode'], 'words_missed'>;
 
-/** Код причины отказа на сервере → ключ причины в приложении. */
-const REJECT_REASONS: Record<RejectReasonCode, RejectReasonKey> = {
-  not_done_properly: 'not-done-properly',
-  not_finished: 'not-finished',
-  other: 'other',
-};
+/**
+ * Код причины отказа на сервере → ключ причины в приложении. Слова дня
+ * (`words_missed`) — без чипа причины, как other: что не вспомнил — в
+ * `missedRanks`.
+ */
+const REJECT_REASONS: Record<LastRejectionDto['reasonCode'], RejectReasonKey> =
+  {
+    not_done_properly: 'not-done-properly',
+    not_finished: 'not-finished',
+    other: 'other',
+    words_missed: 'other',
+  };
 
 /** Ключ причины в приложении → код причины для сервера. */
 export const REJECT_REASON_CODES: Record<RejectReasonKey, RejectReasonCode> = {
@@ -153,8 +196,10 @@ function toTask(
           reason: REJECT_REASONS[rejected.reasonCode] ?? 'other',
           comment: rejected.comment ?? '',
           by: rejected.reviewedBy,
+          missedRanks: rejected.missedRanks ?? [],
         }
       : null,
+    words: assignment.words ? toWordsPortion(assignment.words) : null,
     checklist: task.checklist.map((item) => ({
       id: item.id,
       title: item.title,

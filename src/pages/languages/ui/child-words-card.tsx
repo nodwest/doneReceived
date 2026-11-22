@@ -1,30 +1,20 @@
-import { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   deckFocus,
-  getWordsOverview,
-  giveWordsError,
-  rewardsOf,
-  useGiveWords,
-  useWordsReward,
+  useSaveWordsSettings,
+  useWordsOverview,
   WordsProgress,
+  WordsRewardSetup,
+  type WordsReward,
   type WordsStatus,
 } from '@features/english-words';
 import type { FamilyChild } from '@entities/family';
 import { useMyId } from '@entities/session';
 import type { Task } from '@entities/task';
-import { useChildWallet, type ChildWallet } from '@entities/wallet';
-import {
-  nextWordsRange,
-  parseWordsRange,
-  WORDS_PER_DAY,
-  WORDS_REWARD,
-  WORDS_TOTAL,
-  wordsDay,
-  wordsInRange,
-} from '@entities/word';
-import { authorizedImage } from '@shared/api';
+import { WORDS_PER_DAY, wordsDay, wordsInRange } from '@entities/word';
+import { authorizedImage, hasApiErrorCode, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
@@ -34,21 +24,18 @@ import { styles } from './languages.styled';
 type ChildWordsCardProps = {
   child: FamilyChild;
   familyId: string;
-  /** Задания семьи: из них — слова этого ребёнка. */
+  /** Задания семьи: из них — порция слов этого ребёнка. */
   tasks: readonly Task[];
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
- * Итоги слов по наградам в кошельке ребёнка: сколько дней сдано, серия
- * дней подряд (до сегодня или вчера), сколько заработано и сколько
+ * Итоги слов по наградам за слова в кошельке ребёнка: сколько дней сдано,
+ * серия дней подряд (до сегодня или вчера), сколько заработано и сколько
  * выплачено сегодня.
  */
-function wordsStats(wallet: ChildWallet | undefined, now = new Date()) {
-  const rewards = (wallet?.transactions ?? []).filter(
-    (item) => item.kind === 'reward' && parseWordsRange(item.task) !== null,
-  );
+function wordsStats(rewards: readonly WordsReward[], now = new Date()) {
   const days = new Set(rewards.map((item) => wordsDay(item.at)));
   const today = wordsDay(now);
   let streak = 0;
@@ -70,27 +57,31 @@ function wordsStats(wallet: ChildWallet | undefined, now = new Date()) {
 
 /** Иконка плашки состояния. */
 const STATUS_ICON: Record<WordsStatus, IconName> = {
-  none: 'book',
+  off: 'book',
   learning: 'book',
+  redo: 'refresh',
   review: 'clock',
   tomorrow: 'badge-check',
+  noFunds: 'coins',
   finished: 'star',
 };
 
 const statusColor = (status: WordsStatus) =>
-  status === 'review'
+  status === 'review' || status === 'noFunds'
     ? theme.colors.reviewAccent
     : status === 'tomorrow' || status === 'finished'
       ? theme.colors.earnedInk
-      : status === 'learning'
+      : status === 'learning' || status === 'redo'
         ? theme.colors.childInk
         : theme.colors.parentInk;
 
 /**
- * Слова ребёнка глазами родителя. Сверху — имя и чип состояния, под ним
- * цветная плашка: учит (голубая), ждёт проверки (оранжевая), сегодня
- * проверено (зелёная), слова не выданы. Ниже — прогресс по словарю, итоги
- * (дней подряд, всего дней, заработано), слова дня и одна главная кнопка.
+ * Слова ребёнка глазами родителя. Сверху — имя и сколько выучено, под ним
+ * цветная плашка: учит (голубая), ждёт проверки или не хватает денег
+ * (оранжевая), сегодня проверено (зелёная), слова не включены. Ниже — слова
+ * дня, прогресс по словарю, итоги (дней подряд, всего дней, заработано),
+ * награда за день и одна главная кнопка. Слова выдаёт сервер сам: родитель
+ * только включает их и выбирает награду.
  */
 export function ChildWordsCard({
   child,
@@ -100,42 +91,46 @@ export function ChildWordsCard({
   const { t } = useTranslation();
   const router = useRouter();
   const myId = useMyId();
-  const { data: wallet } = useChildWallet(child.id, familyId);
-  const giveWords = useGiveWords();
-  const { reward } = useWordsReward(familyId);
-  const overview = useMemo(
-    () =>
-      getWordsOverview(
-        tasks.filter((task) => task.assignee.id === child.id),
-        rewardsOf(wallet),
-      ),
-    [tasks, wallet, child.id],
-  );
-  const stats = useMemo(() => wordsStats(wallet), [wallet]);
-  const { status, task, range, learned } = overview;
-  const canCheck = task ? (task.canManage ?? task.createdBy === myId) : false;
+  const { overview, rewards } = useWordsOverview(familyId, child.id, tasks);
+  const save = useSaveWordsSettings(familyId);
+  const [editing, setEditing] = useState(false);
+  const stats = useMemo(() => wordsStats(rewards), [rewards]);
   const name = child.displayName;
-  const next = nextWordsRange(learned);
-  const amount = `$${reward ?? WORDS_REWARD}`;
 
-  // Сегодняшние слова: пока учит или на проверке — слова задания; сдано —
-  // проверенные сегодня.
+  if (!overview) {
+    return (
+      <View style={styles.childCard}>
+        <ChildHead child={child} subtitle={null} />
+      </View>
+    );
+  }
+
+  const { status, task, range, learned, total, reward } = overview;
+  const amount = `$${reward ?? 0}`;
+
+  // Сегодняшние слова: пока учит или на проверке — слова порции (после
+  // неудачной проверки — и пройденные, которые не вспомнил); сдано —
+  // последняя оплаченная порция.
   const focus = deckFocus(overview);
+  const missedRanks = new Set(overview.missed.map((word) => word.rank));
   const shownWords =
     status === 'learning' || status === 'review'
       ? overview.words
-      : status === 'tomorrow' && focus.today
-        ? wordsInRange(focus.today)
-        : [];
+      : status === 'redo'
+        ? [
+            ...overview.words,
+            ...overview.missed.filter(
+              (word) => !overview.words.some((item) => item.rank === word.rank),
+            ),
+          ]
+        : status === 'tomorrow' && focus.today
+          ? wordsInRange(focus.today)
+          : [];
 
   const banner = {
-    none: {
+    off: {
       title: t('words.parent.card.noneTitle'),
-      text: next
-        ? learned > 0
-          ? t('words.parent.card.noneNext', { from: next.from, to: next.to })
-          : t('words.parent.card.noneText', { count: WORDS_PER_DAY, amount })
-        : '',
+      text: t('words.parent.card.noneText', { count: WORDS_PER_DAY }),
     },
     learning: {
       title: t('words.parent.card.learningTitle', {
@@ -145,6 +140,13 @@ export function ChildWordsCard({
       text: task?.rejection
         ? t('words.parent.card.learningRedo', { name })
         : t('words.parent.card.learningText', { name }),
+    },
+    redo: {
+      title: t('words.parent.card.learningTitle', {
+        from: range?.from ?? 0,
+        to: range?.to ?? 0,
+      }),
+      text: t('words.parent.card.learningRedo', { name }),
     },
     review: {
       title: t('words.parent.card.reviewTitle'),
@@ -157,69 +159,91 @@ export function ChildWordsCard({
     tomorrow: {
       title: t('words.parent.card.doneTitle'),
       text: t('words.parent.card.doneText', {
-        amount: `$${stats.paidToday}`,
+        amount: `$${stats.paidToday || reward || 0}`,
         name,
       }),
     },
+    noFunds: {
+      title: t('words.parent.card.noFundsTitle'),
+      text: t('words.parent.card.noFundsText', { name, amount }),
+    },
     finished: {
       title: t('words.parent.card.finishedTitle'),
-      text: t('words.parent.card.finishedText', { total: WORDS_TOTAL }),
+      text: t('words.parent.card.finishedText', { total }),
     },
   }[status];
 
-  const give = () => {
-    if (!next) return;
-    giveWords.mutate(
-      { childId: child.id, range: next },
+  // Включить слова или сменить награду. Не хватило денег на первую порцию —
+  // настройки всё равно сохранены (тост), порция ждёт пополнения.
+  const saveReward = (rewardPoints: number) =>
+    save.mutate(
+      { childId: child.id, enabled: true, rewardPoints },
       {
-        onError: (error) =>
-          showToast(t(`words.errors.${giveWordsError(error)}`)),
+        onSuccess: () => {
+          setEditing(false);
+          if (status !== 'off') {
+            showToast(t('words.reward.saved', { amount: `$${rewardPoints}` }));
+          }
+        },
+        onError: (error) => {
+          if (
+            isApiError(error) &&
+            hasApiErrorCode(error, 'INSUFFICIENT_FUNDS')
+          ) {
+            setEditing(false);
+          }
+        },
       },
     );
-  };
+
+  if (editing) {
+    return (
+      <View style={styles.childCard}>
+        <ChildHead child={child} subtitle={null} />
+        <WordsRewardSetup
+          initial={status === 'off' ? null : reward}
+          saving={save.isPending}
+          onSave={saveReward}
+          onCancel={() => setEditing(false)}
+        />
+      </View>
+    );
+  }
+
+  const done = status === 'tomorrow' || status === 'finished';
+  const warn = status === 'review' || status === 'noFunds';
 
   return (
     <View
       style={[
         styles.childCard,
-        status === 'review' && styles.childCardReview,
+        warn && styles.childCardReview,
         status === 'tomorrow' && styles.childCardDone,
       ]}
     >
-      <View style={styles.childHead}>
-        <LetterAvatar
-          source={child.avatarUrl ? authorizedImage(child.avatarUrl) : null}
-          name={name}
-          style={styles.avatar}
-        />
-        <View style={styles.childHeadText}>
-          <Text style={styles.childName} numberOfLines={1}>
-            {name}
-          </Text>
-          <Text style={styles.childStatus}>
-            {t('words.parent.card.learnedCount', {
-              count: learned,
-              total: WORDS_TOTAL,
-            })}
-          </Text>
-        </View>
-      </View>
+      <ChildHead
+        child={child}
+        subtitle={t('words.parent.card.learnedCount', {
+          count: learned,
+          total,
+        })}
+      />
 
       <View
         style={[
           styles.banner,
-          status === 'learning' && styles.bannerLearning,
-          status === 'review' && styles.bannerReview,
-          (status === 'tomorrow' || status === 'finished') && styles.bannerDone,
+          (status === 'learning' || status === 'redo') && styles.bannerLearning,
+          warn && styles.bannerReview,
+          done && styles.bannerDone,
         ]}
       >
         <View
           style={[
             styles.bannerIcon,
-            status === 'learning' && styles.bannerIconLearning,
-            status === 'review' && styles.bannerIconReview,
-            (status === 'tomorrow' || status === 'finished') &&
-              styles.bannerIconDone,
+            (status === 'learning' || status === 'redo') &&
+              styles.bannerIconLearning,
+            warn && styles.bannerIconReview,
+            done && styles.bannerIconDone,
           ]}
         >
           <Icon
@@ -245,15 +269,21 @@ export function ChildWordsCard({
                 key={word.rank}
                 style={[
                   styles.chip,
+                  (status === 'learning' || status === 'redo') &&
+                    styles.chipLearning,
                   status === 'tomorrow' && styles.chipDone,
                   status === 'review' && styles.chipReview,
+                  missedRanks.has(word.rank) && styles.chipMissed,
                 ]}
               >
                 <Text
                   style={[
                     styles.chipText,
+                    (status === 'learning' || status === 'redo') &&
+                      styles.chipTextLearning,
                     status === 'tomorrow' && styles.chipTextDone,
                     status === 'review' && styles.chipTextReview,
+                    missedRanks.has(word.rank) && styles.chipTextMissed,
                   ]}
                 >
                   {word.word}
@@ -264,60 +294,110 @@ export function ChildWordsCard({
         </View>
       ) : null}
 
-      <WordsProgress
-        tone="parent"
-        label={t('words.parent.card.dictionary')}
-        value={learned}
-        total={WORDS_TOTAL}
-      />
+      {status !== 'off' ? (
+        <>
+          <WordsProgress
+            tone="parent"
+            label={t('words.parent.card.dictionary')}
+            value={learned}
+            total={total}
+          />
 
-      <View style={styles.stats}>
-        <Stat
-          value={String(stats.streak)}
-          label={t('words.parent.card.streak')}
-        />
-        <Stat value={String(stats.days)} label={t('words.parent.card.days')} />
-        <Stat
-          value={`$${stats.earned}`}
-          label={t('words.parent.card.earned')}
-        />
-      </View>
+          <View style={styles.stats}>
+            <Stat
+              value={String(stats.streak)}
+              label={t('words.parent.card.streak')}
+            />
+            <Stat
+              value={String(stats.days)}
+              label={t('words.parent.card.days')}
+            />
+            <Stat
+              value={`$${stats.earned}`}
+              label={t('words.parent.card.earned')}
+            />
+          </View>
 
-      {status === 'none' && next ? (
+          {reward !== null ? (
+            <View style={styles.rewardLine}>
+              <Text style={styles.rewardLineText} numberOfLines={1}>
+                {t('words.parent.card.rewardLine', { amount })}
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('words.reward.edit')}
+                hitSlop={8}
+                onPress={() => setEditing(true)}
+              >
+                <Text style={styles.rewardLineLink}>
+                  {t('words.parent.card.changeReward')}
+                </Text>
+              </Pressable>
+            </View>
+          ) : null}
+        </>
+      ) : null}
+
+      {status === 'off' ? (
         <View style={styles.actions}>
           <GradientButton
-            label={t('words.parent.give', {
-              count: next.to - next.from + 1,
-              amount,
-            })}
+            label={t('words.parent.enable')}
             icon="plus"
-            loading={giveWords.isPending}
-            onPress={give}
+            onPress={() => setEditing(true)}
           />
           <Text style={styles.note}>{t('words.parent.giveHint')}</Text>
         </View>
       ) : null}
 
-      {status === 'review' && task ? (
-        canCheck ? (
+      {status === 'noFunds' ? (
+        overview.payerId === myId ? (
           <GradientButton
-            label={t('words.parent.check')}
-            icon="check"
-            onPress={() =>
-              router.push({
-                pathname: '/languages',
-                params: { check: task.id },
-              })
-            }
+            label={t('words.parent.card.deposit')}
+            icon="coins"
+            onPress={() => router.dismissTo('/wallet')}
           />
         ) : (
-          <Text style={styles.note}>
-            {t('words.parent.checksAuthor', {
-              name: task.authorName ?? t('member.parent'),
-            })}
-          </Text>
+          <Text style={styles.note}>{t('words.parent.card.noFundsOther')}</Text>
         )
       ) : null}
+
+      {status === 'review' && task ? (
+        <GradientButton
+          label={t('words.parent.check')}
+          icon="check"
+          onPress={() =>
+            router.push({
+              pathname: '/languages',
+              params: { check: task.id },
+            })
+          }
+        />
+      ) : null}
+    </View>
+  );
+}
+
+/** Шапка карточки: фото или буква, имя и строка под ним. */
+function ChildHead({
+  child,
+  subtitle,
+}: {
+  child: FamilyChild;
+  subtitle: string | null;
+}) {
+  return (
+    <View style={styles.childHead}>
+      <LetterAvatar
+        source={child.avatarUrl ? authorizedImage(child.avatarUrl) : null}
+        name={child.displayName}
+        style={styles.avatar}
+      />
+      <View style={styles.childHeadText}>
+        <Text style={styles.childName} numberOfLines={1}>
+          {child.displayName}
+        </Text>
+        {subtitle ? <Text style={styles.childStatus}>{subtitle}</Text> : null}
+      </View>
     </View>
   );
 }
