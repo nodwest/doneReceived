@@ -138,26 +138,25 @@ export async function setChildAvatar(
   );
 }
 
-/**
- * DELETE /families/:id/children/:childId — удалить профиль ребёнка.
- * 409 — на счету есть деньги (`CHILD_BALANCE_NOT_ZERO`) или открытые задания
- * (`CHILD_HAS_TASKS`).
- */
-export function deleteChild(familyId: string, childId: string) {
+export function deleteChild(
+  familyId: string,
+  childId: string,
+  expectedBalancePoints?: string,
+) {
   return apiRequest<null>(`/families/${familyId}/children/${childId}`, {
     method: 'DELETE',
+    body:
+      expectedBalancePoints === undefined
+        ? undefined
+        : { expectedBalancePoints },
   });
 }
 
-/**
- * DELETE /families/:id/children/me — ребёнок удаляет свой профиль. Только
- * при нулевом балансе (иначе 409 `CHILD_HAS_BALANCE`); незавершённые задания
- * сервер отклоняет и возвращает резервы родителям.
- */
-export function deleteMyChildProfile(familyId: string) {
-  return apiRequest<null>(`/families/${familyId}/children/me`, {
-    method: 'DELETE',
-  });
+export function deleteMyChildProfile(
+  familyId: string,
+  expectedBalancePoints?: string,
+) {
+  return deleteChild(familyId, 'me', expectedBalancePoints);
 }
 
 /**

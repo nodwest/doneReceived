@@ -396,9 +396,9 @@
     "semantic_hash": ""
   },
   "src/entities/family/api/families-api.ts": {
-    "mtime": 1795169861.3277082,
-    "seen": 1795170570.0919778,
-    "ast_hash": "7d1f202312a09fc0969a1a7bc5214ffc",
+    "mtime": 1795338442.9543612,
+    "seen": 1795338463.0842788,
+    "ast_hash": "483759b54e3f8da3b7593e27f14edc09",
     "semantic_hash": ""
   },
   "src/entities/family/api/families-query.ts": {
@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "src/entities/task/api/server-tasks-api.ts": {
-    "mtime": 1795116497.5527883,
-    "seen": 1795162011.5135324,
-    "ast_hash": "c815c6428ad0b9c3adc80347c6bef876",
+    "mtime": 1795338442.7696795,
+    "seen": 1795338463.0918224,
+    "ast_hash": "dd507b616b57ce88aa34de9e0d8895ce",
     "semantic_hash": ""
   },
   "src/entities/task/api/tasks-api.ts": {
@@ -606,9 +606,9 @@
     "semantic_hash": ""
   },
   "src/entities/task/model/task.ts": {
-    "mtime": 1794901476.953957,
-    "seen": 1794920449.2381568,
-    "ast_hash": "0ecadce626938255bef0d4e734e36e02",
+    "mtime": 1795338442.770187,
+    "seen": 1795338463.0930386,
+    "ast_hash": "4923c1f421deec51c25813d17533920d",
     "semantic_hash": ""
   },
   "src/entities/task/model/types.ts": {
@@ -882,9 +882,9 @@
     "semantic_hash": ""
   },
   "src/entities/wallet/api/child-wallet-api.ts": {
-    "mtime": 1795116529.539646,
-    "seen": 1795162011.5135324,
-    "ast_hash": "f137f34b5321ef5b76f3272c3991b7d0",
+    "mtime": 1795338442.7711961,
+    "seen": 1795338463.1045911,
+    "ast_hash": "d3b6ca6557a7b27caa07ed54e2feaece",
     "semantic_hash": ""
   },
   "src/entities/wallet/api/parent-funds-api.ts": {
@@ -924,9 +924,9 @@
     "semantic_hash": ""
   },
   "src/entities/wallet/model/wallet.ts": {
-    "mtime": 1794901476.95654,
-    "seen": 1794920449.2381568,
-    "ast_hash": "e6422645a256b4d3444b7cbd021b3d9a",
+    "mtime": 1795338442.7721953,
+    "seen": 1795338463.1068923,
+    "ast_hash": "48b78fee91af4efa67e1c044eedacd60",
     "semantic_hash": ""
   },
   "src/entities/wallet/ui/funds-bar.tsx": {
@@ -1374,9 +1374,9 @@
     "semantic_hash": ""
   },
   "src/features/delete-child/model/use-delete-child.ts": {
-    "mtime": 1794899664.295389,
-    "seen": 1794920449.2381568,
-    "ast_hash": "bb2e312094cc22dede69190c6c56883b",
+    "mtime": 1795338442.9557774,
+    "seen": 1795338463.1303086,
+    "ast_hash": "2b285fe4a210149b6eb569e71b3df93e",
     "semantic_hash": ""
   },
   "src/features/delete-wish/index.ts": {
@@ -1776,9 +1776,9 @@
     "semantic_hash": ""
   },
   "src/pages/child-home/ui/child-home.tsx": {
-    "mtime": 1795256528.9138744,
-    "seen": 1795256620.8859,
-    "ast_hash": "098b064482fbffb4d44c66c43f49605f",
+    "mtime": 1795338442.795555,
+    "seen": 1795338463.1525033,
+    "ast_hash": "0be8d6d804e916f5e6a19cb54daf2bf7",
     "semantic_hash": ""
   },
   "src/pages/child-profile/index.ts": {
@@ -1914,9 +1914,9 @@
     "semantic_hash": ""
   },
   "src/pages/family/ui/family.tsx": {
-    "mtime": 1795294274.7594652,
-    "seen": 1795294301.3535564,
-    "ast_hash": "b3ebb84ea7f1c6169e6203142f8fec1c",
+    "mtime": 1795338442.9596722,
+    "seen": 1795338463.159998,
+    "ast_hash": "86e3278b233b9effa86020d48d5cfd56",
     "semantic_hash": ""
   },
   "src/pages/login/index.ts": {
@@ -1974,9 +1974,9 @@
     "semantic_hash": ""
   },
   "src/pages/my-tasks/ui/my-tasks.tsx": {
-    "mtime": 1795256528.9238746,
-    "seen": 1795256620.8899074,
-    "ast_hash": "8b5b20cab27c77bcd8a73611624cc346",
+    "mtime": 1795338442.80581,
+    "seen": 1795338463.164006,
+    "ast_hash": "f55e4c21c5b3005f051150303bf5d159",
     "semantic_hash": ""
   },
   "src/pages/my-tasks/ui/section-head.tsx": {
@@ -2118,9 +2118,9 @@
     "semantic_hash": ""
   },
   "src/pages/tasks/ui/tasks.tsx": {
-    "mtime": 1795256528.9276457,
-    "seen": 1795256620.8929114,
-    "ast_hash": "aae2cb3602dffe2e4550abcec97bcd16",
+    "mtime": 1795338442.8072314,
+    "seen": 1795338463.1685216,
+    "ast_hash": "d48bc901d2e8df4f2d2a1c01f0722a28",
     "semantic_hash": ""
   },
   "src/pages/tasks/ui/view-only-note.tsx": {
@@ -2256,9 +2256,9 @@
     "semantic_hash": ""
   },
   "src/shared/api/data-sync.ts": {
-    "mtime": 1794901476.9729717,
-    "seen": 1794920449.2381568,
-    "ast_hash": "860142e81394c5ef0cff29c1c348c0a5",
+    "mtime": 1795338442.80824,
+    "seen": 1795338463.1740332,
+    "ast_hash": "1df69844abd9dcc77febde63f964c68f",
     "semantic_hash": ""
   },
   "src/shared/api/http.ts": {
@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795300261.256544,
-    "seen": 1795300392.759499,
-    "ast_hash": "9aabd8b05854ca1d0d94877601d61ca0",
+    "mtime": 1795338442.9608452,
+    "seen": 1795338463.1755931,
+    "ast_hash": "a0b6e22c4cc093a4444b295e1695f74b",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795300261.2585635,
-    "seen": 1795300392.759499,
-    "ast_hash": "149d252a661c4cefe3cc40b0c7df86e8",
+    "mtime": 1795338442.961853,
+    "seen": 1795338463.1755931,
+    "ast_hash": "5e148b9b36f0584dd96b5bb44b2a0028",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -2970,9 +2970,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/pill-button.tsx": {
-    "mtime": 1795156563.8476377,
-    "seen": 1795162011.5145373,
-    "ast_hash": "c36f4ac59555f9c2e0ce71ed7d5b1a56",
+    "mtime": 1795338442.9628534,
+    "seen": 1795338463.2039952,
+    "ast_hash": "e8456d6ff481a603b6f1808c26a29ff9",
     "semantic_hash": ""
   },
   "src/shared/ui/round-button.tsx": {
@@ -4176,9 +4176,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1795256525.7834792,
-    "seen": 1795256620.9425647,
-    "ast_hash": "d7301c47d249678f905ac5188f58aeff",
+    "mtime": 1795338442.7330244,
+    "seen": 1795338463.2579236,
+    "ast_hash": "e3f383f7a19bcd00be9cf14125587f15",
     "semantic_hash": ""
   },
   "obsidian-done/C4.md": {
@@ -4212,9 +4212,9 @@
     "semantic_hash": ""
   },
   "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u0418\u0434\u0435\u0438.md": {
-    "mtime": 1795256525.7942746,
-    "seen": 1795256620.9439905,
-    "ast_hash": "9586d287db71836ff02a294d657d3e16",
+    "mtime": 1795338442.766393,
+    "seen": 1795338463.2599292,
+    "ast_hash": "1bbced3f2cf750233ac10a0d8035e359",
     "semantic_hash": ""
   },
   "obsidian-done/\u0421\u0434\u0435\u043b\u0430\u043b-\u043f\u043e\u043b\u0443\u0447\u0438\u043b/\u041d\u0430\u0432\u044b\u043a\u0438 Codex \u0434\u043b\u044f DoneReceived.md": {
@@ -4386,9 +4386,9 @@
     "semantic_hash": ""
   },
   "src/pages/map-zone/ui/map-zone.tsx": {
-    "mtime": 1795295195.838292,
-    "seen": 1795295220.121014,
-    "ast_hash": "c2114cbc394300fd103149528f94fd4b",
+    "mtime": 1795338442.804297,
+    "seen": 1795338463.1620066,
+    "ast_hash": "1fa2e3a7d5b95aac0633cdadf9afc36d",
     "semantic_hash": ""
   },
   "src/widgets/map/layers/dynamic/zones.ts": {
@@ -4944,15 +4944,15 @@
     "semantic_hash": ""
   },
   "src/features/delete-child/model/use-delete-my-profile.ts": {
-    "mtime": 1795169861.3297095,
-    "seen": 1795170570.0919778,
-    "ast_hash": "8473588c27734a26207202beacfd3a26",
+    "mtime": 1795338442.9567878,
+    "seen": 1795338463.1303086,
+    "ast_hash": "09b4b6eef128a2be11e8bb5aea49ae68",
     "semantic_hash": ""
   },
   "src/features/delete-child/ui/delete-account-sheet.tsx": {
-    "mtime": 1795169861.3297095,
-    "seen": 1795170570.0919778,
-    "ast_hash": "e4c529550bd3714a0c4de6026ee8ae65",
+    "mtime": 1795338442.9567878,
+    "seen": 1795338463.1303086,
+    "ast_hash": "a6121b68cf339d382fbb0439e396f34e",
     "semantic_hash": ""
   },
   "src/pages/delete-account/index.ts": {
@@ -4962,15 +4962,15 @@
     "semantic_hash": ""
   },
   "src/pages/delete-account/ui/delete-account.styled.ts": {
-    "mtime": 1795169861.3322268,
-    "seen": 1795170570.0919778,
-    "ast_hash": "d2b8204e910374ec74fdcb33b825cbae",
+    "mtime": 1795338442.9582026,
+    "seen": 1795338463.157252,
+    "ast_hash": "f11dd000421b5d63072fa048f6d6fd5a",
     "semantic_hash": ""
   },
   "src/pages/delete-account/ui/delete-account.tsx": {
-    "mtime": 1795256528.9168754,
-    "seen": 1795256620.8879066,
-    "ast_hash": "543c79127d1ee6cd439ea5afc5819341",
+    "mtime": 1795338442.9582026,
+    "seen": 1795338463.157252,
+    "ast_hash": "d248b807b35b5af7eb38fe7f8761d58b",
     "semantic_hash": ""
   },
   "src/entities/session/api/push-tokens-api.ts": {
@@ -5034,9 +5034,9 @@
     "semantic_hash": ""
   },
   "src/entities/word/index.ts": {
-    "mtime": 1795256525.80001,
-    "seen": 1795256620.859638,
-    "ast_hash": "94f0d9e6247ba6c18c0be0f7907ebfe7",
+    "mtime": 1795338442.7747,
+    "seen": 1795338463.110523,
+    "ast_hash": "f2767c4f674a9dbc9c14b68961e12cc8",
     "semantic_hash": ""
   },
   "src/entities/word/lib/speech.ts": {
@@ -5058,15 +5058,15 @@
     "semantic_hash": ""
   },
   "src/entities/word/model/words-deck.ts": {
-    "mtime": 1795256525.802011,
-    "seen": 1795256620.859638,
-    "ast_hash": "fbbf0de54cee9921a4d92dd81b973c16",
+    "mtime": 1795338442.7762055,
+    "seen": 1795338463.111985,
+    "ast_hash": "ef0e8efe4b28255113f5af8e7aaef8cb",
     "semantic_hash": ""
   },
   "src/entities/word/model/words-task.ts": {
-    "mtime": 1795256525.8030097,
-    "seen": 1795256620.859638,
-    "ast_hash": "45713a005d1b025fc695ea75456b96e4",
+    "mtime": 1795338442.7772121,
+    "seen": 1795338463.111985,
+    "ast_hash": "e08a8dcf91c1764f25c7cb37be700490",
     "semantic_hash": ""
   },
   "src/entities/word/ui/speak-button.tsx": {
@@ -5076,15 +5076,15 @@
     "semantic_hash": ""
   },
   "src/entities/word/ui/word-card.styled.ts": {
-    "mtime": 1795256525.8040113,
-    "seen": 1795256620.859638,
-    "ast_hash": "f77f8681868aafe2d79aac898dad9f5f",
+    "mtime": 1795338442.7782156,
+    "seen": 1795338463.1125803,
+    "ast_hash": "1e870894624cf485facdef26a83bc27a",
     "semantic_hash": ""
   },
   "src/entities/word/ui/word-card.tsx": {
-    "mtime": 1795256525.8040113,
-    "seen": 1795256620.859638,
-    "ast_hash": "a70183a0957fb213fae2ebc74d28c88f",
+    "mtime": 1795338442.7792163,
+    "seen": 1795338463.1125803,
+    "ast_hash": "389c359f5318b3029442388c094a1fb5",
     "semantic_hash": ""
   },
   "src/entities/word/ui/words-task-row.tsx": {
@@ -5094,39 +5094,33 @@
     "semantic_hash": ""
   },
   "src/features/english-words/index.ts": {
-    "mtime": 1795256525.8055153,
-    "seen": 1795256620.8717673,
-    "ast_hash": "f3a2a2941ed8aa8c975015ab17c915d1",
+    "mtime": 1795338442.7814722,
+    "seen": 1795338463.131878,
+    "ast_hash": "080b0c4d8dfee22fbfe440f591d77c23",
     "semantic_hash": ""
   },
   "src/features/english-words/model/settings-store.ts": {
-    "mtime": 1795256525.8069472,
-    "seen": 1795256620.8717673,
-    "ast_hash": "a735a8db772ba7ec48f5b3ec2199e120",
+    "mtime": 1795338442.782478,
+    "seen": 1795338463.131878,
+    "ast_hash": "ec3b6a61cd2b00259e4d6ebd6c15851c",
     "semantic_hash": ""
   },
   "src/features/english-words/model/study-store.ts": {
-    "mtime": 1795256525.8069472,
-    "seen": 1795256620.8717673,
-    "ast_hash": "75a4ad2ca0019e92b9d5e4d3e0274958",
+    "mtime": 1795338442.782478,
+    "seen": 1795338463.131878,
+    "ast_hash": "ca3f2cd11564a0ded70f348afe273a37",
     "semantic_hash": ""
   },
   "src/features/english-words/model/use-check-words.ts": {
-    "mtime": 1795256525.8069472,
-    "seen": 1795256620.8717673,
-    "ast_hash": "0ae3cae3e63dca5f8a3f08115c1f93a3",
-    "semantic_hash": ""
-  },
-  "src/features/english-words/model/use-give-words.ts": {
-    "mtime": 1795256525.808404,
-    "seen": 1795256620.8717673,
-    "ast_hash": "88d9167d2ce4205c541da03c8d1eeb0f",
+    "mtime": 1795338442.7844114,
+    "seen": 1795338463.131878,
+    "ast_hash": "b0f241e0b15979a35c17ccb41fa5d5ca",
     "semantic_hash": ""
   },
   "src/features/english-words/model/use-submit-words.ts": {
-    "mtime": 1795256525.808404,
-    "seen": 1795256620.8717673,
-    "ast_hash": "a49dbd89b07e9a35b60ffc93ca7f4211",
+    "mtime": 1795338442.7854183,
+    "seen": 1795338463.131878,
+    "ast_hash": "77fdbc463e2f8b8c28c564c28780f1ed",
     "semantic_hash": ""
   },
   "src/features/english-words/model/use-words-family-id.ts": {
@@ -5136,15 +5130,15 @@
     "semantic_hash": ""
   },
   "src/features/english-words/model/words-overview.ts": {
-    "mtime": 1795256525.8098564,
-    "seen": 1795256620.8717673,
-    "ast_hash": "1426fb575a65428baba0f820a1a67b51",
+    "mtime": 1795338442.788266,
+    "seen": 1795338463.131878,
+    "ast_hash": "986cdfb83e93ec453e6a7b91378f4fb4",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/child-words-task-row.tsx": {
-    "mtime": 1795256525.8108685,
-    "seen": 1795256620.8717673,
-    "ast_hash": "e41d30571a3c963e27602f3bd691fc1f",
+    "mtime": 1795338442.7896843,
+    "seen": 1795338463.131878,
+    "ast_hash": "a5fecb9c3c9c7ed663e35ec638d17c0b",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/word-viewer.tsx": {
@@ -5154,15 +5148,15 @@
     "semantic_hash": ""
   },
   "src/features/english-words/ui/words-check.tsx": {
-    "mtime": 1795256525.8120062,
-    "seen": 1795256620.8717673,
-    "ast_hash": "4f272b27884fec1ef29c9760e65d17ec",
+    "mtime": 1795338442.7906928,
+    "seen": 1795338463.1324084,
+    "ast_hash": "ecb0163ddd86ffed1c533cc27f914363",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/words-deck-list.tsx": {
-    "mtime": 1795256525.8120062,
-    "seen": 1795256620.8717673,
-    "ast_hash": "ed3e60b6cf20e6ee62b61d4f2194e7f2",
+    "mtime": 1795338442.7906928,
+    "seen": 1795338463.1324084,
+    "ast_hash": "fa13d1f2a10e87f502f47df086124cc7",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/words-intro.tsx": {
@@ -5172,27 +5166,27 @@
     "semantic_hash": ""
   },
   "src/features/english-words/ui/words-parts.tsx": {
-    "mtime": 1795256525.8135042,
-    "seen": 1795256620.8717673,
-    "ast_hash": "834e1ffdd39a10b6287fe790d0d4bae5",
+    "mtime": 1795338442.7916918,
+    "seen": 1795338463.1324084,
+    "ast_hash": "cd0b2fe9894ec89fab560cd15d5d5cb1",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/words-reward-setup.tsx": {
-    "mtime": 1795256525.8145099,
-    "seen": 1795256620.8717673,
-    "ast_hash": "55b7c15877cae555d833983e10bdcf91",
+    "mtime": 1795338442.7932217,
+    "seen": 1795338463.1324084,
+    "ast_hash": "eb5bc8f39bb2fd5eb48a54a3f92cf6a2",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/words-study.tsx": {
-    "mtime": 1795256525.8145099,
-    "seen": 1795256620.8717673,
-    "ast_hash": "068434d10cf36f97d5a95690584211d2",
+    "mtime": 1795338442.7942271,
+    "seen": 1795338463.1324084,
+    "ast_hash": "d0bea59893fc3190014bfdc623852b31",
     "semantic_hash": ""
   },
   "src/features/english-words/ui/words.styled.ts": {
-    "mtime": 1795256525.8145099,
-    "seen": 1795256620.8717673,
-    "ast_hash": "72b63ddde35a9afd2eb2c931220c9c6a",
+    "mtime": 1795338442.7942271,
+    "seen": 1795338463.1324084,
+    "ast_hash": "e3a294659a80549c85009ca1012bfd32",
     "semantic_hash": ""
   },
   "src/pages/languages/index.ts": {
@@ -5202,15 +5196,15 @@
     "semantic_hash": ""
   },
   "src/pages/languages/ui/child-languages.tsx": {
-    "mtime": 1795256525.8180528,
-    "seen": 1795256620.8889065,
-    "ast_hash": "225cd2bca893816b6685e8ac5d1fb9c4",
+    "mtime": 1795338442.798374,
+    "seen": 1795338463.1610084,
+    "ast_hash": "b0a9e5906b1ebfc4873952313c705ee1",
     "semantic_hash": ""
   },
   "src/pages/languages/ui/child-words-card.tsx": {
-    "mtime": 1795256525.8180528,
-    "seen": 1795256620.8889065,
-    "ast_hash": "94a19000ae2ab70db8cd4e703a0c16bd",
+    "mtime": 1795338442.7998059,
+    "seen": 1795338463.1610084,
+    "ast_hash": "c50b70bfcaa129d58321b0c2cdef0c56",
     "semantic_hash": ""
   },
   "src/pages/languages/ui/languages-header.tsx": {
@@ -5220,15 +5214,15 @@
     "semantic_hash": ""
   },
   "src/pages/languages/ui/languages.styled.ts": {
-    "mtime": 1795256525.8190506,
-    "seen": 1795256620.8889065,
-    "ast_hash": "cc682b4a5022149ec340ff26db8b400a",
+    "mtime": 1795338442.800812,
+    "seen": 1795338463.1610084,
+    "ast_hash": "ad114dd276d0f7cc84f384c04bae87d9",
     "semantic_hash": ""
   },
   "src/pages/languages/ui/languages.tsx": {
-    "mtime": 1795256525.8190506,
-    "seen": 1795256620.8889065,
-    "ast_hash": "3002a705949c89f61e4f7efe8a5e2524",
+    "mtime": 1795338442.8022652,
+    "seen": 1795338463.1610084,
+    "ast_hash": "c9d6b460cb9574fe359fedffe20954d7",
     "semantic_hash": ""
   },
   "src/shared/ui/icons/book.tsx": {
@@ -5253,6 +5247,36 @@
     "mtime": 1795256525.7845743,
     "seen": 1795256620.9425647,
     "ast_hash": "8a6e89b01f51dc7f1c02728c2c263a91",
+    "semantic_hash": ""
+  },
+  "src/entities/word/api/words-api.ts": {
+    "mtime": 1795338442.774195,
+    "seen": 1795338463.110523,
+    "ast_hash": "c8b53096c89884e6919733d11a4c1e62",
+    "semantic_hash": ""
+  },
+  "src/entities/word/api/words-query.ts": {
+    "mtime": 1795338442.7747,
+    "seen": 1795338463.110523,
+    "ast_hash": "2859ac7ef0979e85d78f91d5eec8cabf",
+    "semantic_hash": ""
+  },
+  "src/features/english-words/model/use-words-overview.ts": {
+    "mtime": 1795338442.7854183,
+    "seen": 1795338463.131878,
+    "ast_hash": "c397776fa30bf4a103d7aee181bfdde9",
+    "semantic_hash": ""
+  },
+  "src/features/english-words/model/use-words-settings.ts": {
+    "mtime": 1795338442.7870133,
+    "seen": 1795338463.131878,
+    "ast_hash": "9760a2c990df0383681b249153be3ec3",
+    "semantic_hash": ""
+  },
+  "src/features/english-words/ui/card-entering.ts": {
+    "mtime": 1795338442.788266,
+    "seen": 1795338463.131878,
+    "ast_hash": "be4a8f76553165ebb424cfd3aa4ae378",
     "semantic_hash": ""
   },
   "package-lock.json": {

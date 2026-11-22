@@ -115,6 +115,7 @@ const styles = createStyles((colors) => ({
     opacity: 0.85,
   },
   label: {
+    textAlign: 'center',
     fontSize: theme.fontSize.md,
     letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.bold,

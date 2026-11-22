@@ -1,41 +1,46 @@
 import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useLogout } from '@features/auth';
 import {
   DeleteAccountSheet,
-  isChildHasBalanceError,
+  childBalanceToConfirm,
   useDeleteMyProfile,
   type DeleteAccountStep,
 } from '@features/delete-child';
-import { useMyChildBalance } from '@features/family-tasks';
-import { formatMoney } from '@entities/wallet';
+import { useMyChildWallet } from '@features/family-tasks';
+import { apiErrorCode, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
-import { theme } from '@shared/theme';
+import { theme, useTheme } from '@shared/theme';
 import { Icon, PillButton, RoundButton, type IconName } from '@shared/ui';
 import { styles } from './delete-account.styled';
 
 const goBack = () =>
   router.canGoBack() ? router.back() : router.replace('/profile');
 
-/**
- * Удаление аккаунта ребёнка (Profile → Delete account): что нужно знать —
- * удалить можно только с нулевым балансом, восстановить не получится — и
- * кнопка Delete. На счету есть деньги — шторка «сначала выведите» (Withdraw
- * пока не работает), ноль — «вы уверены?» и Delete account. Удалили —
- * выход, тост и логин.
- */
 export function DeleteAccountPage() {
-  const { t } = useTranslation();
-  const { balance, isPending: balanceLoading } = useMyChildBalance();
+  useTheme();
+  const { t, i18n } = useTranslation();
+  const wallet = useMyChildWallet();
+  const balance = wallet.data?.balance;
   const deleteProfile = useDeleteMyProfile();
   const logout = useLogout();
   const [step, setStep] = useState<DeleteAccountStep>(null);
+  const [confirmedBalance, setConfirmedBalance] = useState<string>();
+
+  const openConfirmation = () => {
+    if (balance !== undefined && Number.isSafeInteger(balance) && balance > 0) {
+      setConfirmedBalance(String(balance));
+      setStep('balance');
+    } else {
+      setStep('confirm');
+    }
+  };
 
   const confirmDelete = () =>
-    deleteProfile.mutate(undefined, {
+    deleteProfile.mutate(step === 'balance' ? confirmedBalance : undefined, {
       onSuccess: async () => {
         setStep(null);
         await logout();
@@ -43,9 +48,23 @@ export function DeleteAccountPage() {
         router.replace('/login');
       },
       onError: (error) => {
-        // Баланс успел измениться — сервер не удалил.
-        if (isChildHasBalanceError(error)) setStep('balance');
-        else showToast(t('deleteAccount.failed'));
+        const balance = childBalanceToConfirm(error);
+        if (balance !== undefined) {
+          setConfirmedBalance(balance);
+          setStep('balance');
+          return;
+        }
+        setStep(null);
+        const code = isApiError(error) ? apiErrorCode(error) : null;
+        showToast(
+          t(
+            code === 'CHILD_HAS_PENDING_REVIEW'
+              ? 'deleteAccount.pendingReview'
+              : code === 'CHILD_HAS_BALANCE'
+                ? 'deleteAccount.balanceBlocked'
+                : 'deleteAccount.failed',
+          ),
+        );
       },
     });
 
@@ -67,86 +86,99 @@ export function DeleteAccountPage() {
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.hero}>
-          <View style={styles.heroIcon}>
-            <Icon name="trash" size={28} color={theme.colors.dangerText} />
+        <View style={styles.wallet}>
+          <View style={styles.walletHeading}>
+            <Icon name="wallet" size={20} color={theme.colors.ink} />
+            <Text accessibilityRole="header" style={styles.rowTitle}>
+              {t('deleteAccount.virtualBalanceTitle')}
+            </Text>
           </View>
-          <Text style={styles.heroTitle}>{t('deleteAccount.heading')}</Text>
-          <Text style={styles.heroText}>{t('deleteAccount.intro')}</Text>
+          {balance !== undefined ? (
+            <Text style={styles.balance}>
+              {new Intl.NumberFormat(i18n.resolvedLanguage).format(balance)}
+              <Text style={styles.unit}>
+                {' '}
+                {t('deleteAccount.points', { count: balance })}
+              </Text>
+            </Text>
+          ) : wallet.isFetching ? (
+            <Text accessibilityLiveRegion="polite" style={styles.rowBody}>
+              {t('common.loading')}
+            </Text>
+          ) : (
+            <View style={styles.unavailable}>
+              <Text style={styles.rowBody}>
+                {t('deleteAccount.balanceUnavailable')}
+              </Text>
+              {wallet.isError ? (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void wallet.refetch()}
+                  style={styles.retry}
+                >
+                  <Text style={styles.rowTitle}>{t('common.retry')}</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          )}
+          <Text style={styles.rowBody}>
+            {t('deleteAccount.virtualBalanceText')}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('wallet.withdrawAction')}
+            accessibilityHint={t('deleteAccount.withdrawUnavailable')}
+            onPress={() => showToast(t('deleteAccount.withdrawUnavailable'))}
+            style={styles.withdraw}
+          >
+            <Text style={styles.withdrawLabel}>
+              {t('deleteAccount.withdrawFunds')}
+            </Text>
+          </Pressable>
+          <Text style={styles.notice}>
+            {t('deleteAccount.withdrawUnavailable')}
+          </Text>
         </View>
 
-        <View style={styles.card}>
+        <View style={styles.consequences}>
+          <Text accessibilityRole="header" style={styles.rowTitle}>
+            {t('deleteAccount.consequencesTitle')}
+          </Text>
+          <InfoRow icon="trash" text={t('deleteAccount.foreverText')} />
           <InfoRow
             icon="wallet"
-            title={t('deleteAccount.zeroBalanceTitle')}
-            text={t('deleteAccount.zeroBalanceText')}
-            // Баланс — когда он пришёл с сервера, а не «$0», пока грузится.
-            note={
-              balanceLoading
-                ? undefined
-                : t('deleteAccount.balanceNow', {
-                    amount: formatMoney(balance),
-                  })
-            }
+            text={t('deleteAccount.rewardsHistoryUnavailable')}
           />
-          <View style={styles.divider} />
-          <InfoRow
-            icon="trash"
-            title={t('deleteAccount.foreverTitle')}
-            text={t('deleteAccount.foreverText')}
-          />
+          <InfoRow icon="tasks" text={t('deleteAccount.pendingTasksFailed')} />
         </View>
 
         <View style={styles.footer}>
-          {/* Пока баланс не пришёл, не знаем, какую шторку открыть. */}
           <PillButton
             label={t('deleteAccount.delete')}
             variant="danger"
-            disabled={balanceLoading}
             style={styles.deleteButton}
-            onPress={() => setStep(balance > 0 ? 'balance' : 'confirm')}
+            onPress={openConfirmation}
           />
         </View>
       </ScrollView>
       <DeleteAccountSheet
         step={step}
-        balance={balance}
+        balance={confirmedBalance}
         deleting={deleteProfile.isPending}
         onClose={() => setStep(null)}
         onConfirm={confirmDelete}
-        // Вывода пока нет. Шторку закрываем: на телефоне она — Modal поверх
-        // тостов, и тост под ней был бы не виден.
-        onWithdraw={() => {
-          setStep(null);
-          showToast(t('deleteAccount.withdrawSoon'));
-        }}
       />
     </TabScreen>
   );
 }
 
-function InfoRow({
-  icon,
-  title,
-  text,
-  note,
-}: {
-  icon: IconName;
-  title: string;
-  text: string;
-  /** Строка ниже текста тёмным (текущий баланс). */
-  note?: string;
-}) {
+function InfoRow({ icon, text }: { icon: IconName; text: string }) {
   return (
     <View style={styles.row}>
       <View style={styles.rowIcon}>
         <Icon name={icon} size={20} color={theme.colors.dangerText} />
       </View>
-      <View style={styles.rowText}>
-        <Text style={styles.rowTitle}>{title}</Text>
-        <Text style={styles.rowBody}>{text}</Text>
-        {note ? <Text style={styles.rowNote}>{note}</Text> : null}
-      </View>
+      <Text style={[styles.rowBody, styles.rowText]}>{text}</Text>
     </View>
   );
 }

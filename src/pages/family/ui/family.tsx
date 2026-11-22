@@ -1,10 +1,14 @@
 import { useRef, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AddMember } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
 import { ChildDevices } from '@widgets/child-devices';
-import { useDeleteChild } from '@features/delete-child';
+import {
+  childBalanceToConfirm,
+  DeleteAccountSheet,
+  useDeleteChild,
+} from '@features/delete-child';
 import { useFamilyTasks } from '@features/family-tasks';
 import {
   homePresenceFrom,
@@ -23,7 +27,7 @@ import { useMyId, useSessionUser } from '@entities/session';
 import { countChildTasks, countTasks, type Task } from '@entities/task';
 import { MemberCard } from '@entities/user';
 import { formatMoney } from '@entities/wallet';
-import { authorizedImage, isApiError } from '@shared/api';
+import { apiErrorCode, authorizedImage, isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { showToast, useNow } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
@@ -69,6 +73,10 @@ export function FamilyPage() {
     (presence?.children ?? []).map((child) => [child.childId, child]),
   );
   const deleteChild = useDeleteChild();
+  const [removal, setRemoval] = useState<{
+    child: FamilyChildDetails;
+    balance?: string;
+  } | null>(null);
   const isOwner = details?.myRole === 'owner';
   // Открытая смахиванием карточка: одновременно — только одна.
   const [swipedId, setSwipedId] = useState<string | null>(null);
@@ -103,42 +111,40 @@ export function FamilyPage() {
     });
   };
 
-  // Сервер не удалит ребёнка с деньгами на счету или открытыми заданиями.
-  const removeChild = (child: FamilyChildDetails) => {
-    setSwipedId(null);
-    deleteChild.mutate(child.childId, {
-      onSuccess: () =>
-        showToast(t('family.childDeleted', { name: child.displayName })),
-      onError: (error) => {
-        const code =
-          isApiError(error) && error.data && typeof error.data === 'object'
-            ? (error.data as { code?: unknown }).code
-            : null;
-        showToast(
-          code === 'CHILD_HAS_BALANCE'
-            ? t('family.deleteHasBalance', { name: child.displayName })
-            : code === 'CHILD_HAS_PENDING_REVIEW'
-              ? t('family.deleteHasTasks', { name: child.displayName })
-              : t('family.deleteFailed'),
-        );
+  const removeChild = (
+    child: FamilyChildDetails,
+    expectedBalancePoints?: string,
+  ) => {
+    deleteChild.mutate(
+      { childId: child.childId, expectedBalancePoints },
+      {
+        onSuccess: () => {
+          setRemoval(null);
+          showToast(t('family.childDeleted', { name: child.displayName }));
+        },
+        onError: (error) => {
+          const balance = childBalanceToConfirm(error);
+          if (balance !== undefined) {
+            setRemoval({ child, balance });
+            return;
+          }
+          setRemoval(null);
+          const code = isApiError(error) ? apiErrorCode(error) : null;
+          showToast(
+            code === 'CHILD_HAS_BALANCE'
+              ? t('deleteAccount.balanceBlocked')
+              : code === 'CHILD_HAS_PENDING_REVIEW'
+                ? t('family.deleteHasTasks', { name: child.displayName })
+                : t('family.deleteFailed'),
+          );
+        },
       },
-    });
+    );
   };
 
   const confirmRemoveChild = (child: FamilyChildDetails) => {
     setSwipedId(null);
-    Alert.alert(
-      t('family.deleteChildConfirmTitle', { name: child.displayName }),
-      t('family.deleteChildConfirmMessage'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('family.deleteChild'),
-          style: 'destructive',
-          onPress: () => removeChild(child),
-        },
-      ],
-    );
+    setRemoval({ child });
   };
 
   const parentCards = isParent
@@ -326,6 +332,22 @@ export function FamilyPage() {
           </ScreenSection>
         </ScrollView>
       </View>
+      <DeleteAccountSheet
+        step={
+          removal
+            ? removal.balance === undefined
+              ? 'confirm'
+              : 'balance'
+            : null
+        }
+        balance={removal?.balance}
+        profileName={removal?.child.displayName}
+        deleting={deleteChild.isPending}
+        onClose={() => setRemoval(null)}
+        onConfirm={() => {
+          if (removal) removeChild(removal.child, removal.balance);
+        }}
+      />
     </TabScreen>
   );
 }

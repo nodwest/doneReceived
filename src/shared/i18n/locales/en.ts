@@ -1242,22 +1242,31 @@ export const en = {
   },
   deleteAccount: {
     title: 'Delete account',
-    heading: 'Before you delete',
-    intro: 'Please read this carefully.',
-    zeroBalanceTitle: 'Only with a $0 balance',
-    zeroBalanceText: 'Withdraw all your money from the wallet first.',
-    balanceNow: 'Your balance now: {{amount}}',
-    foreverTitle: 'It can’t be restored',
-    foreverText:
-      'Your profile, tasks, rewards and wishlist will be deleted for good.',
+    virtualBalanceTitle: 'Virtual balance',
+    virtualBalanceText:
+      'All virtual points will be deducted once you confirm deletion.',
+    balanceUnavailable: 'Could not load the balance.',
+    points_one: 'point',
+    points_other: 'points',
+    withdrawFunds: 'Withdraw funds',
+    withdrawUnavailable:
+      'Your balance is currently virtual. Withdrawals are unavailable.',
+    consequencesTitle: 'What happens to your account',
+    foreverText: 'Access ends on all devices. The account can’t be restored.',
+    rewardsHistoryUnavailable:
+      'Your earned rewards history will be unavailable.',
+    pendingTasksFailed: 'All pending tasks will be marked as failed.',
     delete: 'Delete',
     confirmTitle: 'Are you sure?',
     confirmMessage: 'Your account will be deleted and can’t be restored.',
     confirm: 'Delete account',
-    balanceTitle: 'Withdraw your money first',
+    balanceTitle: 'Confirm point deduction',
     balanceMessage:
-      'You still have {{amount}} on your balance. Withdraw all of it before deleting your account.',
-    withdrawSoon: 'Withdrawals are coming soon',
+      'Virtual points that will be deducted permanently when this profile is deleted: {{amount}}.',
+    pendingReview:
+      'Resolve reports awaiting review before deleting the profile.',
+    balanceBlocked:
+      'This profile can’t be deleted while its balance is positive.',
     deleted: 'Account deleted',
     failed: 'Couldn’t delete the account. Please try again.',
   },

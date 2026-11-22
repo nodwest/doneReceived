@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
-import { theme, tracking } from '@shared/theme';
+import { createStyles, theme, tracking } from '@shared/theme';
 
-export const styles = StyleSheet.create({
+export const styles = createStyles((colors) => ({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -14,98 +13,101 @@ export const styles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     letterSpacing: tracking(theme.fontSize.lg),
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   headerSpacer: {
     width: 44,
   },
   body: {
     flexGrow: 1,
-    gap: 24,
+    gap: 20,
     paddingTop: 16,
     paddingHorizontal: 24,
     paddingBottom: 24,
   },
-  hero: {
+  wallet: {
+    padding: 16,
+    gap: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
+  },
+  walletHeading: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  heroIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    marginBottom: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.dangerSoft,
-  },
-  heroTitle: {
-    textAlign: 'center',
-    fontSize: theme.fontSize.xl,
-    letterSpacing: tracking(theme.fontSize.xl),
+  balance: {
+    color: colors.ink,
     fontFamily: theme.fonts.bold,
-    color: theme.colors.ink,
+    fontSize: 36,
+    fontVariant: ['tabular-nums'],
   },
-  heroText: {
-    textAlign: 'center',
-    fontSize: theme.fontSize.sm,
-    lineHeight: 20,
-    letterSpacing: tracking(theme.fontSize.sm),
+  unit: {
+    fontSize: theme.fontSize.md,
     fontFamily: theme.fonts.medium,
-    color: theme.colors.grey,
+    color: colors.ink,
   },
-  card: {
-    paddingVertical: 4,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.white,
-    boxShadow: '0px 4px 6px rgba(26, 26, 46, 0.06)',
+  unavailable: {
+    gap: 4,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    padding: 12,
+  retry: {
+    minHeight: 44,
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
   },
-  rowIcon: {
-    width: 36,
-    height: 36,
+  withdraw: {
+    minHeight: 48,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.dangerSoft,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.outlineBg,
   },
-  rowText: {
-    flex: 1,
-    gap: 2,
+  withdrawLabel: {
+    color: colors.inkSoft,
+    fontFamily: theme.fonts.semibold,
+    fontSize: theme.fontSize.md,
+    textAlign: 'center',
   },
+  notice: {
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: colors.dangerTint,
+    color: colors.ink,
+    fontSize: theme.fontSize.sm,
+    fontFamily: theme.fonts.medium,
+  },
+  consequences: {
+    gap: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  rowIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.dangerSoft,
+  },
+  rowText: { flex: 1 },
   rowTitle: {
     fontSize: theme.fontSize.md,
-    letterSpacing: tracking(theme.fontSize.md),
     fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
+    color: colors.ink,
   },
   rowBody: {
     fontSize: theme.fontSize.sm,
-    lineHeight: 20,
-    letterSpacing: tracking(theme.fontSize.sm),
     fontFamily: theme.fonts.regular,
-    color: theme.colors.grey,
-  },
-  rowNote: {
-    marginTop: 4,
-    fontSize: theme.fontSize.sm,
-    lineHeight: 20,
-    letterSpacing: tracking(theme.fontSize.sm),
-    fontFamily: theme.fonts.semibold,
-    color: theme.colors.ink,
-  },
-  // Отступ разделителя слева: иконка пункта (12 + 36 + 12).
-  divider: {
-    height: 1,
-    marginLeft: 60,
-    backgroundColor: theme.colors.line,
+    color: colors.ink,
   },
   // Прижимает кнопку к низу, когда текста меньше экрана.
   footer: {
@@ -119,4 +121,4 @@ export const styles = StyleSheet.create({
     flexShrink: 0,
     flexBasis: 'auto',
   },
-});
+}));
