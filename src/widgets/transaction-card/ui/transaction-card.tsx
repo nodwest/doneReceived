@@ -112,7 +112,7 @@ function BalanceNote({
   tone,
 }: {
   title: string;
-  caption: string;
+  caption?: string;
   tone: Tone;
 }) {
   return (
@@ -124,9 +124,11 @@ function BalanceNote({
         <Text style={styles.noteTitle} numberOfLines={1}>
           {title}
         </Text>
-        <Text style={styles.noteCaption} numberOfLines={1}>
-          {caption}
-        </Text>
+        {caption && (
+          <Text style={styles.noteCaption} numberOfLines={1}>
+            {caption}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -284,7 +286,7 @@ type ChildTransactionCardProps = {
   transaction: ChildTransaction;
   balanceAfter: number;
   /** Сколько ребёнок заработал за последние 7 дней (у награды). */
-  weekEarned: number;
+  weekEarned?: number;
   onOpenTask?: () => void;
   style?: StyleProp<ViewStyle>;
 };
@@ -332,9 +334,13 @@ export function ChildTransactionCard({
           <BalanceNote
             tone="child"
             title={balance}
-            caption={t('transactions.earnedThisWeek', {
-              amount: `$${weekEarned}`,
-            })}
+            caption={
+              weekEarned === undefined
+                ? undefined
+                : t('transactions.earnedThisWeek', {
+                    amount: `$${weekEarned}`,
+                  })
+            }
           />
         }
       >

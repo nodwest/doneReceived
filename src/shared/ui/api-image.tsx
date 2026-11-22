@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Image, type ImageProps, type ImageSourcePropType } from 'react-native';
 import { currentAccessToken, usePrivateReadScope } from '../api';
 
@@ -44,20 +45,30 @@ export function ApiImage({
 }: ApiImageProps) {
   const scope = usePrivateReadScope();
   const token = currentAccessToken();
-  const remote = headerSource(source);
-  if (remote && (!token || !scope)) return <Image {...props} />;
-  const fresh: ImageProps['source'] = remote
-    ? ([
-        {
-          uri: remote.uri,
-          // Native decoded-image caches can be keyed by URL alone.
-          cache: 'reload',
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(!retainInMemory ? { 'Cache-Control': 'no-store' } : {}),
-          },
-        },
-      ] satisfies ImageSourcePropType[])
-    : source;
-  return <Image key={remote ? scope : undefined} source={fresh} {...props} />;
+  const uri = headerSource(source)?.uri;
+  const authorizedSource = useMemo<ImageSourcePropType | undefined>(
+    () =>
+      uri && token && scope
+        ? [
+            {
+              uri,
+              // Native decoded-image caches can be keyed by URL alone.
+              cache: 'reload',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                ...(!retainInMemory ? { 'Cache-Control': 'no-store' } : {}),
+              },
+            },
+          ]
+        : undefined,
+    [uri, token, scope, retainInMemory],
+  );
+  return (
+    <Image
+      key={uri ? scope : undefined}
+      source={uri ? authorizedSource : source}
+      fadeDuration={uri ? 0 : undefined}
+      {...props}
+    />
+  );
 }

@@ -1,6 +1,15 @@
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles, theme, themedValue, tracking } from '../theme';
+
+import { selectionTiming, useSlidingSegment } from './use-sliding-segment';
 
 type Option<T extends string> = { value: T; label: string };
 
@@ -26,8 +35,29 @@ export function SegmentedFilter<T extends string>({
   onChange,
   tone = 'parent',
 }: SegmentedFilterProps<T>) {
+  const { target, indicator, measure, reduceMotion } = useSlidingSegment(value);
+
   return (
     <View style={styles.bar} accessibilityRole="tablist">
+      {target && (
+        <Animated.View
+          pointerEvents="none"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={[
+            styles.indicator,
+            { top: target.y, height: target.height },
+            indicator,
+          ]}
+        >
+          <LinearGradient
+            colors={GRADIENTS[tone]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </Animated.View>
+      )}
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -37,25 +67,76 @@ export function SegmentedFilter<T extends string>({
             accessibilityLabel={option.label}
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
-            style={[styles.segment, selected && styles.segmentSelected]}
+            onLayout={measure(option.value)}
+            style={styles.segment}
           >
-            {selected && (
-              <LinearGradient
-                colors={GRADIENTS[tone]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-            )}
-            <Text
-              style={[styles.label, selected && styles.labelSelected]}
-              numberOfLines={1}
-            >
-              {option.label}
-            </Text>
+            <SegmentLabel
+              label={option.label}
+              selected={selected}
+              reduceMotion={reduceMotion}
+            />
           </Pressable>
         );
       })}
+    </View>
+  );
+}
+
+function SegmentLabel({
+  label,
+  selected,
+  reduceMotion,
+}: {
+  label: string;
+  selected: boolean;
+  reduceMotion: boolean;
+}) {
+  const progress = useSharedValue(selected ? 1 : 0);
+  const inactive = theme.colors.ink;
+  const active = theme.colors.white;
+
+  useEffect(() => {
+    const next = selected ? 1 : 0;
+    progress.value = reduceMotion ? next : withTiming(next, selectionTiming);
+  }, [selected, reduceMotion, progress]);
+
+  const tint = useAnimatedStyle(() => ({
+    color: interpolateColor(progress.value, [0, 1], [inactive, active]),
+  }));
+  const bold = useAnimatedStyle(() => ({ opacity: progress.value }));
+
+  return (
+    <View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
+      <Text
+        aria-hidden
+        numberOfLines={1}
+        style={[styles.label, styles.labelSelected, styles.sizer]}
+      >
+        {label}
+      </Text>
+      <Animated.Text
+        aria-hidden
+        numberOfLines={1}
+        style={[styles.label, styles.textLayer, tint]}
+      >
+        {label}
+      </Animated.Text>
+      <Animated.Text
+        aria-hidden
+        numberOfLines={1}
+        style={[
+          styles.label,
+          styles.labelSelected,
+          styles.textLayer,
+          tint,
+          bold,
+        ]}
+      >
+        {label}
+      </Animated.Text>
     </View>
   );
 }
@@ -84,9 +165,15 @@ const styles = createStyles((colors) => ({
     borderRadius: 16,
     overflow: 'hidden',
   },
-  segmentSelected: {
+  indicator: {
+    position: 'absolute',
+    left: 0,
+    borderRadius: 16,
+    overflow: 'hidden',
     boxShadow: '0px 3px 8px rgba(108, 92, 231, 0.25)',
   },
+  sizer: { opacity: 0 },
+  textLayer: { ...StyleSheet.absoluteFill, textAlign: 'center' },
   label: {
     fontSize: 13,
     letterSpacing: tracking(13),

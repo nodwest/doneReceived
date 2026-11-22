@@ -677,6 +677,9 @@ export const en = {
     failed: "Couldn't top up. Please try again.",
   },
   transactions: {
+    emptyToday: 'No transactions today',
+    loadError: 'Could not load transactions.',
+    loadMore: 'Load more',
     title: 'Transactions',
     all: 'All',
     payouts: 'Payouts',

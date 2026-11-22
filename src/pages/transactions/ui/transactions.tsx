@@ -1,20 +1,27 @@
+import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
 import { useCurrentFamily } from '@entities/family';
 import { useMemo, useState, type ReactNode } from 'react';
-import { ScrollView, Text, View, type ViewStyle } from 'react-native';
+import {
+  ActivityIndicator,
+  SectionList,
+  Text,
+  View,
+  type ViewStyle,
+} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
-import { useMyChildWallet } from '@features/family-tasks';
+import { useChildAccount } from '@features/family-tasks';
 import {
   ChildTransactionCard,
   TransactionCard,
 } from '@widgets/transaction-card';
 import { TaskIconBadge } from '@entities/task';
 import {
-  balanceAfter,
   ChildTransactionRow,
   groupByDay,
   TransactionRow,
-  useWallet,
+  useParentTransactionHistory,
+  useChildTransactionHistory,
   type ChildTransaction,
   type Transaction,
   type TransactionDay,
@@ -28,14 +35,26 @@ import {
   startOfDay,
 } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
-import { RoundButton, SegmentedFilter, SnapCarousel } from '@shared/ui';
+import { Button, RoundButton, SegmentedFilter, SnapCarousel } from '@shared/ui';
 import { styles } from './transactions.styled';
+
+const filterEntering = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
 
 type Tone = 'parent' | 'child';
 
 type ScreenProps<T extends { id: string; at: string }, F extends string> = {
   tone: Tone;
-  isPending: boolean;
+  history: {
+    isLoading: boolean;
+    isFetching: boolean;
+    isError: boolean;
+    isPageError: boolean;
+    invalidCursor: boolean;
+    hasNext: boolean;
+    oldestAt: string | undefined;
+    loadMore: () => void;
+    refresh: () => Promise<void>;
+  };
   filters: readonly { value: F; label: string }[];
   filter: F;
   onFilter: (value: F) => void;
@@ -77,7 +96,7 @@ function TransactionsScreen<
   F extends string,
 >({
   tone,
-  isPending,
+  history,
   filters,
   filter,
   onFilter,
@@ -87,33 +106,40 @@ function TransactionsScreen<
 }: ScreenProps<T, F>) {
   const { t } = useTranslation();
   const dayTitle = useDayTitle();
-  // Открытые карточки: день и номер транзакции в нём; null — список.
-  const [open, setOpen] = useState<{ day: number; index: number } | null>(null);
-  // ?transaction=<id> (тап по строке в Wallet) — сразу карточка этой
-  // транзакции; «назад» из неё уводит обратно в Wallet.
   const { transaction: linkParam } = useLocalSearchParams<{
     transaction?: string;
   }>();
+  const [open, setOpen] = useState<string | null>(() => linkParam ?? null);
   const [linked, setLinked] = useState(linkParam !== undefined);
-  const [linkPending, setLinkPending] = useState(linkParam !== undefined);
-  if (linkPending && !isPending) {
-    setLinkPending(false);
-    const dayIndex = days.findIndex((day) =>
-      day.items.some((item) => String(item.id) === linkParam),
-    );
-    if (dayIndex >= 0) {
-      setOpen({
-        day: dayIndex,
-        index: days[dayIndex].items.findIndex(
-          (item) => String(item.id) === linkParam,
-        ),
-      });
-    } else {
-      setLinked(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const cardsDay = open
+    ? days.find((day) => day.items.some((item) => item.id === open))
+    : undefined;
+  const cards = cardsDay !== undefined;
+  const sections = useMemo(
+    () =>
+      days.map((day) => ({
+        ...day,
+        key: String(day.date.getTime()),
+        data: day.items,
+      })),
+    [days],
+  );
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      await history.refresh();
+    } finally {
+      setRefreshing(false);
     }
-  }
-  const cardsDay = open ? days[open.day] : undefined;
-  const cards = open !== null && cardsDay !== undefined;
+  };
+  const showError = history.isError || history.invalidCursor;
+  const incompleteDay =
+    history.hasNext && history.oldestAt
+      ? startOfDay(new Date(history.oldestAt)).getTime()
+      : undefined;
+  const retry =
+    history.isPageError && !history.invalidCursor ? history.loadMore : refresh;
   const leave = () =>
     router.canGoBack() ? router.back() : router.replace('/wallet');
 
@@ -141,7 +167,7 @@ function TransactionsScreen<
           <RoundButton
             icon="cards"
             accessibilityLabel={t('tasks.showAsCards')}
-            onPress={() => setOpen({ day: 0, index: 0 })}
+            onPress={() => setOpen(days[0].items[0].id)}
           />
         ) : (
           // Место кнопки держится, чтобы заголовок оставался по центру.
@@ -153,8 +179,10 @@ function TransactionsScreen<
           <SnapCarousel
             items={cardsDay.items}
             keyExtractor={(item) => item.id}
-            initialIndex={open.index}
-            onIndexChange={(index) => setOpen({ day: open.day, index })}
+            initialIndex={cardsDay.items.findIndex((item) => item.id === open)}
+            onIndexChange={(index) =>
+              setOpen(cardsDay.items[index]?.id ?? null)
+            }
             peek={0}
             gutter={16}
             fill
@@ -170,52 +198,92 @@ function TransactionsScreen<
             <SegmentedFilter
               options={filters}
               value={filter}
-              onChange={onFilter}
+              onChange={(value) => {
+                setOpen(null);
+                setLinked(false);
+                onFilter(value);
+              }}
               tone={tone}
             />
           </View>
-          <ScrollView
-            bounces={false}
-            overScrollMode="never"
-            contentContainerStyle={styles.body}
-            showsVerticalScrollIndicator={false}
+          <Animated.View
+            key={filter}
+            entering={filterEntering}
+            style={styles.list}
           >
-            {isPending ? null : days.length === 0 ? (
-              <Text style={styles.empty}>
-                {filter === filters[0].value
-                  ? t('transactions.empty')
-                  : t('transactions.emptyFilter')}
-              </Text>
-            ) : (
-              days.map((day, dayIndex) => (
-                <View key={day.date.getTime()} style={styles.day}>
-                  <View style={styles.dayHead}>
-                    <Text style={styles.dayTitle}>{dayTitle(day.date)}</Text>
+            <SectionList
+              sections={sections}
+              keyExtractor={(item) => item.id}
+              style={styles.list}
+              contentContainerStyle={styles.body}
+              stickySectionHeadersEnabled={false}
+              onEndReachedThreshold={0.5}
+              onEndReached={() => {
+                if (!showError && days.length > 0) history.loadMore();
+              }}
+              refreshing={refreshing}
+              onRefresh={() => void refresh()}
+              renderSectionHeader={({ section }) => (
+                <View style={styles.dayHead}>
+                  <Text style={styles.dayTitle}>{dayTitle(section.date)}</Text>
+                  {!showError && section.date.getTime() !== incompleteDay && (
                     <View style={styles.totals}>
-                      {day.income > 0 && (
-                        <Text style={styles.income}>+${day.income}</Text>
+                      {section.income > 0 && (
+                        <Text style={styles.income}>+${section.income}</Text>
                       )}
-                      {day.outcome > 0 && (
+                      {section.outcome > 0 && (
                         <Text
                           style={[
                             styles.outcome,
                             tone === 'child' && styles.outcomeChild,
                           ]}
                         >
-                          −${day.outcome}
+                          −${section.outcome}
                         </Text>
                       )}
                     </View>
-                  </View>
-                  {day.items.map((item, index) => (
-                    <View key={item.id}>
-                      {renderRow(item, () => setOpen({ day: dayIndex, index }))}
-                    </View>
-                  ))}
+                  )}
                 </View>
-              ))
-            )}
-          </ScrollView>
+              )}
+              renderItem={({ item }) => (
+                <View style={styles.row}>
+                  {renderRow(item, () => {
+                    setLinked(false);
+                    setOpen(item.id);
+                  })}
+                </View>
+              )}
+              ListEmptyComponent={
+                !history.isLoading && !showError && !history.hasNext ? (
+                  <Text style={styles.empty}>
+                    {filter === filters[0].value
+                      ? t('transactions.empty')
+                      : t('transactions.emptyFilter')}
+                  </Text>
+                ) : null
+              }
+              ListFooterComponent={
+                history.isFetching ? (
+                  <ActivityIndicator accessibilityLabel={t('common.loading')} />
+                ) : showError ? (
+                  <View>
+                    <Text style={styles.empty}>
+                      {t('transactions.loadError')}
+                    </Text>
+                    <Button onPress={() => void retry()}>
+                      <Text style={styles.action}>{t('common.retry')}</Text>
+                    </Button>
+                  </View>
+                ) : history.hasNext ? (
+                  <Button onPress={history.loadMore}>
+                    <Text style={styles.action}>
+                      {t('transactions.loadMore')}
+                    </Text>
+                  </Button>
+                ) : null
+              }
+            />
+          </Animated.View>
         </>
       )}
     </TabScreen>
@@ -238,22 +306,24 @@ type ParentFilter = 'all' | Transaction['kind'];
 export function TransactionsPage() {
   useTheme();
   const { t } = useTranslation();
-  const { data: wallet, isPending } = useWallet(useCurrentFamily()?.id ?? null);
+  const history = useParentTransactionHistory(useCurrentFamily()?.id ?? null);
+  const { transactions } = history;
   const [filter, setFilter] = useState<ParentFilter>('all');
   const days = useMemo(
     () =>
       groupByDay(
-        (wallet?.transactions ?? []).filter(
+        transactions.filter(
           (transaction) => filter === 'all' || transaction.kind === filter,
         ),
       ),
-    [wallet, filter],
+    [transactions, filter],
   );
 
   return (
     <TransactionsScreen
       tone="parent"
-      isPending={isPending}
+      key={history.key}
+      history={history}
       filters={[
         { value: 'all', label: t('transactions.all') },
         { value: 'payout', label: t('transactions.payouts') },
@@ -274,11 +344,7 @@ export function TransactionsPage() {
       renderCard={(transaction, style) => (
         <TransactionCard
           transaction={transaction}
-          balanceAfter={
-            wallet
-              ? balanceAfter(wallet.transactions, wallet.balance, transaction)
-              : 0
-          }
+          balanceAfter={transaction.balanceAfter ?? 0}
           onOpenTask={
             transaction.kind === 'payout'
               ? () => openTask(transaction.operationId)
@@ -300,30 +366,53 @@ type ChildFilter = 'all' | ChildTransaction['kind'];
 export function ChildTransactionsPage() {
   useTheme();
   const { t } = useTranslation();
-  const { data: wallet, isPending } = useMyChildWallet();
+  const { familyId, childId } = useChildAccount();
+  const history = useChildTransactionHistory(familyId, childId);
+  const { transactions, balance } = history;
   const [filter, setFilter] = useState<ChildFilter>('all');
   const [today] = useState(() => startOfDay(new Date()));
   const days = useMemo(
     () =>
       groupByDay(
-        (wallet?.transactions ?? []).filter(
+        transactions.filter(
           (transaction) => filter === 'all' || transaction.kind === filter,
         ),
       ),
-    [wallet, filter],
+    [transactions, filter],
   );
-  // Заработано за последние 7 дней вместе с сегодняшним.
-  const weekEarned = useMemo(() => {
-    const from = addDays(today, -6).toISOString();
-    return (wallet?.transactions ?? [])
-      .filter((item) => item.kind === 'reward' && item.at >= from)
-      .reduce((sum, item) => sum + item.amount, 0);
-  }, [wallet, today]);
+  const from = addDays(today, -6).getTime();
+  const oldest = transactions.at(-1);
+  const weekComplete =
+    !history.invalidCursor &&
+    (!history.hasNext || (oldest && Date.parse(oldest.at) < from));
+  const weekEarned = useMemo(
+    () =>
+      weekComplete
+        ? transactions.reduce(
+            (sum, item) =>
+              item.kind === 'reward' && Date.parse(item.at) >= from
+                ? sum + item.amount
+                : sum,
+            0,
+          )
+        : undefined,
+    [transactions, from, weekComplete],
+  );
+  const balances = useMemo(() => {
+    const balances = new Map<string, number>();
+    let remaining = balance;
+    for (const item of transactions) {
+      balances.set(item.id, remaining);
+      remaining -= item.kind === 'reward' ? item.amount : -item.amount;
+    }
+    return balances;
+  }, [transactions, balance]);
 
   return (
     <TransactionsScreen
       tone="child"
-      isPending={isPending}
+      key={history.key}
+      history={history}
       filters={[
         { value: 'all', label: t('transactions.all') },
         { value: 'reward', label: t('transactions.rewards') },
@@ -345,9 +434,7 @@ export function ChildTransactionsPage() {
         <ChildTransactionCard
           transaction={transaction}
           balanceAfter={
-            wallet
-              ? balanceAfter(wallet.transactions, wallet.balance, transaction)
-              : 0
+            transaction.balanceAfter ?? balances.get(transaction.id) ?? 0
           }
           weekEarned={weekEarned}
           onOpenTask={

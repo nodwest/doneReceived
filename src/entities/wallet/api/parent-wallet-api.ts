@@ -1,6 +1,6 @@
 import { apiRequest, authorizedImage } from '@shared/api';
 import { withTimeout } from '@shared/lib';
-import type { Transaction, Wallet } from '../model/wallet';
+import type { Transaction } from '../model/wallet';
 
 /**
  * Денежные движения вошедшего родителя в семье: пополнения, выплаты детям и
@@ -25,28 +25,50 @@ type TransactionsDto = {
 /** Дети семьи — только чтобы подписать выплаты именем. */
 type ChildDto = { id: string; displayName: string; avatarUrl: string | null };
 
-/**
- * GET /families/:id/wallet/transactions и свободный баланс GET
- * /families/:id/wallet. Выплата ведёт в историю наград по id назначения
- * (`operationId`), у пополнений и выводов карты нет.
- */
-/** Все страницы истории родителя; ограничение защищает от бесконечного цикла. */
-async function fetchAllTransactions(
+function fetchTransactions(
   familyId: string,
-): Promise<TransactionsDto['items']> {
-  const items: TransactionsDto['items'] = [];
-  let before: string | null | undefined;
-  for (let page = 0; page < 20; page += 1) {
-    const query = new URLSearchParams({ limit: '100' });
-    if (before) query.set('before', before);
-    const data = await apiRequest<TransactionsDto>(
-      `/families/${familyId}/wallet/transactions?${query.toString()}`,
-    );
-    items.push(...data.items);
-    before = data.next;
-    if (!before) break;
-  }
-  return items;
+  limit: number,
+  before?: string,
+  signal?: AbortSignal,
+) {
+  const query = new URLSearchParams({ limit: String(limit) });
+  if (before) query.set('before', before);
+  return apiRequest<TransactionsDto>(
+    `/families/${familyId}/wallet/transactions?${query.toString()}`,
+    { signal },
+  );
+}
+
+export async function fetchParentTransactionPage(
+  familyId: string,
+  limit: number,
+  before: string | undefined,
+  signal: AbortSignal,
+) {
+  const page = await fetchTransactions(familyId, limit, before, signal);
+  return {
+    transactions: mapTransactions(
+      page.items,
+      await fetchChildren(familyId, page.items, signal),
+    ),
+    next: page.next,
+    balance: 0,
+  };
+}
+
+function fetchChildren(
+  familyId: string,
+  items: TransactionsDto['items'],
+  signal?: AbortSignal,
+) {
+  if (!items.some((item) => item.kind === 'payout')) return Promise.resolve([]);
+  return withTimeout(
+    apiRequest<ChildDto[]>(`/families/${familyId}/children`, {
+      signal,
+      timeoutMs: 5_000,
+    }),
+    [] as ChildDto[],
+  );
 }
 
 /** Сумма выплат родителю за всё время — серверный агрегат, не страница истории. */
@@ -59,17 +81,11 @@ export function fetchParentPaidTotal(familyId: string, parentId?: string) {
   );
 }
 
-export async function fetchServerWallet(familyId: string): Promise<Wallet> {
-  const [historyItems, funds, children] = await Promise.all([
-    fetchAllTransactions(familyId),
-    apiRequest<{ balancePoints: string }>(`/families/${familyId}/wallet`),
-    // Имена детей — подпись выплат; без них история всё равно показывается.
-    withTimeout(
-      apiRequest<ChildDto[]>(`/families/${familyId}/children`),
-      [] as ChildDto[],
-    ),
-  ]);
-  const transactions = historyItems.map((item): Transaction => {
+function mapTransactions(
+  historyItems: TransactionsDto['items'],
+  children: ChildDto[],
+) {
+  return historyItems.map((item): Transaction => {
     const base = {
       id: item.id,
       amount: item.points,
@@ -93,5 +109,4 @@ export async function fetchServerWallet(familyId: string): Promise<Wallet> {
     }
     return { ...base, kind: item.kind, card: null };
   });
-  return { balance: Number(funds.balancePoints), transactions };
 }

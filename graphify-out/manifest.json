@@ -882,9 +882,9 @@
     "semantic_hash": ""
   },
   "src/entities/wallet/api/child-wallet-api.ts": {
-    "mtime": 1795338442.7711961,
-    "seen": 1795338463.1045911,
-    "ast_hash": "d3b6ca6557a7b27caa07ed54e2feaece",
+    "mtime": 1795384460.6846485,
+    "seen": 1795384482.0363746,
+    "ast_hash": "8d47e217785177b8c2bffd5643c93358",
     "semantic_hash": ""
   },
   "src/entities/wallet/api/parent-funds-api.ts": {
@@ -894,27 +894,27 @@
     "semantic_hash": ""
   },
   "src/entities/wallet/api/parent-wallet-api.ts": {
-    "mtime": 1795116559.7197485,
-    "seen": 1795162011.5135324,
-    "ast_hash": "956484d7809fe0ff6d37ab4787212ce5",
+    "mtime": 1795384539.209831,
+    "seen": 1795384602.4986875,
+    "ast_hash": "82a4cd68a2f552f4822062413f77152b",
     "semantic_hash": ""
   },
   "src/entities/wallet/api/wallet-api.ts": {
-    "mtime": 1794899663.6273043,
-    "seen": 1794920449.2381568,
-    "ast_hash": "726fa023f0085b067fec67e3c3c81f5e",
+    "mtime": 1795384460.7217133,
+    "seen": 1795384482.03738,
+    "ast_hash": "5451a6bf86c7e74f546e0ffa9ab51284",
     "semantic_hash": ""
   },
   "src/entities/wallet/api/wallet-query.ts": {
-    "mtime": 1794901476.95654,
-    "seen": 1794920449.2381568,
-    "ast_hash": "c1b4ced21085fcf98e1a7a9bb2188580",
+    "mtime": 1795384460.7431707,
+    "seen": 1795384482.03738,
+    "ast_hash": "fcb3ada669eb26a31aa4c41166d7c1d8",
     "semantic_hash": ""
   },
   "src/entities/wallet/index.ts": {
-    "mtime": 1794899663.6399622,
-    "seen": 1794920449.2381568,
-    "ast_hash": "a7130420556dad4419c5a3a7c5a905b1",
+    "mtime": 1795384460.7496946,
+    "seen": 1795384482.03738,
+    "ast_hash": "42e41b5de98b09bde863368905d99f38",
     "semantic_hash": ""
   },
   "src/entities/wallet/model/funds.ts": {
@@ -1974,9 +1974,9 @@
     "semantic_hash": ""
   },
   "src/pages/my-tasks/ui/my-tasks.tsx": {
-    "mtime": 1795338442.80581,
-    "seen": 1795338463.164006,
-    "ast_hash": "f55e4c21c5b3005f051150303bf5d159",
+    "mtime": 1795385914.5380847,
+    "seen": 1795386000.7221494,
+    "ast_hash": "362cb16a7d0cdb624e58cc2eab0caebe",
     "semantic_hash": ""
   },
   "src/pages/my-tasks/ui/section-head.tsx": {
@@ -2136,15 +2136,15 @@
     "semantic_hash": ""
   },
   "src/pages/transactions/ui/transactions.styled.ts": {
-    "mtime": 1795156838.1647732,
-    "seen": 1795162011.5135324,
-    "ast_hash": "c844e61762dc9f69e4cc10756ae5a616",
+    "mtime": 1795384460.7718117,
+    "seen": 1795384482.1219885,
+    "ast_hash": "e2959264bbc44214df8aa1efabe6d02b",
     "semantic_hash": ""
   },
   "src/pages/transactions/ui/transactions.tsx": {
-    "mtime": 1795256528.9286463,
-    "seen": 1795256620.894045,
-    "ast_hash": "8956bfba948ed69530f1f08582454fd5",
+    "mtime": 1795385914.539111,
+    "seen": 1795386000.7275655,
+    "ast_hash": "97fea30f1486456776501ae9a0fe060f",
     "semantic_hash": ""
   },
   "src/pages/verify-email/index.ts": {
@@ -2196,9 +2196,9 @@
     "semantic_hash": ""
   },
   "src/pages/wallet/ui/child-wallet.tsx": {
-    "mtime": 1795256528.9286463,
-    "seen": 1795256620.8950505,
-    "ast_hash": "2eb9a8ca166eaf6bd27666729e73a273",
+    "mtime": 1795384460.8659215,
+    "seen": 1795384482.1240206,
+    "ast_hash": "87c5c1b5d936a6171879d03130eefa00",
     "semantic_hash": ""
   },
   "src/pages/wallet/ui/rewards-history-link.styled.ts": {
@@ -2220,9 +2220,9 @@
     "semantic_hash": ""
   },
   "src/pages/wallet/ui/wallet.tsx": {
-    "mtime": 1795256528.929646,
-    "seen": 1795256620.8950505,
-    "ast_hash": "f8711a34ea4a845554b4936428574a95",
+    "mtime": 1795384460.880119,
+    "seen": 1795384482.1250267,
+    "ast_hash": "c5cd3aaf06946c3af55ca4c8b4fb4132",
     "semantic_hash": ""
   },
   "src/pages/wishlist/index.ts": {
@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795382611.0922668,
-    "seen": 1795382718.2502763,
-    "ast_hash": "73b1e26e0eb116afb227c15a85087211",
+    "mtime": 1795384460.9547634,
+    "seen": 1795384482.1289258,
+    "ast_hash": "c2023061992bfdaef110c4136797cf88",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795382610.8708851,
-    "seen": 1795382718.2502763,
-    "ast_hash": "5a1cd68d8ed367ddc2204991de3dd8b5",
+    "mtime": 1795384461.034715,
+    "seen": 1795384482.1289258,
+    "ast_hash": "349a1ee60685bc6e65cdd2cb36ed4081",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -2478,9 +2478,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/api-image.tsx": {
-    "mtime": 1795380494.9181948,
-    "seen": 1795380944.6297257,
-    "ast_hash": "6ebee9ce5660feec4cb48a3127411abd",
+    "mtime": 1795385915.8040967,
+    "seen": 1795386000.7374742,
+    "ast_hash": "4fb3a728aef6daf312c476027d2d902f",
     "semantic_hash": ""
   },
   "src/shared/ui/api-image.web.tsx": {
@@ -2928,9 +2928,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/index.ts": {
-    "mtime": 1794923242.037304,
-    "seen": 1795026546.7693708,
-    "ast_hash": "7dc589e34cd72bf5da89d862f8ff59d7",
+    "mtime": 1795385914.5402524,
+    "seen": 1795386000.7545147,
+    "ast_hash": "44bb514922a257139604f85b1b37dca4",
     "semantic_hash": ""
   },
   "src/shared/ui/input-with-icon.tsx": {
@@ -3000,9 +3000,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/segmented-filter.tsx": {
-    "mtime": 1795156525.0196433,
-    "seen": 1795162011.5145373,
-    "ast_hash": "81e390438a9f6ce1884b88f3bc9ba05d",
+    "mtime": 1795385914.5412588,
+    "seen": 1795386000.7572455,
+    "ast_hash": "015f27410f46173f7c7c1274db59d3b2",
     "semantic_hash": ""
   },
   "src/shared/ui/select-menu.tsx": {
@@ -3054,9 +3054,9 @@
     "semantic_hash": ""
   },
   "src/shared/ui/toggle.tsx": {
-    "mtime": 1795156395.0487359,
-    "seen": 1795162011.5145373,
-    "ast_hash": "d398a727d3ea39716c6c0c79b2999f6f",
+    "mtime": 1795385914.541777,
+    "seen": 1795386000.7595296,
+    "ast_hash": "8782ec49dba8e7180f6e90e29661eef6",
     "semantic_hash": ""
   },
   "src/widgets/add-member/index.ts": {
@@ -3192,15 +3192,15 @@
     "semantic_hash": ""
   },
   "src/widgets/children-filter/ui/children-filter.styled.ts": {
-    "mtime": 1795156838.8154647,
-    "seen": 1795162011.5145373,
-    "ast_hash": "78bf5dae644e7f9b62a0d7029ff83080",
+    "mtime": 1795385914.543087,
+    "seen": 1795386000.7633624,
+    "ast_hash": "22a36766bc5fdb9b4cc24a5ecfcb1abc",
     "semantic_hash": ""
   },
   "src/widgets/children-filter/ui/children-filter.tsx": {
-    "mtime": 1794899667.0108173,
-    "seen": 1794920449.2381568,
-    "ast_hash": "d974b99a9c84009a743b1cae37336b08",
+    "mtime": 1795385914.543087,
+    "seen": 1795386000.7633624,
+    "ast_hash": "351ec719d0c4bedf96532eb754cc954c",
     "semantic_hash": ""
   },
   "src/widgets/day-summary/index.ts": {
@@ -3708,9 +3708,9 @@
     "semantic_hash": ""
   },
   "src/widgets/transaction-card/ui/transaction-card.tsx": {
-    "mtime": 1794899667.4874053,
-    "seen": 1794920449.2396638,
-    "ast_hash": "acd32d61c97fbc139cbff697492fb654",
+    "mtime": 1795384510.8188863,
+    "seen": 1795384531.0043805,
+    "ast_hash": "3e888d416c6d3aabec7ff38fc9151eb3",
     "semantic_hash": ""
   },
   "src/widgets/wishlist-preview/index.ts": {
@@ -4590,9 +4590,9 @@
     "semantic_hash": ""
   },
   "src/widgets/paid-task-card/ui/reward-kind-toggle.tsx": {
-    "mtime": 1795157501.2381823,
-    "seen": 1795162011.5145373,
-    "ast_hash": "431fb1e307a3f7755eb933bcc69548fd",
+    "mtime": 1795385914.543087,
+    "seen": 1795386000.7809372,
+    "ast_hash": "e872b650de27879d6861fe75f0bfdc44",
     "semantic_hash": ""
   },
   "app/create-family-event.tsx": {
@@ -5346,8 +5346,8 @@
     "semantic_hash": ""
   },
   "src/entities/family-event/api/generated/calendar.ts": {
-    "mtime": 1795382687.195955,
-    "seen": 1795382717.895467,
+    "mtime": 1795382733.6000948,
+    "seen": 1795384482.0039322,
     "ast_hash": "c0ef7edf9f3f765c43864587e64fb260",
     "semantic_hash": ""
   },
@@ -5385,6 +5385,30 @@
     "mtime": 1795382655.4636486,
     "seen": 1795382718.0601857,
     "ast_hash": "36ca5ada44b7f4dfe86f08598f562514",
+    "semantic_hash": ""
+  },
+  "src/entities/wallet/api/wallet-history-query.ts": {
+    "mtime": 1795384561.0662606,
+    "seen": 1795384602.4986875,
+    "ast_hash": "37258f96caa83d2a43f84ff9964584bb",
+    "semantic_hash": ""
+  },
+  "src/entities/wallet/api/wallet-transaction-pages.test.ts": {
+    "mtime": 1795384561.087559,
+    "seen": 1795384602.4986875,
+    "ast_hash": "5b49d2a8f17192156e6186a2951065ce",
+    "semantic_hash": ""
+  },
+  "src/entities/wallet/api/wallet-history-pages.ts": {
+    "mtime": 1795384561.02439,
+    "seen": 1795384602.4986875,
+    "ast_hash": "5e5fce93d8fcee3a95d90010d0785b5b",
+    "semantic_hash": ""
+  },
+  "src/shared/ui/use-sliding-segment.ts": {
+    "mtime": 1795385914.5440924,
+    "seen": 1795386000.7595296,
+    "ast_hash": "bdd8dddf599bc4b23dcaa8ac7d5ea949",
     "semantic_hash": ""
   },
   "package-lock.json": {

@@ -32,3 +32,5 @@ export * from './api-image';
 export * from './photo-viewer';
 export * from './avatar-cropper';
 export * from './paper-texture';
+
+export { selectionTiming, useSlidingSegment } from './use-sliding-segment';
