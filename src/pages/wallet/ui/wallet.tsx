@@ -4,10 +4,14 @@ import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { DepositSheet } from '@features/deposit-funds';
 import { useCurrentFamily, useFamilyChildren } from '@entities/family';
-import { TransactionRow, useParentFunds, useWallet } from '@entities/wallet';
+import {
+  TransactionRow,
+  useParentFunds,
+  useRecentParentWallet,
+} from '@entities/wallet';
 import { useTheme } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
-import { SectionHeader } from '@shared/ui';
+import { Button, SectionHeader } from '@shared/ui';
 import { BalanceCard } from './balance-card';
 import { ChildBalance } from './child-balance';
 import { RewardsHistoryLink } from './rewards-history-link';
@@ -21,9 +25,6 @@ const openTransaction = (id: string) =>
     params: { transaction: id },
   });
 
-// Сколько последних транзакций показываем; остальные — по «See all».
-const RECENT_TRANSACTIONS = 4;
-
 /**
  * Вкладка Wallet: деньги вошедшего родителя (не всей семьи) — доступное на
  * задания и резерв за невыплаченные (с сервера) — с кнопками ввода и вывода
@@ -36,12 +37,16 @@ export function WalletPage() {
   const { t } = useTranslation();
   // Деньги и транзакции родителя — с сервера (без семьи — моки).
   const familyId = useCurrentFamily()?.id ?? null;
-  const { data: wallet } = useWallet(familyId);
+  const {
+    data: wallet,
+    transactions,
+    isError,
+    refetch,
+  } = useRecentParentWallet(familyId);
   const { data: funds } = useParentFunds(familyId);
   // Балансы детей: моковые Emma и Liam и дети семьи с сервера.
   const { data: serverChildren = [] } = useFamilyChildren(familyId);
   const [depositOpen, setDepositOpen] = useState(false);
-  const transactions = wallet?.transactions.slice(0, RECENT_TRANSACTIONS) ?? [];
 
   return (
     <TabScreen activeKey="wallet">
@@ -72,10 +77,20 @@ export function WalletPage() {
             onAction={() => router.push('/transactions')}
           />
         </View>
+        {isError && (
+          <Button
+            onPress={() => void refetch()}
+            accessibilityLabel={t('common.retry')}
+          >
+            <Text style={styles.empty}>
+              {t('transactions.loadError')} {t('common.retry')}
+            </Text>
+          </Button>
+        )}
         {wallet && (
           <View style={styles.transactions}>
             {transactions.length === 0 ? (
-              <Text style={styles.empty}>{t('wallet.noTransactions')}</Text>
+              <Text style={styles.empty}>{t('transactions.emptyToday')}</Text>
             ) : (
               transactions.map((transaction, index) => (
                 <Fragment key={transaction.id}>

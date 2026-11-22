@@ -4,3 +4,4 @@ export * from './api/wallet-query';
 export { depositFunds } from './api/parent-funds-api';
 export * from './ui/transaction-row';
 export * from './ui/funds-bar';
+export * from './api/wallet-history-query';

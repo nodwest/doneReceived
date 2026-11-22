@@ -681,6 +681,9 @@ export const ru: Dictionary = {
     failed: 'Не получилось пополнить. Попробуйте ещё раз.',
   },
   transactions: {
+    emptyToday: 'Сегодня операций нет',
+    loadError: 'Не удалось загрузить операции.',
+    loadMore: 'Загрузить ещё',
     title: 'Транзакции',
     all: 'Все',
     payouts: 'Выплаты',
