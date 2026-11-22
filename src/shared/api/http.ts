@@ -95,13 +95,16 @@ export function authorizedImage(url: string): {
   const absolute = /^https?:\/\//i.test(url)
     ? (fromParentDomain(url) ?? url)
     : apiUrlFor(url);
-  let trustedApiUrl = !/^https?:\/\//i.test(url);
-  if (!trustedApiUrl) {
-    try {
-      trustedApiUrl = new URL(absolute).origin === new URL(API_URL).origin;
-    } catch {
-      trustedApiUrl = false;
-    }
+  let trustedApiUrl = false;
+  try {
+    const target = new URL(absolute);
+    trustedApiUrl =
+      /^https?:$/.test(target.protocol) &&
+      !target.username &&
+      !target.password &&
+      target.origin === new URL(API_URL).origin;
+  } catch {
+    // Некорректный URL не получает заголовок авторизации.
   }
   // Заголовки есть у любой картинки нашего API, даже если токена ещё нет:
   // ApiImage подставит текущий токен при загрузке.

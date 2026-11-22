@@ -2,6 +2,11 @@
 
 Read the exact versioned docs at https://docs.expo.dev/versions/v56.0.0/ before writing any code.
 
+## Documentation
+
+- Product documentation and task lists live in `../doneReceived-obsidian`.
+- Before reporting a task complete, update the affected project documentation and mark its existing task entry as complete. Record any pending rollout or production verification in the relevant release or operations notes.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
