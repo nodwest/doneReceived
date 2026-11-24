@@ -20,13 +20,7 @@ import {
   type TransactionDay,
 } from '@entities/wallet';
 import { useTranslation } from '@shared/i18n';
-import {
-  addDays,
-  formatDayLabel,
-  formatMonthDay,
-  formatWeekdayShort,
-  startOfDay,
-} from '@shared/lib';
+import { addDays, formatDayHeader, startOfDay } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
 import { RoundButton, SegmentedFilter, SnapCarousel } from '@shared/ui';
 import { styles } from './transactions.styled';
@@ -44,25 +38,6 @@ type ScreenProps<T extends { id: string; at: string }, F extends string> = {
   renderRow: (item: T, onPress: () => void) => ReactNode;
   renderCard: (item: T, style: ViewStyle) => ReactNode;
 };
-
-// В русском день недели приходит строчным: «сб» → «Сб».
-const capitalize = (text: string) =>
-  text.charAt(0).toUpperCase() + text.slice(1);
-
-/** «Today, Nov 13», «Yesterday, Nov 12», «Mon, Nov 11». */
-function useDayTitle() {
-  const { t } = useTranslation();
-  return (date: Date) => {
-    const today = startOfDay(new Date());
-    const recent =
-      date.getTime() >= addDays(today, -1).getTime() &&
-      date.getTime() <= today.getTime();
-    return t('transactions.dayHeader', {
-      day: recent ? formatDayLabel(date) : capitalize(formatWeekdayShort(date)),
-      date: formatMonthDay(date),
-    });
-  };
-}
 
 /**
  * Экран истории транзакций — общий у родителя и ребёнка: фильтр по типу,
@@ -86,7 +61,6 @@ function TransactionsScreen<
   renderCard,
 }: ScreenProps<T, F>) {
   const { t } = useTranslation();
-  const dayTitle = useDayTitle();
   // Открытые карточки: день и номер транзакции в нём; null — список.
   const [open, setOpen] = useState<{ day: number; index: number } | null>(null);
   // ?transaction=<id> (тап по строке в Wallet) — сразу карточка этой
@@ -190,7 +164,9 @@ function TransactionsScreen<
               days.map((day, dayIndex) => (
                 <View key={day.date.getTime()} style={styles.day}>
                   <View style={styles.dayHead}>
-                    <Text style={styles.dayTitle}>{dayTitle(day.date)}</Text>
+                    <Text style={styles.dayTitle}>
+                      {formatDayHeader(day.date)}
+                    </Text>
                     <View style={styles.totals}>
                       {day.income > 0 && (
                         <Text style={styles.income}>+${day.income}</Text>

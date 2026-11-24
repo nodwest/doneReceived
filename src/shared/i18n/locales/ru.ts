@@ -292,6 +292,7 @@ export const ru: Dictionary = {
     loadError: 'Не удалось загрузить область',
   },
   time: {
+    dayHeader: '{{day}}, {{date}}',
     justNow: 'только что',
     minutesAgo: '{{count}} мин назад',
     hoursAgo: '{{count}} ч назад',
@@ -330,6 +331,10 @@ export const ru: Dictionary = {
     onReview: 'На проверке',
   },
   activity: {
+    title: 'События',
+    all: 'Все',
+    empty: 'За последние 30 дней событий нет',
+    end: 'Это всё за последние 30 дней',
     pending: 'Ждёт проверки',
     approved: 'Подтверждено',
     taskName: '«{{task}}»',
@@ -690,7 +695,6 @@ export const ru: Dictionary = {
     rewards: 'Награды',
     empty: 'Транзакций пока нет',
     emptyFilter: 'Транзакций этого типа нет',
-    dayHeader: '{{day}}, {{date}}',
     completed: 'Выполнено',
     paidTo: 'Выплата',
     depositFrom: 'Пополнение с',

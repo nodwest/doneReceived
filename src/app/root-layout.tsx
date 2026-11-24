@@ -50,6 +50,7 @@ const APP_SCREENS = [
   'map-zone',
   'rewards-history',
   'transactions',
+  'activity',
   'child/[id]/index',
   'child/[id]/tasks',
   'child/[id]/wishlist/index',

@@ -80,17 +80,21 @@ type FeedItemProps = {
    * из родителей это сделал.
    */
   viewer: 'parent' | 'child';
+  /** Когда: «5 min ago» (главная) или время, если день уже в заголовке. */
+  when?: 'ago' | 'clock';
 };
 
 const capitalize = (text: string) =>
   text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 
 /** Карточка ленты: одна на задание, со статусом и историей изменений. */
-export function FeedItem({ card, viewer }: FeedItemProps) {
+export function FeedItem({ card, viewer, when = 'ago' }: FeedItemProps) {
   const { t } = useTranslation();
   const latest = card.events[0];
   const now = useNow(MINUTE_MS);
-  const timeAgo = formatTimeAgo(new Date(latest.at), now);
+  const latestAt = new Date(latest.at);
+  const time =
+    when === 'clock' ? formatClock(latestAt) : formatTimeAgo(latestAt, now);
   const isTask = latest.assignmentId !== null;
 
   // Кто рядом с карточкой: у родителя — ребёнок (у пополнения — сам родитель),
@@ -110,7 +114,7 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
       : latest.type === 'task_expired'
         ? ''
         : actorName;
-  const subtitle = subtitleName ? `${timeAgo} · ${subtitleName}` : timeAgo;
+  const subtitle = subtitleName ? `${time} · ${subtitleName}` : time;
 
   // Сумма одна на задание: в событиях она повторяется, берём ближайшую.
   const points =
@@ -139,9 +143,9 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
     return event.actor.name || t('member.parent');
   };
   const history = isTask
-    ? [...card.events].reverse().map((event) => {
+    ? card.events.map((event) => {
         const at = new Date(event.at);
-        const when = t('activity.stepTime', {
+        const stepTime = t('activity.stepTime', {
           day: formatDayInPhrase(at, now),
           time: formatClock(at),
         });
@@ -149,7 +153,7 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
         return {
           id: event.id,
           label: capitalize(t(STATUS_KEYS[event.type])),
-          detail: who ? `${who} · ${when}` : when,
+          detail: who ? `${who} · ${stepTime}` : stepTime,
           color: DOT_COLORS[event.type],
         };
       })

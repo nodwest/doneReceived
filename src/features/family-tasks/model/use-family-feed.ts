@@ -1,16 +1,15 @@
 import { useMemo } from 'react';
-import { useFeed, type FeedViewer } from '@entities/activity';
+import { useFeed, useFeedHistory, type FeedViewer } from '@entities/activity';
 import { useMe, useSession } from '@entities/session';
 import { useChildAccount } from './use-child-account';
 import { useFamilyLabels, useRecheckFamilyAccess } from './use-family-labels';
 import { useTaskViewer } from './use-family-tasks';
 
 /**
- * Лента событий на главной. Родитель с семьёй — события всей семьи, вошедший
- * ребёнок — только свои. Родитель в режиме ребёнка смотрит моковую Emma — у
- * него ленты с сервера нет (null), главная показывает моки; так же без семьи.
+ * Кто смотрит ленту: родитель с семьёй — события всей семьи, вошедший ребёнок
+ * — только свои; без семьи — null. Вместе с именами для событий.
  */
-export function useFamilyFeed() {
+function useFeedViewer() {
   const viewer = useTaskViewer();
   const session = useSession();
   const me = useMe();
@@ -33,15 +32,37 @@ export function useFamilyFeed() {
       },
     };
   }, [viewer, childSession, childId, session, me?.avatarUrl]);
-  const { children, members, accessDenied } = useFamilyLabels(
-    feedViewer ? viewer : null,
-  );
+  const labels = useFamilyLabels(feedViewer ? viewer : null);
+  return { feedViewer, childSession, ...labels };
+}
+
+/** Лента событий на главной: последние события. */
+export function useFamilyFeed() {
+  const { feedViewer, childSession, children, members, accessDenied } =
+    useFeedViewer();
   const query = useFeed(feedViewer, children, members);
   const denied = accessDenied || query.accessDenied;
   useRecheckFamilyAccess(denied, !!feedViewer && !childSession);
   return {
     feedViewer,
     ...query,
+    accessDenied: denied,
+    isError: denied || query.isError,
+    data: denied ? undefined : query.data,
+  };
+}
+
+/** Лента за последние 30 дней: страница Activity. */
+export function useFamilyFeedHistory() {
+  const { feedViewer, childSession, children, members, accessDenied } =
+    useFeedViewer();
+  const query = useFeedHistory(feedViewer, children, members);
+  const denied = accessDenied || query.accessDenied;
+  useRecheckFamilyAccess(denied, !!feedViewer && !childSession);
+  return {
+    ...query,
+    /** Дети семьи для фильтра; у вошедшего ребёнка списка нет. */
+    familyChildren: denied ? undefined : children,
     accessDenied: denied,
     isError: denied || query.isError,
     data: denied ? undefined : query.data,

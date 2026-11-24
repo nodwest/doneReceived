@@ -1,3 +1,4 @@
+import { ActivityPage, ChildActivityPage } from '@pages/activity';
 import { ChildHomePage } from '@pages/child-home';
 import { ChildLanguagesPage, LanguagesPage } from '@pages/languages';
 import { MyTasksPage } from '@pages/my-tasks';
@@ -49,4 +50,8 @@ export function LanguagesRoute() {
   ) : (
     <LanguagesPage />
   );
+}
+
+export function ActivityRoute() {
+  return useViewerRole() === 'child' ? <ChildActivityPage /> : <ActivityPage />;
 }

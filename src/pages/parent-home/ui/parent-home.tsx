@@ -145,6 +145,7 @@ export function ParentHomePage() {
           <RecentActivity
             events={familyAccessDenied ? [] : feed}
             viewer="parent"
+            onSeeAll={() => router.push('/activity')}
             isLoading={feedQuery.isPending}
             isError={familyAccessDenied || feedQuery.isError}
             onRetry={

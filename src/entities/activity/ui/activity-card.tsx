@@ -31,7 +31,7 @@ type ActivityCardProps = {
   status?: string;
   subtitle: string;
   amount: string;
-  /** История статусов задания от старой к новой; пусто — не раскрывается. */
+  /** История статусов задания, новые первыми; пусто — не раскрывается. */
   history?: ActivityStep[];
 };
 
@@ -59,7 +59,7 @@ const VISIBLE_CHANGES = 5;
 /**
  * Карточка события в ленте: аватар, название задания со статусом, когда и
  * с кем это случилось, сумма и точки изменений. Карточка задания
- * раскрывается тапом: вместо точек — история статусов по порядку.
+ * раскрывается тапом: вместо точек — история статусов, текущий сверху.
  */
 export function ActivityCard({
   tone,
@@ -76,6 +76,8 @@ export function ActivityCard({
   // Даже одно изменение показываем точкой: у только что созданного задания
   // тоже должен быть виден его статус, а не только слово в заголовке.
   const hasHistory = history.length > 0;
+  // Точки идут слева направо, от старого шага к новому.
+  const dots = history.slice(0, VISIBLE_CHANGES).reverse();
   const changes = t('activity.changeCount', { count: history.length });
 
   const summary = (
@@ -134,7 +136,7 @@ export function ActivityCard({
             <View style={styles.track}>
               {!expanded && (
                 <View style={styles.dots}>
-                  {history.slice(-VISIBLE_CHANGES).map((step, index) => (
+                  {dots.map((step, index) => (
                     <Fragment key={step.id}>
                       {index > 0 && (
                         <View

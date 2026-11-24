@@ -13,15 +13,18 @@ export interface ActivityStep {
 }
 
 type ActivityHistoryProps = {
-  /** Шаги от старого к новому. */
+  /** Шаги от нового к старому. */
   steps: ActivityStep[];
   /** Цвет линии между точками. */
   lineColor: string;
-  /** Цвет последнего, текущего статуса — как у статуса в шапке карточки. */
+  /** Цвет первого, текущего статуса — как у статуса в шапке карточки. */
   currentStyle: StyleProp<TextStyle>;
 };
 
-/** Раскрытая история задания: статусы сверху вниз, последний выделен. */
+/**
+ * Раскрытая история задания: сверху текущий статус (выделен), ниже — всё
+ * более старые.
+ */
 export function ActivityHistory({
   steps,
   lineColor,
@@ -30,6 +33,7 @@ export function ActivityHistory({
   return (
     <View style={styles.panel}>
       {steps.map((step, index) => {
+        const current = index === 0;
         const last = index === steps.length - 1;
         return (
           <View key={step.id} style={styles.step} accessible>
@@ -47,7 +51,10 @@ export function ActivityHistory({
             </View>
             <View style={[styles.text, !last && styles.textGap]}>
               <Text
-                style={[styles.label, last && [styles.current, currentStyle]]}
+                style={[
+                  styles.label,
+                  current && [styles.current, currentStyle],
+                ]}
               >
                 {step.label}
               </Text>

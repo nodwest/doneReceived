@@ -161,6 +161,7 @@ export function ChildHomePage() {
               <RecentActivity
                 events={feed}
                 viewer="child"
+                onSeeAll={() => router.push('/activity')}
                 isLoading={feedQuery.isPending}
                 isError={feedQuery.isError}
                 onRetry={() => {
