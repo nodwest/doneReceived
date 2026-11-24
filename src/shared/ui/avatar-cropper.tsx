@@ -467,7 +467,7 @@ const styles = createStyles((colors) => ({
     bottom: 0,
     left: 0,
     overflow: 'hidden',
-    backgroundColor: colors.viewerBg,
+    backgroundColor: colors.cropperBg,
   },
   scrim: {
     position: 'absolute',

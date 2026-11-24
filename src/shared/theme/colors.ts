@@ -17,10 +17,12 @@ export const lightColors = {
   yellow: '#FFB930',
   grey: '#8A8FA3',
   ink: '#1A1A2E',
-  // Просмотр фото на весь экран: почти чёрный фон и полупрозрачные кнопки на нём.
-  viewerBg: '#0B0C12',
+  // Просмотр фото на весь экран: мягкий чёрный фон, один в обеих темах, и
+  // полупрозрачные кнопки на нём.
+  viewerBg: '#16171C',
   viewerChrome: 'rgba(255, 255, 255, 0.14)',
-  // Затемнение вокруг круга при обрезке аватарки.
+  // Обрезка аватарки: фон и затемнение вокруг круга.
+  cropperBg: '#0B0C12',
   viewerScrim: 'rgba(11, 12, 18, 0.62)',
   success: '#2ECC71',
   white: '#FFFFFF',
@@ -246,8 +248,9 @@ export const darkColors: ThemeColors = {
   yellow: '#FFB930',
   grey: '#9CA3B8',
   ink: '#F3F5FB',
-  viewerBg: '#05060A',
+  viewerBg: '#16171C',
   viewerChrome: 'rgba(255, 255, 255, 0.16)',
+  cropperBg: '#05060A',
   viewerScrim: 'rgba(0, 0, 0, 0.7)',
   success: '#3DDC84',
   white: '#FFFFFF',
