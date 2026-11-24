@@ -57,6 +57,8 @@ export const lightColors = {
   reviewBorder: '#F8CC94',
   // Плашка «On review» в шапке карточки: светлая на янтарной шапке.
   reviewPillBg: 'rgba(255, 255, 255, 0.85)',
+  // Раскрытая история задания в карточке ленты: светлее самой карточки.
+  activityHistory: 'rgba(255, 255, 255, 0.72)',
   // Подтверждённая запись активности.
   approvedFrom: '#E0F8E7',
   approvedTo: '#C5EFD5',
@@ -283,6 +285,7 @@ export const darkColors: ThemeColors = {
   reviewBorder: '#5A4322',
   // Тёмная полупрозрачная плашка на приглушённой янтарной шапке.
   reviewPillBg: 'rgba(0, 0, 0, 0.22)',
+  activityHistory: 'rgba(0, 0, 0, 0.22)',
   approvedFrom: '#123023',
   approvedTo: '#17402E',
   approvedBorder: '#2C5A41',

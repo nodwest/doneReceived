@@ -1,7 +1,12 @@
 import { theme, themedValue } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
-import { useTimeAgo } from '@shared/lib';
-import type { FeedCard, FeedEventType } from '../model';
+import {
+  formatClock,
+  formatDayInPhrase,
+  formatTimeAgo,
+  useNow,
+} from '@shared/lib';
+import type { FeedCard, FeedEvent, FeedEventType } from '../model';
 import { ActivityCard, type ActivityTone } from './activity-card';
 
 /**
@@ -59,8 +64,13 @@ const STATUS_KEYS = {
   event_cancelled: 'activity.status.event_cancelled',
 } as const satisfies Record<FeedEventType, string>;
 
-/** Сколько последних шагов задания видно точками на дорожке. */
-const VISIBLE_CHANGES = 5;
+/** Что делает сам ребёнок: имя берём у него, среди участников его может не быть. */
+const CHILD_ACTIONS: ReadonlySet<FeedEventType> = new Set([
+  'task_submitted',
+  'task_withdrawn',
+]);
+
+const MINUTE_MS = 60 * 1000;
 
 type FeedItemProps = {
   /** Задание со всей историей или одиночное событие. */
@@ -79,7 +89,8 @@ const capitalize = (text: string) =>
 export function FeedItem({ card, viewer }: FeedItemProps) {
   const { t } = useTranslation();
   const latest = card.events[0];
-  const timeAgo = useTimeAgo(latest.at);
+  const now = useNow(MINUTE_MS);
+  const timeAgo = formatTimeAgo(new Date(latest.at), now);
   const isTask = latest.assignmentId !== null;
 
   // Кто рядом с карточкой: у родителя — ребёнок (у пополнения — сам родитель),
@@ -120,15 +131,28 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
       });
   const status = isTask ? t(STATUS_KEYS[latest.type]) : undefined;
 
+  // Кто сделал шаг; у истёкшего задания действующего лица нет.
+  const whoDid = (event: FeedEvent) => {
+    if (event.type === 'task_expired') return '';
+    if (event.byMe) return t('activity.feed.you');
+    if (CHILD_ACTIONS.has(event.type) && event.child) return event.child.name;
+    return event.actor.name || t('member.parent');
+  };
   const history = isTask
-    ? card.events
-        .slice(0, VISIBLE_CHANGES)
-        .reverse()
-        .map((event) => ({
+    ? [...card.events].reverse().map((event) => {
+        const at = new Date(event.at);
+        const when = t('activity.stepTime', {
+          day: formatDayInPhrase(at, now),
+          time: formatClock(at),
+        });
+        const who = whoDid(event);
+        return {
           id: event.id,
           label: capitalize(t(STATUS_KEYS[event.type])),
+          detail: who ? `${who} · ${when}` : when,
           color: DOT_COLORS[event.type],
-        }))
+        };
+      })
     : [];
 
   return (
@@ -141,7 +165,6 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
       subtitle={subtitle}
       amount={amount}
       history={history}
-      changesCount={isTask ? card.events.length : 0}
     />
   );
 }
