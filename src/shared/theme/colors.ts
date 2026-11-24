@@ -59,6 +59,13 @@ export const lightColors = {
   reviewPillBg: 'rgba(255, 255, 255, 0.85)',
   // Раскрытая история задания в карточке ленты: светлее самой карточки.
   activityHistory: 'rgba(255, 255, 255, 0.72)',
+  activityComment: 'rgba(26, 26, 46, 0.06)',
+  // Линия между точками статусов: по цвету карточки.
+  feedLinePending: 'rgba(230, 126, 0, 0.3)',
+  feedLineApproved: 'rgba(31, 153, 92, 0.3)',
+  feedLineNew: 'rgba(30, 95, 184, 0.25)',
+  feedLineSentBack: 'rgba(194, 74, 42, 0.28)',
+  feedLineMissed: 'rgba(75, 84, 104, 0.24)',
   // Подтверждённая запись активности.
   approvedFrom: '#E0F8E7',
   approvedTo: '#C5EFD5',
@@ -285,7 +292,14 @@ export const darkColors: ThemeColors = {
   reviewBorder: '#5A4322',
   // Тёмная полупрозрачная плашка на приглушённой янтарной шапке.
   reviewPillBg: 'rgba(0, 0, 0, 0.22)',
-  activityHistory: 'rgba(0, 0, 0, 0.22)',
+  // Ближе к чёрному, а не к цвету карточки: иначе под оранжевой желтит.
+  activityHistory: 'rgba(11, 12, 16, 0.6)',
+  activityComment: 'rgba(255, 255, 255, 0.08)',
+  feedLinePending: 'rgba(255, 165, 61, 0.5)',
+  feedLineApproved: 'rgba(46, 184, 115, 0.5)',
+  feedLineNew: 'rgba(91, 157, 240, 0.5)',
+  feedLineSentBack: 'rgba(255, 122, 85, 0.5)',
+  feedLineMissed: 'rgba(138, 147, 168, 0.5)',
   approvedFrom: '#123023',
   approvedTo: '#17402E',
   approvedBorder: '#2C5A41',

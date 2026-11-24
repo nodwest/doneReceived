@@ -148,6 +148,7 @@ export function presentFeed(
       const child = visibleChildren.find((entry) => entry.id === item.childId);
       return {
         id: item.id,
+        familyId: viewer.familyId,
         // Закрывающий отказ — последний по назначению: после него событий
         // по нему не бывает, поэтому любой task_rejected закрытого — закрытие.
         type:

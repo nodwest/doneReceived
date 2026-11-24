@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { Pressable, Text, View, type ImageSourcePropType } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme, themedValue } from '@shared/theme';
@@ -33,6 +33,10 @@ type ActivityCardProps = {
   amount: string;
   /** История статусов задания, новые первыми; пусто — не раскрывается. */
   history?: ActivityStep[];
+  expanded: boolean;
+  onToggle: () => void;
+  /** Комментарии к истории не загрузились: показать «повторить». */
+  onRetryComments?: () => void;
 };
 
 const GRADIENTS = themedValue<Record<ActivityTone, readonly [string, string]>>(
@@ -45,13 +49,13 @@ const GRADIENTS = themedValue<Record<ActivityTone, readonly [string, string]>>(
   }),
 );
 
-const CONNECTORS: Record<ActivityTone, string> = {
-  pending: 'rgba(230, 126, 0, 0.3)',
-  approved: 'rgba(31, 153, 92, 0.3)',
-  new: 'rgba(30, 95, 184, 0.25)',
-  sentBack: 'rgba(194, 74, 42, 0.28)',
-  missed: 'rgba(75, 84, 104, 0.24)',
-};
+const CONNECTORS = themedValue<Record<ActivityTone, string>>(() => ({
+  pending: theme.colors.feedLinePending,
+  approved: theme.colors.feedLineApproved,
+  new: theme.colors.feedLineNew,
+  sentBack: theme.colors.feedLineSentBack,
+  missed: theme.colors.feedLineMissed,
+}));
 
 /** Сколько последних шагов задания видно точками на свёрнутой карточке. */
 const VISIBLE_CHANGES = 5;
@@ -70,9 +74,11 @@ export function ActivityCard({
   subtitle,
   amount,
   history = [],
+  expanded,
+  onToggle,
+  onRetryComments,
 }: ActivityCardProps) {
   const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(false);
   // Даже одно изменение показываем точкой: у только что созданного задания
   // тоже должен быть виден его статус, а не только слово в заголовке.
   const hasHistory = history.length > 0;
@@ -125,7 +131,7 @@ export function ActivityCard({
               .join(', ')}
             accessibilityState={{ expanded }}
             aria-expanded={expanded}
-            onPress={() => setExpanded((current) => !current)}
+            onPress={onToggle}
             style={({ pressed }) => [
               styles.content,
               expanded && styles.contentOpen,
@@ -171,6 +177,7 @@ export function ActivityCard({
                 steps={history}
                 lineColor={CONNECTORS[tone]}
                 currentStyle={STATUS_STYLES[tone]}
+                onRetryComments={onRetryComments}
               />
             </View>
           </Collapsible>

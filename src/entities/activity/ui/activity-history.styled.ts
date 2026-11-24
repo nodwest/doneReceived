@@ -36,6 +36,9 @@ export const styles = createStyles((colors) => ({
   textGap: {
     paddingBottom: 10,
   },
+  textGapWide: {
+    paddingBottom: 14,
+  },
   label: {
     fontSize: theme.fontSize.sm,
     lineHeight: 18,
@@ -52,5 +55,45 @@ export const styles = createStyles((colors) => ({
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: colors.inkSoft,
+  },
+  // Пузырь комментария: острый верхний левый угол — как сообщение.
+  comment: {
+    gap: 4,
+    marginTop: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderTopLeftRadius: 2,
+    borderTopRightRadius: 12,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    backgroundColor: colors.activityComment,
+  },
+  reason: {
+    fontSize: theme.fontSize.xs,
+    lineHeight: 15,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.bold,
+    color: colors.sentBack,
+  },
+  commentText: {
+    fontSize: theme.fontSize.sm,
+    lineHeight: 20,
+    letterSpacing: tracking(theme.fontSize.sm),
+    fontFamily: theme.fonts.regular,
+    color: colors.ink,
+  },
+  failed: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 8,
+    marginTop: 10,
+  },
+  retry: {
+    fontSize: theme.fontSize.xs,
+    lineHeight: 15,
+    letterSpacing: tracking(theme.fontSize.xs),
+    fontFamily: theme.fonts.bold,
+    color: colors.childInk,
   },
 }));

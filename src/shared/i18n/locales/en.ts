@@ -339,6 +339,7 @@ export const en = {
     loading: 'Loading activity…',
     loadError: 'Could not load activity',
     stepTime: '{{day}}, {{time}}',
+    commentsError: 'Could not load comments',
     changeCount_one: '{{count}} change',
     changeCount_other: '{{count}} changes',
     status: {

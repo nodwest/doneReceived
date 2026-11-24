@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { skipToken, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import type { FeedViewer } from '../model/feed';
+import { fetchSubmissionComments } from './comments-api';
 import {
   fetchFeed,
   mergeFeedPages,
@@ -32,6 +33,11 @@ export const feedKeys = {
     childId?: string,
     scope?: string | null,
   ) => [...feedKeys.all, familyId, userId, childId, scope] as const,
+  comments: (
+    familyId: string,
+    assignmentId: string | null,
+    scope?: string | null,
+  ) => [...feedKeys.all, 'comments', familyId, assignmentId, scope] as const,
   history: (
     familyId: string | null,
     userId: string | null,
@@ -132,4 +138,25 @@ export function useFeedHistory(
   );
   const accessDenied = isAccessDenied(query.error);
   return { ...query, accessDenied, data: accessDenied ? undefined : data };
+}
+
+/**
+ * Комментарии к истории задания. Запрос — только когда карточку раскрыли
+ * (`enabled`): статусы видны сразу, комментарии появляются следом.
+ */
+export function useSubmissionComments(
+  familyId: string,
+  assignmentId: string | null,
+  enabled: boolean,
+) {
+  const scope = usePrivateReadScope();
+  return useQuery({
+    ...privateReadOptions,
+    queryKey: feedKeys.comments(familyId, assignmentId, scope),
+    queryFn:
+      assignmentId && enabled
+        ? ({ signal }) =>
+            fetchSubmissionComments(familyId, assignmentId, signal)
+        : skipToken,
+  });
 }

@@ -9,7 +9,11 @@ import Animated, {
 } from 'react-native-reanimated';
 
 const DURATION_MS = 220;
-const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
+const TIMING = {
+  duration: DURATION_MS,
+  easing: Easing.bezier(0.23, 1, 0.32, 1),
+  reduceMotion: ReduceMotion.System,
+};
 
 type CollapsibleProps = {
   open: boolean;
@@ -29,13 +33,7 @@ export function Collapsible({ open, children }: CollapsibleProps) {
   const progress = useSharedValue(open ? 1 : 0);
 
   useEffect(() => {
-    progress.set(
-      withTiming(open ? 1 : 0, {
-        duration: DURATION_MS,
-        easing: EASE_OUT,
-        reduceMotion: ReduceMotion.System,
-      }),
-    );
+    progress.set(withTiming(open ? 1 : 0, TIMING));
     if (open) return;
     // Убирает содержимое таймер, а не конец анимации: так оно исчезнет, даже
     // если анимация не доиграет.
@@ -57,7 +55,11 @@ export function Collapsible({ open, children }: CollapsibleProps) {
     >
       <View
         style={styles.content}
-        onLayout={(event) => height.set(event.nativeEvent.layout.height)}
+        onLayout={(event) => {
+          const next = event.nativeEvent.layout.height;
+          // Первый замер — сразу, дальше содержимое растёт плавно.
+          height.set(height.get() === 0 ? next : withTiming(next, TIMING));
+        }}
       >
         {children}
       </View>

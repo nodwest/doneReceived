@@ -341,6 +341,7 @@ export const ru: Dictionary = {
     loading: 'Загружаем историю…',
     loadError: 'Не удалось загрузить историю',
     stepTime: '{{day}}, {{time}}',
+    commentsError: 'Не удалось загрузить комментарии',
     changeCount_one: '{{count}} изменение',
     changeCount_few: '{{count}} изменения',
     changeCount_many: '{{count}} изменений',

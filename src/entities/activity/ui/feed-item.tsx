@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { theme, themedValue } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
 import {
@@ -6,7 +7,14 @@ import {
   formatTimeAgo,
   useNow,
 } from '@shared/lib';
-import type { FeedCard, FeedEvent, FeedEventType } from '../model';
+import { useSubmissionComments } from '../api/feed-query';
+import {
+  canHaveComments,
+  matchStepComments,
+  type FeedCard,
+  type FeedEvent,
+  type FeedEventType,
+} from '../model';
 import { ActivityCard, type ActivityTone } from './activity-card';
 
 /**
@@ -135,6 +143,19 @@ export function FeedItem({ card, viewer, when = 'ago' }: FeedItemProps) {
       });
   const status = isTask ? t(STATUS_KEYS[latest.type]) : undefined;
 
+  // Комментарии ребёнка и родителя: загружаются, когда карточку раскрыли.
+  const [expanded, setExpanded] = useState(false);
+  const commentsQuery = useSubmissionComments(
+    latest.familyId,
+    latest.assignmentId,
+    expanded && canHaveComments(card.events),
+  );
+  const submissions = commentsQuery.data;
+  const comments = useMemo(
+    () => submissions && matchStepComments(card.events, submissions),
+    [card.events, submissions],
+  );
+
   // Кто сделал шаг; у истёкшего задания действующего лица нет.
   const whoDid = (event: FeedEvent) => {
     if (event.type === 'task_expired') return '';
@@ -155,6 +176,7 @@ export function FeedItem({ card, viewer, when = 'ago' }: FeedItemProps) {
           label: capitalize(t(STATUS_KEYS[event.type])),
           detail: who ? `${who} · ${stepTime}` : stepTime,
           color: DOT_COLORS[event.type],
+          comment: comments?.get(event.id),
         };
       })
     : [];
@@ -169,6 +191,11 @@ export function FeedItem({ card, viewer, when = 'ago' }: FeedItemProps) {
       subtitle={subtitle}
       amount={amount}
       history={history}
+      expanded={expanded}
+      onToggle={() => setExpanded((current) => !current)}
+      onRetryComments={
+        commentsQuery.isError ? () => void commentsQuery.refetch() : undefined
+      }
     />
   );
 }

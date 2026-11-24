@@ -27,6 +27,7 @@ export interface FeedPerson {
 /** Событие ленты на главной, с именами вместо id. */
 export interface FeedEvent {
   id: string;
+  familyId: string;
   type: FeedEventType;
   /** ISO-время события. */
   at: string;
