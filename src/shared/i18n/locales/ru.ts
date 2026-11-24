@@ -774,6 +774,7 @@ export const ru: Dictionary = {
     wentBackTo: 'Вернулись к {{name}} · {{date}}',
   },
   rewardsHistory: {
+    rewardUnavailable: 'Награда недоступна',
     paidTasks: 'Выплаченные задания',
     myRewards: 'Мои награды',
     title: 'История вознаграждений',

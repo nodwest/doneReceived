@@ -756,6 +756,7 @@ export const en = {
     wentBackTo: 'Went back to {{name}} · {{date}}',
   },
   rewardsHistory: {
+    rewardUnavailable: 'Reward unavailable',
     paidTasks: 'Paid tasks',
     myRewards: 'My rewards',
     title: 'Rewards history',

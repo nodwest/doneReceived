@@ -13,6 +13,15 @@ export const styles = createStyles((colors) => ({
     paddingTop: 12,
     paddingHorizontal: 16,
   },
+  period: {
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  periodLabel: {
+    color: colors.ink,
+  },
   headerSpacer: {
     width: 44,
   },

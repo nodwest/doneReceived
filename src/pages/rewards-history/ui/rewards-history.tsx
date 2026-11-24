@@ -17,7 +17,8 @@ import {
 } from '@widgets/paid-task-card';
 import {
   getDayTotals,
-  getHistoryDays,
+  useRewardById,
+  useRewardPeriod,
   isSameDay,
   OperationRow,
   sortByNewest,
@@ -26,24 +27,35 @@ import {
 } from '@entities/operation';
 import {
   useChildAccount,
-  useFamilyOperations,
-  useMyChildWallet,
+  useOperationsViewer,
   useMyWishlistOwner,
   useTaskFamilyId,
 } from '@features/family-tasks';
 import { useFamilyChildren, useFamilyMembers } from '@entities/family';
 import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { TaskIconBadge } from '@entities/task';
-import { balanceAfter } from '@entities/wallet';
 import { getRewardGoal, useWishes } from '@entities/wish';
 import { useTranslation } from '@shared/i18n';
-import { formatDayLabel, formatMonthDay, startOfDay } from '@shared/lib';
+import {
+  addDays,
+  formatDayLabel,
+  formatMonthDay,
+  startOfDay,
+} from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
-import { RoundButton, SnapCarousel } from '@shared/ui';
+import { Button, RoundButton, SnapCarousel } from '@shared/ui';
 import { styles } from './rewards-history.styled';
 import { authorizedImage } from '@shared/api';
 
 const NO_OPERATIONS: Operation[] = [];
+
+function dayKey(date: Date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
+}
 
 /**
  * История наград по дням (открывается из Wallet и «See all» в профилях):
@@ -64,8 +76,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   useTheme();
   const myId = useMyId();
   const { t } = useTranslation();
-  const { data: allOperations = NO_OPERATIONS, isPending } =
-    useFamilyOperations();
+  const operationsViewer = useOperationsViewer();
   // Кто дал и подтвердил задание: вошедший родитель — из его профиля,
   // остальные — из участников семьи (их видит и ребёнок; без фото — буква),
   // не нашли — «Родитель».
@@ -96,18 +107,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
       })),
     [serverChildren],
   );
-  // Родитель видит награды только по своим заданиям — те, что выплатил из
-  // своего кошелька; ребёнок — все свои награды, от любого родителя.
-  const operations = useMemo(
-    () =>
-      childId === undefined
-        ? allOperations.filter((operation) => operation.parentId === myId)
-        : allOperations,
-    [allOperations, childId, myId],
-  );
-  // Копилка — только в истории от лица ребёнка: его вишлист и кошелёк.
   const { data: wishes } = useWishes(useMyWishlistOwner());
-  const { data: childWallet } = useMyChildWallet();
   // Сегодня фиксируем на время жизни экрана: от него строится лента дней.
   const [today] = useState(() => new Date());
   // «See all» в профиле ребёнка открывает историю сразу с его фильтром;
@@ -132,21 +132,61 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const [linked, setLinked] = useState<string | undefined>(operationParam);
   const [linkPending, setLinkPending] = useState(operationParam !== undefined);
 
-  // Лента дней общая для всех детей, чтобы при смене фильтра не прыгала.
-  const days = useMemo(
-    () => getHistoryDays(operations, today),
-    [operations, today],
+  const [month, setMonth] = useState(
+    () => new Date(today.getFullYear(), today.getMonth(), 1),
   );
+  const [handledLink, setHandledLink] = useState<string>();
+  const rewardQuery = useRewardById(
+    operationsViewer,
+    linkPending ? operationParam : undefined,
+  );
+  const linkedReward = rewardQuery.data;
+  if (linkPending && linkedReward && handledLink !== linkedReward.id) {
+    const date = new Date(linkedReward.at);
+    setHandledLink(linkedReward.id);
+    setFilter(linkedReward.child.id);
+    setMonth(new Date(date.getFullYear(), date.getMonth(), 1));
+    setSelected(date.getDate() - 1);
+  }
+  const nextMonth = new Date(month.getFullYear(), month.getMonth() + 1, 1);
+  const tomorrow = addDays(startOfDay(today), 1);
+  const end = nextMonth < tomorrow ? nextMonth : tomorrow;
+  const endTime = end.getTime();
+  const historyQuery = useRewardPeriod(
+    operationsViewer,
+    {
+      from: month.toISOString(),
+      to: end.toISOString(),
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC',
+    },
+    filter,
+  );
+  const { isPending } = historyQuery;
+  const days = useMemo(() => {
+    const result: Date[] = [];
+    for (let date = month; date.getTime() < endTime; date = addDays(date, 1))
+      result.push(date);
+    return result;
+  }, [month, endTime]);
   const filtered = useMemo(
-    () =>
-      sortByNewest(
-        filter === 'all'
-          ? operations
-          : operations.filter((operation) => operation.child.id === filter),
-      ),
-    [operations, filter],
+    () => sortByNewest(historyQuery.data?.operations ?? NO_OPERATIONS),
+    [historyQuery.data],
   );
-  const totals = useMemo(() => getDayTotals(days, filtered), [days, filtered]);
+  const totals = useMemo(
+    () =>
+      getDayTotals(days, filtered).map((day) => ({
+        ...day,
+        earned: historyQuery.data?.earnedByDay.get(dayKey(day.date)) ?? 0,
+      })),
+    [days, filtered, historyQuery.data],
+  );
+
+  const changeMonth = (delta: number) => {
+    setSelected(null);
+    setLinkPending(false);
+    setLinked(undefined);
+    setMonth(new Date(month.getFullYear(), month.getMonth() + delta, 1));
+  };
 
   /** Задания дня одного вида — в том порядке, в каком листаются карточки. */
   const ofDay = (date: Date, of: OperationKind) =>
@@ -167,21 +207,14 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     return true;
   };
 
-  // Ссылка на награду: как только история пришла, встаём на её день и
-  // открываем её карточку (один раз).
-  if (linkPending && operations.length > 0) {
-    setLinkPending(false);
+  if (linkPending && linkedReward && historyQuery.isSuccess) {
     const target = filtered.find(
-      // Ссылка из транзакции: id награды или (выплата с сервера) назначения.
-      (operation) =>
-        operation.id === operationParam ||
-        (operation.kind === 'earned' &&
-          operation.assignmentId === operationParam),
+      (operation) => operation.id === linkedReward.id,
     );
-    if (!target || !openCard(target)) setLinked(undefined);
+    if (target && openCard(target)) setLinkPending(false);
   }
 
-  const selectedIndex = selected ?? days.length - 1;
+  const selectedIndex = Math.min(selected ?? days.length - 1, days.length - 1);
   const day = totals[selectedIndex];
   // В списке под графиком — и выплаченные, и упущенные (серые), по времени.
   const dayOperations = useMemo(
@@ -210,19 +243,9 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     return groups;
   }, [filtered, kind]);
 
-  // Копилка ребёнка после награды: баланс сразу после неё по его
-  // транзакциям (награды и выводы на карту).
   const goalFor = (operation: Operation) => {
-    if (childId === undefined || !wishes || !childWallet) return null;
-    const reward = childWallet.transactions.find(
-      (item) => item.kind === 'reward' && item.operationId === operation.id,
-    );
-    if (!reward) return null;
-    const after = balanceAfter(
-      childWallet.transactions,
-      childWallet.balance,
-      reward,
-    );
+    const after = operation.balanceAfter;
+    if (childId === undefined || !wishes || after === undefined) return null;
     return getRewardGoal(wishes, after - operation.amount, after);
   };
 
@@ -417,9 +440,53 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
           ) : (
             <View style={styles.noFilter} />
           )}
-          {!isPending && (
+          <View style={styles.period}>
+            <RoundButton
+              icon="arrow-left"
+              accessibilityLabel={t('calendar.previousMonth')}
+              onPress={() => changeMonth(-1)}
+            />
+            <Text style={styles.periodLabel}>
+              {month.toLocaleDateString(undefined, {
+                month: 'long',
+                year: 'numeric',
+              })}
+            </Text>
+            {nextMonth <= today ? (
+              <RoundButton
+                icon="arrow-right"
+                accessibilityLabel={t('calendar.nextMonth')}
+                onPress={() => changeMonth(1)}
+              />
+            ) : (
+              <View style={styles.headerSpacer} />
+            )}
+          </View>
+          {historyQuery.isError || (linkPending && rewardQuery.isError) ? (
+            <Button
+              onPress={() => {
+                if (historyQuery.isError) void historyQuery.refetch();
+                if (rewardQuery.isError) void rewardQuery.refetch();
+              }}
+            >
+              <Text style={styles.empty}>{t('common.retry')}</Text>
+            </Button>
+          ) : null}
+          {linkPending &&
+          (rewardQuery.data === null ||
+            (linkedReward &&
+              historyQuery.isSuccess &&
+              !filtered.some(
+                (operation) => operation.id === linkedReward.id,
+              ))) ? (
+            <Text style={styles.empty}>
+              {t('rewardsHistory.rewardUnavailable')}
+            </Text>
+          ) : null}
+          {!isPending && !historyQuery.isError && (
             <>
               <OperationsChart
+                key={month.toISOString()}
                 days={totals}
                 selectedIndex={selectedIndex}
                 onSelect={setSelected}

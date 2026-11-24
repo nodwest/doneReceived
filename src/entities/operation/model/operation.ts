@@ -38,6 +38,7 @@ export interface Operation {
    * транзакциях родителя открывает эту награду.
    */
   assignmentId?: string;
+  balanceAfter?: number;
   /** Упущенная: срок задания; null — срока не было. */
   dueAt?: string | null;
   /**
