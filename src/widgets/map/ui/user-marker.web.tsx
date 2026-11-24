@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import * as maplibregl from 'maplibre-gl';
+import { authorizedImage } from '@shared/api';
+import { LetterAvatar } from '@shared/ui';
 import { useTranslation } from '@shared/i18n';
 import { useTheme } from '@shared/theme';
 import { formatTimeAgo, useNow } from '@shared/lib';
@@ -13,7 +15,7 @@ export type UserMarkerData = {
   lat: number;
   lng: number;
   name: string;
-  /** object URL авторизованного аватара; null — рисуем первую букву. */
+  /** URL аватара API; null — рисуем первую букву. */
   avatarUrl: string | null;
   color: string;
   /** Находится ли человек в какой-либо зоне прямо сейчас. */
@@ -109,7 +111,6 @@ export function UserMarker({ map, user }: UserMarkerProps) {
   const status = hasDate
     ? [place, ago].filter(Boolean).join(' · ')
     : t('map.markerNoData');
-  const initial = user.name.trim().charAt(0).toUpperCase() || '?';
 
   const cardStyle: CSSProperties = {
     position: 'absolute',
@@ -182,49 +183,18 @@ export function UserMarker({ map, user }: UserMarkerProps) {
         <circle cx="24" cy="23" r="17.5" fill="#FFFFFF" />
       </svg>
 
-      <span
-        aria-hidden="true"
+      <LetterAvatar
+        source={user.avatarUrl ? authorizedImage(user.avatarUrl) : null}
+        name={user.name}
         style={{
           position: 'absolute',
           left: 7,
           top: 6,
-          zIndex: 0,
           width: 34,
           height: 34,
-          borderRadius: '50%',
-          display: 'grid',
-          placeItems: 'center',
-          backgroundColor: colors.violetIcon,
-          color: user.color,
-          fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: 14,
-          fontWeight: 700,
+          borderRadius: 17,
         }}
-      >
-        {initial}
-      </span>
-
-      {user.avatarUrl ? (
-        <img
-          src={user.avatarUrl}
-          alt=""
-          draggable={false}
-          onError={(event) => {
-            event.currentTarget.style.display = 'none';
-          }}
-          style={{
-            position: 'absolute',
-            left: 7,
-            top: 6,
-            zIndex: 1,
-            width: 34,
-            height: 34,
-            borderRadius: '50%',
-            objectFit: 'cover',
-            backgroundColor: colors.surface,
-          }}
-        />
-      ) : null}
+      />
 
       <span
         aria-hidden="true"

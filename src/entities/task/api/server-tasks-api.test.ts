@@ -79,11 +79,11 @@ describe('task submission requests', () => {
     expect(apiRequest.mock.calls).toEqual([
       [
         '/families/family/task-submissions/original-report',
-        { method: 'DELETE', signal: undefined },
+        { method: 'DELETE', signal: undefined, timeoutMs: 15_000 },
       ],
       [
         '/families/family/task-submissions/original-report',
-        { method: 'DELETE', signal: undefined },
+        { method: 'DELETE', signal: undefined, timeoutMs: 15_000 },
       ],
     ]);
   });

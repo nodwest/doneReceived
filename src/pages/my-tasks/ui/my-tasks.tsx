@@ -109,7 +109,10 @@ export function MyTasksPage() {
   );
   // У каждой вкладки своя карточка: возвращаясь тоглом, видим ту, с которой ушли.
   const [currentIds, setCurrentIds] = useState<Record<TasksTab, string | null>>(
-    { all: initialTaskId, review: null },
+    {
+      all: params.tab === 'review' ? null : initialTaskId,
+      review: params.tab === 'review' ? initialTaskId : null,
+    },
   );
 
   const tasks = tab === 'review' ? reviewTasks : allTasks;
@@ -208,6 +211,7 @@ export function MyTasksPage() {
             ]}
           >
             <TaskCarousel
+              key={tab}
               fullWidth
               tone="child"
               tasks={cardTasks}

@@ -119,7 +119,6 @@ export function useTaskActions(taskId?: string) {
           .some(
             ({ state }) =>
               state.status === 'success' &&
-              !state.isInvalidated &&
               Array.isArray(state.data) &&
               (state.data as Task[]).some(
                 (latest) => latest.id === id && latest.status === 'active',

@@ -57,7 +57,8 @@
         }
       ],
       "@maplibre/maplibre-react-native",
-      "./plugins/with-windows-cmake-paths"
+      "./plugins/with-windows-cmake-paths",
+      "expo-image"
     ]
   }
 }

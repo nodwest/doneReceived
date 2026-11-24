@@ -28,17 +28,6 @@ export const styles = createStyles((colors) => ({
     height: 56,
     borderRadius: 28,
   },
-  initial: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.violetSoft,
-  },
-  initialText: {
-    fontSize: 24,
-    letterSpacing: tracking(24),
-    fontFamily: theme.fonts.semibold,
-    color: colors.violetInk,
-  },
   subtitle: {
     fontSize: theme.fontSize.inputName,
     letterSpacing: tracking(theme.fontSize.inputName),

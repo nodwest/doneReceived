@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ApiImage } from '@shared/ui';
+import { LetterAvatar } from '@shared/ui';
 import {
   Platform,
   Pressable,
@@ -72,15 +72,12 @@ export function MemberCard({
           onPress={onPress}
           style={({ pressed }) => [styles.main, pressed && styles.pressed]}
         >
-          {avatar ? (
-            <ApiImage source={avatar} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, styles.initial]}>
-              <Text style={styles.initialText}>
-                {name.charAt(0).toUpperCase()}
-              </Text>
-            </View>
-          )}
+          <LetterAvatar
+            source={avatar}
+            name={name}
+            style={styles.avatar}
+            letterSize={24}
+          />
           <View style={styles.info}>
             <View style={styles.nameRow}>
               <Text style={styles.name} numberOfLines={1}>

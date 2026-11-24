@@ -25,7 +25,6 @@ import {
   defaultMapColor,
   type MapLayerSettings,
 } from './model/layer-preferences';
-import { useUserAvatarUrls } from './model/use-user-avatar-urls';
 import { UserMarker } from './ui/user-marker.web';
 import { HistoryMapLayer } from './ui/history-map.web';
 import type { HistoryMapProps } from './ui/history-map-model';
@@ -118,16 +117,6 @@ export function MapWeb({
     () => new Map(zones.map((zone) => [zone.id, zone.name] as const)),
     [zones],
   );
-  const avatarUsers = useMemo(
-    () =>
-      childMembers.map((member) => ({
-        id: member.userId,
-        avatarUrl: member.avatarUrl,
-      })),
-    [childMembers],
-  );
-  const avatarUrls = useUserAvatarUrls(avatarUsers);
-
   // Скрытые пункты нужны внутри циклов отрисовки и обработчиков без
   // пересоздания сокетов и эффектов на каждое переключение.
   const hiddenRoutesRef = useRef(hiddenRoutes);
@@ -383,7 +372,7 @@ export function MapWeb({
                   lat: location.lat,
                   lng: location.lng,
                   name: member.displayName,
-                  avatarUrl: avatarUrls[location.userId] ?? null,
+                  avatarUrl: member.avatarUrl,
                   color: member.mapColor ?? defaultMapColor(member.kind),
                   inZone: !!location.zoneId,
                   zoneName: location.zoneId

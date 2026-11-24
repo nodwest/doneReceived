@@ -65,6 +65,20 @@ describe('toFamilyEvent', () => {
     expect(event.canEdit).toBe(true);
   });
 
+  it('shows a participant once and keeps their available avatar', () => {
+    const person = { userId: 'person', displayName: 'Эмма', avatarUrl: null };
+    const event = toFamilyEvent(
+      dto({
+        participants: [person, { ...person, avatarUrl: '/avatar' }, person],
+      }),
+      image,
+    );
+
+    expect(event.participants).toEqual([
+      { id: 'person', name: 'Эмма', avatar: { uri: 'image:/avatar' } },
+    ]);
+  });
+
   it('maps a personal response, photo and reminder', () => {
     const event = toFamilyEvent(
       dto({

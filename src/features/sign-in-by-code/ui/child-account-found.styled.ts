@@ -19,17 +19,6 @@ export const styles = createStyles((colors) => ({
     borderWidth: 2,
     borderColor: colors.white,
   },
-  initial: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.violetSoft,
-  },
-  initialText: {
-    fontSize: 18,
-    letterSpacing: tracking(18),
-    fontFamily: theme.fonts.bold,
-    color: colors.violetInk,
-  },
   text: {
     flex: 1,
     gap: 3,

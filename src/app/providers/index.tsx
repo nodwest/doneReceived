@@ -24,8 +24,10 @@ import { PushNotificationsConnection } from '@features/push-notifications';
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
-      if (query.meta?.privateRead && isAccessDenied(error))
-        query.setState({ data: undefined });
+      if (!query.meta?.privateRead || !isAccessDenied(error)) return;
+      const hadData = query.state.data !== undefined;
+      query.setState({ data: undefined });
+      if (hadData) clearPrivateImageCache();
     },
   }),
   defaultOptions: { queries: { staleTime: FRESH_MS } },

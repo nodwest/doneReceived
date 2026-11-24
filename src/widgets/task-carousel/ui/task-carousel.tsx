@@ -3,6 +3,7 @@ import type { ViewStyle } from 'react-native';
 import { TaskCard, type Task } from '@entities/task';
 import { theme } from '@shared/theme';
 import { SnapCarousel } from '@shared/ui';
+import { TaskPager } from './task-pager';
 
 type TaskCarouselProps = {
   tasks: readonly Task[];
@@ -29,6 +30,20 @@ export function TaskCarousel({
   tone = 'parent',
   fullWidth,
 }: TaskCarouselProps) {
+  const dotColor =
+    tone === 'child' ? theme.colors.childFrom : theme.colors.violet;
+  if (fullWidth) {
+    return (
+      <TaskPager
+        items={tasks}
+        renderItem={renderTask}
+        initialIndex={initialIndex ?? 0}
+        onIndexChange={onIndexChange}
+        dotColor={dotColor}
+      />
+    );
+  }
+
   return (
     <SnapCarousel
       items={tasks}
@@ -36,10 +51,7 @@ export function TaskCarousel({
       renderItem={renderTask}
       initialIndex={initialIndex}
       onIndexChange={onIndexChange}
-      dotColor={tone === 'child' ? theme.colors.childFrom : theme.colors.violet}
-      peek={fullWidth ? 0 : undefined}
-      fill={fullWidth}
-      gutter={fullWidth ? 16 : undefined}
+      dotColor={dotColor}
     />
   );
 }

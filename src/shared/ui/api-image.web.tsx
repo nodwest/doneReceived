@@ -2,9 +2,14 @@ import { useEffect, useState } from 'react';
 import { Image, type ImageProps } from 'react-native';
 import {
   currentAccessToken,
+  isTrustedApiImageUrl,
   refreshAccessToken,
   usePrivateReadScope,
 } from '../api';
+import {
+  invalidatePrivateImageGeneration,
+  usePrivateImageGeneration,
+} from './private-image-cache';
 
 // В вебе <img> не умеет слать заголовки, а react-native-web их отбрасывает:
 // картинку с токеном скачиваем fetch'ем и показываем через blob-ссылку.
@@ -23,6 +28,7 @@ export function clearPrivateImageCache() {
   for (const url of ready.values()) URL.revokeObjectURL(url);
   loaded.clear();
   ready.clear();
+  invalidatePrivateImageGeneration();
 }
 
 /**
@@ -31,10 +37,12 @@ export function clearPrivateImageCache() {
  * тем же единственным refresh, что у запросов, и пробуем ещё раз.
  */
 async function download(uri: string, signal: AbortSignal) {
+  if (!isTrustedApiImageUrl(uri)) throw new Error('Untrusted image origin');
   const get = (token: string | null) =>
     fetch(uri, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       cache: 'no-store',
+      redirect: 'error',
       signal,
     });
   const token = currentAccessToken();
@@ -48,22 +56,22 @@ async function download(uri: string, signal: AbortSignal) {
   return response.blob();
 }
 
-function load(uri: string) {
-  let pending = loaded.get(uri);
+function load(uri: string, key: string) {
+  let pending = loaded.get(key);
   if (!pending) {
     const { signal } = imageRequests;
     pending = download(uri, signal).then((blob) => {
       if (signal.aborted) throw new Error('Image request cancelled');
       const url = URL.createObjectURL(blob);
-      ready.set(uri, url);
+      ready.set(key, url);
       return url;
     });
     // Ошибка не запоминается: при следующем показе (например, с новым
     // токеном) попробуем снова.
     pending.catch(() => {
-      if (loaded.get(uri) === pending) loaded.delete(uri);
+      if (loaded.get(key) === pending) loaded.delete(key);
     });
-    loaded.set(uri, pending);
+    loaded.set(key, pending);
     if (loaded.size > MAX_CACHED) {
       const [oldest] = loaded.keys();
       loaded
@@ -90,33 +98,72 @@ const withHeaders = (source: ImageProps['source']): HeaderSource | null =>
     ? (source as HeaderSource)
     : null;
 
-export function ApiImage({ source, ...props }: ImageProps) {
+type ApiImageProps = ImageProps & {
+  retainInMemory?: boolean;
+  onImageLoad?: () => void;
+};
+
+export function ApiImage({
+  source,
+  retainInMemory = true,
+  onImageLoad,
+  onLoad,
+  ...props
+}: ApiImageProps) {
   const remote = withHeaders(source);
   const uri = remote?.uri;
   const scope = usePrivateReadScope();
+  const generation = usePrivateImageGeneration();
   const [blob, setBlob] = useState<{
-    scope: string;
-    uri: string;
+    key: string;
     url: string;
   } | null>(null);
-  const cached = scope && uri ? ready.get(uri) : undefined;
+  const cacheKey =
+    scope && uri ? JSON.stringify([generation, scope, uri]) : null;
+  const cached = retainInMemory && cacheKey ? ready.get(cacheKey) : undefined;
 
   useEffect(() => {
-    if (!scope || !uri || ready.has(uri)) return;
+    if (!scope || !uri || !cacheKey || (retainInMemory && ready.has(cacheKey)))
+      return;
     let alive = true;
-    load(uri)
+    let objectUrl: string | undefined;
+    const controller = new AbortController();
+    const signal = AbortSignal.any([controller.signal, imageRequests.signal]);
+    const pending = retainInMemory
+      ? load(uri, cacheKey)
+      : download(uri, signal).then((data) => {
+          if (!alive || signal.aborted)
+            throw new Error('Image request cancelled');
+          objectUrl = URL.createObjectURL(data);
+          return objectUrl;
+        });
+    pending
       .then((url) => {
-        if (alive) setBlob({ scope, uri, url });
+        if (alive && !signal.aborted) setBlob({ key: cacheKey, url });
       })
       .catch(() => {});
+    const revoke = () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+    signal.addEventListener('abort', revoke, { once: true });
     return () => {
       alive = false;
+      controller.abort();
+      signal.removeEventListener('abort', revoke);
     };
-  }, [uri, scope]);
+  }, [uri, scope, cacheKey, retainInMemory]);
 
-  if (!remote) return <Image source={source} {...props} />;
-  const url =
-    cached ??
-    (blob && blob.scope === scope && blob.uri === uri ? blob.url : undefined);
-  return <Image source={url ? { uri: url } : undefined} {...props} />;
+  const handleLoad: ImageProps['onLoad'] = (event) => {
+    onLoad?.(event);
+    onImageLoad?.();
+  };
+  if (!remote) return <Image source={source} {...props} onLoad={handleLoad} />;
+  const url = cached ?? (blob && blob.key === cacheKey ? blob.url : undefined);
+  return (
+    <Image
+      source={url ? { uri: url } : undefined}
+      {...props}
+      onLoad={handleLoad}
+    />
+  );
 }

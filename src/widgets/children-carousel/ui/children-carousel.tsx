@@ -1,4 +1,5 @@
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { ChildCard, type ChildOverview } from '@entities/user';
 import { useSnapCarousel } from '@shared/lib';
 import {
@@ -35,8 +36,7 @@ export function ChildrenCarousel({
     trackPaddingRight,
     onLayout,
     onScroll,
-    onMomentumScrollEnd,
-    onScrollEndDrag,
+    snapToOffsets,
   } = useSnapCarousel({
     count: items.length,
     gutter: CAROUSEL_GUTTER,
@@ -46,13 +46,13 @@ export function ChildrenCarousel({
 
   return (
     <View>
-      <ScrollView
+      <Animated.ScrollView
         ref={scrollRef}
         horizontal
         onLayout={onLayout}
         onScroll={onScroll}
-        onMomentumScrollEnd={onMomentumScrollEnd}
-        onScrollEndDrag={onScrollEndDrag}
+        snapToOffsets={snapToOffsets}
+        disableIntervalMomentum
         scrollEventThrottle={16}
         scrollEnabled={!single}
         showsHorizontalScrollIndicator={false}
@@ -78,7 +78,7 @@ export function ChildrenCarousel({
             style={{ width: cardWidth || undefined }}
           />
         ))}
-      </ScrollView>
+      </Animated.ScrollView>
       {!single && (
         <View style={styles.dots}>
           {items.map((child, i) => (

@@ -25,7 +25,7 @@ import { authorizedImage } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
 import { createStyles, theme, tracking } from '@shared/theme';
-import { ApiImage } from '@shared/ui';
+import { LetterAvatar } from '@shared/ui';
 import { MAP_STYLE } from './config/map-style';
 import {
   defaultMapColor,
@@ -258,11 +258,20 @@ export function MapWeb({
               source="buses"
               layout={{
                 'icon-image': 'bus',
-                'icon-size': 0.7,
+                'icon-size': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  10,
+                  0.14,
+                  14,
+                  0.22,
+                  17,
+                  0.36,
+                ],
                 'icon-rotate': ['get', 'bearing'],
                 'icon-rotation-alignment': 'map',
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': true,
+                'icon-padding': 4,
               }}
             />
           </GeoJSONSource>
@@ -312,16 +321,13 @@ export function MapWeb({
                 }`}
                 style={[styles.pin, { backgroundColor: marker.color }]}
               >
-                {marker.avatarUrl ? (
-                  <ApiImage
-                    source={authorizedImage(marker.avatarUrl)}
-                    style={styles.avatar}
-                  />
-                ) : (
-                  <Text style={styles.initial}>
-                    {marker.name.trim().charAt(0).toUpperCase() || '?'}
-                  </Text>
-                )}
+                <LetterAvatar
+                  source={
+                    marker.avatarUrl ? authorizedImage(marker.avatarUrl) : null
+                  }
+                  name={marker.name}
+                  style={styles.avatar}
+                />
               </View>
               <View
                 style={[styles.pinTail, { borderTopColor: marker.color }]}
@@ -423,11 +429,6 @@ const styles = createStyles((colors) => ({
     width: 34,
     height: 34,
     borderRadius: 17,
-  },
-  initial: {
-    fontSize: 16,
-    fontFamily: theme.fonts.bold,
-    color: colors.white,
   },
   pinTail: {
     width: 0,
