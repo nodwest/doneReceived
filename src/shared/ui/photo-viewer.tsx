@@ -411,6 +411,6 @@ const styles = createStyles((colors) => ({
   },
   dotActive: {
     width: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
   },
 }));

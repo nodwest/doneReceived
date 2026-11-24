@@ -304,6 +304,7 @@ export const en = {
     loadError: 'Could not load the area',
   },
   time: {
+    dayHeader: '{{day}}, {{date}}',
     justNow: 'just now',
     minutesAgo: '{{count}} min ago',
     hoursAgo: '{{count}} h ago',
@@ -342,11 +343,17 @@ export const en = {
     onReview: 'On review',
   },
   activity: {
+    title: 'Activity',
+    all: 'All',
+    empty: 'No activity in the last 30 days',
+    end: 'That’s all for the last 30 days',
     pending: 'Pending review',
     approved: 'Approved',
     taskName: '“{{task}}”',
     loading: 'Loading activity…',
     loadError: 'Could not load activity',
+    stepTime: '{{day}}, {{time}}',
+    commentsError: 'Could not load comments',
     changeCount_one: '{{count}} change',
     changeCount_other: '{{count}} changes',
     status: {
@@ -688,7 +695,6 @@ export const en = {
     rewards: 'Rewards',
     empty: 'No transactions yet',
     emptyFilter: 'No transactions of this type',
-    dayHeader: '{{day}}, {{date}}',
     completed: 'Completed',
     paidTo: 'Paid to',
     depositFrom: 'Deposit from',
