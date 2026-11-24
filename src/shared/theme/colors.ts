@@ -17,20 +17,22 @@ export const lightColors = {
   yellow: '#FFB930',
   grey: '#8A8FA3',
   ink: '#1A1A2E',
-  // Просмотр фото на весь экран: почти чёрный фон и полупрозрачные кнопки на нём.
-  viewerBg: '#0B0C12',
+  // Просмотр фото на весь экран: мягкий чёрный фон, один в обеих темах, и
+  // полупрозрачные кнопки на нём.
+  viewerBg: '#16171C',
   viewerChrome: 'rgba(255, 255, 255, 0.14)',
-  // Затемнение вокруг круга при обрезке аватарки.
+  // Обрезка аватарки: фон и затемнение вокруг круга.
+  cropperBg: '#0B0C12',
   viewerScrim: 'rgba(11, 12, 18, 0.62)',
   success: '#2ECC71',
   white: '#FFFFFF',
   // Карточки, меню, поля и шторки.
   surface: '#FFFFFF',
-  // Основа бумажных карточек заданий: под фактурой. В тёмной теме — почти
-  // чёрная, как в макете, чтобы бумага читалась нейтральной, а не синей.
-  paperBase: '#FFFFFF',
-  // Фон кнопок с обводкой: в светлой теме — карточка, в тёмной — прозрачный,
-  // чтобы сквозь кнопку была видна бумага, как в макете.
+  // Фон карточек и плиток заданий. В тёмной теме — почти чёрный и
+  // нейтральный, как в макете.
+  cardBase: '#FFFFFF',
+  // Фон кнопок с обводкой: в светлой теме — белый, в тёмной — чуть светлее
+  // карточки, как в макете.
   outlineBg: '#FFFFFF',
   // Тёмная плашка: тост и вариант dark у кнопок.
   inverseSurface: '#1A1A2E',
@@ -40,7 +42,14 @@ export const lightColors = {
   // Подсветка «на проверке»: плитка Tasks to Review и запись Pending review.
   reviewFrom: '#FFF3D1',
   reviewTo: '#FFE2C4',
-  // Чип и плашка «на проверке» на крафтовой бумаге плитки.
+  // Плитка задания «на проверке»: у родителя тёплый градиент и белые чипы, у
+  // ребёнка градиент светлее, чипы тёплые (reviewChipBg). В тёмной теме
+  // градиента нет — обычный фон карточки.
+  reviewTileFrom: '#FFF3D1',
+  reviewTileTo: '#FFE2C4',
+  reviewTileChip: '#FFFFFF',
+  reviewTileChildFrom: '#FFFAF0',
+  reviewTileChildTo: '#FFF1DC',
   reviewChipBg: '#FFE9CC',
   reviewAccent: '#E67E00',
   reviewChip: '#FFE9CC',
@@ -48,6 +57,15 @@ export const lightColors = {
   reviewBorder: '#F8CC94',
   // Плашка «On review» в шапке карточки: светлая на янтарной шапке.
   reviewPillBg: 'rgba(255, 255, 255, 0.85)',
+  // Раскрытая история задания в карточке ленты: светлее самой карточки.
+  activityHistory: 'rgba(255, 255, 255, 0.72)',
+  activityComment: 'rgba(26, 26, 46, 0.06)',
+  // Линия между точками статусов: по цвету карточки.
+  feedLinePending: 'rgba(230, 126, 0, 0.3)',
+  feedLineApproved: 'rgba(31, 153, 92, 0.3)',
+  feedLineNew: 'rgba(30, 95, 184, 0.25)',
+  feedLineSentBack: 'rgba(194, 74, 42, 0.28)',
+  feedLineMissed: 'rgba(75, 84, 104, 0.24)',
   // Подтверждённая запись активности.
   approvedFrom: '#E0F8E7',
   approvedTo: '#C5EFD5',
@@ -246,15 +264,15 @@ export const darkColors: ThemeColors = {
   yellow: '#FFB930',
   grey: '#9CA3B8',
   ink: '#F3F5FB',
-  viewerBg: '#05060A',
+  viewerBg: '#16171C',
   viewerChrome: 'rgba(255, 255, 255, 0.16)',
+  cropperBg: '#05060A',
   viewerScrim: 'rgba(0, 0, 0, 0.7)',
   success: '#3DDC84',
   white: '#FFFFFF',
   surface: '#161B2B',
-  paperBase: '#121317',
-  // Сплошная тёмная заливка кнопок с обводкой, как в макете: фактура бумаги
-  // сквозь кнопку не просвечивает.
+  cardBase: '#121317',
+  // Сплошная тёмная заливка кнопок с обводкой, как в макете.
   outlineBg: '#181A20',
   inverseSurface: '#2A3148',
   line: '#252C40',
@@ -262,6 +280,11 @@ export const darkColors: ThemeColors = {
   yellowSoft: '#2A2412',
   reviewFrom: '#3B2C14',
   reviewTo: '#4A3618',
+  reviewTileFrom: '#121317',
+  reviewTileTo: '#121317',
+  reviewTileChip: '#3A2B12',
+  reviewTileChildFrom: '#121317',
+  reviewTileChildTo: '#121317',
   reviewChipBg: '#3A2B12',
   reviewAccent: '#FFB24A',
   reviewChip: '#3A2B12',
@@ -269,6 +292,14 @@ export const darkColors: ThemeColors = {
   reviewBorder: '#5A4322',
   // Тёмная полупрозрачная плашка на приглушённой янтарной шапке.
   reviewPillBg: 'rgba(0, 0, 0, 0.22)',
+  // Ближе к чёрному, а не к цвету карточки: иначе под оранжевой желтит.
+  activityHistory: 'rgba(11, 12, 16, 0.6)',
+  activityComment: 'rgba(255, 255, 255, 0.08)',
+  feedLinePending: 'rgba(255, 165, 61, 0.5)',
+  feedLineApproved: 'rgba(46, 184, 115, 0.5)',
+  feedLineNew: 'rgba(91, 157, 240, 0.5)',
+  feedLineSentBack: 'rgba(255, 122, 85, 0.5)',
+  feedLineMissed: 'rgba(138, 147, 168, 0.5)',
   approvedFrom: '#123023',
   approvedTo: '#17402E',
   approvedBorder: '#2C5A41',

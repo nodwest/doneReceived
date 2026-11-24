@@ -2,9 +2,6 @@ import { createStyles, theme, tracking } from '@shared/theme';
 
 export const styles = createStyles((colors) => ({
   container: {
-    gap: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
     borderRadius: 18,
     borderWidth: 1,
     backgroundColor: colors.surface,
@@ -32,6 +29,22 @@ export const styles = createStyles((colors) => ({
     bottom: 0,
     left: 0,
     borderRadius: 18,
+  },
+  content: {
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  contentOpen: {
+    paddingBottom: 8,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
+  // Отступ сверху даёт нижний край шапки карточки.
+  history: {
+    paddingHorizontal: 14,
+    paddingBottom: 12,
   },
   row: {
     flexDirection: 'row',
@@ -109,8 +122,6 @@ export const styles = createStyles((colors) => ({
     color: colors.missedDeep,
   },
   track: {
-    position: 'relative',
-    zIndex: 2,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -119,12 +130,6 @@ export const styles = createStyles((colors) => ({
   dots: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  dotSlot: {
-    width: 10,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   dot: {
     width: 10,
@@ -137,27 +142,14 @@ export const styles = createStyles((colors) => ({
     borderRadius: 1,
   },
   changes: {
+    flex: 1,
     fontSize: theme.fontSize.xs,
     letterSpacing: tracking(theme.fontSize.xs),
     fontFamily: theme.fonts.medium,
     color: colors.grey,
   },
-  tooltip: {
-    position: 'absolute',
-    bottom: 22,
-    zIndex: 10,
-    maxWidth: 190,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: theme.radius.full,
-    backgroundColor: colors.inverseSurface,
-    boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.18)',
-  },
-  tooltipText: {
-    fontSize: theme.fontSize.xs,
-    letterSpacing: tracking(theme.fontSize.xs),
-    fontFamily: theme.fonts.bold,
-    color: colors.white,
+  chevronUp: {
+    transform: [{ rotate: '180deg' }],
   },
   reward: {
     marginTop: 1,

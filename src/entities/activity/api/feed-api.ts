@@ -12,6 +12,8 @@ type ActivityDto = {
     taskTitle: string | null;
     points: number | null;
   }[];
+  /** Курсор следующей, более старой страницы; null — её нет. */
+  next?: string | null;
 };
 
 export type FeedMemberLabel = {
@@ -96,17 +98,33 @@ export async function fetchFeed(
   familyId: string,
   limit: number,
   signal: AbortSignal,
+  before?: string,
 ) {
+  const cursor = before ? `&before=${encodeURIComponent(before)}` : '';
   const activity = await apiRequest<ActivityDto>(
-    `/families/${familyId}/activity?limit=${limit}`,
+    `/families/${familyId}/activity?limit=${limit}${cursor}`,
     { signal },
   );
   const closed = await fetchClosedAssignments(familyId, activity.items, signal);
   return { activity, closed: [...closed] };
 }
 
+type FeedPage = Awaited<ReturnType<typeof fetchFeed>>;
+
+/** Страницы ленты одной: новые события первыми, без повторов. */
+export function mergeFeedPages(pages: readonly FeedPage[]): FeedPage {
+  const items = new Map<string, ActivityDto['items'][number]>();
+  for (const page of pages) {
+    for (const item of page.activity.items) items.set(item.id, item);
+  }
+  return {
+    activity: { items: [...items.values()] },
+    closed: [...new Set(pages.flatMap((page) => page.closed))],
+  };
+}
+
 export function presentFeed(
-  { activity, closed }: Awaited<ReturnType<typeof fetchFeed>>,
+  { activity, closed }: FeedPage,
   viewer: FeedViewer,
   members: readonly FeedMemberLabel[] = [],
   children: readonly FeedChildLabel[] = [],
@@ -130,6 +148,7 @@ export function presentFeed(
       const child = visibleChildren.find((entry) => entry.id === item.childId);
       return {
         id: item.id,
+        familyId: viewer.familyId,
         // Закрывающий отказ — последний по назначению: после него событий
         // по нему не бывает, поэтому любой task_rejected закрытого — закрытие.
         type:
@@ -143,6 +162,7 @@ export function presentFeed(
         assignmentId: item.assignmentId,
         title: item.taskTitle,
         points: item.points,
+        childId: item.childId,
         child: child
           ? { name: child.displayName, avatar: photo(child.avatarUrl) }
           : null,

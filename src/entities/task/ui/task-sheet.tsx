@@ -8,13 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import {
-  Icon,
-  PaperTexture,
-  PhotoCarousel,
-  type IconName,
-  type Paper,
-} from '@shared/ui';
+import { Icon, PhotoCarousel, type IconName } from '@shared/ui';
 import {
   formatCountdown,
   KeepInViewContext,
@@ -22,7 +16,7 @@ import {
   useKeepInView,
   withAlpha,
 } from '@shared/lib';
-import { theme, themedValue } from '@shared/theme';
+import { theme, themedValue, useTheme } from '@shared/theme';
 import { formatRewardShort } from '../model';
 import { AssigneeAvatar } from './assignee-avatar';
 import { styles } from './task-sheet.styled';
@@ -59,17 +53,6 @@ const SHADOWS = themedValue(() => ({
   missed: styles.shadowSheet,
   wallet: styles.shadowWallet,
 }));
-
-/** Бумага под телом карточки: у каждого статуса своя. */
-const PAPERS: Record<TaskSheetTone, { paper: Paper; opacity: number } | null> =
-  {
-    parent: { paper: 'white', opacity: 0.3 },
-    child: { paper: 'white', opacity: 0.3 },
-    review: { paper: 'kraft', opacity: 0.22 },
-    paid: { paper: 'paid', opacity: 0.55 },
-    missed: { paper: 'missed', opacity: 0.2 },
-    wallet: null,
-  };
 
 type TaskSheetProps = {
   tone: TaskSheetTone;
@@ -120,7 +103,9 @@ export function TaskSheet({
   style,
 }: TaskSheetProps) {
   const dark = tone === 'review';
-  const paper = PAPERS[tone];
+  // В тёмной теме края тела не растворяются, кроме карточек кошелька.
+  const { isDark } = useTheme();
+  const fades = tone === 'wallet' || !isDark;
   // Секции, которые растут (комментарий), держат низ над кнопками: выше
   // растворения у края.
   const { scrollRef, viewportRef, onScroll, keepInView } =
@@ -131,7 +116,6 @@ export function TaskSheet({
 
   return (
     <View style={[styles.card, SHADOWS[tone], style]}>
-      {paper && <PaperTexture paper={paper.paper} opacity={paper.opacity} />}
       <LinearGradient
         colors={HERO_GRADIENTS[tone]}
         start={{ x: 0, y: 0 }}
@@ -201,22 +185,21 @@ export function TaskSheet({
             )}
           </KeepInViewContext.Provider>
         </ScrollView>
-        {/* Белое растворение — только на гладкой белой карточке: на бумаге
-            оно ложится молочной полупрозрачной полосой поверх фактуры. */}
-        {!paper && scrolled && (
+        {fades && scrolled && (
           <LinearGradient
             colors={[
-              theme.colors.paperBase,
-              withAlpha(theme.colors.paperBase, 0),
+              theme.colors.cardBase,
+              withAlpha(theme.colors.cardBase, 0),
             ]}
             style={[styles.fade, styles.fadeTop]}
           />
         )}
-        {!paper && (
+        {/* Кнопки в теле доезжают до края: там их растворение закрыло бы. */}
+        {fades && !footerInBody && (
           <LinearGradient
             colors={[
-              withAlpha(theme.colors.paperBase, 0),
-              theme.colors.paperBase,
+              withAlpha(theme.colors.cardBase, 0),
+              theme.colors.cardBase,
             ]}
             style={styles.fade}
           />

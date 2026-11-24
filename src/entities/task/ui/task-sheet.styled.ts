@@ -8,10 +8,10 @@ export const styles = createStyles((colors) => ({
     flex: 1,
     minHeight: 0,
     borderRadius: 32,
-    backgroundColor: colors.paperBase,
+    backgroundColor: colors.cardBase,
     overflow: 'hidden',
   },
-  // Тень со всех сторон: карточка на бумаге не сливается с фоном экрана.
+  // Тень со всех сторон: карточка не сливается с фоном экрана.
   shadowSheet: {
     boxShadow: '0px 0px 24px 2px rgba(26, 26, 46, 0.28)',
   },
@@ -255,7 +255,7 @@ export const styles = createStyles((colors) => ({
     gap: 10,
     padding: 12,
     borderRadius: 16,
-    // Плитка чуть вдавлена в бумагу карточки.
+    // Плитка чуть вдавлена в карточку.
     boxShadow: 'inset 1.5px 1.5px 2.5px rgba(51, 61, 82, 0.2)',
   },
   tileIcon: {

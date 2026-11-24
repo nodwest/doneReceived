@@ -1,4 +1,5 @@
 import type { ImageSourcePropType } from 'react-native';
+import { startOfDay } from '@shared/lib';
 
 /** Что случилось: тип события в ленте с сервера (GET /families/:id/activity). */
 export type FeedEventType =
@@ -26,6 +27,7 @@ export interface FeedPerson {
 /** Событие ленты на главной, с именами вместо id. */
 export interface FeedEvent {
   id: string;
+  familyId: string;
   type: FeedEventType;
   /** ISO-время события. */
   at: string;
@@ -38,6 +40,8 @@ export interface FeedEvent {
   title: string | null;
   /** Сумма события (награда, пополнение); null — без суммы. */
   points: number | null;
+  /** id этого ребёнка: по нему фильтр на странице Activity. */
+  childId: string | null;
   /** Ребёнок, о чьём задании или желании событие; null — пополнение. */
   child: FeedPerson | null;
   /** Кто это сделал. */
@@ -80,4 +84,28 @@ export function groupFeed(events: FeedEvent[]): FeedCard[] {
     else cards.set(key, { key, events: [event] });
   }
   return [...cards.values()];
+}
+
+/** Карточки за один день, новые первыми. */
+export interface FeedDay {
+  /** Полночь дня по местному времени. */
+  date: Date;
+  cards: FeedCard[];
+}
+
+/**
+ * Разложить карточки по дням последнего события; карточки, которые не
+ * менялись с `since`, не нужны. Порядок карточек — как в `groupFeed`.
+ */
+export function groupFeedByDay(cards: FeedCard[], since: Date): FeedDay[] {
+  const days: FeedDay[] = [];
+  for (const card of cards) {
+    const at = new Date(card.events[0].at);
+    if (at < since) continue;
+    const date = startOfDay(at);
+    const last = days[days.length - 1];
+    if (last && last.date.getTime() === date.getTime()) last.cards.push(card);
+    else days.push({ date, cards: [card] });
+  }
+  return days;
 }

@@ -11,10 +11,16 @@ export const styles = createStyles((colors) => ({
   pressed: {
     opacity: 0.85,
   },
+  // Теснее, чем в других плитках: чип и время по-русски входят на 360pt.
+  head: {
+    gap: 8,
+  },
   meta: {
     gap: 4,
   },
+  // Не шире места рядом с плашкой времени: на узком экране — многоточие.
   chip: {
+    maxWidth: '100%',
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 8,

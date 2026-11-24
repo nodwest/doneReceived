@@ -21,7 +21,7 @@ import {
 } from '@entities/session';
 import { useViewerRoleStore } from '@entities/user';
 import { createStyles, syncNativeAppearance, useTheme } from '@shared/theme';
-import { PaperPreload, ToastHost } from '@shared/ui';
+import { ToastHost } from '@shared/ui';
 import { Providers } from './providers';
 
 // Экраны входа: пока не вошли. Первый из них — куда попадаем без входа.
@@ -50,6 +50,7 @@ const APP_SCREENS = [
   'map-zone',
   'rewards-history',
   'transactions',
+  'activity',
   'child/[id]/index',
   'child/[id]/tasks',
   'child/[id]/wishlist/index',
@@ -118,7 +119,6 @@ export function RootLayout() {
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <Screens signedIn={sessionStatus === 'signed-in'} kind={kind} />
       <ToastHost />
-      <PaperPreload />
     </Providers>
   );
 }

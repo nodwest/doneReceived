@@ -26,7 +26,7 @@ export const styles = createStyles((colors) => ({
     backgroundColor: colors.violetChip,
   },
   chipReview: {
-    backgroundColor: colors.reviewChipBg,
+    backgroundColor: colors.reviewTileChip,
   },
   chipText: {
     fontSize: 11,

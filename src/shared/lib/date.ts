@@ -74,6 +74,20 @@ export function formatDayLabel(date: Date, now = new Date()) {
   return formatMonthDay(date);
 }
 
+/** «Today, Nov 13», «Yesterday, Nov 12», «Mon, Nov 11» — заголовок дня. */
+export function formatDayHeader(date: Date, now = new Date()) {
+  const days = dayOffset(date, now);
+  const weekday = formatWeekdayShort(date);
+  return i18n.t('time.dayHeader', {
+    // В русском день недели приходит строчным: «сб» → «Сб».
+    day:
+      days === 0 || days === -1
+        ? formatDayLabel(date, now)
+        : weekday.charAt(0).toUpperCase() + weekday.slice(1),
+    date: formatMonthDay(date),
+  });
+}
+
 /** Как formatDayLabel, но внутри фразы: «Created today», а не «Created Today». */
 export function formatDayInPhrase(date: Date, now = new Date()) {
   const days = dayOffset(date, now);

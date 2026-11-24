@@ -1,7 +1,20 @@
+import { useMemo, useState } from 'react';
 import { theme, themedValue } from '@shared/theme';
 import { useTranslation } from '@shared/i18n';
-import { useTimeAgo } from '@shared/lib';
-import type { FeedCard, FeedEventType } from '../model';
+import {
+  formatClock,
+  formatDayInPhrase,
+  formatTimeAgo,
+  useNow,
+} from '@shared/lib';
+import { useSubmissionComments } from '../api/feed-query';
+import {
+  canHaveComments,
+  matchStepComments,
+  type FeedCard,
+  type FeedEvent,
+  type FeedEventType,
+} from '../model';
 import { ActivityCard, type ActivityTone } from './activity-card';
 
 /**
@@ -59,8 +72,13 @@ const STATUS_KEYS = {
   event_cancelled: 'activity.status.event_cancelled',
 } as const satisfies Record<FeedEventType, string>;
 
-/** Сколько последних шагов задания видно точками на дорожке. */
-const VISIBLE_CHANGES = 5;
+/** Что делает сам ребёнок: имя берём у него, среди участников его может не быть. */
+const CHILD_ACTIONS: ReadonlySet<FeedEventType> = new Set([
+  'task_submitted',
+  'task_withdrawn',
+]);
+
+const MINUTE_MS = 60 * 1000;
 
 type FeedItemProps = {
   /** Задание со всей историей или одиночное событие. */
@@ -70,16 +88,21 @@ type FeedItemProps = {
    * из родителей это сделал.
    */
   viewer: 'parent' | 'child';
+  /** Когда: «5 min ago» (главная) или время, если день уже в заголовке. */
+  when?: 'ago' | 'clock';
 };
 
 const capitalize = (text: string) =>
   text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 
 /** Карточка ленты: одна на задание, со статусом и историей изменений. */
-export function FeedItem({ card, viewer }: FeedItemProps) {
+export function FeedItem({ card, viewer, when = 'ago' }: FeedItemProps) {
   const { t } = useTranslation();
   const latest = card.events[0];
-  const timeAgo = useTimeAgo(latest.at);
+  const now = useNow(MINUTE_MS);
+  const latestAt = new Date(latest.at);
+  const time =
+    when === 'clock' ? formatClock(latestAt) : formatTimeAgo(latestAt, now);
   const isTask = latest.assignmentId !== null;
 
   // Кто рядом с карточкой: у родителя — ребёнок (у пополнения — сам родитель),
@@ -99,7 +122,7 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
       : latest.type === 'task_expired'
         ? ''
         : actorName;
-  const subtitle = subtitleName ? `${timeAgo} · ${subtitleName}` : timeAgo;
+  const subtitle = subtitleName ? `${time} · ${subtitleName}` : time;
 
   // Сумма одна на задание: в событиях она повторяется, берём ближайшую.
   const points =
@@ -120,15 +143,42 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
       });
   const status = isTask ? t(STATUS_KEYS[latest.type]) : undefined;
 
+  // Комментарии ребёнка и родителя: загружаются, когда карточку раскрыли.
+  const [expanded, setExpanded] = useState(false);
+  const commentsQuery = useSubmissionComments(
+    latest.familyId,
+    latest.assignmentId,
+    expanded && canHaveComments(card.events),
+  );
+  const submissions = commentsQuery.data;
+  const comments = useMemo(
+    () => submissions && matchStepComments(card.events, submissions),
+    [card.events, submissions],
+  );
+
+  // Кто сделал шаг; у истёкшего задания действующего лица нет.
+  const whoDid = (event: FeedEvent) => {
+    if (event.type === 'task_expired') return '';
+    if (event.byMe) return t('activity.feed.you');
+    if (CHILD_ACTIONS.has(event.type) && event.child) return event.child.name;
+    return event.actor.name || t('member.parent');
+  };
   const history = isTask
-    ? card.events
-        .slice(0, VISIBLE_CHANGES)
-        .reverse()
-        .map((event) => ({
+    ? card.events.map((event) => {
+        const at = new Date(event.at);
+        const stepTime = t('activity.stepTime', {
+          day: formatDayInPhrase(at, now),
+          time: formatClock(at),
+        });
+        const who = whoDid(event);
+        return {
           id: event.id,
           label: capitalize(t(STATUS_KEYS[event.type])),
+          detail: who ? `${who} · ${stepTime}` : stepTime,
           color: DOT_COLORS[event.type],
-        }))
+          comment: comments?.get(event.id),
+        };
+      })
     : [];
 
   return (
@@ -141,7 +191,11 @@ export function FeedItem({ card, viewer }: FeedItemProps) {
       subtitle={subtitle}
       amount={amount}
       history={history}
-      changesCount={isTask ? card.events.length : 0}
+      expanded={expanded}
+      onToggle={() => setExpanded((current) => !current)}
+      onRetryComments={
+        commentsQuery.isError ? () => void commentsQuery.refetch() : undefined
+      }
     />
   );
 }
