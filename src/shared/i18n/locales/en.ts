@@ -602,6 +602,9 @@ export const en = {
     all: 'All time',
   },
   map: {
+    viewMode: 'Map view',
+    view2d: '2D map',
+    view3d: '3D map',
     markerInside: 'In “{{name}}”',
     markerInsideUnknown: 'Inside an area',
     markerOutside: 'Outside areas',

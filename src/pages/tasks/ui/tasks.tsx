@@ -216,6 +216,7 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
             ]}
           >
             <TaskCarousel
+              key={tab}
               fullWidth
               tasks={cardTasks}
               initialIndex={currentIndex}

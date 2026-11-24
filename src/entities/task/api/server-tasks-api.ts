@@ -369,7 +369,7 @@ export async function withdrawServerSubmission(
   const submissionId = requireSubmissionId(assignment);
   return apiRequest<{ note: string | null }>(
     `/families/${familyId}/task-submissions/${submissionId}`,
-    { method: 'DELETE', signal },
+    { method: 'DELETE', signal, timeoutMs: 15_000 },
   );
 }
 

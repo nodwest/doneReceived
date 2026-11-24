@@ -87,7 +87,7 @@ export function CardButton({
         // (на любом языке) с постоянными отступами.
         fit ? styles.fit : styles.stretch,
         styles[variant],
-        (pressed || inactive) && styles.dimmed,
+        (pressed || disabled) && styles.dimmed,
         style,
       ]}
     >

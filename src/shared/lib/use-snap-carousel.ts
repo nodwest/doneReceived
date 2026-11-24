@@ -1,16 +1,19 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   Platform,
   type LayoutChangeEvent,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
   type ScrollView,
 } from 'react-native';
 
 // Доля шага, после которой свайп считается переходом к соседней карточке.
 const SWIPE_THRESHOLD = 0.15;
 const SETTLE_DELAY_WEB = 120;
-const MIN_FLING_VELOCITY = 0.05;
+const IS_WEB = Platform.OS === 'web';
 
 type SnapCarouselOptions = {
   count: number;
@@ -45,6 +48,7 @@ export function useSnapCarousel({
   onIndexChange,
 }: SnapCarouselOptions) {
   const scrollRef = useRef<ScrollView>(null);
+  const scrollProgress = useSharedValue(initialIndex);
   const settleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // Страница, на которой лента остановилась в последний раз.
   const settledPage = useRef(initialIndex);
@@ -56,8 +60,6 @@ export function useSnapCarousel({
   const appliedKey = useRef(resetKey);
   const [width, setWidth] = useState(0);
   const [index, setIndex] = useState(initialIndex);
-  // Лента стоит на стартовой карточке: до этого её не показываем.
-  const [positioned, setPositioned] = useState(initialIndex === 0);
 
   // Новый набор карточек: точки сразу показывают стартовую страницу.
   const [prevKey, setPrevKey] = useState(resetKey);
@@ -79,8 +81,15 @@ export function useSnapCarousel({
   const interval = cardWidth + gap;
   // Запас справа, чтобы последняя карточка тоже вставала к левому отступу.
   const trackPaddingRight = Math.max(width - cardWidth - gutter, gutter);
-  // Пока ширина не измерена или лента не на месте, кадр был бы неверным.
-  const ready = cardWidth > 0 && positioned;
+  const ready = cardWidth > 0;
+
+  const snapToOffsets = useMemo(
+    () =>
+      !IS_WEB && ready && !single
+        ? Array.from({ length: count }, (_, page) => page * interval)
+        : undefined,
+    [count, interval, ready, single],
+  );
 
   useEffect(() => () => clearTimeout(settleTimer.current), []);
 
@@ -89,6 +98,7 @@ export function useSnapCarousel({
     if (appliedKey.current === resetKey) return;
     appliedKey.current = resetKey;
     clearTimeout(settleTimer.current);
+    scrollProgress.set(initialIndex);
     settledPage.current = initialIndex;
     reportedIndex.current = initialIndex;
     // Нативная лента могла ещё не вырасти под новые карточки: повторим в onContentSizeChange.
@@ -99,7 +109,7 @@ export function useSnapCarousel({
         animated: false,
       });
     }
-  }, [resetKey, initialIndex, interval, cardWidth]);
+  }, [resetKey, initialIndex, interval, cardWidth, scrollProgress]);
 
   // Прокрутка к стартовой карточке, когда лента уже достаточно широкая,
   // иначе scrollTo упрётся в край и останется на нуле.
@@ -107,15 +117,15 @@ export function useSnapCarousel({
     const target = pendingIndex.current;
     if (target === null || cardWidth <= 0) return;
     const x = target * interval;
-    if (contentWidth < x + width) return;
+    if (contentWidth < x + gutter + cardWidth - 1) return;
     pendingIndex.current = null;
+    scrollProgress.set(target);
     scrollRef.current?.scrollTo({ x, animated: false });
-    setPositioned(true);
   };
 
   const changeIndex = (page: number) => {
-    setIndex(page);
     if (page !== reportedIndex.current) {
+      setIndex(page);
       reportedIndex.current = page;
       onIndexChange?.(page);
     }
@@ -132,13 +142,16 @@ export function useSnapCarousel({
         ? Math.round(offsetX / interval)
         : settledPage.current +
           (Math.abs(shift) > interval * SWIPE_THRESHOLD ? Math.sign(shift) : 0);
-    const page = clampPage(raw);
+    const start = settledPage.current;
+    const page = clampPage(Math.min(start + 1, Math.max(start - 1, raw)));
 
     // Лента уже стоит, где нужно: отложенная стартовая прокрутка больше не нужна.
     pendingIndex.current = null;
     settledPage.current = page;
     changeIndex(page);
-    scrollRef.current?.scrollTo({ x: page * interval, animated: true });
+    if (Math.abs(offsetX - page * interval) > 0.5) {
+      scrollRef.current?.scrollTo({ x: page * interval, animated: true });
+    }
   };
 
   // Ставит ленту на карточку, где она остановилась, без анимации.
@@ -166,32 +179,37 @@ export function useSnapCarousel({
     // лента встанет на соседнюю карточку. Оставляем прежнюю ширину.
     if (next === 0) return;
     // Экран снова виден: браузер мог сбросить прокрутку скрытой ленты.
-    if (next === width) realign();
-    else setWidth(next);
+    if (next !== width) setWidth(next);
+    else if (IS_WEB) realign();
   };
 
-  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    // До стартовой прокрутки события скролла говорят о нулевой позиции: пропускаем.
-    if (!positioned || cardWidth <= 0) return;
-    const offsetX = event.nativeEvent.contentOffset.x;
+  const onWebScroll = (offsetX: number) => {
+    if (pendingIndex.current !== null) return;
     changeIndex(clampPage(Math.round(offsetX / interval)));
-    // В вебе нет событий окончания инерции: считаем, что скролл закончен после паузы.
-    if (Platform.OS === 'web') {
-      clearTimeout(settleTimer.current);
-      settleTimer.current = setTimeout(() => settle(offsetX), SETTLE_DELAY_WEB);
-    }
+    clearTimeout(settleTimer.current);
+    settleTimer.current = setTimeout(() => settle(offsetX), SETTLE_DELAY_WEB);
   };
 
-  const onMomentumScrollEnd = (
-    event: NativeSyntheticEvent<NativeScrollEvent>,
-  ) => settle(event.nativeEvent.contentOffset.x);
-
-  // Палец отпущен без инерции: onMomentumScrollEnd не придёт, доводим сразу.
-  const onScrollEndDrag = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (Math.abs(event.nativeEvent.velocity?.x ?? 0) < MIN_FLING_VELOCITY) {
-      settle(event.nativeEvent.contentOffset.x);
-    }
+  const onNativePageChange = (page: number) => {
+    if (pendingIndex.current !== null) return;
+    settledPage.current = page;
+    changeIndex(page);
   };
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      if (!ready || single) return;
+      const offsetX = event.contentOffset.x;
+      const page = Math.min(Math.max(offsetX / interval, 0), count - 1);
+      const previous = scrollProgress.get();
+      scrollProgress.set(page);
+      if (IS_WEB) {
+        scheduleOnRN(onWebScroll, offsetX);
+      } else if (Math.round(previous) !== Math.round(page)) {
+        scheduleOnRN(onNativePageChange, Math.round(page));
+      }
+    },
+  });
 
   return {
     scrollRef,
@@ -203,7 +221,7 @@ export function useSnapCarousel({
     onLayout,
     onContentSizeChange,
     onScroll,
-    onMomentumScrollEnd,
-    onScrollEndDrag,
+    scrollProgress,
+    snapToOffsets,
   };
 }

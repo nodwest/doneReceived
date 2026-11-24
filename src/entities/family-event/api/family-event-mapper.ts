@@ -31,6 +31,13 @@ export function toFamilyEvent(
 ): FamilyEvent {
   const startsAt = new Date(dto.startsAt);
   const endsAt = new Date(dto.endsAt);
+  const participants = new Map<string, FamilyEventPerson>();
+  for (const person of dto.participants ?? []) {
+    const previous = participants.get(person.userId);
+    if (!previous || (!previous.avatar && person.avatarUrl)) {
+      participants.set(person.userId, toPerson(person, toImage));
+    }
+  }
   return {
     id: dto.id,
     kind: dto.kind ?? 'event',
@@ -40,9 +47,7 @@ export function toFamilyEvent(
     endsAt,
     repeat: dto.repeat,
     timezone: dto.timezone,
-    participants: (dto.participants ?? []).map((person) =>
-      toPerson(person, toImage),
-    ),
+    participants: [...participants.values()],
     photo: dto.photoUrl ? toImage(dto.photoUrl) : undefined,
     audienceUserIds: dto.audienceUserIds,
     reminderLeadMinutes: dto.reminderLeadMinutes ?? undefined,

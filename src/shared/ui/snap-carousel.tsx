@@ -1,5 +1,7 @@
 import { useState, type Key, type ReactNode } from 'react';
-import { ScrollView, View, type ViewStyle } from 'react-native';
+import { View, type ViewStyle } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { CarouselDots } from './carousel-dots';
 import { useSnapCarousel } from '../lib';
 import { createStyles, theme } from '../theme';
 
@@ -15,7 +17,8 @@ const FULL_GAP = 16;
 const SHADOW_TOP = 12;
 const SHADOW_BOTTOM = 24;
 // Высота точек под лентой вместе с отступом над ними.
-const DOTS_HEIGHT = 6 + 13;
+const DOT_SIZE = 6;
+const DOTS_HEIGHT = DOT_SIZE + 13;
 // Сколько карточек по обе стороны от текущей держим отрисованными.
 const RENDER_RADIUS = 1;
 
@@ -71,8 +74,8 @@ export function SnapCarousel<T>({
     onLayout,
     onContentSizeChange,
     onScroll,
-    onMomentumScrollEnd,
-    onScrollEndDrag,
+    scrollProgress,
+    snapToOffsets,
   } = useSnapCarousel({
     count: items.length,
     gutter,
@@ -80,7 +83,7 @@ export function SnapCarousel<T>({
     gap,
     initialIndex,
     // Новый набор (смена вкладки) — та же лента, она просто встаёт на место.
-    resetKey: items,
+    resetKey: JSON.stringify(items.map(keyExtractor)),
     onIndexChange,
   });
   // Самая высокая лента, какую видели: рисуются только соседние карточки, и без
@@ -98,7 +101,6 @@ export function SnapCarousel<T>({
     0,
   );
   const measured = !fill || rootHeight > 0;
-
   return (
     <View
       style={fill ? styles.rootFill : styles.root}
@@ -112,14 +114,15 @@ export function SnapCarousel<T>({
           : undefined
       }
     >
-      <ScrollView
+      <Animated.ScrollView
         ref={scrollRef}
         horizontal
         onLayout={onLayout}
         onContentSizeChange={onTrackSizeChange}
         onScroll={onScroll}
-        onMomentumScrollEnd={onMomentumScrollEnd}
-        onScrollEndDrag={onScrollEndDrag}
+        snapToOffsets={snapToOffsets}
+        disableIntervalMomentum
+        removeClippedSubviews={false}
         scrollEventThrottle={16}
         scrollEnabled={!single}
         showsHorizontalScrollIndicator={false}
@@ -144,7 +147,8 @@ export function SnapCarousel<T>({
         {items.map((item, i) => {
           const key = keyExtractor(item);
           const style: ViewStyle = {
-            width: cardWidth || undefined,
+            width: cardWidth,
+            flexShrink: 0,
             height: fill ? slotHeight : undefined,
           };
           // Рисуем только видимую карточку и соседние: остальные — пустые места
@@ -157,23 +161,12 @@ export function SnapCarousel<T>({
             <View key={key} style={style} />
           );
         })}
-      </ScrollView>
-      {!single && (
-        <View style={styles.dots}>
-          {items.map((item, i) => (
-            <View
-              key={keyExtractor(item)}
-              style={[
-                styles.dot,
-                i === index && [
-                  styles.dotActive,
-                  { backgroundColor: dotColor },
-                ],
-              ]}
-            />
-          ))}
-        </View>
-      )}
+      </Animated.ScrollView>
+      <CarouselDots
+        keys={items.map(keyExtractor)}
+        progress={scrollProgress}
+        color={dotColor}
+      />
     </View>
   );
 }
@@ -205,21 +198,5 @@ const styles = createStyles((colors) => ({
   // Карточка заполняет слот ленты по высоте.
   card: {
     flexGrow: 1,
-  },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 13,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.placeholder,
-  },
-  dotActive: {
-    width: 20,
   },
 }));

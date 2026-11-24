@@ -620,6 +620,9 @@ export const ru: Dictionary = {
     all: 'За всё время',
   },
   map: {
+    viewMode: 'Вид карты',
+    view2d: 'Двумерная карта',
+    view3d: 'Трёхмерная карта',
     markerInside: 'В «{{name}}»',
     markerInsideUnknown: 'В области',
     markerOutside: 'Вне областей',

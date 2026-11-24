@@ -83,38 +83,28 @@ export function setAccessTokenGetter(
   getSessionScope = scope;
 }
 
-/**
- * Картинка API для `<Image>`: относительный адрес дополняется API_URL,
- * запрос идёт с Bearer-токеном (без него сервер ответит 401). Адрес с
- * токеном не логируем.
- */
+/** Приватный медиа-запрос допустим только к настроенному origin API. */
+export function isTrustedApiImageUrl(uri: string): boolean {
+  try {
+    const target = new URL(uri);
+    return (
+      /^https?:$/.test(target.protocol) &&
+      !target.username &&
+      !target.password &&
+      target.origin === new URL(API_URL).origin
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Источник помечает приватную картинку, токен добавляется только при запросе. */
 export function authorizedImage(url: string): {
   uri: string;
   headers: Record<string, string> | undefined;
 } {
-  const token = getAccessToken();
-  const absolute = /^https?:\/\//i.test(url) ? url : apiUrlFor(url);
-  let trustedApiUrl = false;
-  try {
-    const target = new URL(absolute);
-    trustedApiUrl =
-      /^https?:$/.test(target.protocol) &&
-      !target.username &&
-      !target.password &&
-      target.origin === new URL(API_URL).origin;
-  } catch {
-    // Некорректный URL не получает заголовок авторизации.
-  }
-  // Заголовки есть у любой картинки нашего API, даже если токена ещё нет:
-  // ApiImage подставит текущий токен при загрузке.
-  return {
-    uri: absolute,
-    headers: trustedApiUrl
-      ? token
-        ? { Authorization: `Bearer ${token}` }
-        : {}
-      : undefined,
-  };
+  const uri = /^https?:\/\//i.test(url) ? url : apiUrlFor(url);
+  return { uri, headers: isTrustedApiImageUrl(uri) ? {} : undefined };
 }
 
 /**
