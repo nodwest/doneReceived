@@ -1,12 +1,13 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
+import { theme } from '@shared/theme';
 import type { Task, TaskAssignee } from '../model';
 import { AssigneeAvatar } from './assignee-avatar';
 import {
   RewardAmount,
   TILE_DESCRIPTION_LINES,
-  TilePaper,
   TilePill,
   TileTimer,
   tileStyles,
@@ -47,8 +48,16 @@ export function TaskRow({ task, author, onPress }: TaskRowProps) {
         pressed && styles.pressed,
       ]}
     >
-      {/* Крафтовая бумага «на проверке», у остальных — белая. */}
-      <TilePaper review={review} />
+      {/* Тёплый градиент «на проверке» под содержимым плитки. */}
+      {review && (
+        <LinearGradient
+          colors={[theme.colors.reviewTileFrom, theme.colors.reviewTileTo]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          locations={[0, 0.7071]}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
       <View style={tileStyles.head}>
         <AssigneeAvatar
           source={person.avatar}

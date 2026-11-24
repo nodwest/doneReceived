@@ -17,7 +17,7 @@ export const styles = createStyles((colors) => ({
     backgroundColor: colors.noteReviewBg,
     borderColor: withAlpha(colors.reviewDot, 0.35),
   },
-  // Непрозрачный: сквозь пузырь не проступает бумага карточки.
+  // Непрозрачный: не зависит от фона карточки.
   bubblePaid: {
     backgroundColor: colors.noteBubblePaid,
     borderColor: withAlpha(colors.earned, 0.3),

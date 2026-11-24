@@ -798,7 +798,7 @@ export const ru: Dictionary = {
     onlyAuthorEdits: 'Изменить или отменить может только {{name}}',
     doneAgo: 'Сделано {{ago}}',
     onReview: 'На проверке',
-    sentAgo: 'Отправлено {{ago}}',
+    sentAgo: 'Сдано {{ago}}',
     photoCount_one: '{{count}} фото',
     photoCount_few: '{{count}} фото',
     photoCount_many: '{{count}} фото',

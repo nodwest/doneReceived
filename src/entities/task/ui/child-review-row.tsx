@@ -1,12 +1,13 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
+import { theme } from '@shared/theme';
 import type { Task, TaskAssignee } from '../model';
 import { AssigneeAvatar } from './assignee-avatar';
 import {
   RewardAmount,
   TILE_DESCRIPTION_LINES,
-  TilePaper,
   TilePill,
   tileStyles,
 } from './task-tile-parts';
@@ -20,8 +21,8 @@ type ChildReviewRowProps = {
 };
 
 /**
- * Плитка задания ребёнка на проверке — как у родителя, на крафтовой бумаге,
- * но глазами ребёнка. Шапка: родитель, который проверяет, чип On review и
+ * Плитка задания ребёнка на проверке — как у родителя, но светлее и
+ * глазами ребёнка. Шапка: родитель, который проверяет, чип On review и
  * когда отправлено. Название, описание до 5 строк; внизу награда, сколько
  * фото в отчёте и «Sarah is checking».
  */
@@ -40,8 +41,16 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
         pressed && styles.pressed,
       ]}
     >
-      <TilePaper review />
-      <View style={tileStyles.head}>
+      <LinearGradient
+        colors={[
+          theme.colors.reviewTileChildFrom,
+          theme.colors.reviewTileChildTo,
+        ]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={[tileStyles.head, styles.head]}>
         <AssigneeAvatar
           source={author.avatar}
           name={author.name}
@@ -52,12 +61,14 @@ export function ChildReviewRow({ task, author, onPress }: ChildReviewRowProps) {
             {author.name}
           </Text>
           <View style={styles.chip}>
-            <Text style={styles.chipText}>{t('tasks.onReview')}</Text>
+            <Text style={styles.chipText} numberOfLines={1}>
+              {t('tasks.onReview')}
+            </Text>
           </View>
         </View>
         {task.doneAt && (
           <TilePill
-            tone="review"
+            tone="reviewChild"
             label={t('tasks.sentAgo', {
               ago: formatTimeAgo(new Date(task.doneAt), now),
             })}

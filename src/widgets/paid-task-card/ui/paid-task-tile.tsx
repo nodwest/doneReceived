@@ -4,7 +4,6 @@ import {
   AssigneeAvatar,
   RewardAmount,
   TILE_DESCRIPTION_LINES,
-  TilePaper,
   TilePill,
   tileStyles,
   type TaskAssignee,
@@ -54,7 +53,6 @@ export function PaidTaskTile({
         pressed && styles.pressed,
       ]}
     >
-      <TilePaper />
       <View style={tileStyles.head}>
         <AssigneeAvatar
           source={person.avatar}

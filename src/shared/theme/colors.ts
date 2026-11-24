@@ -28,11 +28,11 @@ export const lightColors = {
   white: '#FFFFFF',
   // Карточки, меню, поля и шторки.
   surface: '#FFFFFF',
-  // Основа бумажных карточек заданий: под фактурой. В тёмной теме — почти
-  // чёрная, как в макете, чтобы бумага читалась нейтральной, а не синей.
-  paperBase: '#FFFFFF',
-  // Фон кнопок с обводкой: в светлой теме — карточка, в тёмной — прозрачный,
-  // чтобы сквозь кнопку была видна бумага, как в макете.
+  // Фон карточек и плиток заданий. В тёмной теме — почти чёрный и
+  // нейтральный, как в макете.
+  cardBase: '#FFFFFF',
+  // Фон кнопок с обводкой: в светлой теме — белый, в тёмной — чуть светлее
+  // карточки, как в макете.
   outlineBg: '#FFFFFF',
   // Тёмная плашка: тост и вариант dark у кнопок.
   inverseSurface: '#1A1A2E',
@@ -42,7 +42,14 @@ export const lightColors = {
   // Подсветка «на проверке»: плитка Tasks to Review и запись Pending review.
   reviewFrom: '#FFF3D1',
   reviewTo: '#FFE2C4',
-  // Чип и плашка «на проверке» на крафтовой бумаге плитки.
+  // Плитка задания «на проверке»: у родителя тёплый градиент и белые чипы, у
+  // ребёнка градиент светлее, чипы тёплые (reviewChipBg). В тёмной теме
+  // градиента нет — обычный фон карточки.
+  reviewTileFrom: '#FFF3D1',
+  reviewTileTo: '#FFE2C4',
+  reviewTileChip: '#FFFFFF',
+  reviewTileChildFrom: '#FFFAF0',
+  reviewTileChildTo: '#FFF1DC',
   reviewChipBg: '#FFE9CC',
   reviewAccent: '#E67E00',
   reviewChip: '#FFE9CC',
@@ -255,9 +262,8 @@ export const darkColors: ThemeColors = {
   success: '#3DDC84',
   white: '#FFFFFF',
   surface: '#161B2B',
-  paperBase: '#121317',
-  // Сплошная тёмная заливка кнопок с обводкой, как в макете: фактура бумаги
-  // сквозь кнопку не просвечивает.
+  cardBase: '#121317',
+  // Сплошная тёмная заливка кнопок с обводкой, как в макете.
   outlineBg: '#181A20',
   inverseSurface: '#2A3148',
   line: '#252C40',
@@ -265,6 +271,11 @@ export const darkColors: ThemeColors = {
   yellowSoft: '#2A2412',
   reviewFrom: '#3B2C14',
   reviewTo: '#4A3618',
+  reviewTileFrom: '#121317',
+  reviewTileTo: '#121317',
+  reviewTileChip: '#3A2B12',
+  reviewTileChildFrom: '#121317',
+  reviewTileChildTo: '#121317',
   reviewChipBg: '#3A2B12',
   reviewAccent: '#FFB24A',
   reviewChip: '#3A2B12',
