@@ -327,6 +327,12 @@ export const en = {
     hide: 'Hide password',
   },
   home: {
+    activeShort: 'Active',
+    reviewShort: 'In review',
+    lastLocation: 'Last update {{date}}, {{time}}',
+    eventLive: 'Happening now',
+    eventUpcoming: 'Next event',
+    eventUntil: '{{date}} · until {{time}}',
     noChildren: 'No children in this family yet.',
     childrenLoadError: 'Could not load the children.',
     greetingMorning: 'Good morning 👋',

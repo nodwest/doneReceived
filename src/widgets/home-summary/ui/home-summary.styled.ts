@@ -11,6 +11,25 @@ const card = {
 } as const;
 
 export const styles = createStyles((colors) => ({
+  plainContainer: {
+    flexDirection: 'row',
+    gap: 3,
+  },
+  plainStat: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+  },
+  plainValue: {
+    fontSize: 22,
+    color: colors.ink,
+    fontFamily: theme.fonts.bold,
+    fontVariant: ['tabular-nums'],
+  },
+  plainAccent: { color: colors.blueInk },
+  plainReview: { color: colors.reviewChipText },
+  plainLabel: { fontSize: 10, textAlign: 'center', color: colors.grey },
   container: {
     flexDirection: 'row',
     gap: 6,

@@ -6,6 +6,9 @@ export const styles = createStyles((colors) => ({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  withSummary: { gap: 6 },
+  summary: { flexBasis: 212, flexShrink: 1 },
+  compactGreeting: { flex: 1, minWidth: 0 },
   greeting: {
     gap: 4,
   },

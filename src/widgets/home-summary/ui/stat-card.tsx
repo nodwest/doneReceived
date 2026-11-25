@@ -6,6 +6,7 @@ import { styles } from './home-summary.styled';
 
 type StatCardProps = {
   icon: ReactNode;
+  plain?: boolean;
   value: string;
   label: string;
   /** Градиентная плитка: фиолетовая (parent) или голубая (child). */
@@ -24,6 +25,7 @@ const ACCENT_GRADIENTS = themedValue<
 
 export function StatCard({
   icon,
+  plain,
   value,
   label,
   accent,
@@ -43,7 +45,24 @@ export function StatCard({
   );
 
   let card = <View style={styles.card}>{content}</View>;
-  if (accent) {
+  if (plain) {
+    card = (
+      <View style={styles.plainStat}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          style={[
+            styles.plainValue,
+            accent && styles.plainAccent,
+            highlight && styles.plainReview,
+          ]}
+        >
+          {value}
+        </Text>
+        <Text style={styles.plainLabel}>{label}</Text>
+      </View>
+    );
+  } else if (accent) {
     card = (
       <LinearGradient
         colors={ACCENT_GRADIENTS[accent]}

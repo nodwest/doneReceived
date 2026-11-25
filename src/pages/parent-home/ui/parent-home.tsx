@@ -1,4 +1,10 @@
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskButton } from '@features/create-task';
@@ -12,6 +18,13 @@ import {
   useFamilyTasks,
   useTaskFamilyId,
 } from '@features/family-tasks';
+import { FeaturedEventCard } from '@entities/family-event';
+import { useFamilyEvents } from '@features/family-event';
+import {
+  isLocationPresenceFresh,
+  useLocationPresence,
+} from '@features/location';
+import { useLocationZones } from '@entities/zone';
 import { useFamilyChildren } from '@entities/family';
 import { useMe, useMyAvatar, useMyId } from '@entities/session';
 import { countChildTasks, countTasks } from '@entities/task';
@@ -34,6 +47,8 @@ export function ParentHomePage() {
   const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
+  const { width, fontScale } = useWindowDimensions();
+  const summaryInHeader = width >= 390 && fontScale <= 1.15;
   // Имя и фото — вошедшего родителя (GET /users/me).
   const me = useMe();
   const myAvatar = useMyAvatar();
@@ -51,24 +66,70 @@ export function ParentHomePage() {
   const familyId = useTaskFamilyId();
   const { data: paidTotal } = useParentPaidTotal(familyId, myId);
   const rewardsPaid = paidTotal ? Number(paidTotal.points) : 0;
-  // Дети семьи с сервера. Статус «дома» к геозонам пока не подключён.
+  const calendar = useFamilyEvents(0, false);
   const childrenQuery = useFamilyChildren(familyId);
   const familyAccessDenied =
     childrenQuery.accessDenied ||
     tasksQuery.accessDenied ||
     feedQuery.accessDenied;
+  const locationFamilyId = familyAccessDenied ? null : familyId;
+  const presence = useLocationPresence(locationFamilyId);
+  const zones = useLocationZones(locationFamilyId);
+  const presenceByChild = new Map(
+    (presence.isError ? [] : (presence.data?.children ?? [])).map((item) => [
+      item.childId,
+      item,
+    ]),
+  );
+  const zoneNames = new Map(
+    (zones.isError ? [] : (zones.data ?? [])).map((zone) => [
+      zone.id,
+      zone.name,
+    ]),
+  );
+  const event =
+    familyAccessDenied || calendar.rollingError ? null : calendar.featured;
   const serverChildren = familyAccessDenied ? undefined : childrenQuery.data;
   const children: ChildOverview[] = (serverChildren ?? []).map((child) => {
     const { active, review } = countChildTasks(tasks ?? [], child.id, myId);
+    const location = presenceByChild.get(child.id);
+    const timestamp = Date.parse(
+      location?.recordedAt ?? location?.updatedAt ?? '',
+    );
+    const locationName = isLocationPresenceFresh(location, calendar.now)
+      ? location?.zones
+          .filter((zone) => zone.state === 'inside')
+          .sort((a, b) => Date.parse(b.since) - Date.parse(a.since))
+          .map((zone) => zoneNames.get(zone.zoneId))
+          .find(Boolean)
+      : undefined;
     return {
       id: child.id,
       name: child.displayName,
       avatar: child.avatarUrl ? authorizedImage(child.avatarUrl) : null,
       activeTasks: active,
       reviewTasks: review,
-      atHome: false,
+      locationName,
+      lastLocationAt: Number.isFinite(timestamp)
+        ? new Date(timestamp)
+        : undefined,
     };
   });
+
+  const summary = (
+    <HomeSummary
+      variant="plain"
+      amount={familyAccessDenied ? 0 : rewardsPaid}
+      activeTasks={familyAccessDenied ? 0 : (total?.active ?? 0)}
+      tasksToReview={familyAccessDenied ? 0 : (total?.review ?? 0)}
+      onActiveTasksPress={() =>
+        router.push({ pathname: '/tasks', params: { tab: 'all' } })
+      }
+      onTasksToReviewPress={() =>
+        router.push({ pathname: '/tasks', params: { tab: 'review' } })
+      }
+    />
+  );
 
   return (
     <View style={styles.screen}>
@@ -84,18 +145,26 @@ export function ParentHomePage() {
             greeting={t(greetingKey(new Date().getHours()))}
             name={me?.displayName ?? ''}
             avatar={myAvatar}
+            summary={summaryInHeader ? summary : undefined}
           />
-          <HomeSummary
-            amount={familyAccessDenied ? 0 : rewardsPaid}
-            activeTasks={familyAccessDenied ? 0 : (total?.active ?? 0)}
-            tasksToReview={familyAccessDenied ? 0 : (total?.review ?? 0)}
-            onActiveTasksPress={() =>
-              router.push({ pathname: '/tasks', params: { tab: 'all' } })
-            }
-            onTasksToReviewPress={() =>
-              router.push({ pathname: '/tasks', params: { tab: 'review' } })
-            }
-          />
+          {!summaryInHeader && summary}
+          {event && (
+            <FeaturedEventCard
+              event={event}
+              homeStatus={event.startsAt <= calendar.now ? 'live' : 'upcoming'}
+              onPress={() =>
+                router.push({
+                  pathname: '/family-event/[id]',
+                  params: {
+                    id: event.id,
+                    ...(event.repeat === 'annual'
+                      ? { year: String(event.startsAt.getFullYear()) }
+                      : {}),
+                  },
+                })
+              }
+            />
+          )}
           {children.length > 0 ? (
             <ChildrenCarousel
               items={children}

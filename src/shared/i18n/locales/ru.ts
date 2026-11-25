@@ -329,6 +329,12 @@ export const ru: Dictionary = {
     hide: 'Скрыть пароль',
   },
   home: {
+    activeShort: 'Активные',
+    reviewShort: 'На проверке',
+    lastLocation: 'Отметка {{date}}, {{time}}',
+    eventLive: 'Идёт сейчас',
+    eventUpcoming: 'Ближайшее событие',
+    eventUntil: '{{date}} · до {{time}}',
     noChildren: 'В семье пока нет детей.',
     childrenLoadError: 'Не удалось загрузить список детей.',
     greetingMorning: 'Доброе утро 👋',
