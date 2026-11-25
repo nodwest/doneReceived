@@ -49,6 +49,7 @@ export function toFamilyEvent(
     timezone: dto.timezone,
     participants: [...participants.values()],
     photo: dto.photoUrl ? toImage(dto.photoUrl) : undefined,
+    audienceUserIds: dto.audienceUserIds,
     reminderLeadMinutes: dto.reminderLeadMinutes ?? undefined,
     reminderAt:
       dto.reminderLeadMinutes == null

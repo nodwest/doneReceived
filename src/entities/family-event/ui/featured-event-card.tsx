@@ -17,6 +17,7 @@ import { styles } from './calendar-event.styled';
 
 type FeaturedEventCardProps = {
   event: FamilyEvent;
+  homeStatus?: 'live' | 'upcoming';
   /** Тап по карточке — открыть событие. */
   onPress?: () => void;
   /** Кнопка галереи: показывается только в форме события. */
@@ -31,6 +32,7 @@ type FeaturedEventCardProps = {
  */
 export function FeaturedEventCard({
   event,
+  homeStatus,
   onPress,
   onPickPhoto,
   onRemovePhoto,
@@ -45,8 +47,9 @@ export function FeaturedEventCard({
         month: 'short',
       })
     : formatDayRange(event.startsAt, event.endsAt);
-  const kicker =
-    event.repeat === 'annual'
+  const kicker = homeStatus
+    ? t(homeStatus === 'live' ? 'home.eventLive' : 'home.eventUpcoming')
+    : event.repeat === 'annual'
       ? t('calendar.annualKicker', {
           date: formatMonthDay(event.startsAt),
         })
@@ -55,11 +58,23 @@ export function FeaturedEventCard({
           range,
         });
 
+  const schedule =
+    homeStatus === 'live'
+      ? t('home.eventUntil', {
+          date: formatMonthDay(event.endsAt),
+          time: formatClock(event.endsAt),
+        })
+      : range + ' · ' + formatClock(event.startsAt);
+
   return (
     <Pressable
       accessible
       accessibilityRole={onPress ? 'button' : 'summary'}
-      accessibilityLabel={`${event.title}. ${event.description}`}
+      accessibilityLabel={
+        homeStatus
+          ? [kicker, event.title, schedule].join('. ')
+          : `${event.title}. ${event.description}`
+      }
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
@@ -67,18 +82,19 @@ export function FeaturedEventCard({
       ]}
     >
       <ApiImage
+        retainInMemory={false}
         source={familyEventCover(event, mode)}
         resizeMode="cover"
         style={styles.background}
       />
       <LinearGradient
         colors={[
-          'rgba(8, 16, 32, 0.72)',
-          'rgba(8, 16, 32, 0.22)',
+          homeStatus ? 'transparent' : 'rgba(8, 16, 32, 0.72)',
+          homeStatus ? 'transparent' : 'rgba(8, 16, 32, 0.22)',
           'rgba(8, 16, 32, 0.04)',
-          'rgba(8, 16, 32, 0.78)',
+          homeStatus ? 'rgba(8, 16, 32, 0.96)' : 'rgba(8, 16, 32, 0.78)',
         ]}
-        locations={[0, 0.38, 0.59, 1]}
+        locations={homeStatus ? [0, 0.3, 0.48, 1] : [0, 0.38, 0.59, 1]}
         style={styles.overlay}
       />
 
@@ -113,47 +129,60 @@ export function FeaturedEventCard({
         </View>
       )}
 
-      <View style={[styles.copy, onPickPhoto ? styles.copyWithActions : null]}>
+      <View
+        style={[
+          styles.copy,
+          homeStatus && styles.homeCopy,
+          onPickPhoto ? styles.copyWithActions : null,
+        ]}
+      >
         <View style={styles.text}>
-          <Text style={styles.kicker}>{kicker}</Text>
+          <Text style={[styles.kicker, homeStatus && styles.homeKicker]}>
+            {kicker}
+          </Text>
           <Text style={styles.title} numberOfLines={2}>
             {event.title}
           </Text>
-          <Text style={styles.description} numberOfLines={2}>
-            {event.description}
+          <Text
+            style={[styles.description, homeStatus && styles.homeSchedule]}
+            numberOfLines={2}
+          >
+            {homeStatus ? schedule : event.description}
           </Text>
         </View>
 
-        <View style={styles.row}>
-          {participants.length > 0 && (
-            <View style={styles.avatars}>
-              {participants.map((person, index) => (
-                <LetterAvatar
-                  key={person.id}
-                  source={person.avatar}
-                  name={person.name}
-                  tone="onDark"
-                  letterSize={11}
-                  style={[
-                    styles.avatar,
-                    index > 0 ? styles.avatarOverlap : null,
-                  ]}
-                />
-              ))}
-            </View>
-          )}
-          <View style={styles.spacer} />
-          {event.reminderAt && (
-            <Text style={styles.reminder} numberOfLines={1}>
-              {t('calendar.remindOn', {
-                date:
-                  formatMonthDay(event.reminderAt) +
-                  ', ' +
-                  formatClock(event.reminderAt),
-              })}
-            </Text>
-          )}
-        </View>
+        {!homeStatus && (
+          <View style={styles.row}>
+            {participants.length > 0 && (
+              <View style={styles.avatars}>
+                {participants.map((person, index) => (
+                  <LetterAvatar
+                    key={person.id}
+                    source={person.avatar}
+                    name={person.name}
+                    tone="onDark"
+                    letterSize={11}
+                    style={[
+                      styles.avatar,
+                      index > 0 ? styles.avatarOverlap : null,
+                    ]}
+                  />
+                ))}
+              </View>
+            )}
+            <View style={styles.spacer} />
+            {event.reminderAt && (
+              <Text style={styles.reminder} numberOfLines={1}>
+                {t('calendar.remindOn', {
+                  date:
+                    formatMonthDay(event.reminderAt) +
+                    ', ' +
+                    formatClock(event.reminderAt),
+                })}
+              </Text>
+            )}
+          </View>
+        )}
       </View>
     </Pressable>
   );

@@ -47,6 +47,7 @@ export type FamilyEventPayload = {
   kind: FamilyEventKind;
   reminderLeadMinutes: number | null;
   participants: string[];
+  audienceUserIds?: string[] | null;
   /** Только для создания: retry после потерянного ответа не создаёт дубль. */
   clientRequestId?: string;
 };
@@ -61,6 +62,7 @@ const bodyOf = (payload: FamilyEventPayload): CreateFamilyEventRequestBody => ({
   kind: payload.kind,
   reminderLeadMinutes: payload.reminderLeadMinutes,
   participants: payload.participants,
+  audienceUserIds: payload.audienceUserIds,
 });
 
 /** GET /families/:id/events?from=&to= — не шире 92 дней. */
@@ -68,6 +70,7 @@ export async function fetchFamilyEvents(
   familyId: string,
   from: Date,
   to: Date,
+  signal: AbortSignal,
 ): Promise<FamilyEvent[]> {
   const query = new URLSearchParams({
     from: from.toISOString(),
@@ -75,6 +78,7 @@ export async function fetchFamilyEvents(
   });
   const events = await apiRequest<FamilyEventDto[]>(
     `/families/${familyId}/events?${query.toString()}`,
+    { signal },
   );
   return events.map(mapEvent);
 }
@@ -83,12 +87,14 @@ export async function fetchFamilyEvents(
 export async function fetchFamilyEvent(
   familyId: string,
   eventId: string,
-  year?: number | null,
+  year: number | null | undefined,
+  signal: AbortSignal,
 ): Promise<FamilyEvent> {
   const query = year ? `?year=${encodeURIComponent(String(year))}` : '';
   return mapEvent(
     await apiRequest<FamilyEventDto>(
       `/families/${familyId}/events/${eventId}${query}`,
+      { signal },
     ),
   );
 }

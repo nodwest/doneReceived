@@ -9,6 +9,6 @@ export interface ChildOverview {
   avatar: ImageSourcePropType | null;
   activeTasks: number;
   reviewTasks: number;
-  /** Ребёнок сейчас дома: на карточке показываем значок домика. */
-  atHome: boolean;
+  locationName?: string;
+  lastLocationAt?: Date;
 }

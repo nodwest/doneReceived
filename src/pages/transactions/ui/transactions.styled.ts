@@ -24,16 +24,17 @@ export const styles = createStyles((colors) => ({
     marginTop: 12,
     paddingHorizontal: 12,
   },
+  list: { flex: 1 },
   body: {
-    gap: 18,
     paddingTop: 16,
     paddingHorizontal: 12,
     paddingBottom: 24,
   },
-  day: {
-    gap: 8,
-  },
+  row: { marginBottom: 8 },
+  action: { color: colors.ink, fontFamily: theme.fonts.semibold },
   dayHead: {
+    marginTop: 10,
+    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

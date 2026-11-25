@@ -1,0 +1,56 @@
+<!doctype html><meta charset="utf-8"><style>html,body,#map{margin:0;height:100%}</style><div id="map"></div>
+<script type="module">
+import * as ml from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+globalThis.process ??= {env:{}};
+process.env.EXPO_PUBLIC_MAP_FACADES_TILEJSON_URL = 'http://127.0.0.1:8094/facades-v1.json';
+const {MAP_3D_STYLE} = await import('./src/widgets/map/config/map-3d-style');
+const city = await import('./src/widgets/map/model/city-details');
+ml.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
+const prepared = 'buildings-prepared-details';
+const center = {Moscow:[37.588,55.796],Rostov:[39.7152,47.23325],Kazan:[49.1192,55.7908]};
+let map;
+window.audit = (place, legacy = false) => new Promise((resolve, reject) => {
+ map?.remove();
+ const style = structuredClone(MAP_3D_STYLE);
+ delete style.sprite;
+ style.layers = style.layers.filter(l=>l.type!=='symbol' && (!legacy || l.id!==prepared));
+ map = new ml.Map({container:'map',style,center:center[place],zoom:17.9,pitch:54,bearing:-26, attributionControl:false, maxTileCacheSize:24});
+ window.liveMap = map;
+ let start=performance.now(), firstBuilding, firstWindow, firstCount, treeCount, legacyDone=false, errors=[];
+ const frames=[];
+ let previous=start;
+ const timer=setTimeout(()=>reject(Error(JSON.stringify({firstBuilding,firstWindow,errors}))),20000);
+ map.on('error',e=>errors.push(String(e.error)));
+ map.on('render',()=>{
+   const now=performance.now();
+   frames.push(now-previous);
+   previous=now;
+   const buildings=map.queryRenderedFeatures({layers:['buildings-3d']});
+   if(buildings.length && firstBuilding===undefined) firstBuilding=now-start;
+   if(map.getLayer(legacy ? city.CITY_DETAILS_LAYER_ID : prepared)) {
+      const windows=map.queryRenderedFeatures({layers:[legacy ? city.CITY_DETAILS_LAYER_ID : prepared]})
+       .filter(f=>f.properties.kind.startsWith('window'));
+      if(windows.length && firstWindow===undefined){firstWindow=now-start;firstCount=windows.length;}
+   }
+ });
+ map.on('idle',()=>{
+   if (!legacyDone) {
+     legacyDone=true;
+     const parks=map.queryRenderedFeatures({layers:city.CITY_PARK_LAYERS.filter(l=>map.getLayer(l))});
+     const buildings=legacy?map.queryRenderedFeatures({layers:['buildings-3d']}):[];
+     const bounds=map.getBounds();
+     const d=city.buildCityDetails(buildings,parks,map.getZoom(),[bounds.getWest(),bounds.getSouth(),bounds.getEast(),bounds.getNorth()]);
+     treeCount=d.trees.features.filter(f=>f.properties.kind==='tree-trunk').length;
+     map.addSource(city.CITY_DETAILS_SOURCE_ID,{type:'geojson', data:city.cityDetailsSource(d), tolerance:0});
+     map.addLayer(city.CITY_DETAILS_LAYER);
+     return;
+   }
+   if(firstWindow===undefined)return;
+   clearTimeout(timer);
+   const sorted=frames.slice(1).sort((a,b)=>a-b);
+   resolve({place,legacy,firstBuilding,firstWindow,delta:firstWindow-firstBuilding,firstCount,treeCount,p95Frame:sorted[Math.floor(sorted.length*0.95)],errors});
+ });
+});
+window.disposePilot = () => { map?.remove(); map=undefined; window.liveMap=undefined; return document.querySelectorAll('canvas').length; };
+</script>

@@ -248,11 +248,9 @@ export function MyTasksPage() {
                     ? t('tasks.emptyReview')
                     : t('tasks.emptyAll')}
                 </Text>
-              ) : tab === 'review' ? (
-                reviewSection
               ) : (
                 <>
-                  {earn > 0 && (
+                  {tab === 'all' && earn > 0 && (
                     <EarnGoalCard
                       earn={earn}
                       count={activeTasks.length}
@@ -265,7 +263,7 @@ export function MyTasksPage() {
                       }
                     />
                   )}
-                  {activeTasks.length > 0 && (
+                  {tab === 'all' && activeTasks.length > 0 && (
                     <View style={styles.section}>
                       <SectionHead
                         tone="child"

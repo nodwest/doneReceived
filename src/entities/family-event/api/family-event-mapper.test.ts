@@ -17,6 +17,7 @@ const dto = (overrides: Partial<FamilyEventDto> = {}): FamilyEventDto => ({
   kind: 'trip',
   photoUrl: null,
   reminderLeadMinutes: null,
+  audienceUserIds: null,
   participants: [],
   viewer: { canEdit: true, response: null },
   createdAt: '2026-11-01T00:00:00.000Z',
@@ -110,6 +111,18 @@ describe('toFamilyEvent', () => {
     expect(event.photo).toBeUndefined();
     expect(event.response).toBeUndefined();
     expect(event.canEdit).toBe(false);
+  });
+
+  it('keeps restricted audience separate from event participants', () => {
+    const audienceUserIds = ['1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'];
+    const event = toFamilyEvent(dto({ audienceUserIds }), image);
+
+    expect(event.audienceUserIds).toEqual(audienceUserIds);
+    expect(event.participants).toEqual([]);
+    expect(
+      toFamilyEvent(dto({ audienceUserIds: [] }), image).audienceUserIds,
+    ).toEqual([]);
+    expect(toFamilyEvent(dto(), image).audienceUserIds).toBeNull();
   });
 
   it('ignores extra fields from the server', () => {

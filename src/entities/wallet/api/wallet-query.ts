@@ -1,26 +1,25 @@
 import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
 import { fetchParentFunds } from './parent-funds-api';
 import { fetchParentPaidTotal } from './parent-wallet-api';
-import { fetchChildWallet, fetchWallet } from './wallet-api';
-import { queryRoots } from '@shared/api';
+import { fetchChildWallet } from './wallet-api';
+import {
+  isAccessDenied,
+  isApiError,
+  privateReadOptions,
+  queryRoots,
+  usePrivateReadScope,
+} from '@shared/api';
+import { fetchChildBalance } from './child-wallet-api';
 
 /** Ключи кэша кошелька. */
 export const walletKeys = {
   all: queryRoots.wallet,
-  detail: (familyId: string | null) =>
-    [...walletKeys.all, 'detail', familyId] as const,
   child: (childId: string) => [...walletKeys.all, 'child', childId] as const,
   funds: (familyId: string | null) =>
     [...walletKeys.all, 'funds', familyId] as const,
   paidTotal: (familyId: string | null, parentId: string | null) =>
     [...walletKeys.all, 'paid-total', familyId, parentId] as const,
 };
-
-export const walletQueryOptions = (familyId: string | null) =>
-  queryOptions({
-    queryKey: walletKeys.detail(familyId),
-    queryFn: () => fetchWallet(familyId),
-  });
 
 export const childWalletQueryOptions = (
   childId: string | null,
@@ -30,14 +29,6 @@ export const childWalletQueryOptions = (
     queryKey: walletKeys.child(childId ?? ''),
     queryFn: childId ? () => fetchChildWallet(childId, familyId) : skipToken,
   });
-
-/**
- * Кошелёк вошедшего родителя: баланс и транзакции, сначала новые. С семьёй —
- * с сервера, без неё (null) — моки.
- */
-export function useWallet(familyId: string | null) {
-  return useQuery(walletQueryOptions(familyId));
-}
 
 /**
  * Кошелёк ребёнка: баланс, награды за задания и выводы, сначала новые.
@@ -56,8 +47,21 @@ export function useChildBalance(
   childId: string | null,
   familyId: string | null = null,
 ) {
-  const { data, isPending } = useChildWallet(childId, familyId);
-  return { balance: data?.balance ?? 0, isPending: !!childId && isPending };
+  const scope = usePrivateReadScope();
+  const enabled = !!scope && !!familyId && !!childId;
+  const { data, error, isPending } = useQuery({
+    ...privateReadOptions,
+    queryKey: [...walletKeys.all, 'child-balance', scope, familyId, childId],
+    queryFn: enabled
+      ? ({ signal }) => fetchChildBalance(familyId, childId, signal)
+      : skipToken,
+  });
+  const unavailable =
+    isAccessDenied(error) || (isApiError(error) && error.status === 404);
+  return {
+    balance: unavailable ? 0 : (data ?? 0),
+    isPending: enabled && isPending,
+  };
 }
 
 /**

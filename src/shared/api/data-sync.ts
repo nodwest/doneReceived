@@ -81,6 +81,7 @@ const AFFECTS: Record<DataChange, readonly DataArea[]> = {
   ],
   'device-changed': ['devices', 'families'],
   'family-changed': [
+    'calendar',
     'families',
     'tasks',
     'wallet',
@@ -119,13 +120,23 @@ export const syncable = (query: Query) => query.meta?.sync !== false;
  * открытых экранах — без мигания: старые данные остаются, пока не придут
  * новые; остальные помечаются устаревшими и обновятся при показе.
  */
-export function syncData(queryClient: QueryClient, change: DataChange) {
+export function syncData(
+  queryClient: QueryClient,
+  change: DataChange,
+  { clearCalendar = false } = {},
+) {
   return Promise.all(
-    AFFECTS[change].map((area) =>
-      queryClient.invalidateQueries({
-        queryKey: queryRoots[area],
-        predicate: syncable,
-      }),
-    ),
+    AFFECTS[change].map((area) => {
+      const filters = { queryKey: queryRoots[area], predicate: syncable };
+      if (
+        clearCalendar &&
+        (area === 'calendar' ||
+          (area === 'activity' &&
+            (change === 'calendar-changed' || change === 'family-changed')))
+      ) {
+        return queryClient.resetQueries(filters);
+      }
+      return queryClient.invalidateQueries(filters);
+    }),
   );
 }

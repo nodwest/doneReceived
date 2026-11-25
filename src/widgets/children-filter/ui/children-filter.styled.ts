@@ -26,7 +26,10 @@ export const styles = createStyles((colors) => ({
     overflow: 'hidden',
   },
   // Выбранный — белый в тёмной рамке, как выбранный день на графике.
-  segmentActive: {
+  indicator: {
+    position: 'absolute',
+    left: 0,
+    borderRadius: 16,
     borderWidth: 1.5,
     borderColor: colors.ink,
     backgroundColor: colors.surface,

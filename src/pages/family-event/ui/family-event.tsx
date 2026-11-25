@@ -186,10 +186,24 @@ export function FamilyEventPage() {
     ? (event.reminderLeadMinutes ??
       reminderLeadKey(event.startsAt, event.reminderAt))
     : null;
+  const customLead = (minutes: number) => {
+    if (minutes % 10080 === 0) {
+      return t('calendar.reminderCustomWeeks', { count: minutes / 10080 });
+    }
+    if (minutes % 1440 === 0) {
+      return t('calendar.reminderCustomDays', { count: minutes / 1440 });
+    }
+    if (minutes % 60 === 0) {
+      return t('calendar.reminderCustomHours', { count: minutes / 60 });
+    }
+    return t('calendar.reminderCustomMinutes', { count: minutes });
+  };
   const reminderText = event.reminderAt
     ? [
         leadKey
-          ? t(REMINDER_KEYS[leadKey as keyof typeof REMINDER_KEYS])
+          ? leadKey in REMINDER_KEYS
+            ? t(REMINDER_KEYS[leadKey as keyof typeof REMINDER_KEYS])
+            : customLead(leadKey)
           : null,
         `${formatMonthDay(event.reminderAt)}, ${formatClock(event.reminderAt)}`,
       ]
@@ -244,6 +258,7 @@ export function FamilyEventPage() {
       >
         <View style={styles.hero}>
           <ApiImage
+            retainInMemory={false}
             source={familyEventCover(event, mode)}
             resizeMode="cover"
             style={[styles.heroImage, !event.photo && styles.heroTemplate]}

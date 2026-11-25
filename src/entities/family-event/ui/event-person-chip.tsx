@@ -6,6 +6,7 @@ import type { FamilyEventPerson } from '../model/family-event';
 type EventPersonChipProps = {
   person: FamilyEventPerson;
   selected: boolean;
+  disabled?: boolean;
   onPress: () => void;
 };
 
@@ -13,12 +14,14 @@ type EventPersonChipProps = {
 export function EventPersonChip({
   person,
   selected,
+  disabled,
   onPress,
 }: EventPersonChipProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityState={{ selected, disabled }}
+      disabled={disabled}
       accessibilityLabel={person.name}
       onPress={onPress}
       style={({ pressed }) => [

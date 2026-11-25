@@ -1,4 +1,12 @@
-import { Pressable, View } from 'react-native';
+import { useEffect } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { selectionTiming } from './use-sliding-segment';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createStyles, theme } from '../theme';
 
@@ -21,6 +29,18 @@ export function Toggle({
   tone = 'violet',
 }: ToggleProps) {
   const blue = tone === 'blue';
+  const reduceMotion = useReducedMotion();
+  const progress = useSharedValue(value ? 1 : 0);
+
+  useEffect(() => {
+    const next = value ? 1 : 0;
+    progress.value = reduceMotion ? next : withTiming(next, selectionTiming);
+  }, [value, reduceMotion, progress]);
+
+  const gradient = useAnimatedStyle(() => ({ opacity: progress.value }));
+  const knob = useAnimatedStyle(() => ({
+    transform: [{ translateX: progress.value * 18 }],
+  }));
   return (
     <Pressable
       accessibilityRole="switch"
@@ -31,26 +51,24 @@ export function Toggle({
       onPress={() => onValueChange(!value)}
       style={disabled && styles.disabled}
     >
-      {value ? (
-        <LinearGradient
-          colors={
-            blue
-              ? [theme.colors.childFrom, theme.colors.childDeep]
-              : [theme.colors.violet, theme.colors.blue]
-          }
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0.37, y: 1 }}
-          style={[styles.track, styles.trackOn]}
+      <View style={[styles.track, blue && styles.trackOffBlue]}>
+        <Animated.View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, gradient]}
         >
-          <View style={styles.knob} />
-        </LinearGradient>
-      ) : (
-        <View
-          style={[styles.track, styles.trackOff, blue && styles.trackOffBlue]}
-        >
-          <View style={styles.knob} />
-        </View>
-      )}
+          <LinearGradient
+            colors={
+              blue
+                ? [theme.colors.childFrom, theme.colors.childDeep]
+                : [theme.colors.violet, theme.colors.blue]
+            }
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0.37, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </Animated.View>
+        <Animated.View pointerEvents="none" style={[styles.knob, knob]} />
+      </View>
     </Pressable>
   );
 }
@@ -64,13 +82,7 @@ const styles = createStyles((colors) => ({
     height: 26,
     borderRadius: 13,
     padding: 3,
-    flexDirection: 'row',
-  },
-  trackOn: {
-    justifyContent: 'flex-end',
-  },
-  trackOff: {
-    justifyContent: 'flex-start',
+    overflow: 'hidden',
     backgroundColor: colors.placeholder,
   },
   trackOffBlue: {

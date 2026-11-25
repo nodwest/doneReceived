@@ -193,6 +193,7 @@ export const styles = createStyles((colors) => ({
     borderColor: colors.line,
     backgroundColor: colors.surface,
   },
+  eyeInactive: { backgroundColor: colors.line },
   eye: {
     width: 28,
     height: 28,

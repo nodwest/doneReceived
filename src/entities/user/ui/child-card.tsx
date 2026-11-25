@@ -1,15 +1,13 @@
 import {
-  Platform,
   Pressable,
   Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@shared/i18n';
-import { Icon, LetterAvatar } from '@shared/ui';
-import { theme } from '@shared/theme';
+import { LetterAvatar } from '@shared/ui';
+import { formatClock, formatMonthDay } from '@shared/lib';
 import type { ChildOverview } from '../model/child-overview';
 import { styles } from './child-card.styled';
 
@@ -32,29 +30,51 @@ export function ChildCard({
   onReviewTasksPress,
 }: ChildCardProps) {
   const { t } = useTranslation();
-  const { name, avatar, activeTasks, reviewTasks, atHome } = child;
+  const {
+    name,
+    avatar,
+    activeTasks,
+    reviewTasks,
+    locationName,
+    lastLocationAt,
+  } = child;
+
+  const locationTime =
+    lastLocationAt &&
+    t('home.lastLocation', {
+      date: formatMonthDay(lastLocationAt),
+      time: formatClock(lastLocationAt),
+    });
 
   return (
-    <Pressable
-      // В вебе роль button делает из карточки <button>, а внутри неё кнопки-чипы:
-      // вложенные <button> HTML запрещает. Там карточка остаётся просто
-      // нажимаемым блоком.
-      accessibilityRole={Platform.OS === 'web' ? undefined : 'button'}
-      accessibilityLabel={name}
-      disabled={!onPress}
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed, style]}
-    >
-      <View style={styles.child}>
+    <View style={[styles.card, style]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={[name, locationName, locationTime]
+          .filter(Boolean)
+          .join('. ')}
+        disabled={!onPress}
+        onPress={onPress}
+        style={({ pressed }) => [styles.child, pressed && styles.pressed]}
+      >
         <LetterAvatar
           source={avatar}
           name={name}
           style={styles.avatar}
           letterSize={22}
         />
-        <Text style={styles.name}>{name}</Text>
-      </View>
-      {/* Чипы — отдельные кнопки внутри карточки: тап по ним не открывает профиль. */}
+        <View style={styles.identity}>
+          <Text style={styles.name} numberOfLines={2}>
+            {name}
+          </Text>
+          {locationName && (
+            <Text style={styles.place} numberOfLines={2}>
+              {locationName}
+            </Text>
+          )}
+          {lastLocationAt && <Text style={styles.meta}>{locationTime}</Text>}
+        </View>
+      </Pressable>
       <View style={styles.stats}>
         <Pressable
           accessibilityRole="button"
@@ -67,45 +87,24 @@ export function ChildCard({
           style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
         >
           <Text style={styles.statValue}>{activeTasks}</Text>
-          <Text style={styles.statLabel}>
-            {t('childCard.activeTasks', { count: activeTasks })}
-          </Text>
+          <Text style={styles.statLabel}>{t('home.activeShort')}</Text>
         </Pressable>
-        {/* Нечего проверять — чип не показываем. */}
-        {reviewTasks > 0 && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('childCard.tasksToReviewA11y', {
-              name,
-              count: reviewTasks,
-            })}
-            disabled={!onReviewTasksPress}
-            onPress={onReviewTasksPress}
-            style={({ pressed }) => [
-              styles.stat,
-              styles.statReview,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text style={[styles.statValue, styles.statReviewText]}>
-              {reviewTasks}
-            </Text>
-            <Text style={[styles.statLabel, styles.statReviewText]}>
-              {t('childCard.tasksToReview', { count: reviewTasks })}
-            </Text>
-          </Pressable>
-        )}
-      </View>
-      {atHome && (
-        <LinearGradient
-          colors={[theme.colors.homeFrom, theme.colors.homeTo]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.homeBadge}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('childCard.tasksToReviewA11y', {
+            name,
+            count: reviewTasks,
+          })}
+          disabled={!onReviewTasksPress}
+          onPress={onReviewTasksPress}
+          style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
         >
-          <Icon name="home" size={20} color={theme.colors.homeBrown} />
-        </LinearGradient>
-      )}
-    </Pressable>
+          <Text style={[styles.statValue, styles.statReviewText]}>
+            {reviewTasks}
+          </Text>
+          <Text style={styles.statLabel}>{t('home.reviewShort')}</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 }

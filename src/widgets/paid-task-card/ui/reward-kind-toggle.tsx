@@ -1,5 +1,12 @@
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { selectionTiming, useSlidingSegment } from '@shared/ui';
 import type { OperationKind } from '@entities/operation';
 import { useTranslation } from '@shared/i18n';
 import { createStyles, theme, themedValue, tracking } from '@shared/theme';
@@ -20,12 +27,49 @@ const KINDS: readonly OperationKind[] = ['earned', 'missed'];
 
 /**
  * Тогл в шапке карточек и списка наград: Done — выплаченные (зелёный),
- * Missed — упущенные (графит). Выбранный сегмент шире и на градиенте.
+ * Missed — упущенные (графит). Выбранный сегмент отмечен градиентом.
  */
 export function RewardKindToggle({ value, onChange }: RewardKindToggleProps) {
   const { t } = useTranslation();
+  const { target, indicator, measure, reduceMotion } = useSlidingSegment(value);
+  const progress = useSharedValue(value === 'earned' ? 0 : 1);
+
+  useEffect(() => {
+    const next = value === 'earned' ? 0 : 1;
+    progress.value = reduceMotion ? next : withTiming(next, selectionTiming);
+  }, [value, reduceMotion, progress]);
+
+  const missed = useAnimatedStyle(() => ({ opacity: progress.value }));
   return (
     <View style={styles.bar} accessibilityRole="tablist">
+      {target && (
+        <Animated.View
+          pointerEvents="none"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={[
+            styles.indicator,
+            styles[value],
+            { top: target.y, height: target.height },
+            indicator,
+          ]}
+        >
+          <LinearGradient
+            colors={GRADIENTS.earned}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <Animated.View style={[StyleSheet.absoluteFill, missed]}>
+            <LinearGradient
+              colors={GRADIENTS.missed}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+        </Animated.View>
+      )}
       {KINDS.map((kind) => {
         const selected = kind === value;
         const label =
@@ -39,20 +83,9 @@ export function RewardKindToggle({ value, onChange }: RewardKindToggleProps) {
             accessibilityLabel={label}
             accessibilityState={{ selected }}
             onPress={() => onChange(kind)}
-            style={[
-              styles.segment,
-              selected && styles.segmentSelected,
-              selected && styles[kind],
-            ]}
+            onLayout={measure(kind)}
+            style={styles.segment}
           >
-            {selected && (
-              <LinearGradient
-                colors={GRADIENTS[kind]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-            )}
             <Text
               style={[styles.label, selected && styles.labelSelected]}
               numberOfLines={1}
@@ -87,8 +120,11 @@ const styles = createStyles((colors) => ({
     borderRadius: 18,
     overflow: 'hidden',
   },
-  segmentSelected: {
-    flex: 1.4,
+  indicator: {
+    position: 'absolute',
+    left: 0,
+    borderRadius: 18,
+    overflow: 'hidden',
   },
   earned: {
     boxShadow: '0px 3px 8px rgba(26, 133, 79, 0.3)',

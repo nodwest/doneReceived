@@ -7,6 +7,7 @@ import { styles } from './home-summary.styled';
 
 type HomeSummaryProps = {
   /** Сумма на первой плитке: выплачено семьёй или баланс ребёнка. */
+  variant?: 'tiles' | 'plain';
   amount: number;
   amountLabel?: string;
   activeTasks: number;
@@ -21,6 +22,7 @@ type HomeSummaryProps = {
 };
 
 export function HomeSummary({
+  variant = 'tiles',
   amount,
   amountLabel,
   activeTasks,
@@ -31,26 +33,33 @@ export function HomeSummary({
   tone = 'parent',
 }: HomeSummaryProps) {
   const { t } = useTranslation();
+  const plain = variant === 'plain';
   return (
-    <View style={styles.container}>
+    <View style={plain ? styles.plainContainer : styles.container}>
       <StatCard
+        plain={plain}
         accent={tone}
         icon={<Icon name="coins" size={20} color={theme.colors.white} />}
         value={`$${amount}`}
         label={amountLabel ?? t('summary.rewardsPaid')}
       />
       <StatCard
+        plain={plain}
         icon={<Icon name="tasks" size={20} color={theme.colors.blueInk} />}
         value={String(activeTasks)}
-        label={t('summary.activeTasks')}
+        label={t(plain ? 'home.activeShort' : 'summary.activeTasks')}
         onPress={onActiveTasksPress}
       />
       {tasksToReview !== undefined && (
         <StatCard
+          plain={plain}
           highlight
           icon={<Icon name="cheque" size={20} color={theme.colors.violetInk} />}
           value={String(tasksToReview)}
-          label={reviewLabel ?? t('summary.tasksToReview')}
+          label={
+            reviewLabel ??
+            t(plain ? 'home.reviewShort' : 'summary.tasksToReview')
+          }
           onPress={onTasksToReviewPress}
         />
       )}

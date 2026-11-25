@@ -1,4 +1,4 @@
-import { apiRequest, authorizedImage } from '@shared/api';
+import { apiRequest, authorizedImage, isApiError } from '@shared/api';
 import { withTimeout } from '@shared/lib';
 import type { Operation } from '../model/operation';
 
@@ -21,6 +21,7 @@ type WalletDto = {
     id: string;
     assignmentId: string;
     points: number;
+    balanceAfterPoints?: string;
     createdAt: string;
     /** Название и описание задания на момент запроса истории. */
     taskTitle: string;
@@ -34,6 +35,7 @@ type WalletDto = {
     /** Фото одобренного отчёта, у которых не истёк срок хранения. */
     attachmentIds?: string[];
   }[];
+  next?: string | null;
 };
 
 type MissedItemDto = {
@@ -125,58 +127,191 @@ export async function fetchServerOperations(
       ]),
     ),
   );
-  const toChild = (child: ChildDto) => ({
+  return children.flatMap((child, index) => {
+    const [wallet, missed] = histories[index];
+    const earned = wallet.entries.map((entry) =>
+      toEarned(entry, child, familyId),
+    );
+    return [...earned, ...missed.map((item) => toMissed(item, child))];
+  });
+}
+
+function toMissed(item: MissedItemDto, child: ChildDto): Operation {
+  const rejected = item.lastRejection;
+  return {
+    id: item.assignmentId,
+    kind: 'missed',
+    title: item.taskTitle,
+    description: item.taskDescription ?? '',
+    amount: item.rewardPoints,
+    child: toOperationChild(child),
+    parentId: item.createdBy,
+    at: item.closedAt,
+    doneAt: null,
+    photos: [],
+    note: null,
+    assignmentId: item.assignmentId,
+    dueAt: item.deadlineAt,
+    missedReason: item.reason,
+    rejection: rejected
+      ? {
+          reason: REJECT_REASONS[rejected.reasonCode] ?? 'other',
+          comment: rejected.comment?.trim() ?? '',
+          by: rejected.reviewedBy,
+        }
+      : null,
+  };
+}
+
+function toOperationChild(child: ChildDto) {
+  return {
     id: child.id,
     name: child.displayName,
     avatar: child.avatarUrl ? authorizedImage(child.avatarUrl) : null,
-  });
+  };
+}
 
-  return children.flatMap((child, index) => {
-    const [wallet, missed] = histories[index];
-    const earned = wallet.entries.map(
-      (entry): Operation => ({
-        id: entry.id,
-        kind: 'earned',
-        title: entry.taskTitle,
-        description: entry.taskDescription ?? '',
-        amount: entry.points,
-        child: toChild(child),
-        parentId: entry.approvedBy ?? '',
-        at: entry.createdAt,
-        doneAt: entry.submittedAt,
-        photos: (entry.attachmentIds ?? []).map((id) =>
-          authorizedImage(`/families/${familyId}/task-attachments/${id}`),
-        ),
-        note: entry.submissionNote?.trim() || null,
-        assignmentId: entry.assignmentId,
-      }),
-    );
-    const lost = missed.map((item): Operation => {
-      const rejected = item.lastRejection;
-      return {
-        id: item.assignmentId,
-        kind: 'missed',
-        title: item.taskTitle,
-        description: item.taskDescription ?? '',
-        amount: item.rewardPoints,
-        child: toChild(child),
-        parentId: item.createdBy,
-        at: item.closedAt,
-        doneAt: null,
-        photos: [],
-        note: null,
-        assignmentId: item.assignmentId,
-        dueAt: item.deadlineAt,
-        missedReason: item.reason,
-        rejection: rejected
-          ? {
-              reason: REJECT_REASONS[rejected.reasonCode] ?? 'other',
-              comment: rejected.comment?.trim() ?? '',
-              by: rejected.reviewedBy,
-            }
-          : null,
-      };
-    });
-    return [...earned, ...lost];
+function toEarned(
+  entry: WalletDto['entries'][number],
+  child: ChildDto,
+  familyId: string,
+): Operation {
+  return {
+    id: entry.id,
+    kind: 'earned',
+    title: entry.taskTitle,
+    description: entry.taskDescription ?? '',
+    amount: entry.points,
+    child: toOperationChild(child),
+    parentId: entry.approvedBy ?? '',
+    at: entry.createdAt,
+    doneAt: entry.submittedAt,
+    photos: (entry.attachmentIds ?? []).map((id) =>
+      authorizedImage(`/families/${familyId}/task-attachments/${id}`),
+    ),
+    note: entry.submissionNote?.trim() || null,
+    assignmentId: entry.assignmentId,
+    balanceAfter:
+      entry.balanceAfterPoints === undefined
+        ? undefined
+        : Number(entry.balanceAfterPoints),
+  };
+}
+
+export type RewardPeriod = { from: string; to: string; timeZone: string };
+type RewardDay = { day: string; points: string; approvedBy: string | null };
+
+async function fetchRewardChildren(
+  viewer: OperationsViewer,
+  signal: AbortSignal,
+): Promise<ChildDto[]> {
+  if (viewer.child) {
+    return [
+      {
+        id: viewer.child.id,
+        displayName: viewer.child.name,
+        avatarUrl: viewer.child.avatarUrl,
+      },
+    ];
+  }
+  return apiRequest<ChildDto[]>(`/families/${viewer.familyId}/children`, {
+    signal,
   });
+}
+
+export async function fetchRewardPeriod(
+  viewer: OperationsViewer,
+  period: RewardPeriod,
+  childFilter: string,
+  signal: AbortSignal,
+) {
+  const { familyId, userId } = viewer;
+  const children = (await fetchRewardChildren(viewer, signal)).filter(
+    (child) => childFilter === 'all' || child.id === childFilter,
+  );
+  const bounds = new URLSearchParams({ from: period.from, to: period.to });
+  const aggregate = new URLSearchParams(bounds);
+  aggregate.set('timeZone', period.timeZone);
+  const histories = await Promise.all(
+    children.map(async (child) => {
+      const base = `/families/${familyId}/children/${child.id}`;
+      const [days, earned, missed] = await Promise.all([
+        apiRequest<RewardDay[]>(`${base}/wallet/reward-days?${aggregate}`, {
+          signal,
+        }),
+        fetchPeriodPages(`${base}/wallet`, bounds, signal, (url) =>
+          apiRequest<WalletDto>(url, { signal }).then(({ entries, next }) => ({
+            items: entries,
+            next,
+          })),
+        ),
+        fetchPeriodPages(`${base}/missed-tasks`, bounds, signal, (url) =>
+          apiRequest<MissedDto>(url, { signal }),
+        ),
+      ]);
+      return {
+        days: days.filter((day) => viewer.child || day.approvedBy === userId),
+        operations: [
+          ...earned.map((entry) => toEarned(entry, child, familyId)),
+          ...missed.map((entry) => toMissed(entry, child)),
+        ].filter((operation) => viewer.child || operation.parentId === userId),
+      };
+    }),
+  );
+  const earnedByDay = new Map<string, number>();
+  for (const history of histories) {
+    for (const { day, points } of history.days) {
+      earnedByDay.set(day, (earnedByDay.get(day) ?? 0) + Number(points));
+    }
+  }
+  return {
+    earnedByDay,
+    operations: histories.flatMap((history) => history.operations),
+  };
+}
+
+async function fetchPeriodPages<T>(
+  path: string,
+  bounds: URLSearchParams,
+  signal: AbortSignal,
+  fetchPage: (url: string) => Promise<{ items: T[]; next?: string | null }>,
+) {
+  const params = new URLSearchParams(bounds);
+  const items: T[] = [];
+  let next: string | null | undefined;
+  do {
+    signal.throwIfAborted();
+    if (next) params.set('before', next);
+    const page = await fetchPage(`${path}?${params}`);
+    items.push(...page.items);
+    next = page.next;
+  } while (next);
+  return items;
+}
+
+export async function fetchRewardById(
+  viewer: OperationsViewer,
+  id: string,
+  signal: AbortSignal,
+) {
+  if (!/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i.test(id)) return null;
+  const { familyId, userId } = viewer;
+  const children = await fetchRewardChildren(viewer, signal);
+  const matches = await Promise.all(
+    children.map(async (child) => {
+      try {
+        const entry = await apiRequest<WalletDto['entries'][number]>(
+          `/families/${familyId}/children/${child.id}/wallet/rewards/${id}`,
+          { signal },
+        );
+        return viewer.child || entry.approvedBy === userId
+          ? toEarned(entry, child, familyId)
+          : null;
+      } catch (error) {
+        if (isApiError(error) && error.status === 404) return null;
+        throw error;
+      }
+    }),
+  );
+  return matches.find((match) => match !== null) ?? null;
 }

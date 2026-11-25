@@ -56,13 +56,13 @@ export function useMyWishlistOwner(): WishlistOwner | null {
  * История наград для экранов, собранная с сервера (начисления из кошельков
  * детей и упущенные). У вошедшего ребёнка — только его.
  */
-export function useFamilyOperations() {
+export function useOperationsViewer() {
   const viewer = useTaskViewer();
   const session = useSession();
   const me = useMe();
   const { childId } = useChildAccount();
   const childSession = session?.user.kind === 'child';
-  const operationsViewer = useMemo<OperationsViewer | null>(() => {
+  return useMemo<OperationsViewer | null>(() => {
     if (!viewer) return null;
     if (!childSession) return viewer;
     // Ребёнок без id профиля — истории с сервера не собрать.
@@ -77,5 +77,8 @@ export function useFamilyOperations() {
       },
     };
   }, [viewer, childSession, childId, session, me?.avatarUrl]);
-  return useOperations(operationsViewer);
+}
+
+export function useFamilyOperations() {
+  return useOperations(useOperationsViewer());
 }

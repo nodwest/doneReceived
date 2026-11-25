@@ -46,6 +46,9 @@ export const styles = createStyles((colors) => ({
     bottom: 0,
     left: 0,
   },
+  homeCopy: { justifyContent: 'flex-end' },
+  homeKicker: { fontSize: 12, textTransform: 'none', color: colors.success },
+  homeSchedule: { fontSize: 13, lineHeight: 18 },
   copy: {
     flex: 1,
     justifyContent: 'space-between',
