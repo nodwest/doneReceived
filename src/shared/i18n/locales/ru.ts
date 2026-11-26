@@ -351,6 +351,7 @@ export const ru: Dictionary = {
     onReview: 'На проверке',
   },
   activity: {
+    loadMore: 'Загрузить ещё',
     title: 'События',
     all: 'Все',
     empty: 'За последние 30 дней событий нет',
@@ -711,6 +712,7 @@ export const ru: Dictionary = {
     failed: 'Не получилось пополнить. Попробуйте ещё раз.',
   },
   transactions: {
+    end: 'Все транзакции загружены',
     emptyToday: 'Сегодня операций нет',
     loadError: 'Не удалось загрузить операции.',
     loadMore: 'Загрузить ещё',

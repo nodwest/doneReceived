@@ -349,6 +349,7 @@ export const en = {
     onReview: 'On review',
   },
   activity: {
+    loadMore: 'Load more',
     title: 'Activity',
     all: 'All',
     empty: 'No activity in the last 30 days',
@@ -693,6 +694,7 @@ export const en = {
     failed: "Couldn't top up. Please try again.",
   },
   transactions: {
+    end: 'All transactions loaded',
     emptyToday: 'No transactions today',
     loadError: 'Could not load transactions.',
     loadMore: 'Load more',

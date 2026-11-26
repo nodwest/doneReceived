@@ -76,11 +76,16 @@ export function HistoryMapLayer({
     }
   }, [bottomInset, camera, first, points, routeKey]);
   useEffect(() => {
-    const control = camera.current;
     return () => {
-      void control?.setStop({
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
-      });
+      // The Camera ref is cleared before cleanup when the map also unmounts.
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- Use the live ref so a detached camera is skipped.
+      void camera.current
+        ?.setStop({
+          padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        })
+        .catch(() => {
+          // The native view can disappear before the queued reset is applied.
+        });
     };
   }, [camera]);
   const active = markers.find((marker) => marker.id === selected);

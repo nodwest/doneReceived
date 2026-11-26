@@ -40,7 +40,7 @@ function useFeedViewer() {
 export function useFamilyFeed() {
   const { feedViewer, childSession, children, members, accessDenied } =
     useFeedViewer();
-  const query = useFeed(feedViewer, children, members);
+  const query = useFeed(accessDenied ? null : feedViewer, children, members);
   const denied = accessDenied || query.accessDenied;
   useRecheckFamilyAccess(denied, !!feedViewer && !childSession);
   return {
@@ -53,10 +53,18 @@ export function useFamilyFeed() {
 }
 
 /** Лента за последние 30 дней: страница Activity. */
-export function useFamilyFeedHistory() {
+export function useFamilyFeedHistory(selectedChildId?: string) {
   const { feedViewer, childSession, children, members, accessDenied } =
     useFeedViewer();
-  const query = useFeedHistory(feedViewer, children, members);
+  const childId = childSession
+    ? undefined
+    : children?.find((child) => child.id === selectedChildId)?.id;
+  const query = useFeedHistory(
+    accessDenied ? null : feedViewer,
+    children,
+    members,
+    childId,
+  );
   const denied = accessDenied || query.accessDenied;
   useRecheckFamilyAccess(denied, !!feedViewer && !childSession);
   return {

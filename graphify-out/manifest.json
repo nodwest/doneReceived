@@ -312,15 +312,15 @@
     "semantic_hash": ""
   },
   "src/entities/activity/api/feed-api.ts": {
-    "mtime": 1795645228.1170633,
-    "seen": 1795645706.7088282,
-    "ast_hash": "963c3d9a963f3177cb06b1b4d81e2cc4",
+    "mtime": 1795649597.4013665,
+    "seen": 1795649650.6669292,
+    "ast_hash": "679510ca758fe9226ee99bf433aa6637",
     "semantic_hash": ""
   },
   "src/entities/activity/api/feed-query.ts": {
-    "mtime": 1795645228.1180663,
-    "seen": 1795645706.7088282,
-    "ast_hash": "20056d9a3dd470a7e32c3b718fc87eea",
+    "mtime": 1795649627.9716234,
+    "seen": 1795649650.6669292,
+    "ast_hash": "a506192dc47faefe5553efc653a6a0ae",
     "semantic_hash": ""
   },
   "src/entities/activity/index.ts": {
@@ -1428,9 +1428,9 @@
     "semantic_hash": ""
   },
   "src/features/family-tasks/model/use-family-feed.ts": {
-    "mtime": 1795645228.1528373,
-    "seen": 1795645706.709838,
-    "ast_hash": "4d4007a042c17d66b9892e3986a6c53b",
+    "mtime": 1795647622.9989436,
+    "seen": 1795647719.6851368,
+    "ast_hash": "b611a7dd7f72e8b9e7683dff302e1d12",
     "semantic_hash": ""
   },
   "src/features/family-tasks/model/use-family-tasks.ts": {
@@ -2136,15 +2136,15 @@
     "semantic_hash": ""
   },
   "src/pages/transactions/ui/transactions.styled.ts": {
-    "mtime": 1795645626.9958458,
-    "seen": 1795645706.709838,
-    "ast_hash": "e2959264bbc44214df8aa1efabe6d02b",
+    "mtime": 1795649221.977131,
+    "seen": 1795649276.845523,
+    "ast_hash": "70a257a6eba15d06db773e9fb43f06e9",
     "semantic_hash": ""
   },
   "src/pages/transactions/ui/transactions.tsx": {
-    "mtime": 1795645626.9993699,
-    "seen": 1795645706.709838,
-    "ast_hash": "1b64cbe269d0d2200a21890a2839f605",
+    "mtime": 1795649275.406449,
+    "seen": 1795649276.845523,
+    "ast_hash": "bbff039b0cb8e4addef961bcae3cd950",
     "semantic_hash": ""
   },
   "src/pages/verify-email/index.ts": {
@@ -2304,15 +2304,15 @@
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/en.ts": {
-    "mtime": 1795645627.0113003,
-    "seen": 1795645706.709838,
-    "ast_hash": "1844bffa6db71289ea87bd5c9544f728",
+    "mtime": 1795649243.3742063,
+    "seen": 1795649276.8544412,
+    "ast_hash": "a290dfc610b434f39dbb9e4d73ba0783",
     "semantic_hash": ""
   },
   "src/shared/i18n/locales/ru.ts": {
-    "mtime": 1795645627.0138185,
-    "seen": 1795645706.709838,
-    "ast_hash": "1580148659d3807e852404ac86fdedc6",
+    "mtime": 1795649243.3731759,
+    "seen": 1795649276.8544412,
+    "ast_hash": "9e4287e89fe1ff1b4652d70a61a47a05",
     "semantic_hash": ""
   },
   "src/shared/i18n/storage.ts": {
@@ -3438,9 +3438,9 @@
     "semantic_hash": ""
   },
   "src/widgets/map/map.tsx": {
-    "mtime": 1795645228.1919453,
-    "seen": 1795645706.709838,
-    "ast_hash": "2774a4ef2d134776271708c5507b3a56",
+    "mtime": 1795646172.4002042,
+    "seen": 1795646228.2770894,
+    "ast_hash": "f8ddaa5d3be95da432a0b858a33d57a1",
     "semantic_hash": ""
   },
   "src/widgets/map/map.web.tsx": {
@@ -4848,9 +4848,9 @@
     "semantic_hash": ""
   },
   "src/widgets/map/ui/history-map.tsx": {
-    "mtime": 1795156916.2187781,
-    "seen": 1795645706.709838,
-    "ast_hash": "c1cffabccb93d1afafb4fa08437b8483",
+    "mtime": 1795646247.6251526,
+    "seen": 1795646303.1893814,
+    "ast_hash": "1b4d0ab1a58e7469aa7954dd476e48ac",
     "semantic_hash": ""
   },
   "src/widgets/map/ui/history-map.web.tsx": {
@@ -5388,9 +5388,9 @@
     "semantic_hash": ""
   },
   "src/pages/activity/ui/activity.tsx": {
-    "mtime": 1795645228.158869,
-    "seen": 1795645706.709838,
-    "ast_hash": "ccf0ba1110a5042a2eda26d252d0db1e",
+    "mtime": 1795647742.2473612,
+    "seen": 1795647792.2032259,
+    "ast_hash": "641b6a3b0b2cc2738fb4a266b03286c5",
     "semantic_hash": ""
   },
   "src/shared/api/authorized-image.test.ts": {
@@ -5460,9 +5460,9 @@
     "semantic_hash": ""
   },
   "src/entities/wallet/api/wallet-history-query.ts": {
-    "mtime": 1795645626.957312,
-    "seen": 1795645706.7088282,
-    "ast_hash": "37258f96caa83d2a43f84ff9964584bb",
+    "mtime": 1795649221.9761245,
+    "seen": 1795649276.7508345,
+    "ast_hash": "cb588e705c08e71f95dc286a76146c68",
     "semantic_hash": ""
   },
   "src/entities/wallet/api/wallet-transaction-pages.test.ts": {
@@ -5535,6 +5535,12 @@
     "mtime": 1795645626.9020352,
     "seen": 1795645706.7113483,
     "ast_hash": "0f08d9c319dff38d76d312978ecf42da",
+    "semantic_hash": ""
+  },
+  "src/entities/activity/api/feed-api.test.ts": {
+    "mtime": 1795649627.947252,
+    "seen": 1795649650.6669292,
+    "ast_hash": "1aa0d726000a1d3406330db1eed9d43e",
     "semantic_hash": ""
   },
   "package-lock.json": {

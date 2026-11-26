@@ -38,12 +38,15 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
     data: events,
     familyChildren,
     isPending,
+    isPlaceholderData,
     isError,
+    isFetching,
+    isFetchingNextPage,
     accessDenied,
     hasNextPage,
-    refetch,
+    retry,
     fetchNextPage,
-  } = useFamilyFeedHistory();
+  } = useFamilyFeedHistory(filter === ALL ? undefined : filter);
 
   const children = viewer === 'parent' ? (familyChildren ?? []) : [];
   // Ребёнка удалили, пока он был выбран, — снова вся семья.
@@ -59,16 +62,16 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
     [events, selected],
   );
 
-  const retry = accessDenied ? null : (
-    <Pressable
-      accessibilityRole="button"
-      hitSlop={12}
-      onPress={() => void (hasNextPage ? fetchNextPage() : refetch())}
-    >
+  const retryButton = accessDenied ? null : (
+    <Pressable accessibilityRole="button" hitSlop={12} onPress={retry}>
       <Text style={styles.retry}>{t('common.retry')}</Text>
     </Pressable>
   );
-  const loadingMore = isPending || hasNextPage;
+  const loadMore = () => {
+    if (hasNextPage && !isFetching && !isError && !accessDenied) {
+      void fetchNextPage({ cancelRefetch: false });
+    }
+  };
 
   return (
     <TabScreen activeKey="home" navHidden>
@@ -111,6 +114,8 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
         showsVerticalScrollIndicator={false}
         stickySectionHeadersEnabled={false}
         sections={sections}
+        onEndReachedThreshold={0.5}
+        onEndReached={sections.length > 0 ? loadMore : undefined}
         keyExtractor={(card) => card.key}
         renderSectionHeader={({ section }) => (
           <Text style={styles.day} accessibilityRole="header">
@@ -126,13 +131,22 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
             {isError ? (
               <>
                 <Text style={styles.footerText}>{t('activity.loadError')}</Text>
-                {retry}
+                {retryButton}
               </>
-            ) : loadingMore ? (
+            ) : isPending || isPlaceholderData || isFetchingNextPage ? (
               <ActivityIndicator
                 color={theme.colors.blueInk}
                 accessibilityLabel={t('activity.loading')}
               />
+            ) : hasNextPage ? (
+              <Pressable
+                accessibilityRole="button"
+                hitSlop={12}
+                disabled={isFetching}
+                onPress={loadMore}
+              >
+                <Text style={styles.retry}>{t('activity.loadMore')}</Text>
+              </Pressable>
             ) : (
               <Text style={styles.footerText}>
                 {t(sections.length > 0 ? 'activity.end' : 'activity.empty')}

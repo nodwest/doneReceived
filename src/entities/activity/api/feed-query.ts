@@ -1,12 +1,19 @@
-import { useEffect, useMemo } from 'react';
-import { skipToken, useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import {
+  skipToken,
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import type { FeedViewer } from '../model/feed';
 import { fetchSubmissionComments } from './comments-api';
 import {
   fetchFeed,
+  fetchFeedHistoryPage,
   mergeFeedPages,
   presentFeed,
   type FeedChildLabel,
+  type FeedHistoryCursor,
   type FeedMemberLabel,
 } from './feed-api';
 import { addDays, startOfDay } from '@shared/lib';
@@ -15,15 +22,10 @@ import {
   privateReadOptions,
   usePrivateReadScope,
   isAccessDenied,
+  isApiError,
 } from '@shared/api';
 
-/**
- * Сколько последних событий берём для ленты на главной. Из них получаются
- * карточки: у задания одна карточка со всей историей, поэтому событий нужно
- * заметно больше, чем карточек, — берём максимум сервера, чтобы в истории
- * были и первые шаги.
- */
-export const FEED_LIMIT = 100;
+const FEED_PAGE_SIZE = 20;
 
 export const feedKeys = {
   all: queryRoots.activity,
@@ -41,9 +43,21 @@ export const feedKeys = {
   history: (
     familyId: string | null,
     userId: string | null,
-    childId?: string,
-    scope?: string | null,
-  ) => [...feedKeys.all, 'history', familyId, userId, childId, scope] as const,
+    scope: string | null,
+    since: string,
+    childId: string | undefined,
+    viewerChildId: string | undefined,
+  ) =>
+    [
+      ...feedKeys.all,
+      'history',
+      familyId,
+      userId,
+      scope,
+      since,
+      childId,
+      viewerChildId,
+    ] as const,
 };
 
 /**
@@ -64,9 +78,10 @@ export function useFeed(
       viewer?.child?.id,
       scope,
     ),
-    queryFn: viewer
-      ? ({ signal }) => fetchFeed(viewer.familyId, FEED_LIMIT, signal)
-      : skipToken,
+    queryFn:
+      viewer && scope
+        ? ({ signal }) => fetchFeed(viewer.familyId, FEED_PAGE_SIZE, signal)
+        : skipToken,
   });
   const data = useMemo(
     () =>
@@ -87,43 +102,77 @@ export const feedHistoryStart = () =>
   addDays(startOfDay(new Date()), 1 - HISTORY_DAYS);
 
 /**
- * События за последние 30 дней для страницы Activity. Фильтра по датам на
- * сервере нет: страницы ленты загружаются одна за другой, пока не дойдём до
- * начала периода. Уже загруженное видно сразу.
+ * События за последние 30 дней для страницы Activity. Следующую страницу
+ * запрашивает экран при прокрутке или по кнопке.
  */
 export function useFeedHistory(
   viewer: FeedViewer | null,
   children?: readonly FeedChildLabel[],
   members?: readonly FeedMemberLabel[],
+  selectedChildId?: string,
 ) {
   const scope = usePrivateReadScope();
+  const client = useQueryClient();
+  const since = feedHistoryStart().toISOString();
+  const previewKey = feedKeys.list(
+    viewer?.familyId ?? null,
+    viewer?.userId ?? null,
+    viewer?.child?.id,
+    scope,
+  );
+  const preview =
+    viewer && scope && !selectedChildId
+      ? client.getQueryState<Awaited<ReturnType<typeof fetchFeed>>>(previewKey)
+      : undefined;
+  const queryKey = feedKeys.history(
+    viewer?.familyId ?? null,
+    viewer?.userId ?? null,
+    scope,
+    since,
+    selectedChildId,
+    viewer?.child?.id,
+  );
   const query = useInfiniteQuery({
     ...privateReadOptions,
-    queryKey: feedKeys.history(
-      viewer?.familyId ?? null,
-      viewer?.userId ?? null,
-      viewer?.child?.id,
-      scope,
-    ),
-    queryFn: viewer
-      ? ({ signal, pageParam }) =>
-          fetchFeed(viewer.familyId, FEED_LIMIT, signal, pageParam)
-      : skipToken,
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: ({ activity }) => {
-      const oldest = activity.items[activity.items.length - 1];
+    queryKey,
+    gcTime: 30_000,
+    queryFn:
+      viewer && scope
+        ? ({ signal, pageParam }) =>
+            fetchFeedHistoryPage(
+              viewer.familyId,
+              FEED_PAGE_SIZE,
+              signal,
+              { since, childId: selectedChildId },
+              pageParam,
+            )
+        : skipToken,
+    // The preview is unfiltered. Its cursor cannot continue a history query.
+    placeholderData:
+      preview?.status === 'success' && !preview.isInvalidated && preview.data
+        ? {
+            pages: [
+              {
+                ...preview.data,
+                legacy: false,
+                activity: {
+                  items: preview.data.activity.items.filter(
+                    (item) => Date.parse(item.createdAt) >= Date.parse(since),
+                  ),
+                },
+              },
+            ],
+            pageParams: [undefined],
+          }
+        : undefined,
+    initialPageParam: undefined as FeedHistoryCursor | undefined,
+    getNextPageParam: ({ activity, legacy }, _pages, _previous, cursors) => {
       return activity.next &&
-        oldest &&
-        new Date(oldest.createdAt) >= feedHistoryStart()
-        ? activity.next
+        !cursors.some((cursor) => cursor?.before === activity.next)
+        ? { before: activity.next, legacy }
         : undefined;
     },
   });
-  const { hasNextPage, isFetching, isError, fetchNextPage } = query;
-  useEffect(() => {
-    if (hasNextPage && !isFetching && !isError) void fetchNextPage();
-  }, [hasNextPage, isFetching, isError, fetchNextPage]);
-
   const data = useMemo(
     () =>
       query.data && viewer
@@ -137,7 +186,23 @@ export function useFeedHistory(
     [query.data, viewer, members, children],
   );
   const accessDenied = isAccessDenied(query.error);
-  return { ...query, accessDenied, data: accessDenied ? undefined : data };
+  const retry = () => {
+    if (query.isFetching || accessDenied || !viewer || !scope) return;
+    if (!query.isFetchNextPageError) {
+      void query.refetch({ cancelRefetch: false });
+    } else if (isApiError(query.error) && query.error.status === 400) {
+      // Restart this scoped list instead of retrying an invalid cursor.
+      void client.resetQueries({ queryKey, exact: true });
+    } else {
+      void query.fetchNextPage({ cancelRefetch: false });
+    }
+  };
+  return {
+    ...query,
+    accessDenied,
+    retry,
+    data: accessDenied ? undefined : data,
+  };
 }
 
 /**
@@ -154,7 +219,7 @@ export function useSubmissionComments(
     ...privateReadOptions,
     queryKey: feedKeys.comments(familyId, assignmentId, scope),
     queryFn:
-      assignmentId && enabled
+      scope && assignmentId && enabled
         ? ({ signal }) =>
             fetchSubmissionComments(familyId, assignmentId, signal)
         : skipToken,

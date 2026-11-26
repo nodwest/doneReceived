@@ -1,11 +1,13 @@
 import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
 import { useCurrentFamily } from '@entities/family';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   SectionList,
   Text,
   View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
   type ViewStyle,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -33,6 +35,7 @@ import { Button, RoundButton, SegmentedFilter, SnapCarousel } from '@shared/ui';
 import { styles } from './transactions.styled';
 
 const filterEntering = FadeIn.duration(180).reduceMotion(ReduceMotion.System);
+const END_REACHED_THRESHOLD = 0.5;
 
 type Tone = 'parent' | 'child';
 
@@ -41,6 +44,7 @@ type ScreenProps<T extends { id: string; at: string }, F extends string> = {
   history: {
     isLoading: boolean;
     isFetching: boolean;
+    isFetchingNextPage: boolean;
     isError: boolean;
     isPageError: boolean;
     invalidCursor: boolean;
@@ -86,6 +90,7 @@ function TransactionsScreen<
   const [open, setOpen] = useState<string | null>(() => linkParam ?? null);
   const [linked, setLinked] = useState(linkParam !== undefined);
   const [refreshing, setRefreshing] = useState(false);
+  const pageRequested = useRef(false);
   const cardsDay = open
     ? days.find((day) => day.items.some((item) => item.id === open))
     : undefined;
@@ -108,6 +113,47 @@ function TransactionsScreen<
     }
   };
   const showError = history.isError || history.invalidCursor;
+  const { hasNext, isFetching, isFetchingNextPage, loadMore } = history;
+  useEffect(() => {
+    if (!pageRequested.current) return;
+    if (cards || showError || !hasNext || isFetchingNextPage) {
+      pageRequested.current = false;
+    } else if (!isFetching && !refreshing) {
+      pageRequested.current = false;
+      loadMore();
+    }
+  }, [
+    cards,
+    hasNext,
+    isFetching,
+    isFetchingNextPage,
+    loadMore,
+    refreshing,
+    showError,
+  ]);
+  const requestNextPage = () => {
+    if (!hasNext || showError || isFetchingNextPage || days.length === 0)
+      return;
+    if (isFetching || refreshing) {
+      pageRequested.current = true;
+    } else {
+      pageRequested.current = false;
+      loadMore();
+    }
+  };
+  const onScrollEnd = ({
+    nativeEvent,
+  }: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = nativeEvent;
+    if (
+      contentSize.height - contentOffset.y - layoutMeasurement.height <=
+      layoutMeasurement.height * END_REACHED_THRESHOLD
+    ) {
+      requestNextPage();
+    } else {
+      pageRequested.current = false;
+    }
+  };
   const incompleteDay =
     history.hasNext && history.oldestAt
       ? startOfDay(new Date(history.oldestAt)).getTime()
@@ -173,6 +219,7 @@ function TransactionsScreen<
               options={filters}
               value={filter}
               onChange={(value) => {
+                pageRequested.current = false;
                 setOpen(null);
                 setLinked(false);
                 onFilter(value);
@@ -191,10 +238,11 @@ function TransactionsScreen<
               style={styles.list}
               contentContainerStyle={styles.body}
               stickySectionHeadersEnabled={false}
-              onEndReachedThreshold={0.5}
-              onEndReached={() => {
-                if (!showError && days.length > 0) history.loadMore();
-              }}
+              overScrollMode="never"
+              onEndReachedThreshold={END_REACHED_THRESHOLD}
+              onEndReached={requestNextPage}
+              onScrollEndDrag={onScrollEnd}
+              onMomentumScrollEnd={onScrollEnd}
               refreshing={refreshing}
               onRefresh={() => void refresh()}
               renderSectionHeader={({ section }) => (
@@ -256,6 +304,8 @@ function TransactionsScreen<
                       {t('transactions.loadMore')}
                     </Text>
                   </Button>
+                ) : days.length > 0 ? (
+                  <Text style={styles.end}>{t('transactions.end')}</Text>
                 ) : null
               }
             />

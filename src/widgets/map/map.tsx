@@ -73,6 +73,7 @@ export function MapWeb({
   const [zoom, setZoom] = useState(12);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mapError, setMapError] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
   const [vehicles, setVehicles] = useState<Bus[]>([]);
 
   const cachedFamilyId = useCurrentFamily()?.id ?? null;
@@ -192,6 +193,7 @@ export function MapWeb({
   );
 
   const zoomBy = (delta: number) => {
+    if (!mapReady) return;
     const next = Math.max(3, Math.min(20, zoom + delta));
     setZoom(next);
     cameraRef.current?.zoomTo(next, { duration: 180 });
@@ -207,6 +209,7 @@ export function MapWeb({
         compass={false}
         scaleBar={false}
         androidView="texture"
+        onDidFinishLoadingMap={() => setMapReady(true)}
         onRegionDidChange={(event) => setZoom(event.nativeEvent.zoom)}
         onDidFailLoadingMap={() => setMapError(true)}
       >
@@ -271,7 +274,6 @@ export function MapWeb({
                 ],
                 'icon-rotate': ['get', 'bearing'],
                 'icon-rotation-alignment': 'map',
-                'icon-padding': 4,
               }}
             />
           </GeoJSONSource>
@@ -335,7 +337,9 @@ export function MapWeb({
             </View>
           </Marker>
         ))}
-        {history && <HistoryMapLayer {...history} camera={cameraRef} />}
+        {mapReady && history && (
+          <HistoryMapLayer {...history} camera={cameraRef} />
+        )}
       </MapView>
 
       <View style={styles.zoomControls} pointerEvents="box-none">

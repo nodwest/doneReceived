@@ -32,6 +32,12 @@ export const styles = createStyles((colors) => ({
   },
   row: { marginBottom: 8 },
   action: { color: colors.ink, fontFamily: theme.fonts.semibold },
+  end: {
+    paddingVertical: 12,
+    textAlign: 'center',
+    color: colors.grey,
+    fontSize: theme.fontSize.sm,
+  },
   dayHead: {
     marginTop: 10,
     marginBottom: 8,

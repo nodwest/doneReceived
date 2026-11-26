@@ -101,6 +101,7 @@ function useWalletPages<T extends { id: string; at: string }>(
     invalidCursor:
       invalidCursor || (isApiError(query.error) && query.error.status === 400),
     isFetching: query.isFetching,
+    isFetchingNextPage: query.isFetchingNextPage,
     isLoading: !!scope && !!request && query.isPending,
     isError: query.isError,
     isPageError: query.isFetchNextPageError,
