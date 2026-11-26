@@ -20,6 +20,20 @@ export const styles = createStyles((colors) => ({
   scroll: {
     flex: 1,
   },
+  // Список и панель проверки лежат друг над другом во всю высоту под шапкой.
+  scrollArea: {
+    flex: 1,
+    minHeight: 0,
+  },
+  // Вкладка проверки: непрозрачная панель над уже нарисованным списком.
+  reviewOverlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: colors.prime,
+  },
   body: {
     gap: 16,
     paddingTop: 12,
@@ -28,6 +42,10 @@ export const styles = createStyles((colors) => ({
   },
   section: {
     gap: TILE_GAP,
+  },
+  // Вкладка не на экране: дерево остаётся смонтированным, но не занимает места.
+  hiddenTab: {
+    display: 'none',
   },
   // Карусель занимает всю высоту под шапкой; карточки — 16pt от краёв.
   cards: {

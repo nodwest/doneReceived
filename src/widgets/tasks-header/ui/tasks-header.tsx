@@ -14,7 +14,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   Easing,
   interpolate,
-  interpolateColor,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
@@ -299,7 +298,9 @@ type SegmentLabelProps = {
  * Подпись сегмента. Выбранная подпись жирная, а жирный текст шире: без
  * распорки граница между сегментами сдвигалась бы при каждом переключении.
  * Ширину всегда задаёт невидимая жирная копия; видимые слои лежат поверх.
- * Цвет и насыщенность перетекают вместе с плашкой, без рывка.
+ * Обычная серая подпись и жирная цветная перетекают друг в друга
+ * прозрачностью: цвет текста не меняется покадрово, поэтому текст не
+ * перерисовывается на каждом кадре анимации.
  */
 function SegmentLabel({
   label,
@@ -309,19 +310,21 @@ function SegmentLabel({
   activeColor,
 }: SegmentLabelProps) {
   const base = [styles.segmentLabel, compact && styles.segmentLabelCompact];
-  const inactiveColor = theme.colors.grey;
 
-  const colorStyle = useAnimatedStyle(() => {
-    const active = direction === 'all' ? 1 - progress.value : progress.value;
-    return {
-      color: interpolateColor(active, [0, 1], [inactiveColor, activeColor]),
-    };
-  }, [activeColor, direction, inactiveColor]);
+  // 0 — сегмент не выбран, 1 — выбран.
+  const idleStyle = useAnimatedStyle(
+    () => ({
+      opacity: direction === 'all' ? progress.value : 1 - progress.value,
+    }),
+    [direction],
+  );
 
-  const boldStyle = useAnimatedStyle(() => {
-    const active = direction === 'all' ? 1 - progress.value : progress.value;
-    return { opacity: active };
-  }, [direction]);
+  const boldStyle = useAnimatedStyle(
+    () => ({
+      opacity: direction === 'all' ? 1 - progress.value : progress.value,
+    }),
+    [direction],
+  );
 
   return (
     <View
@@ -334,7 +337,7 @@ function SegmentLabel({
       >
         {label}
       </Text>
-      <Animated.Text style={[base, styles.segmentLabelOverlay, colorStyle]}>
+      <Animated.Text style={[base, styles.segmentLabelOverlay, idleStyle]}>
         {label}
       </Animated.Text>
       <Animated.Text
