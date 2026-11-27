@@ -1,12 +1,6 @@
 import type { PickedPhoto } from '@shared/lib';
 import type { RejectReasonKey, TaskState } from './task';
 
-export enum TaskStatus {
-  Pending = 'pending',
-  Done = 'done',
-  Cancelled = 'cancelled',
-}
-
 export interface CreateTaskPayload {
   title: string;
   reward: number;

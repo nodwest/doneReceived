@@ -16,4 +16,12 @@ module.exports = defineConfig([
       'src/entities/family-event/api/generated/**',
     ],
   },
+  {
+    // У vitest только поле `exports`, резолвер eslint-plugin-import его не
+    // читает; tsc проверяет этот импорт сам.
+    files: ['**/*.test.ts', 'vitest.config.mts'],
+    rules: {
+      'import/no-unresolved': ['error', { ignore: ['^vitest'] }],
+    },
+  },
 ]);
