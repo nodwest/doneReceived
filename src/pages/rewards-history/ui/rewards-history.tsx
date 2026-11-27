@@ -16,7 +16,6 @@ import {
   RewardKindToggle,
 } from '@widgets/paid-task-card';
 import {
-  getDayTotals,
   useRewardById,
   useRewardPeriod,
   isSameDay,
@@ -44,6 +43,7 @@ import {
 } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
 import { Button, RoundButton, SnapCarousel } from '@shared/ui';
+import { indexOperations } from '../model/rewards-index';
 import { styles } from './rewards-history.styled';
 import { authorizedImage } from '@shared/api';
 
@@ -172,13 +172,18 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
     () => sortByNewest(historyQuery.data?.operations ?? NO_OPERATIONS),
     [historyQuery.data],
   );
+  // Один проход по операциям месяца: дни, виды, итоги и группы для списка.
+  const index = useMemo(() => indexOperations(filtered), [filtered]);
   const totals = useMemo(
     () =>
-      getDayTotals(days, filtered).map((day) => ({
-        ...day,
-        earned: historyQuery.data?.earnedByDay.get(dayKey(day.date)) ?? 0,
+      days.map((date) => ({
+        date,
+        // Начисленное сервер уже сгруппировал по дням с учётом своего часового
+        // пояса, упущенное берём из индекса.
+        earned: historyQuery.data?.earnedByDay.get(dayKey(date)) ?? 0,
+        missed: index.totals(date).missed,
       })),
-    [days, filtered, historyQuery.data],
+    [days, index, historyQuery.data],
   );
 
   const changeMonth = (delta: number) => {
@@ -189,10 +194,7 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   };
 
   /** Задания дня одного вида — в том порядке, в каком листаются карточки. */
-  const ofDay = (date: Date, of: OperationKind) =>
-    filtered.filter(
-      (operation) => operation.kind === of && isSameDay(operation, date),
-    );
+  const ofDay = (date: Date, of: OperationKind) => index.dayKind(date, of);
 
   // Карточка награды: встаём на её день и вид и открываем её среди заданий
   // дня.
@@ -217,31 +219,14 @@ export function RewardsHistoryPage({ childId }: { childId?: string }) {
   const selectedIndex = Math.min(selected ?? days.length - 1, days.length - 1);
   const day = totals[selectedIndex];
   // В списке под графиком — и выплаченные, и упущенные (серые), по времени.
-  const dayOperations = useMemo(
-    () => filtered.filter((operation) => isSameDay(operation, day.date)),
-    [filtered, day.date],
-  );
-  const dayKind = dayOperations.filter((operation) => operation.kind === kind);
+  const dayOperations = index.day(day.date);
+  const dayKind = index.dayKind(day.date, kind);
   const cards = card !== null;
   const list = paidList && !cards;
   const missed = kind === 'missed';
 
   // Список: задания выбранного вида по дням, новые сверху, с суммой за день.
-  const listDays = useMemo(() => {
-    const groups: { date: Date; items: Operation[]; total: number }[] = [];
-    for (const operation of filtered) {
-      if (operation.kind !== kind) continue;
-      const date = startOfDay(new Date(operation.at));
-      const last = groups[groups.length - 1];
-      if (last && last.date.getTime() === date.getTime()) {
-        last.items.push(operation);
-        last.total += operation.amount;
-      } else {
-        groups.push({ date, items: [operation], total: operation.amount });
-      }
-    }
-    return groups;
-  }, [filtered, kind]);
+  const listDays = index.groups(kind);
 
   const goalFor = (operation: Operation) => {
     const after = operation.balanceAfter;
