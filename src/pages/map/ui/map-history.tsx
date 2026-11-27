@@ -21,11 +21,8 @@ import { apiRequest } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { createStyles, theme } from '@shared/theme';
 import { Icon, Wheel } from '@shared/ui';
-import {
-  type HistoryMapProps,
-  type HistoryMarker,
-  type HistoryPoint,
-} from '@widgets/map';
+import { type HistoryMapProps, type HistoryPoint } from '@widgets/map';
+import { groupTaskMarkers, prepareRoutePoints } from '../model/route-history';
 
 type HistoryType =
   | 'created'
@@ -307,7 +304,7 @@ function HistoryDay({
     };
   }, [path, requestKey, routePath]);
 
-  const { points, tasks, checkpoints, groups, markers } = useMemo(() => {
+  const { points, tasks, checkpoints, markers, markerOf } = useMemo(() => {
     const points = current?.route?.points ?? [];
     const checkpoints = points.flatMap((point) =>
       point.transitions.map((transition) => ({
@@ -326,56 +323,28 @@ function HistoryDay({
     const tasks =
       current?.data?.items.filter((item) => item.type === 'task_submitted') ??
       [];
-    const groups: (HistoryMarker & { tasks: string[] })[] = [];
-    for (const task of [...tasks].reverse()) {
-      if (!task.title) continue;
-      let match: HistoryPoint | undefined;
-      const at = Date.parse(task.at);
-      for (const point of points) {
-        const elapsed = at - Date.parse(point.recordedAt);
-        if (
-          elapsed >= 0 &&
-          elapsed <= 90_000 &&
-          point.accuracy !== null &&
-          point.accuracy <= 50
-        )
-          match = point;
-      }
-      if (!match) continue;
-      const { lat, lng } = match;
-      const existing = groups.find(
-        (group) =>
-          Math.hypot(
-            (group.lat - lat) * 111_000,
-            (group.lng - lng) * 111_000 * Math.cos((lat * Math.PI) / 180),
-          ) <= 30,
-      );
-      const detail = `${timeLabel(task.at, locale)} · ${task.title}`;
-      if (existing) {
-        existing.tasks.push(task.id);
-        existing.label = String(existing.tasks.length);
-        existing.detail += `\n${detail}`;
-      } else {
-        groups.push({
-          id: task.id,
-          label: '✓',
-          lat,
-          lng,
-          detail: `${t('mapHistory.approximatePlace')}\n${detail}`,
-          task: true,
-          tasks: [task.id],
-        });
-      }
-    }
+    // Точки готовятся один раз: хронология и время не пересчитываются на каждое
+    // задание, задание с маркером связывается одним словарём.
+    const index = prepareRoutePoints(points);
+    const { groups, markerOf } = groupTaskMarkers(tasks, index);
     const markers = [
       ...checkpoints.map((point, index) => ({
         ...point,
         label: String(index + 1),
         detail: `${timeLabel(point.at, locale)} · ${point.title} · ${point.detail}`,
       })),
-      ...groups,
+      ...groups.map((group) => ({
+        id: group.id,
+        lat: group.lat,
+        lng: group.lng,
+        label: group.label,
+        detail: `${t('mapHistory.approximatePlace')}\n${group.tasks
+          .map((task) => `${timeLabel(task.at, locale)} · ${task.title}`)
+          .join('\n')}`,
+        task: true,
+      })),
     ];
-    return { points, tasks, checkpoints, groups, markers };
+    return { points, tasks, checkpoints, markers, markerOf };
   }, [current, locale, t]);
   useLayoutEffect(() => {
     onRoute(
@@ -402,19 +371,23 @@ function HistoryDay({
     selection,
   ]);
   useLayoutEffect(() => () => onRoute(null), [onRoute]);
-  const entries = [
-    ...checkpoints.map((item, index) => ({
-      ...item,
-      badge: String(index + 1),
-      done: false,
-    })),
-    ...tasks.map((item) => ({
-      ...item,
-      badge: '✓',
-      done: true,
-      detail: t('mapHistory.completed'),
-    })),
-  ].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  const entries = useMemo(
+    () =>
+      [
+        ...checkpoints.map((item, index) => ({
+          ...item,
+          badge: String(index + 1),
+          done: false,
+        })),
+        ...tasks.map((item) => ({
+          ...item,
+          badge: '✓',
+          done: true,
+          detail: t('mapHistory.completed'),
+        })),
+      ].sort((a, b) => Date.parse(a.at) - Date.parse(b.at)),
+    [checkpoints, tasks, t],
+  );
   return (
     <>
       <View style={styles.compactDock}>
@@ -488,9 +461,8 @@ function HistoryDay({
               <Text>{t('mapHistory.empty')}</Text>
             )}
           {entries.map((item) => {
-            const markerId = item.done
-              ? groups.find((group) => group.tasks.includes(item.id))?.id
-              : item.id;
+            // Связь задания с маркером собрана один раз: без перебора групп.
+            const markerId = item.done ? markerOf.get(item.id) : item.id;
             return (
               <Pressable
                 accessibilityRole={markerId ? 'button' : undefined}
@@ -499,14 +471,7 @@ function HistoryDay({
                 style={[
                   styles.row,
                   styles.event,
-                  selection !== null &&
-                    (selection === item.id ||
-                      groups.some(
-                        (group) =>
-                          group.id === selection &&
-                          group.tasks.includes(item.id),
-                      )) &&
-                    styles.active,
+                  selection !== null && markerId === selection && styles.active,
                 ]}
                 onPress={
                   markerId
