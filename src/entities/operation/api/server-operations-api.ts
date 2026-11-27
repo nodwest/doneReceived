@@ -229,9 +229,11 @@ export async function fetchRewardPeriod(
   const children = (await fetchRewardChildren(viewer, signal)).filter(
     (child) => childFilter === 'all' || child.id === childFilter,
   );
-  const bounds = new URLSearchParams({ from: period.from, to: period.to });
-  const aggregate = new URLSearchParams(bounds);
-  aggregate.set('timeZone', period.timeZone);
+  const bounds = { from: period.from, to: period.to };
+  const aggregate = new URLSearchParams({
+    ...bounds,
+    timeZone: period.timeZone,
+  });
   const histories = await Promise.all(
     children.map(async (child) => {
       const base = `/families/${familyId}/children/${child.id}`;
@@ -272,7 +274,7 @@ export async function fetchRewardPeriod(
 
 async function fetchPeriodPages<T>(
   path: string,
-  bounds: URLSearchParams,
+  bounds: Pick<RewardPeriod, 'from' | 'to'>,
   signal: AbortSignal,
   fetchPage: (url: string) => Promise<{ items: T[]; next?: string | null }>,
 ) {
@@ -280,7 +282,7 @@ async function fetchPeriodPages<T>(
   const items: T[] = [];
   let next: string | null | undefined;
   do {
-    signal.throwIfAborted();
+    if (signal.aborted) throw new Error('Reward history request cancelled');
     if (next) params.set('before', next);
     const page = await fetchPage(`${path}?${params}`);
     items.push(...page.items);

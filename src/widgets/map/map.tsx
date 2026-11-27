@@ -8,6 +8,7 @@ import {
   Map as MapView,
   Marker,
   type CameraRef,
+  type StyleSpecification,
 } from '@maplibre/maplibre-react-native';
 
 import { useCurrentFamily, useFamilyMembers } from '@entities/family';
@@ -25,18 +26,15 @@ import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
 import { createStyles, theme, tracking } from '@shared/theme';
 import { LetterAvatar } from '@shared/ui';
-import { useNativeMapStyle } from './model/use-native-map-style';
+import { MAP_STYLE } from './config/map-style';
 import { type MapLayerSettings } from './model/layer-preferences';
 import { collectFamilyMarkers } from './model/family-markers';
-import {
-  ZONE_LAYERS,
-  ZONE_SOURCE,
-  zonesToGeoJson,
-} from './layers/dynamic/zones';
+import { zonesToGeoJson } from './layers/dynamic/zones';
 import { HistoryMapLayer } from './ui/history-map';
 import type { HistoryMapProps } from './ui/history-map-model';
 
 const MAP_CENTER: [number, number] = [39.7152, 47.23325];
+const MAP_STYLE_JSON = MAP_STYLE as unknown as StyleSpecification;
 const MAP_IMAGES = { bus: require('../../../assets/bus-icon.png') };
 
 /**
@@ -54,7 +52,6 @@ export function MapWeb({
   pinnedRoutes,
   history,
 }: MapLayerSettings & { history?: HistoryMapProps }) {
-  const { mode, mapStyle } = useNativeMapStyle();
   const { t } = useTranslation();
   const now = useNow(60_000);
   const cameraRef = useRef<CameraRef>(null);
@@ -149,7 +146,7 @@ export function MapWeb({
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        mapStyle={mapStyle}
+        mapStyle={MAP_STYLE_JSON}
         logo={false}
         attribution={false}
         compass={false}
@@ -166,10 +163,36 @@ export function MapWeb({
         <Images images={MAP_IMAGES} />
 
         {areas ? (
-          <GeoJSONSource id={ZONE_SOURCE} data={zonesData}>
-            {ZONE_LAYERS[mode].map((layer) => (
-              <Layer key={layer.id} {...layer} />
-            ))}
+          <GeoJSONSource id="family-zones" data={zonesData}>
+            <Layer
+              id="family-zones-fill"
+              type="fill"
+              source="family-zones"
+              paint={{ 'fill-color': '#2F80DD', 'fill-opacity': 0.14 }}
+            />
+            <Layer
+              id="family-zones-outline"
+              type="line"
+              source="family-zones"
+              paint={{ 'line-color': '#2F80DD', 'line-width': 2 }}
+            />
+            <Layer
+              id="family-zone-labels"
+              type="symbol"
+              source="family-zones"
+              layout={{
+                'text-field': ['get', 'name'],
+                'text-size': 12,
+                'text-font': ['Noto Sans Medium'],
+                'text-allow-overlap': false,
+                'text-padding': 4,
+              }}
+              paint={{
+                'text-color': '#1E5FB8',
+                'text-halo-color': '#FFFFFF',
+                'text-halo-width': 1.5,
+              }}
+            />
           </GeoJSONSource>
         ) : null}
 
