@@ -188,8 +188,8 @@ export function TaskSheet({
         {fades && scrolled && (
           <LinearGradient
             colors={[
-              theme.colors.cardBase,
-              withAlpha(theme.colors.cardBase, 0),
+              theme.colors.taskSheet,
+              withAlpha(theme.colors.taskSheet, 0),
             ]}
             style={[styles.fade, styles.fadeTop]}
           />
@@ -198,14 +198,15 @@ export function TaskSheet({
         {fades && !footerInBody && (
           <LinearGradient
             colors={[
-              withAlpha(theme.colors.cardBase, 0),
-              theme.colors.cardBase,
+              withAlpha(theme.colors.taskSheet, 0),
+              theme.colors.taskSheet,
             ]}
             style={styles.fade}
           />
         )}
       </View>
       {!footerInBody && footer && <View style={styles.footer}>{footer}</View>}
+      <View pointerEvents="none" style={styles.cardOutline} />
     </View>
   );
 }

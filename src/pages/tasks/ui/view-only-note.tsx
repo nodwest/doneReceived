@@ -41,7 +41,7 @@ const styles = createStyles((colors) => ({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.line,
-    backgroundColor: colors.prime,
+    backgroundColor: colors.taskScreen,
   },
   text: {
     flex: 1,

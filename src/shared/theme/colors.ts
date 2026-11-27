@@ -8,6 +8,7 @@
  */
 export const lightColors = {
   prime: '#F5F6FA',
+  taskScreen: '#F5F6FA',
   violet: '#6C5CE7',
   /** Фиолетовый для текста и иконок на поверхности. */
   violetInk: '#6C5CE7',
@@ -31,6 +32,8 @@ export const lightColors = {
   // Фон карточек и плиток заданий. В тёмной теме — почти чёрный и
   // нейтральный, как в макете.
   cardBase: '#FFFFFF',
+  taskSheet: '#FFFFFF',
+  taskSheetBorder: 'transparent',
   // Фон кнопок с обводкой: в светлой теме — белый, в тёмной — чуть светлее
   // карточки, как в макете.
   outlineBg: '#FFFFFF',
@@ -257,6 +260,7 @@ export type ThemeMode = 'light' | 'dark';
 
 export const darkColors: ThemeColors = {
   prime: '#0B0F1A',
+  taskScreen: '#0B0C10',
   violet: '#6C5CE7',
   violetInk: '#A79AFB',
   blue: '#4A90E2',
@@ -272,6 +276,8 @@ export const darkColors: ThemeColors = {
   white: '#FFFFFF',
   surface: '#161B2B',
   cardBase: '#121317',
+  taskSheet: '#16171C',
+  taskSheetBorder: 'rgba(255, 255, 255, 0.08)',
   // Сплошная тёмная заливка кнопок с обводкой, как в макете.
   outlineBg: '#181A20',
   inverseSurface: '#2A3148',
@@ -331,8 +337,8 @@ export const darkColors: ThemeColors = {
   missedLabel: '#262B38',
   missedSoft: 'rgba(138, 147, 168, 0.2)',
   missedDeep: '#C3C9D6',
-  missedHeroFrom: '#3A4152',
-  missedHeroTo: '#232936',
+  missedHeroFrom: '#4D515C',
+  missedHeroTo: '#2C2F36',
   missedTile: '#1C2231',
   missedBorder: '#2E364A',
   missedClock: '#FF8A6B',
@@ -386,14 +392,14 @@ export const darkColors: ThemeColors = {
   // В тёмной теме шапка карточки задания — приглушённая, как в макете:
   // тёмно-синяя у активного, тёмно-зелёная у выплаченного, тёмно-янтарная
   // у задания на проверке. Белый текст на них остаётся читаемым.
-  heroChildFrom: '#23486F',
-  heroChildTo: '#142C48',
-  heroPaidFrom: '#2A5C42',
-  heroPaidTo: '#183B2C',
+  heroChildFrom: '#2B4C78',
+  heroChildTo: '#18294A',
+  heroPaidFrom: '#30654A',
+  heroPaidTo: '#1A3D2C',
   heroWalletFrom: '#3C4685',
   detailsBg: '#121726',
-  heroReviewFrom: '#856315',
-  heroReviewTo: '#5F470F',
+  heroReviewFrom: '#936E25',
+  heroReviewTo: '#916324',
   heroReviewCaption: '#FFD9A0',
   reviewDot: '#FFA53D',
   rewardChipFrom: '#3A2E12',

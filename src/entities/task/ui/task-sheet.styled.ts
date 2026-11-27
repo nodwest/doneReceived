@@ -1,3 +1,5 @@
+import { StyleSheet } from 'react-native';
+
 import { createStyles, theme, tracking } from '@shared/theme';
 
 // Подписи-заголовки секций капсом: «WHAT TO DO», «PHOTO REPORT».
@@ -8,8 +10,14 @@ export const styles = createStyles((colors) => ({
     flex: 1,
     minHeight: 0,
     borderRadius: 32,
-    backgroundColor: colors.cardBase,
+    backgroundColor: colors.taskSheet,
     overflow: 'hidden',
+  },
+  cardOutline: {
+    ...StyleSheet.absoluteFill,
+    borderRadius: 32,
+    borderWidth: 1,
+    borderColor: colors.taskSheetBorder,
   },
   // Тень со всех сторон: карточка не сливается с фоном экрана.
   shadowSheet: {

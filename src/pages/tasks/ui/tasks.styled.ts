@@ -7,7 +7,7 @@ export const styles = createStyles((colors) => ({
   screen: {
     flex: 1,
     minHeight: '100%',
-    backgroundColor: colors.prime,
+    backgroundColor: colors.taskScreen,
   },
   container: {
     flex: 1,
