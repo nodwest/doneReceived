@@ -42,10 +42,6 @@ export function sumTotals(operations: Operation[]) {
   return totals;
 }
 
-/** Операции начиная с полуночи дня `from` (включительно). */
-export const operationsSince = (operations: Operation[], from: Date) =>
-  operations.filter((operation) => new Date(operation.at) >= from);
-
 /** Последние начисленные награды; история уже отсортирована: сначала новые. */
 export const latestRewards = (operations: Operation[], count: number) =>
   operations.filter((operation) => operation.kind === 'earned').slice(0, count);

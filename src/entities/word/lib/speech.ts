@@ -10,8 +10,3 @@ export function speak(text: string, language = 'en-US') {
   Speech.stop();
   Speech.speak(text, { language, rate: 0.85 });
 }
-
-/** Замолчать: уходим с экрана или меняется карточка. */
-export function stopSpeaking() {
-  Speech.stop();
-}
