@@ -1,4 +1,4 @@
-import { apiRequest, authorizedImage, isApiError } from '@shared/api';
+import { apiRequest, authorizedImage } from '@shared/api';
 import type { FeedEvent, FeedEventType, FeedViewer } from '../model/feed';
 
 type ActivityDto = {
@@ -104,9 +104,17 @@ export async function fetchFeed(
   familyId: string,
   limit: number,
   signal: AbortSignal,
-  filters?: { before?: string; since?: string; childId?: string },
+  filters?: {
+    before?: string;
+    since?: string;
+    childId?: string;
+    pageBy?: 'card' | 'task';
+  },
 ) {
-  const params = new URLSearchParams({ limit: String(limit) });
+  const params = new URLSearchParams({
+    limit: String(limit),
+    pageBy: filters?.pageBy ?? 'card',
+  });
   if (filters?.before) params.set('before', filters.before);
   if (filters?.since) params.set('since', filters.since);
   if (filters?.childId) params.set('childId', filters.childId);
@@ -119,58 +127,6 @@ export async function fetchFeed(
 }
 
 type FeedPage = Awaited<ReturnType<typeof fetchFeed>>;
-
-export type FeedHistoryCursor = { before: string; legacy: boolean };
-
-export async function fetchFeedHistoryPage(
-  familyId: string,
-  limit: number,
-  signal: AbortSignal,
-  filters: { since: string; childId?: string },
-  cursor?: FeedHistoryCursor,
-) {
-  if (!cursor?.legacy) {
-    try {
-      const page = await fetchFeed(familyId, limit, signal, {
-        ...filters,
-        before: cursor?.before,
-      });
-      return { ...page, legacy: false };
-    } catch (error) {
-      // Only the old validation pipe's unknown-field response permits fallback.
-      if (
-        cursor ||
-        signal.aborted ||
-        !isApiError(error) ||
-        error.status !== 400 ||
-        !error.messages.includes('property since should not exist')
-      ) {
-        throw error;
-      }
-    }
-  }
-
-  const page = await fetchFeed(familyId, limit, signal, {
-    before: cursor?.before,
-  });
-  const since = Date.parse(filters.since);
-  const oldest = page.activity.items.at(-1);
-  return {
-    ...page,
-    legacy: true,
-    activity: {
-      items: page.activity.items.filter(
-        (item) =>
-          Date.parse(item.createdAt) >= since &&
-          (!filters.childId || item.childId === filters.childId),
-      ),
-      next:
-        oldest && Date.parse(oldest.createdAt) >= since
-          ? page.activity.next
-          : null,
-    },
-  };
-}
 
 /** Страницы ленты одной: новые события первыми, без повторов. */
 export function mergeFeedPages(pages: readonly FeedPage[]): FeedPage {

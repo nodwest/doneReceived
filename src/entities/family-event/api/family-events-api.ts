@@ -45,7 +45,9 @@ export type FamilyEventPayload = {
   timezone: string;
   repeat: FamilyEventRepeat;
   kind: FamilyEventKind;
-  reminderLeadMinutes: number | null;
+  reminderLeadMinutes?: number | null;
+  reminderDailyDays?: number | null;
+  reminderDailyMinute?: number | null;
   participants: string[];
   audienceUserIds?: string[] | null;
   /** Только для создания: retry после потерянного ответа не создаёт дубль. */
@@ -61,6 +63,8 @@ const bodyOf = (payload: FamilyEventPayload): CreateFamilyEventRequestBody => ({
   repeat: payload.repeat,
   kind: payload.kind,
   reminderLeadMinutes: payload.reminderLeadMinutes,
+  reminderDailyDays: payload.reminderDailyDays,
+  reminderDailyMinute: payload.reminderDailyMinute,
   participants: payload.participants,
   audienceUserIds: payload.audienceUserIds,
 });
@@ -161,10 +165,12 @@ export async function uploadFamilyEventPhoto(
 ) {
   const form = new FormData();
   await appendPhoto(form, 'photo', photo);
-  return apiRequest<FamilyEventPhotoDto>(
-    `/families/${familyId}/events/${eventId}/photo`,
-    { method: 'PUT', body: form },
-  );
+  const path = `/families/${familyId}/events/${eventId}/photo`;
+  const result = await apiRequest<FamilyEventPhotoDto>(path, {
+    method: 'PUT',
+    body: form,
+  });
+  return { ...result, url: `${path}/${encodeURIComponent(result.id)}` };
 }
 
 /** DELETE /families/:id/events/:eventId/photo — убрать обложку. */

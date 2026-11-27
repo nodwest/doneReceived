@@ -94,11 +94,18 @@ export const en = {
     kindKicker: '{{kind}} · {{range}}',
     photoLibrary: 'Choose a cover photo',
     removePhoto: 'Remove cover',
-    photoError: "Event saved, but the cover couldn't be uploaded",
+    photoRemoveError:
+      "The event was saved, but the cover couldn't be removed. Try again.",
     allFamily: 'Whole family',
     peopleCount_one: '{{count}} person',
     peopleCount_other: '{{count}} people',
     reminderLabel: 'Remind',
+    reminderClock: 'Reminder time',
+    reminderClockZone: 'Event time zone {{timezone}}',
+    reminderClockHour: 'Hours',
+    reminderClockMinute: 'Minutes',
+    reminderOnEventDay: 'At {{time}} on the event day',
+    reminderDailySummary: 'Daily from {{days}} days before at {{time}}',
     reminderTitle: 'Reminder',
     everyone: 'Everyone',
     audienceMembersUnavailable: 'Family members are unavailable.',
@@ -335,9 +342,6 @@ export const en = {
     eventUntil: '{{date}} · until {{time}}',
     noChildren: 'No children in this family yet.',
     childrenLoadError: 'Could not load the children.',
-    greetingMorning: 'Good morning 👋',
-    greetingAfternoon: 'Good afternoon 👋',
-    greetingEvening: 'Good evening 👋',
     recentActivity: 'Recent Activity',
   },
   summary: {
@@ -352,8 +356,8 @@ export const en = {
     loadMore: 'Load more',
     title: 'Activity',
     all: 'All',
-    empty: 'No activity in the last 30 days',
-    end: 'That’s all for the last 30 days',
+    empty: 'No task history yet',
+    end: 'End of task history',
     pending: 'Pending review',
     approved: 'Approved',
     taskName: '“{{task}}”',
@@ -1529,6 +1533,11 @@ export const en = {
   },
   push: {
     channelReminders: 'Reminders',
+    reminderTimePreview: 'Event time in notifications',
+    reminderTimePreviewConsent:
+      'The start time will appear on your lock screen and be shared with the notification delivery service.',
+    reminderPreviewSyncError:
+      'The device could not confirm the change. Check your connection and notification permission, then try again.',
   },
 };
 

@@ -4,6 +4,7 @@ import * as maplibregl from 'maplibre-gl';
 import type { GeoJSONSource } from 'maplibre-gl';
 import type { ZonePoint } from '@entities/zone';
 import { createMap } from '../model/create-map';
+import { useWebMapStyle } from '../model/use-web-map-style';
 import {
   ZONE_DRAFT_LAYERS,
   ZONE_DRAFT_SOURCE,
@@ -242,6 +243,8 @@ export function ZoneMap({
       map.off('styledata', applyDraft);
     };
   }, [points, selectedIndex]);
+
+  useWebMapStyle(mapRef);
 
   return (
     <div

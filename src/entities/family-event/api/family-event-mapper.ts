@@ -9,6 +9,26 @@ export type EventImageFactory = (
   url: string,
 ) => NonNullable<FamilyEventPerson['avatar']>;
 
+/**
+ * Старые серверы могли использовать адрес сайта как основу ссылки на
+ * приватную обложку. Сам запрос строим по каноническому пути API.
+ */
+function eventPhotoPath(url: string, eventId: string) {
+  const uuid = '[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}';
+  const route = new RegExp(
+    `(/families/${uuid}/events/(${uuid})/photo/${uuid})(?:[?#].*)?$`,
+    'i',
+  );
+  let pathname: string;
+  try {
+    pathname = new URL(url, 'https://relative.invalid').pathname;
+  } catch {
+    return url;
+  }
+  const match = route.exec(pathname);
+  return match?.[2].toLowerCase() === eventId.toLowerCase() ? match[1] : url;
+}
+
 const toPerson = (
   person: FamilyEventPersonDto,
   toImage: EventImageFactory,
@@ -38,6 +58,8 @@ export function toFamilyEvent(
       participants.set(person.userId, toPerson(person, toImage));
     }
   }
+  const lead = dto.reminderLeadMinutes ?? 0;
+  const savedDays = lead > 1440 ? Math.floor(lead / 1440) : undefined;
   return {
     id: dto.id,
     kind: dto.kind ?? 'event',
@@ -48,9 +70,14 @@ export function toFamilyEvent(
     repeat: dto.repeat,
     timezone: dto.timezone,
     participants: [...participants.values()],
-    photo: dto.photoUrl ? toImage(dto.photoUrl) : undefined,
+    photo: dto.photoUrl
+      ? toImage(eventPhotoPath(dto.photoUrl, dto.id))
+      : undefined,
     audienceUserIds: dto.audienceUserIds,
     reminderLeadMinutes: dto.reminderLeadMinutes ?? undefined,
+    reminderDailyDays: dto.reminderDailyDays ?? savedDays,
+    reminderDailyMinute:
+      dto.reminderDailyMinute ?? (savedDays === undefined ? undefined : 0),
     reminderAt:
       dto.reminderLeadMinutes == null
         ? undefined

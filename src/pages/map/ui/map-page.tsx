@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   MapAttribution,
   MapLayersPanel,
@@ -56,75 +57,81 @@ export function MapPage() {
 
   return (
     <TabScreen activeKey="map" wide>
-      <View style={styles.map}>
-        <MapWeb
-          history={
-            parent && !layersOpen && history?.key === historyKey
-              ? history.route
-              : undefined
-          }
-          family={family}
-          transport={transport}
-          areas={areas}
-          hiddenChildren={hiddenChildren}
-          hiddenRoutes={hiddenRoutes}
-          hiddenZones={hiddenZones}
-          pinnedRoutes={pinnedRoutes}
-        />
-        <MapAttribution />
-        <View style={styles.mapControls} pointerEvents="box-none">
-          {!layersOpen && <LocationSharingCard />}
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('mapLayers.open')}
-            accessibilityState={{ expanded: layersOpen }}
-            onPress={() => setLayersOpen((open) => !open)}
-            style={({ pressed }) => [
-              styles.openButton,
-              layersOpen && styles.openButtonActive,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Icon
-              name="layers"
-              size={22}
-              color={layersOpen ? theme.colors.mapAccent : theme.colors.ink}
-            />
-          </Pressable>
-        </View>
-        {parent && familyId && !layersOpen && (
-          <MapHistory
-            key={historyKey}
-            familyId={familyId}
-            onRoute={onHistoryRoute}
+      <SafeAreaView style={styles.map} edges={['top', 'left', 'right']}>
+        <View style={styles.mapContent}>
+          <MapWeb
+            history={
+              parent && !layersOpen && history?.key === historyKey
+                ? history.route
+                : undefined
+            }
+            family={family}
+            transport={transport}
+            areas={areas}
+            hiddenChildren={hiddenChildren}
+            hiddenRoutes={hiddenRoutes}
+            hiddenZones={hiddenZones}
+            pinnedRoutes={pinnedRoutes}
           />
-        )}
-        {layersOpen && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close')}
-            onPress={() => setLayersOpen(false)}
-            style={styles.dim}
-          />
-        )}
-        {layersOpen && (
-          <View style={styles.panelWrap} pointerEvents="box-none">
-            <MapLayersPanel
-              onClose={() => setLayersOpen(false)}
-              onConfigure={() => {
-                setLayersOpen(false);
-                router.push('/map-layers');
-              }}
-            />
+          <MapAttribution />
+          <View style={styles.mapControls} pointerEvents="box-none">
+            {!layersOpen && <LocationSharingCard />}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('mapLayers.open')}
+              accessibilityState={{ expanded: layersOpen }}
+              onPress={() => setLayersOpen((open) => !open)}
+              style={({ pressed }) => [
+                styles.openButton,
+                layersOpen && styles.openButtonActive,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Icon
+                name="layers"
+                size={22}
+                color={layersOpen ? theme.colors.mapAccent : theme.colors.ink}
+              />
+            </Pressable>
           </View>
-        )}
-      </View>
+          {parent && familyId && !layersOpen && (
+            <MapHistory
+              key={historyKey}
+              familyId={familyId}
+              onRoute={onHistoryRoute}
+            />
+          )}
+          {layersOpen && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+              onPress={() => setLayersOpen(false)}
+              style={styles.dim}
+            />
+          )}
+          {layersOpen && (
+            <View style={styles.panelWrap} pointerEvents="box-none">
+              <MapLayersPanel
+                onClose={() => setLayersOpen(false)}
+                onConfigure={() => {
+                  setLayersOpen(false);
+                  router.push('/map-layers');
+                }}
+              />
+            </View>
+          )}
+        </View>
+      </SafeAreaView>
     </TabScreen>
   );
 }
 
 const styles = createStyles((colors) => ({
   map: {
+    flex: 1,
+    backgroundColor: colors.prime,
+  },
+  mapContent: {
     flex: 1,
     minHeight: 0,
   },

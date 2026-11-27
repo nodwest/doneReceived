@@ -6,15 +6,17 @@ import {
   removeFamilyEventPhoto,
   updateFamilyEvent,
   uploadFamilyEventPhoto,
+  type FamilyEvent,
   type FamilyEventPayload,
 } from '@entities/family-event';
 import { authorizedImage, syncData } from '@shared/api';
-import type { PickedPhoto } from '@shared/lib';
+import { photoUploadError, type PickedPhoto } from '@shared/lib';
 
 export type SaveFamilyEventInput = {
   /** undefined — создать, иначе обновить это событие. */
   eventId?: string;
   payload: FamilyEventPayload;
+  coverOnlyEvent?: FamilyEvent;
   cover?: PickedPhoto | null;
 };
 
@@ -24,11 +26,18 @@ export function useSaveFamilyEvent() {
   const familyId = useCurrentFamily()?.id ?? null;
 
   return useMutation({
-    mutationFn: async ({ eventId, payload, cover }: SaveFamilyEventInput) => {
+    mutationFn: async ({
+      eventId,
+      payload,
+      coverOnlyEvent,
+      cover,
+    }: SaveFamilyEventInput) => {
       if (!familyId) throw new Error('Нет активной семьи.');
-      const event = await (eventId
-        ? updateFamilyEvent(familyId, eventId, payload)
-        : createFamilyEvent(familyId, payload));
+      const event =
+        coverOnlyEvent ??
+        (await (eventId
+          ? updateFamilyEvent(familyId, eventId, payload)
+          : createFamilyEvent(familyId, payload)));
 
       try {
         if (cover) {
@@ -39,17 +48,26 @@ export function useSaveFamilyEvent() {
           );
           return {
             event: { ...event, photo: authorizedImage(url) },
-            photoFailed: false,
+            photoError: null,
+            photoRemovalFailed: false,
           };
         }
         if (cover === null) {
           await removeFamilyEventPhoto(familyId, event.id);
-          return { event: { ...event, photo: undefined }, photoFailed: false };
+          return {
+            event: { ...event, photo: undefined },
+            photoError: null,
+            photoRemovalFailed: false,
+          };
         }
-      } catch {
-        return { event, photoFailed: true };
+      } catch (error) {
+        return {
+          event,
+          photoError: cover ? photoUploadError(error) : null,
+          photoRemovalFailed: cover === null,
+        };
       }
-      return { event, photoFailed: false };
+      return { event, photoError: null, photoRemovalFailed: false };
     },
     onSuccess: async ({ event }) => {
       if (familyId) {

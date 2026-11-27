@@ -9,6 +9,7 @@ export type RegisterPushTokenPayload = {
   platform: PushPlatform;
   /** Стабильный id установки: по нему сервер отличает смену аккаунта от чужого токена. */
   installationId: string;
+  reminderTimePreview?: boolean;
 };
 
 /**

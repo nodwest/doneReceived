@@ -6,12 +6,11 @@ import {
   Layer,
   Map,
   ViewAnnotation,
-  type StyleSpecification,
 } from '@maplibre/maplibre-react-native';
 
 import type { ZonePoint } from '@entities/zone';
 import { createStyles } from '@shared/theme';
-import { MAP_STYLE } from '../config/map-style';
+import { useNativeMapStyle } from '../model/use-native-map-style';
 import { zoneDraftToGeoJson } from '../layers/dynamic/zones';
 
 type ZoneMapProps = {
@@ -25,7 +24,6 @@ type ZoneMapProps = {
 
 const CENTER: [number, number] = [39.7152, 47.23325];
 const ZOOM = 13;
-const MAP_STYLE_JSON = MAP_STYLE as unknown as StyleSpecification;
 
 /**
  * Нативный редактор области: тап по карте добавляет вершину, вершины
@@ -39,6 +37,7 @@ export function ZoneMap({
   onMovePoint,
   initialBounds,
 }: ZoneMapProps) {
+  const { mapStyle } = useNativeMapStyle();
   const lastVertexPress = useRef(0);
   const data = zoneDraftToGeoJson(points, selectedIndex);
   const [initialViewState] = useState(() =>
@@ -54,7 +53,7 @@ export function ZoneMap({
     <View style={styles.container}>
       <Map
         style={styles.map}
-        mapStyle={MAP_STYLE_JSON}
+        mapStyle={mapStyle}
         logo={false}
         attribution={false}
         compass={false}

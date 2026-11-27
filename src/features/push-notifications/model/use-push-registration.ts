@@ -7,10 +7,9 @@ import {
   pendingPushRemovals,
   pushPermissionAsked,
   registerPushToken,
+  reminderTimePreviewEnabled,
   removePendingPushRemoval,
   removePushToken,
-  savedPushToken,
-  savedPushTokenUserId,
   savePushToken,
   useMyId,
   useSessionFamilyId,
@@ -33,12 +32,14 @@ function pushLog(message: string, details?: Record<string, unknown>) {
   else console.log(`[push] ${message}`);
 }
 
-// В foreground показываем баннер и список; звук и badge не навязываем.
+// Android suppresses the foreground banner when shouldPlaySound is false.
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
+  handleNotification: async (notification) => ({
     shouldShowBanner: true,
     shouldShowList: true,
-    shouldPlaySound: false,
+    shouldPlaySound:
+      Platform.OS === 'android' &&
+      notification.request.content.data?.type === 'family_event_reminder',
     shouldSetBadge: false,
   }),
 });
@@ -60,6 +61,11 @@ function expoProjectId() {
  * включить уведомления в настройках сам.
  */
 async function requestExpoToken() {
+  const projectId = expoProjectId();
+  if (!projectId) {
+    pushLog('нет extra.eas.projectId: Expo-токен не получить');
+    return null;
+  }
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: i18n.t('push.channelReminders'),
@@ -74,11 +80,6 @@ async function requestExpoToken() {
   }
   if (status !== 'granted') return null;
 
-  const projectId = expoProjectId();
-  if (!projectId) {
-    pushLog('нет extra.eas.projectId: Expo-токен не получить');
-    return null;
-  }
   try {
     return (await Notifications.getExpoPushTokenAsync({ projectId })).data;
   } catch (error) {
@@ -101,23 +102,26 @@ async function retryPendingRemovals() {
   }
 }
 
-async function syncPushToken(userId: string) {
+async function syncPushToken(userId: string, isCurrent: () => boolean) {
   const token = await requestExpoToken();
-  if (!token) return;
-  if (savedPushToken() === token && savedPushTokenUserId() === userId) return;
+  if (!token || !isCurrent()) return false;
   try {
     await registerPushToken({
       token,
       platform: Platform.OS === 'ios' ? 'ios' : 'android',
       installationId: installationId(),
+      reminderTimePreview: reminderTimePreviewEnabled(userId),
     });
+    if (!isCurrent()) return false;
     savePushToken(token, userId);
+    return true;
   } catch (error) {
     // 409 PUSH_TOKEN_OWNED: токен закреплён за другой установкой. Молча не
     // затираем и повторим на следующем запуске.
     pushLog('сервер не принял push-токен', {
       status: isApiError(error) ? error.status : null,
     });
+    return false;
   }
 }
 
@@ -125,11 +129,29 @@ async function syncPushToken(userId: string) {
  * Синхронизация токена с сервером для текущего аккаунта: сначала закрываем
  * неотправленные удаления, затем регистрируем токен этой установки.
  */
-export async function syncPushRegistration() {
+let registration = Promise.resolve(false);
+
+export function syncPushRegistration() {
   const session = useSessionStore.getState().session;
-  if (!session) return;
-  await retryPendingRemovals();
-  await syncPushToken(session.user.id);
+  if (!session) return Promise.resolve(false);
+  const isCurrent = () => {
+    const current = useSessionStore.getState().session;
+    return (
+      current?.user.id === session.user.id &&
+      current.storageEpoch === session.storageEpoch
+    );
+  };
+  registration = registration
+    .then(async () => {
+      if (!isCurrent()) return false;
+      await retryPendingRemovals();
+      return isCurrent() && syncPushToken(session.user.id, isCurrent);
+    })
+    .catch(() => {
+      pushLog('не удалось синхронизировать регистрацию');
+      return false;
+    });
+  return registration;
 }
 
 /**

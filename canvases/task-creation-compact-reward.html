@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Новое задание · DoneReceived</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font: 16px system-ui, sans-serif;
+      color: #f1f2fa;
+      background: #090c14;
+      --page: #0d111c;
+      --surface: #161a29;
+      --border: #282e42;
+      --muted: #a1a9bd;
+      --violet: #6c5ce7;
+      --gold: #ffb529;
+      --green: #49dc9b;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .screen { max-width: 430px; min-height: 100dvh; margin: auto; padding: 24px 14px 32px; background: var(--page); }
+    h1 { margin: 20px 0 38px; text-align: center; font-size: 21px; }
+    form { display: grid; gap: 28px; }
+    fieldset { margin: 0; padding: 0; min-inline-size: 0; border: 0; }
+    legend, .label { display: block; margin-bottom: 10px; padding: 0; font-size: 14px; font-weight: 700; }
+    .optional { margin-left: 4px; color: var(--muted); font-weight: 500; }
+    button, input, textarea { font: inherit; }
+    button, input, textarea { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); color: inherit; }
+    input, textarea { width: 100%; min-width: 0; padding: 16px 18px; }
+    input::placeholder, textarea::placeholder { color: #78839d; opacity: 1; }
+    textarea { min-height: 92px; resize: vertical; }
+    button { min-height: 44px; padding: 4px; color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer; }
+    :focus-visible { outline: 2px solid #a99aff; outline-offset: 2px; }
+    .deadlines, .presets, .reward-row { display: grid; gap: 8px; }
+    .deadlines { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .deadlines [aria-pressed="true"] { color: white; border-color: var(--violet); background: var(--violet); }
+    .expires { margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+    .expires output { display: inline-block; margin-left: 5px; padding: 6px 10px; border: 1px solid var(--violet); border-radius: 12px; color: #ac9dff; }
+    .reward-row, .presets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .amount { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 0 12px; border: 2px solid var(--gold); border-radius: 18px; background: linear-gradient(115deg, #2b2413, var(--surface) 80%); }
+    .amount span { color: var(--gold); font-size: 27px; font-weight: 750; }
+    .amount input { border: 0; background: transparent; padding: 8px 0; font-size: 30px; font-weight: 750; }
+    .presets [aria-pressed="true"] { border-color: var(--gold); background: #2b2413; color: var(--gold); }
+    .budget { display: grid; gap: 12px; margin-top: 10px; padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); font-size: 13px; }
+    .budget-head, .budget-key { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+    .budget-head { justify-content: space-between; }
+    .budget-key { color: var(--muted); }
+    .budget-key b { color: #f1f2fa; }
+    .budget .remaining { color: var(--green); }
+    .bar { display: flex; height: 10px; overflow: hidden; border-radius: 99px; background: var(--green); }
+    .reserved { width: max(5px, 0.463%); background: #525d75; }
+    .allocated { background: var(--gold); }
+  </style>
+</head>
+<body>
+  <main class="screen">
+    <h1>Новое задание</h1>
+    <form>
+      <div>
+        <label class="label" for="title">Название</label>
+        <input id="title" placeholder="Убрать в комнате">
+      </div>
+      <fieldset>
+        <legend>Срок выполнения <span class="optional">(необязательно)</span></legend>
+        <div class="deadlines">
+          <button type="button" data-expiry="" aria-pressed="false">Без срока</button>
+          <button type="button" data-expiry="Сегодня, 22:05" aria-pressed="true">1 час</button>
+          <button type="button" data-expiry="Сегодня, 23:05" aria-pressed="false">2 часа</button>
+          <button type="button" data-expiry="Сегодня, 23:59" aria-pressed="false">Сегодня</button>
+          <button type="button" data-expiry="Завтра, 23:59" aria-pressed="false">Завтра</button>
+          <button type="button" data-expiry="custom" aria-pressed="false">Своё</button>
+        </div>
+        <p class="expires">Срок истекает: <output id="expiry">Сегодня, 22:05</output></p>
+        <input id="custom-expiry" type="datetime-local" aria-label="Свой срок выполнения" hidden>
+      </fieldset>
+      <fieldset>
+        <legend>Награда</legend>
+        <div class="reward-row">
+          <label class="amount">
+            <span aria-hidden="true">$</span>
+            <input id="amount" type="text" inputmode="decimal" placeholder="0" aria-label="Сумма награды в долларах">
+          </label>
+          <div class="presets" role="group" aria-label="Шаблоны суммы">
+            <button type="button" data-amount="1" aria-pressed="false">$1</button>
+            <button type="button" data-amount="2" aria-pressed="false">$2</button>
+            <button type="button" data-amount="3" aria-pressed="false">$3</button>
+            <button type="button" data-amount="5" aria-pressed="false">$5</button>
+          </div>
+        </div>
+        <div class="budget">
+          <div class="budget-head"><strong>Доступно на награды</strong><span><b class="remaining">$2,151</b> останется</span></div>
+          <div class="bar" aria-hidden="true"><span class="reserved"></span><span class="allocated"></span></div>
+          <div class="budget-key">
+            <span>В резерве <b>$10</b></span>
+            <span>Это задание <b id="allocation">$0</b></span>
+            <span>Останется <b class="remaining">$2,151</b></span>
+          </div>
+        </div>
+      </fieldset>
+      <div>
+        <label class="label" for="description">Описание <span class="optional">(необязательно)</span></label>
+        <textarea id="description" placeholder="Заправить кровать, убрать игрушки и пропылесосить пол."></textarea>
+      </div>
+    </form>
+  </main>
+  <script>
+    const amount = document.querySelector('#amount');
+    const presets = document.querySelectorAll('[data-amount]');
+    const available = 2151;
+    const money = new Intl.NumberFormat('en-US', {
+      style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2
+    });
+
+    function updateReward() {
+      const value = Number(amount.value.trim().replace(',', '.'));
+      const reward = Number.isFinite(value) ? Math.max(0, value) : 0;
+      presets.forEach(button => button.setAttribute('aria-pressed', Number(button.dataset.amount) === reward));
+      document.querySelector('#allocation').textContent = money.format(reward);
+      document.querySelectorAll('.remaining').forEach(label => {
+        label.textContent = money.format(available - reward);
+      });
+      document.querySelector('.allocated').style.width = reward ? `clamp(2px, ${Math.min(100, reward / (available + 10) * 100)}%, 100%)` : '0';
+    }
+
+    amount.addEventListener('input', updateReward);
+    presets.forEach(button => button.addEventListener('click', () => {
+      amount.value = button.dataset.amount;
+      updateReward();
+    }));
+    document.querySelector('form').addEventListener('submit', event => event.preventDefault());
+
+    const deadlines = document.querySelectorAll('[data-expiry]');
+    const expires = document.querySelector('.expires');
+    const customExpiry = document.querySelector('#custom-expiry');
+    deadlines.forEach(button => button.addEventListener('click', () => {
+      const expiry = button.dataset.expiry;
+      deadlines.forEach(option => option.setAttribute('aria-pressed', option === button));
+      customExpiry.hidden = expiry !== 'custom';
+      expires.hidden = !expiry || expiry === 'custom';
+      document.querySelector('#expiry').textContent = expiry;
+    }));
+  </script>
+</body>
+</html>

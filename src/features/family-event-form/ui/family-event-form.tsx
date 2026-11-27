@@ -39,16 +39,16 @@ const HOUR_MS = 60 * 60 * 1000;
 const MINUTE_MS = 60 * 1000;
 const KIND_OPTIONS = ['trip', 'event', 'holiday'] as const;
 const REMINDER_OPTIONS = [
-  { minutes: 60, key: 'h1' },
-  { minutes: 1440, key: 'd1' },
-  { minutes: 10080, key: 'w1' },
+  { key: 'h1', days: null },
+  { key: 'd1', days: 0 },
+  { key: 'w1', days: 7 },
 ] as const;
 
 type FamilyEventFormProps = {
   /** Событие для правки; null — создаём новое. */
   event: FamilyEvent | null;
   onClose: () => void;
-  onSaved: (photoFailed: boolean) => void;
+  onSaved: () => void;
 };
 
 /** Следующее наступление ежегодной даты: прошедший день переносится на год. */
@@ -75,8 +75,6 @@ const defaultStart = () => {
  */
 const defaultReminderLead = (start: Date, now: Date) => {
   const diff = start.getTime() - now.getTime();
-  if (diff >= 10080 * MINUTE_MS) return 10080;
-  if (diff >= 1440 * MINUTE_MS) return 1440;
   if (diff >= 60 * MINUTE_MS) return 60;
   return null;
 };
@@ -112,12 +110,15 @@ export function FamilyEventForm({
     event?.audienceUserIds ?? null,
   );
   const [audienceChanged, setAudienceChanged] = useState(false);
-  const [customOpen, setCustomOpen] = useState(false);
+  const [reminderPicker, setReminderPicker] = useState<
+    'd1' | 'w1' | 'custom' | null
+  >(null);
   const [customSelected, setCustomSelected] = useState(false);
   const saveEvent = useSaveFamilyEvent();
   const [now] = useState(() => new Date());
   const [timezone] = useState(() => event?.timezone ?? deviceTimeZone());
   const [initialStart] = useState(defaultStart);
+  const [savedEventId, setSavedEventId] = useState<string>();
   const [clientRequestId] = useState(createRequestId);
   const [title, setTitle] = useState(event?.title ?? '');
   const [description, setDescription] = useState(event?.description ?? '');
@@ -139,8 +140,15 @@ export function FamilyEventForm({
   );
   const [reminderLead, setReminderLead] = useState<number | null>(() =>
     event
-      ? (event.reminderLeadMinutes ?? null)
+      ? event.reminderDailyDays == null
+        ? (event.reminderLeadMinutes ?? null)
+        : null
       : defaultReminderLead(initialStart, now),
+  );
+  const [daily, setDaily] = useState(() =>
+    event?.reminderDailyDays != null && event.reminderDailyMinute != null
+      ? { days: event.reminderDailyDays, minute: event.reminderDailyMinute }
+      : null,
   );
   const [picker, setPicker] = useState<'start' | 'end' | null>(null);
 
@@ -179,10 +187,13 @@ export function FamilyEventForm({
   }, [event?.participants, familyPeople]);
 
   const selectedParticipants = participants ?? familyPeople;
+  const selectedPreset = customSelected
+    ? undefined
+    : REMINDER_OPTIONS.find(({ days }) =>
+        days === null ? !daily && reminderLead === 60 : daily?.days === days,
+      );
   const customReminder =
-    reminderLead !== null &&
-    (customSelected ||
-      !REMINDER_OPTIONS.some(({ minutes }) => minutes === reminderLead));
+    !selectedPreset && (daily !== null || reminderLead !== null);
   const audienceCount =
     audience === null
       ? familyPeople.length
@@ -216,6 +227,8 @@ export function FamilyEventForm({
     photo: cover ? { uri: cover.uri } : coverRemoved ? undefined : event?.photo,
     reminderAt,
     reminderLeadMinutes: reminderLead ?? undefined,
+    reminderDailyDays: daily?.days,
+    reminderDailyMinute: daily?.minute,
     response: event?.response,
     canEdit: true,
     featured: event?.featured,
@@ -284,13 +297,43 @@ export function FamilyEventForm({
       showToast(t('calendar.formInvalid'));
       return;
     }
+    const reminderChanged =
+      !event ||
+      (daily?.days ?? null) !== (event.reminderDailyDays ?? null) ||
+      (daily?.minute ?? null) !== (event.reminderDailyMinute ?? null) ||
+      (!daily &&
+        reminderLead !==
+          (event.reminderDailyDays == null
+            ? (event.reminderLeadMinutes ?? null)
+            : null));
+    const coverOnly =
+      event &&
+      (cover || coverRemoved) &&
+      !reminderChanged &&
+      !audienceChanged &&
+      title.trim() === event.title &&
+      description.trim() === event.description &&
+      kind === event.kind &&
+      repeat === event.repeat &&
+      startsAt.getTime() === event.startsAt.getTime() &&
+      endsAt.getTime() === event.endsAt.getTime() &&
+      selectedParticipants.length === event.participants.length &&
+      selectedParticipants.every(({ id }) =>
+        event.participants.some((person) => person.id === id),
+      );
     const stillInSession = () =>
       useSessionStore.getState().session?.storageEpoch ===
       session?.storageEpoch;
     try {
-      const { photoFailed } = await saveEvent.mutateAsync({
-        eventId: event?.id,
-        cover: cover ?? (event && coverRemoved ? null : undefined),
+      const {
+        event: savedEvent,
+        photoError,
+        photoRemovalFailed,
+      } = await saveEvent.mutateAsync({
+        eventId: savedEventId ?? event?.id,
+        coverOnlyEvent: coverOnly ? event : undefined,
+        cover:
+          cover ?? ((savedEventId || event) && coverRemoved ? null : undefined),
         payload: {
           title: title.trim(),
           description: description.trim(),
@@ -299,17 +342,35 @@ export function FamilyEventForm({
           timezone,
           repeat,
           kind,
-          reminderLeadMinutes: reminderLead,
+          ...(reminderChanged && {
+            reminderLeadMinutes: daily ? null : reminderLead,
+            reminderDailyDays:
+              daily?.days ??
+              (event?.reminderDailyDays != null ? null : undefined),
+            reminderDailyMinute:
+              daily?.minute ??
+              (event?.reminderDailyDays != null ? null : undefined),
+          }),
           audienceUserIds: audienceChanged
             ? (audience?.filter((id) =>
                 familyPeople.some((person) => person.id === id),
               ) ?? null)
             : undefined,
           participants: selectedParticipants.map((person) => person.id),
-          clientRequestId: event ? undefined : clientRequestId,
+          clientRequestId: event || savedEventId ? undefined : clientRequestId,
         },
       });
-      if (stillInSession()) onSaved(photoFailed);
+      if (!stillInSession()) return;
+      if (photoError || photoRemovalFailed) {
+        setSavedEventId(savedEvent.id);
+        showToast(
+          photoError
+            ? t(`photos.${photoError}`)
+            : t('calendar.photoRemoveError'),
+        );
+        return;
+      }
+      onSaved();
     } catch (error) {
       if (!stillInSession()) return;
       showToast(
@@ -573,8 +634,7 @@ export function FamilyEventForm({
               <Text style={styles.label}>{t('calendar.reminderLabel')}</Text>
               <View style={styles.reminderOptions}>
                 {REMINDER_OPTIONS.map((option) => {
-                  const selected =
-                    !customReminder && reminderLead === option.minutes;
+                  const selected = selectedPreset?.key === option.key;
                   return (
                     <Pressable
                       key={option.key}
@@ -585,8 +645,13 @@ export function FamilyEventForm({
                         selected && styles.reminderOptionOn,
                       ]}
                       onPress={() => {
+                        if (option.days !== null) {
+                          setReminderPicker(option.key);
+                          return;
+                        }
                         setCustomSelected(false);
-                        setReminderLead(selected ? null : option.minutes);
+                        setDaily(null);
+                        setReminderLead(selected ? null : 60);
                       }}
                     >
                       <Text
@@ -607,7 +672,7 @@ export function FamilyEventForm({
                     styles.reminderOption,
                     customReminder && styles.reminderOptionOn,
                   ]}
-                  onPress={() => setCustomOpen(true)}
+                  onPress={() => setReminderPicker('custom')}
                 >
                   <Text
                     style={[
@@ -619,16 +684,6 @@ export function FamilyEventForm({
                   </Text>
                 </Pressable>
               </View>
-              {customReminder && (
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={() => setReminderLead(null)}
-                >
-                  <Text style={styles.reminderText}>
-                    {t('calendar.reminderClear')}
-                  </Text>
-                </Pressable>
-              )}
             </View>
 
             <View style={styles.field}>
@@ -739,14 +794,39 @@ export function FamilyEventForm({
         </KeyboardAvoidingView>
       </View>
 
-      {customOpen && (
+      {reminderPicker !== null && (
         <ReminderPicker
-          minutes={reminderLead}
-          onClose={() => setCustomOpen(false)}
-          onConfirm={(minutes) => {
-            setCustomSelected(true);
-            setReminderLead(minutes);
-            setCustomOpen(false);
+          minutes={daily ? daily.days * 1440 : reminderLead}
+          hourly={!daily}
+          fixedDays={
+            reminderPicker === 'd1'
+              ? 0
+              : reminderPicker === 'w1'
+                ? 7
+                : undefined
+          }
+          time={daily?.minute ?? 0}
+          timezone={timezone}
+          onClose={() => setReminderPicker(null)}
+          onClear={
+            (
+              reminderPicker === 'custom'
+                ? customReminder
+                : selectedPreset?.key === reminderPicker
+            )
+              ? () => {
+                  setCustomSelected(false);
+                  setReminderLead(null);
+                  setDaily(null);
+                  setReminderPicker(null);
+                }
+              : undefined
+          }
+          onConfirm={(minutes, hourly, time) => {
+            setCustomSelected(reminderPicker === 'custom');
+            setDaily(hourly ? null : { days: minutes / 1440, minute: time });
+            setReminderLead(hourly ? minutes : null);
+            setReminderPicker(null);
           }}
         />
       )}

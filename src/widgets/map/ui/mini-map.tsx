@@ -1,21 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
-import {
-  Camera,
-  Map,
-  type CameraRef,
-  type StyleSpecification,
-} from '@maplibre/maplibre-react-native';
+import { Camera, Map, type CameraRef } from '@maplibre/maplibre-react-native';
 
 import type { GeoPoint } from '@entities/user';
 import { createStyles } from '@shared/theme';
-import { MAP_STYLE } from '../config/map-style';
+import { useNativeMapStyle } from '../model/use-native-map-style';
 
 const ZOOM = 15;
-const MAP_STYLE_JSON = MAP_STYLE as unknown as StyleSpecification;
 
 /** Неподвижная нативная мини-карта: жесты выключены, пин рисует превью. */
 export function MiniMap({ center }: { center: GeoPoint }) {
+  const { mapStyle } = useNativeMapStyle();
   const cameraRef = useRef<CameraRef>(null);
 
   useEffect(() => {
@@ -29,7 +24,7 @@ export function MiniMap({ center }: { center: GeoPoint }) {
     <View style={styles.container} pointerEvents="none">
       <Map
         style={styles.map}
-        mapStyle={MAP_STYLE_JSON}
+        mapStyle={mapStyle}
         logo={false}
         attribution={false}
         compass={false}

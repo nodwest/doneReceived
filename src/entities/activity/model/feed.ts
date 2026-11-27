@@ -94,14 +94,12 @@ export interface FeedDay {
 }
 
 /**
- * Разложить карточки по дням последнего события; карточки, которые не
- * менялись с `since`, не нужны. Порядок карточек — как в `groupFeed`.
+ * Разложить карточки по дням последнего события, сохраняя порядок ленты.
  */
-export function groupFeedByDay(cards: FeedCard[], since: Date): FeedDay[] {
+export function groupFeedByDay(cards: FeedCard[]): FeedDay[] {
   const days: FeedDay[] = [];
   for (const card of cards) {
     const at = new Date(card.events[0].at);
-    if (at < since) continue;
     const date = startOfDay(at);
     const last = days[days.length - 1];
     if (last && last.date.getTime() === date.getTime()) last.cards.push(card);

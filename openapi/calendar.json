@@ -117,8 +117,24 @@
             "maxItems": 20,
             "type": "array"
           },
+          "reminderDailyDays": {
+            "description": "За сколько дней до начала начинать ежедневные напоминания: 0–30; в день события напоминание тоже отправляется. Задаётся вместе с reminderDailyMinute; оба поля null или отсутствуют — ежедневного напоминания нет. Несовместимо с reminderLeadMinutes.",
+            "example": 3,
+            "maximum": 30,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "reminderDailyMinute": {
+            "description": "Минута от полуночи в часовом поясе события, в которую отправлять ежедневное напоминание: 0–1439. Задаётся вместе с reminderDailyDays; оба поля null или отсутствуют — ежедневного напоминания нет. Несовместимо с reminderLeadMinutes.",
+            "example": 540,
+            "maximum": 1439,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
           "reminderLeadMinutes": {
-            "description": "За сколько минут напомнить. null — без напоминания.",
+            "description": "За сколько минут напомнить. null — без напоминания. Нельзя сочетать с reminderDailyDays и reminderDailyMinute: ежедневное напоминание задаётся только ими.",
             "example": 1440,
             "maximum": 20160,
             "minimum": 1,
@@ -209,8 +225,22 @@
             "nullable": true,
             "type": "string"
           },
+          "reminderDailyDays": {
+            "description": "За сколько дней до начала начинаются ежедневные напоминания: 0–30. null вместе с reminderDailyMinute — ежедневного напоминания нет.",
+            "maximum": 30,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "reminderDailyMinute": {
+            "description": "Минута от полуночи в часовом поясе события для ежедневного напоминания. null вместе с reminderDailyDays — ежедневного напоминания нет.",
+            "maximum": 1439,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
           "reminderLeadMinutes": {
-            "description": "За сколько минут напомнить; null — без напоминания.",
+            "description": "За сколько минут напомнить; null — напоминания до начала нет. Взаимоисключающе с reminderDailyDays и reminderDailyMinute.",
             "maximum": 20160,
             "minimum": 1,
             "nullable": true,
@@ -254,6 +284,8 @@
           "kind",
           "photoUrl",
           "reminderLeadMinutes",
+          "reminderDailyDays",
+          "reminderDailyMinute",
           "participants",
           "audienceUserIds",
           "viewer",
@@ -502,8 +534,24 @@
             "maxItems": 20,
             "type": "array"
           },
+          "reminderDailyDays": {
+            "description": "За сколько дней до начала начинать ежедневные напоминания: 0–30. Можно передать только недостающее поле — второе сохранится из события. Оба поля null очищают ежедневное напоминание; задание ежедневного напоминания очищает reminderLeadMinutes.",
+            "example": 3,
+            "maximum": 30,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "reminderDailyMinute": {
+            "description": "Минута от полуночи в часовом поясе события, в которую отправлять ежедневное напоминание: 0–1439. Можно передать только недостающее поле — второе сохранится из события. Оба поля null очищают ежедневное напоминание; задание ежедневного напоминания очищает reminderLeadMinutes.",
+            "example": 540,
+            "maximum": 1439,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
           "reminderLeadMinutes": {
-            "description": "null убирает напоминание.",
+            "description": "null убирает напоминание. Явное значение переключает событие с ежедневного напоминания на напоминание до начала и очищает reminderDailyDays и reminderDailyMinute.",
             "maximum": 20160,
             "minimum": 1,
             "nullable": true,

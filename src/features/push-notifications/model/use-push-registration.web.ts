@@ -5,4 +5,6 @@
  */
 export function usePushRegistration() {}
 
-export async function syncPushRegistration() {}
+export async function syncPushRegistration() {
+  return false;
+}

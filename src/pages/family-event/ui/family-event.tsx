@@ -198,18 +198,31 @@ export function FamilyEventPage() {
     }
     return t('calendar.reminderCustomMinutes', { count: minutes });
   };
-  const reminderText = event.reminderAt
-    ? [
-        leadKey
-          ? leadKey in REMINDER_KEYS
-            ? t(REMINDER_KEYS[leadKey as keyof typeof REMINDER_KEYS])
-            : customLead(leadKey)
-          : null,
-        `${formatMonthDay(event.reminderAt)}, ${formatClock(event.reminderAt)}`,
-      ]
-        .filter(Boolean)
-        .join(' · ')
-    : '';
+  const dailyMinute = event.reminderDailyMinute;
+  const dailyTime =
+    dailyMinute == null
+      ? undefined
+      : `${String(Math.floor(dailyMinute / 60)).padStart(2, '0')}:${String(dailyMinute % 60).padStart(2, '0')}`;
+  const reminderText =
+    event.reminderDailyDays != null && dailyTime != null
+      ? event.reminderDailyDays === 0
+        ? t('calendar.reminderOnEventDay', { time: dailyTime })
+        : t('calendar.reminderDailySummary', {
+            days: event.reminderDailyDays,
+            time: dailyTime,
+          })
+      : event.reminderAt
+        ? [
+            leadKey
+              ? leadKey in REMINDER_KEYS
+                ? t(REMINDER_KEYS[leadKey as keyof typeof REMINDER_KEYS])
+                : customLead(leadKey)
+              : null,
+            `${formatMonthDay(event.reminderAt)}, ${formatClock(event.reminderAt)}`,
+          ]
+            .filter(Boolean)
+            .join(' · ')
+        : '';
 
   const respond = (response: FamilyEventResponse) => {
     respondEvent.mutate(
@@ -359,7 +372,7 @@ export function FamilyEventPage() {
             <Text style={styles.description}>{event.description}</Text>
           )}
 
-          {!!event.reminderAt && (
+          {!!reminderText && (
             <View style={styles.reminder}>
               <View style={styles.bell}>
                 <Icon name="bell" size={16} color={theme.colors.reviewText} />

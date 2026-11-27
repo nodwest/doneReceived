@@ -211,7 +211,17 @@ export interface components {
              */
             participants: string[];
             /**
-             * @description За сколько минут напомнить. null — без напоминания.
+             * @description За сколько дней до начала начинать ежедневные напоминания: 0–30; в день события напоминание тоже отправляется. Задаётся вместе с reminderDailyMinute; оба поля null или отсутствуют — ежедневного напоминания нет. Несовместимо с reminderLeadMinutes.
+             * @example 3
+             */
+            reminderDailyDays?: number | null;
+            /**
+             * @description Минута от полуночи в часовом поясе события, в которую отправлять ежедневное напоминание: 0–1439. Задаётся вместе с reminderDailyDays; оба поля null или отсутствуют — ежедневного напоминания нет. Несовместимо с reminderLeadMinutes.
+             * @example 540
+             */
+            reminderDailyMinute?: number | null;
+            /**
+             * @description За сколько минут напомнить. null — без напоминания. Нельзя сочетать с reminderDailyDays и reminderDailyMinute: ежедневное напоминание задаётся только ими.
              * @example 1440
              */
             reminderLeadMinutes?: number | null;
@@ -255,7 +265,11 @@ export interface components {
             participants: components["schemas"]["FamilyEventPersonDto"][];
             /** @description Ссылка на обложку события; null — фото нет. */
             photoUrl: string | null;
-            /** @description За сколько минут напомнить; null — без напоминания. */
+            /** @description За сколько дней до начала начинаются ежедневные напоминания: 0–30. null вместе с reminderDailyMinute — ежедневного напоминания нет. */
+            reminderDailyDays: number | null;
+            /** @description Минута от полуночи в часовом поясе события для ежедневного напоминания. null вместе с reminderDailyDays — ежедневного напоминания нет. */
+            reminderDailyMinute: number | null;
+            /** @description За сколько минут напомнить; null — напоминания до начала нет. Взаимоисключающе с reminderDailyDays и reminderDailyMinute. */
             reminderLeadMinutes: number | null;
             /** @enum {string} */
             repeat: "once" | "annual";
@@ -371,7 +385,17 @@ export interface components {
             kind?: "trip" | "event" | "holiday";
             /** @description Новый состав. Отсутствие поля не меняет состав. */
             participants?: string[];
-            /** @description null убирает напоминание. */
+            /**
+             * @description За сколько дней до начала начинать ежедневные напоминания: 0–30. Можно передать только недостающее поле — второе сохранится из события. Оба поля null очищают ежедневное напоминание; задание ежедневного напоминания очищает reminderLeadMinutes.
+             * @example 3
+             */
+            reminderDailyDays?: number | null;
+            /**
+             * @description Минута от полуночи в часовом поясе события, в которую отправлять ежедневное напоминание: 0–1439. Можно передать только недостающее поле — второе сохранится из события. Оба поля null очищают ежедневное напоминание; задание ежедневного напоминания очищает reminderLeadMinutes.
+             * @example 540
+             */
+            reminderDailyMinute?: number | null;
+            /** @description null убирает напоминание. Явное значение переключает событие с ежедневного напоминания на напоминание до начала и очищает reminderDailyDays и reminderDailyMinute. */
             reminderLeadMinutes?: number | null;
             /** @enum {string} */
             repeat?: "once" | "annual";

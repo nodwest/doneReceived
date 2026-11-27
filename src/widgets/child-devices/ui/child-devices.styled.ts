@@ -78,4 +78,25 @@ export const styles = createStyles((colors) => ({
   pressed: {
     opacity: 0.7,
   },
+  removeConfirmation: {
+    gap: 12,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+  },
+  removeTitle: {
+    textAlign: 'center',
+    fontSize: theme.fontSize.xl,
+    fontFamily: theme.fonts.bold,
+    color: colors.ink,
+  },
+  removeMessage: {
+    textAlign: 'center',
+    fontSize: theme.fontSize.sm,
+    fontFamily: theme.fonts.medium,
+    color: colors.inkSoft,
+  },
+  removeActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
 }));

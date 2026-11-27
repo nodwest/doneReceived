@@ -6,9 +6,6 @@ import { theme } from '@shared/theme';
 import { SectionHeader } from '@shared/ui';
 import { styles } from './recent-activity.styled';
 
-/** Сколько разных карточек показываем на главной: задания, а не события. */
-const HOME_FEED_CARDS = 8;
-
 type RecentActivityProps = {
   /** События ленты с сервера, новые первыми. */
   events: FeedEvent[];
@@ -35,12 +32,10 @@ export function RecentActivity({
   onSeeAll,
 }: RecentActivityProps) {
   const { t } = useTranslation();
-  const cards = useMemo(
-    () => groupFeed(events).slice(0, HOME_FEED_CARDS),
-    [events],
-  );
+  const cards = useMemo(() => groupFeed(events), [events]);
 
-  if (cards.length === 0 && !isLoading && !isError) return null;
+  const showState = cards.length === 0 && (isLoading || isError);
+  if (cards.length === 0 && !showState && !onSeeAll) return null;
 
   return (
     <View style={styles.container}>
@@ -49,7 +44,7 @@ export function RecentActivity({
         actionLabel={t('common.seeAll')}
         onAction={onSeeAll}
       />
-      {cards.length === 0 ? (
+      {showState && (
         <View style={styles.state}>
           {isLoading ? (
             <>
@@ -71,7 +66,8 @@ export function RecentActivity({
             </>
           )}
         </View>
-      ) : (
+      )}
+      {cards.length > 0 && (
         <View style={styles.list}>
           {cards.map((card) => (
             <FeedItem key={card.key} card={card} viewer={viewer} />

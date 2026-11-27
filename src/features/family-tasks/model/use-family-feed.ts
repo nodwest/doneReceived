@@ -52,7 +52,7 @@ export function useFamilyFeed() {
   };
 }
 
-/** Лента за последние 30 дней: страница Activity. */
+/** История задач: страница Activity. */
 export function useFamilyFeedHistory(selectedChildId?: string) {
   const { feedViewer, childSession, children, members, accessDenied } =
     useFeedViewer();

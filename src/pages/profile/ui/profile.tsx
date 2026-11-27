@@ -1,12 +1,27 @@
 import { useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Alert,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { router } from 'expo-router';
 import { InviteCodesPanel } from '@widgets/add-member';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useLogout } from '@features/auth';
 import { JoinFamilyPanel } from '@features/join-family';
 import { LanguageMenu } from '@features/select-language';
-import { useMe, useMyAvatar, useSessionKind } from '@entities/session';
+import { syncPushRegistration } from '@features/push-notifications';
+import {
+  reminderTimePreviewEnabled,
+  saveReminderTimePreview,
+  useMe,
+  useMyAvatar,
+  useMyId,
+  useSessionKind,
+} from '@entities/session';
 import { getLanguageLabel, useLanguage, useTranslation } from '@shared/i18n';
 import { useTheme } from '@shared/theme';
 import { SettingsRow, Toggle, type AnchorRect } from '@shared/ui';
@@ -31,6 +46,7 @@ export function ProfilePage() {
   // Карточка — вошедшего (GET /users/me).
   const me = useMe();
   const myAvatar = useMyAvatar();
+  const myId = useMyId();
   const language = useLanguage();
   const [panel, setPanel] = useState<'codes' | 'join' | null>(null);
   const closePanel = () => setPanel(null);
@@ -112,6 +128,9 @@ export function ProfilePage() {
                 }
               />
               <View style={styles.divider} />
+              {Platform.OS !== 'web' && !!myId && (
+                <ReminderPreviewRow key={myId} userId={myId} />
+              )}
               <SettingsRow icon="help" label={t('profile.help')} />
               <View style={styles.divider} />
               <SettingsRow
@@ -139,5 +158,51 @@ export function ProfilePage() {
         onClose={() => setLanguageOpen(false)}
       />
     </TabScreen>
+  );
+}
+
+function ReminderPreviewRow({ userId }: { userId: string }) {
+  const { t } = useTranslation();
+  const [enabled, setEnabled] = useState(() =>
+    reminderTimePreviewEnabled(userId),
+  );
+  const [saving, setSaving] = useState(false);
+  const label = t('push.reminderTimePreview');
+
+  const save = async (value: boolean) => {
+    setSaving(true);
+    saveReminderTimePreview(userId, value);
+    const synced = await syncPushRegistration();
+    if (value && !synced) saveReminderTimePreview(userId, false);
+    if (synced) setEnabled(value);
+    setSaving(false);
+    if (!synced) Alert.alert(label, t('push.reminderPreviewSyncError'));
+  };
+
+  return (
+    <>
+      <SettingsRow
+        icon="help"
+        label={label}
+        right={
+          <Toggle
+            value={enabled}
+            disabled={saving}
+            accessibilityLabel={label}
+            onValueChange={(value) => {
+              if (!value) {
+                void save(false);
+                return;
+              }
+              Alert.alert(label, t('push.reminderTimePreviewConsent'), [
+                { text: t('common.cancel'), style: 'cancel' },
+                { text: t('common.done'), onPress: () => void save(true) },
+              ]);
+            }}
+          />
+        }
+      />
+      <View style={styles.divider} />
+    </>
   );
 }

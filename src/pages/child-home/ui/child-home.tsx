@@ -40,13 +40,6 @@ const authorOf = (task: Task, parentLabel: string) => ({
   avatar: task.authorAvatar ?? null,
 });
 
-/** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
-function greetingKey(hour: number) {
-  if (hour >= 5 && hour < 12) return 'home.greetingMorning' as const;
-  if (hour >= 12 && hour < 18) return 'home.greetingAfternoon' as const;
-  return 'home.greetingEvening' as const;
-}
-
 /**
  * Главная вошедшего ребёнка: баланс и
  * счётчики заданий, карусель активных заданий с I did it!, плитка
@@ -90,6 +83,25 @@ export function ChildHomePage() {
   const openTask = (task: Task) =>
     router.push({ pathname: '/tasks', params: { task: String(task.id) } });
 
+  const summary =
+    !tasksPending && !balancePending ? (
+      <HomeSummary
+        variant="plain"
+        tone="child"
+        amount={balance}
+        amountLabel={t('summary.myBalance')}
+        activeTasks={counts.active}
+        tasksToReview={counts.review}
+        reviewLabel={t('summary.onReview')}
+        onActiveTasksPress={() =>
+          router.push({ pathname: '/tasks', params: { tab: 'all' } })
+        }
+        onTasksToReviewPress={() =>
+          router.push({ pathname: '/tasks', params: { tab: 'review' } })
+        }
+      />
+    ) : undefined;
+
   return (
     <View style={styles.screen}>
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -101,9 +113,9 @@ export function ChildHomePage() {
           showsVerticalScrollIndicator={false}
         >
           <HomeHeader
-            greeting={t(greetingKey(new Date().getHours()))}
             name={me?.displayName ?? ''}
             avatar={myAvatar}
+            summary={summary}
           />
           {loading ? (
             <View style={styles.loading}>
@@ -112,20 +124,6 @@ export function ChildHomePage() {
             </View>
           ) : (
             <>
-              <HomeSummary
-                tone="child"
-                amount={balance}
-                amountLabel={t('summary.myBalance')}
-                activeTasks={counts.active}
-                tasksToReview={counts.review}
-                reviewLabel={t('summary.onReview')}
-                onActiveTasksPress={() =>
-                  router.push({ pathname: '/tasks', params: { tab: 'all' } })
-                }
-                onTasksToReviewPress={() =>
-                  router.push({ pathname: '/tasks', params: { tab: 'review' } })
-                }
-              />
               {wordsTask && (
                 <WordsTaskRow
                   tone="child"

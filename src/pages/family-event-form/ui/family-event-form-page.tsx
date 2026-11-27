@@ -72,10 +72,8 @@ export function FamilyEventFormPage({ mode }: FamilyEventFormPageProps) {
     <FamilyEventForm
       event={mode === 'edit' ? event : null}
       onClose={close}
-      onSaved={(photoFailed) => {
-        showToast(
-          t(photoFailed ? 'calendar.photoError' : 'calendar.eventSaved'),
-        );
+      onSaved={() => {
+        showToast(t('calendar.eventSaved'));
         close();
       }}
     />

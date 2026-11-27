@@ -6,6 +6,7 @@ import type {
   SymbolLayerSpecification,
 } from 'maplibre-gl';
 import type { MapZone, ZonePoint } from '@entities/zone';
+import type { ThemeMode } from '@shared/theme';
 
 /** Источник и слои геозон семьи: контур, заливка и название. */
 export const ZONE_SOURCE = 'family-zones';
@@ -48,49 +49,58 @@ export function zonesToGeoJson(
   };
 }
 
-/** Области на карте и в редакторе — голубые, как акцент вкладки Map. */
+/** Акцент редактируемого контура и сохранённых областей в светлой теме. */
 const ZONE_COLOR = '#2F80DD';
 const ZONE_LABEL_COLOR = '#1E5FB8';
 
-const zoneFillLayer: FillLayerSpecification = {
-  id: ZONE_LAYER_IDS[0],
-  type: 'fill',
-  source: ZONE_SOURCE,
-  paint: {
-    'fill-color': ZONE_COLOR,
-    'fill-opacity': 0.14,
-  },
-};
+function createZoneLayers(mode: ThemeMode) {
+  const dark = mode === 'dark';
+  const color = dark ? '#79DDBF' : ZONE_COLOR;
+  const fill = {
+    id: ZONE_LAYER_IDS[0],
+    type: 'fill',
+    source: ZONE_SOURCE,
+    paint: {
+      'fill-color': color,
+      'fill-opacity': 0.14,
+    },
+  } satisfies FillLayerSpecification;
 
-const zoneOutlineLayer: LineLayerSpecification = {
-  id: ZONE_LAYER_IDS[1],
-  type: 'line',
-  source: ZONE_SOURCE,
-  paint: {
-    'line-color': ZONE_COLOR,
-    'line-width': 2,
-  },
-};
+  const outline = {
+    id: ZONE_LAYER_IDS[1],
+    type: 'line',
+    source: ZONE_SOURCE,
+    paint: {
+      'line-color': color,
+      'line-width': 2,
+    },
+  } satisfies LineLayerSpecification;
 
-const zoneLabelsLayer: SymbolLayerSpecification = {
-  id: ZONE_LAYER_IDS[2],
-  type: 'symbol',
-  source: ZONE_SOURCE,
-  layout: {
-    'text-field': ['get', 'name'],
-    'text-size': 12,
-    'text-font': ['Noto Sans Medium'],
-    'text-allow-overlap': false,
-    'text-padding': 4,
-  },
-  paint: {
-    'text-color': ZONE_LABEL_COLOR,
-    'text-halo-color': '#FFFFFF',
-    'text-halo-width': 1.5,
-  },
-};
+  const labels = {
+    id: ZONE_LAYER_IDS[2],
+    type: 'symbol',
+    source: ZONE_SOURCE,
+    layout: {
+      'text-field': ['get', 'name'],
+      'text-size': 12,
+      'text-font': ['Noto Sans Medium'],
+      'text-allow-overlap': false,
+      'text-padding': 4,
+    },
+    paint: {
+      'text-color': dark ? color : ZONE_LABEL_COLOR,
+      'text-halo-color': dark ? '#172030' : '#FFFFFF',
+      'text-halo-width': 1.5,
+    },
+  } satisfies SymbolLayerSpecification;
 
-export const ZONE_LAYERS = [zoneFillLayer, zoneOutlineLayer, zoneLabelsLayer];
+  return [fill, outline, labels];
+}
+
+export const ZONE_LAYERS = {
+  light: createZoneLayers('light'),
+  dark: createZoneLayers('dark'),
+};
 
 /** Незаконченный контур в редакторе области: заливка, линия и вершины. */
 export const ZONE_DRAFT_SOURCE = 'zone-draft';

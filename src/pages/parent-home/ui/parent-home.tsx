@@ -1,10 +1,4 @@
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CreateTaskButton } from '@features/create-task';
@@ -35,20 +29,11 @@ import { useTranslation } from '@shared/i18n';
 import { styles } from './parent-home.styled';
 import { authorizedImage } from '@shared/api';
 
-/** Приветствие по времени суток: утро до 12, день до 18, дальше вечер. */
-function greetingKey(hour: number) {
-  if (hour >= 5 && hour < 12) return 'home.greetingMorning' as const;
-  if (hour >= 12 && hour < 18) return 'home.greetingAfternoon' as const;
-  return 'home.greetingEvening' as const;
-}
-
 export function ParentHomePage() {
   useTheme();
   const myId = useMyId();
   const { t } = useTranslation();
   const router = useRouter();
-  const { width, fontScale } = useWindowDimensions();
-  const summaryInHeader = width >= 390 && fontScale <= 1.15;
   // Имя и фото — вошедшего родителя (GET /users/me).
   const me = useMe();
   const myAvatar = useMyAvatar();
@@ -142,12 +127,10 @@ export function ParentHomePage() {
           showsVerticalScrollIndicator={false}
         >
           <HomeHeader
-            greeting={t(greetingKey(new Date().getHours()))}
             name={me?.displayName ?? ''}
             avatar={myAvatar}
-            summary={summaryInHeader ? summary : undefined}
+            summary={summary}
           />
-          {!summaryInHeader && summary}
           {event && (
             <FeaturedEventCard
               event={event}

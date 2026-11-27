@@ -89,13 +89,20 @@ export const ru: Dictionary = {
     kindKicker: '{{kind}} · {{range}}',
     photoLibrary: 'Выбрать обложку',
     removePhoto: 'Убрать обложку',
-    photoError: 'Событие сохранено, но обложку загрузить не удалось',
+    photoRemoveError:
+      'Событие сохранено, но убрать обложку не удалось. Попробуйте ещё раз.',
     allFamily: 'Вся семья',
     peopleCount_one: '{{count}} человек',
     peopleCount_few: '{{count}} человека',
     peopleCount_many: '{{count}} человек',
     peopleCount_other: '{{count}} человека',
     reminderLabel: 'Напомнить',
+    reminderClock: 'Время напоминания',
+    reminderClockZone: 'Часовой пояс события {{timezone}}',
+    reminderClockHour: 'Часы',
+    reminderClockMinute: 'Минуты',
+    reminderOnEventDay: 'В день события в {{time}}',
+    reminderDailySummary: 'Ежедневно с −{{days}} дн. в {{time}}',
     reminderTitle: 'Напоминание',
     everyone: 'Всем',
     audienceMembersUnavailable: 'Список членов семьи недоступен.',
@@ -337,9 +344,6 @@ export const ru: Dictionary = {
     eventUntil: '{{date}} · до {{time}}',
     noChildren: 'В семье пока нет детей.',
     childrenLoadError: 'Не удалось загрузить список детей.',
-    greetingMorning: 'Доброе утро 👋',
-    greetingAfternoon: 'Добрый день 👋',
-    greetingEvening: 'Добрый вечер 👋',
     recentActivity: 'Последние события',
   },
   summary: {
@@ -354,8 +358,8 @@ export const ru: Dictionary = {
     loadMore: 'Загрузить ещё',
     title: 'События',
     all: 'Все',
-    empty: 'За последние 30 дней событий нет',
-    end: 'Это всё за последние 30 дней',
+    empty: 'История задач пока пуста',
+    end: 'Это вся история задач',
     pending: 'Ждёт проверки',
     approved: 'Подтверждено',
     taskName: '«{{task}}»',
@@ -1574,5 +1578,10 @@ export const ru: Dictionary = {
   },
   push: {
     channelReminders: 'Напоминания',
+    reminderTimePreview: 'Время события в уведомлениях',
+    reminderTimePreviewConsent:
+      'Время начала будет видно на заблокированном экране и передаваться сервису доставки уведомлений.',
+    reminderPreviewSyncError:
+      'Устройство не подтвердило изменение. Проверьте сеть, разрешение на уведомления и повторите попытку.',
   },
 };

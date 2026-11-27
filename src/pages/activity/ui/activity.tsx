@@ -9,12 +9,7 @@ import {
 import { router } from 'expo-router';
 import { TabScreen } from '@widgets/bottom-nav';
 import { useFamilyFeedHistory } from '@features/family-tasks';
-import {
-  FeedItem,
-  feedHistoryStart,
-  groupFeed,
-  groupFeedByDay,
-} from '@entities/activity';
+import { FeedItem, groupFeed, groupFeedByDay } from '@entities/activity';
 import { useTranslation } from '@shared/i18n';
 import { formatDayHeader } from '@shared/lib';
 import { theme, useTheme } from '@shared/theme';
@@ -27,9 +22,7 @@ const ALL = 'all';
 const Separator = () => <View style={styles.separator} />;
 
 /**
- * Лента за последние 30 дней по дням («See all» на главной): карточки те же,
- * что на главной, и раскрываются так же. У родителя — фильтр по детям,
- * пополнения кошелька видны только в All.
+ * История задач по дням. У родителя доступен фильтр по детям.
  */
 function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
   const { t } = useTranslation();
@@ -38,7 +31,6 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
     data: events,
     familyChildren,
     isPending,
-    isPlaceholderData,
     isError,
     isFetching,
     isFetchingNextPage,
@@ -57,7 +49,6 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
         groupFeed(events ?? []).filter(
           (card) => selected === ALL || card.events[0].childId === selected,
         ),
-        feedHistoryStart(),
       ).map(({ date, cards }) => ({ date, data: cards })),
     [events, selected],
   );
@@ -107,6 +98,8 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
         </View>
       )}
       <SectionList
+        initialNumToRender={8}
+        windowSize={7}
         bounces={false}
         overScrollMode="never"
         style={styles.list}
@@ -133,7 +126,7 @@ function ActivityScreen({ viewer }: { viewer: 'parent' | 'child' }) {
                 <Text style={styles.footerText}>{t('activity.loadError')}</Text>
                 {retryButton}
               </>
-            ) : isPending || isPlaceholderData || isFetchingNextPage ? (
+            ) : isPending || isFetchingNextPage ? (
               <ActivityIndicator
                 color={theme.colors.blueInk}
                 accessibilityLabel={t('activity.loading')}

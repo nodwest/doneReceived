@@ -9,14 +9,11 @@ import type { FeedViewer } from '../model/feed';
 import { fetchSubmissionComments } from './comments-api';
 import {
   fetchFeed,
-  fetchFeedHistoryPage,
   mergeFeedPages,
   presentFeed,
   type FeedChildLabel,
-  type FeedHistoryCursor,
   type FeedMemberLabel,
 } from './feed-api';
-import { addDays, startOfDay } from '@shared/lib';
 import {
   queryRoots,
   privateReadOptions,
@@ -26,6 +23,7 @@ import {
 } from '@shared/api';
 
 const FEED_PAGE_SIZE = 20;
+const HOME_TASK_LIMIT = 6;
 
 export const feedKeys = {
   all: queryRoots.activity,
@@ -44,7 +42,6 @@ export const feedKeys = {
     familyId: string | null,
     userId: string | null,
     scope: string | null,
-    since: string,
     childId: string | undefined,
     viewerChildId: string | undefined,
   ) =>
@@ -54,7 +51,6 @@ export const feedKeys = {
       familyId,
       userId,
       scope,
-      since,
       childId,
       viewerChildId,
     ] as const,
@@ -80,7 +76,10 @@ export function useFeed(
     ),
     queryFn:
       viewer && scope
-        ? ({ signal }) => fetchFeed(viewer.familyId, FEED_PAGE_SIZE, signal)
+        ? ({ signal }) =>
+            fetchFeed(viewer.familyId, HOME_TASK_LIMIT, signal, {
+              pageBy: 'task',
+            })
         : skipToken,
   });
   const data = useMemo(
@@ -94,15 +93,8 @@ export function useFeed(
   return { ...query, accessDenied, data: accessDenied ? undefined : data };
 }
 
-/** За сколько дней, считая сегодняшний, показывает события страница Activity. */
-const HISTORY_DAYS = 30;
-
-/** С какого момента события попадают на страницу Activity. */
-export const feedHistoryStart = () =>
-  addDays(startOfDay(new Date()), 1 - HISTORY_DAYS);
-
 /**
- * События за последние 30 дней для страницы Activity. Следующую страницу
+ * История задач для страницы Activity. Следующую страницу
  * запрашивает экран при прокрутке или по кнопке.
  */
 export function useFeedHistory(
@@ -113,22 +105,10 @@ export function useFeedHistory(
 ) {
   const scope = usePrivateReadScope();
   const client = useQueryClient();
-  const since = feedHistoryStart().toISOString();
-  const previewKey = feedKeys.list(
-    viewer?.familyId ?? null,
-    viewer?.userId ?? null,
-    viewer?.child?.id,
-    scope,
-  );
-  const preview =
-    viewer && scope && !selectedChildId
-      ? client.getQueryState<Awaited<ReturnType<typeof fetchFeed>>>(previewKey)
-      : undefined;
   const queryKey = feedKeys.history(
     viewer?.familyId ?? null,
     viewer?.userId ?? null,
     scope,
-    since,
     selectedChildId,
     viewer?.child?.id,
   );
@@ -139,39 +119,17 @@ export function useFeedHistory(
     queryFn:
       viewer && scope
         ? ({ signal, pageParam }) =>
-            fetchFeedHistoryPage(
-              viewer.familyId,
-              FEED_PAGE_SIZE,
-              signal,
-              { since, childId: selectedChildId },
-              pageParam,
-            )
+            fetchFeed(viewer.familyId, FEED_PAGE_SIZE, signal, {
+              pageBy: 'task',
+              childId: selectedChildId,
+              before: pageParam,
+            })
         : skipToken,
-    // The preview is unfiltered. Its cursor cannot continue a history query.
-    placeholderData:
-      preview?.status === 'success' && !preview.isInvalidated && preview.data
-        ? {
-            pages: [
-              {
-                ...preview.data,
-                legacy: false,
-                activity: {
-                  items: preview.data.activity.items.filter(
-                    (item) => Date.parse(item.createdAt) >= Date.parse(since),
-                  ),
-                },
-              },
-            ],
-            pageParams: [undefined],
-          }
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: ({ activity }, _pages, _previous, cursors) =>
+      activity.next && !cursors.includes(activity.next)
+        ? activity.next
         : undefined,
-    initialPageParam: undefined as FeedHistoryCursor | undefined,
-    getNextPageParam: ({ activity, legacy }, _pages, _previous, cursors) => {
-      return activity.next &&
-        !cursors.some((cursor) => cursor?.before === activity.next)
-        ? { before: activity.next, legacy }
-        : undefined;
-    },
   });
   const data = useMemo(
     () =>

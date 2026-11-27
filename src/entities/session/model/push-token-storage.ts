@@ -68,3 +68,13 @@ export function addPendingPushRemoval(token: string) {
 export function removePendingPushRemoval(token: string) {
   writePendingRemovals(pendingPushRemovals().filter((item) => item !== token));
 }
+
+export function reminderTimePreviewEnabled(userId: string) {
+  return storage.getBoolean(`reminderTimePreview:${userId}`) === true;
+}
+
+export function saveReminderTimePreview(userId: string, enabled: boolean) {
+  const key = `reminderTimePreview:${userId}`;
+  if (enabled) storage.set(key, true);
+  else storage.remove(key);
+}

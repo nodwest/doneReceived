@@ -3,6 +3,7 @@ import * as maplibregl from 'maplibre-gl';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 
 import { createMap } from './create-map';
+import { useWebMapStyle } from './use-web-map-style';
 
 export function useMap(containerRef: React.RefObject<HTMLDivElement | null>) {
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -45,6 +46,8 @@ export function useMap(containerRef: React.RefObject<HTMLDivElement | null>) {
       setMap(null);
     };
   }, [containerRef]);
+
+  useWebMapStyle(mapRef);
 
   return {
     mapRef,

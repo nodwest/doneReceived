@@ -46,6 +46,8 @@ export interface FamilyEvent {
   reminderAt?: Date;
   /** Сколько минут до начала напоминать — для формы и повторного редактирования. */
   reminderLeadMinutes?: number;
+  reminderDailyDays?: number;
+  reminderDailyMinute?: number;
   audienceUserIds?: string[] | null;
   /** Ответ текущего пользователя. */
   response?: FamilyEventResponse;

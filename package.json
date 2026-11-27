@@ -47,7 +47,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@feature-sliced/steiger-plugin": "^0.8.0",
+    "@feature-sliced/steiger-plugin": "^0.8.2",
     "@types/react": "~19.2.2",
     "babel-preset-expo": "^57.0.1",
     "eslint": "^9.0.0",
@@ -55,7 +55,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "prettier": "^3.8.4",
-    "steiger": "^0.6.0",
+    "steiger": "^0.10.0",
     "typescript": "~6.0.3",
     "vitest": "^4.1.12"
   },
@@ -73,5 +73,27 @@
     "test": "vitest run",
     "openapi:types": "npx --yes --package=openapi-typescript@7.13.0 openapi-typescript openapi/calendar.json -o src/entities/family-event/api/generated/calendar.ts"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "brace-expansion@1": "1.1.22",
+    "brace-expansion@5": "5.0.13",
+    "browserslist": "4.29.6",
+    "baseline-browser-mapping": "2.11.39",
+    "js-yaml": "4.3.2",
+    "node-forge": "1.4.4",
+    "glob": "14.0.6",
+    "minimatch@10": "11.0.9",
+    "xcode": {
+      "uuid": "11.1.1"
+    },
+    "metro": {
+      "image-size": "2.2.0"
+    },
+    "@expo/cli": {
+      "zod": "4.6.7"
+    },
+    "eslint-plugin-react-hooks": {
+      "zod": "4.6.7"
+    }
+  }
 }

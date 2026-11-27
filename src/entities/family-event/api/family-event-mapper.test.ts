@@ -17,6 +17,8 @@ const dto = (overrides: Partial<FamilyEventDto> = {}): FamilyEventDto => ({
   kind: 'trip',
   photoUrl: null,
   reminderLeadMinutes: null,
+  reminderDailyDays: null,
+  reminderDailyMinute: null,
   audienceUserIds: null,
   participants: [],
   viewer: { canEdit: true, response: null },
@@ -64,6 +66,15 @@ describe('toFamilyEvent', () => {
     expect(event.reminderAt).toBeUndefined();
     expect(event.response).toBeUndefined();
     expect(event.canEdit).toBe(true);
+  });
+
+  it('uses the API path for a private event cover even if the server sends the site origin', () => {
+    const eventId = dto().id;
+    const path = `/families/1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed/events/${eventId}/photo/2b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed`;
+    expect(
+      toFamilyEvent(dto({ photoUrl: `https://app.example.test${path}` }), image)
+        .photo,
+    ).toEqual({ uri: `image:${path}` });
   });
 
   it('shows a participant once and keeps their available avatar', () => {

@@ -46,6 +46,7 @@ export function TaskCarousel({
 
   return (
     <SnapCarousel
+      fitCards
       items={tasks}
       keyExtractor={(task) => task.id}
       renderItem={renderTask}
