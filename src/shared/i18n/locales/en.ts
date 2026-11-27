@@ -429,7 +429,6 @@ export const en = {
   presence: {
     atHome: 'At home',
     away: 'Away',
-    home: 'Home',
   },
   family: {
     role: {
@@ -576,8 +575,6 @@ export const en = {
     notPaid: 'Not paid',
     recentRewards: 'Recent rewards',
     noRewards: 'No rewards yet',
-    location: 'Location',
-    openMap: 'Open map',
   },
   period: {
     label: 'Summary for',
@@ -828,8 +825,6 @@ export const en = {
     photoCountHint: '{{count}} of {{max}} photos — they go with I did it!',
     reward: 'Reward',
     penalty: 'Penalty',
-    titlePlaceholder: 'Task title',
-    descriptionPlaceholder: 'Task description',
   },
   createTask: {
     createTitle: 'Create Task',

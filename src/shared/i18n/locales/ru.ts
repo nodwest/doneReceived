@@ -439,7 +439,6 @@ export const ru: Dictionary = {
   presence: {
     atHome: 'Дома',
     away: 'Не дома',
-    home: 'Дом',
   },
   family: {
     role: {
@@ -594,8 +593,6 @@ export const ru: Dictionary = {
     notPaid: 'Не выплачено',
     recentRewards: 'Последние награды',
     noRewards: 'Наград пока нет',
-    location: 'Где сейчас',
-    openMap: 'Открыть карту',
   },
   period: {
     label: 'Итоги за период',
@@ -849,8 +846,6 @@ export const ru: Dictionary = {
     photoCountHint: '{{count}} из {{max}} фото — уйдут вместе с I did it!',
     reward: 'Награда',
     penalty: 'Штраф',
-    titlePlaceholder: 'Название задачи',
-    descriptionPlaceholder: 'Описание задачи',
   },
   createTask: {
     createTitle: 'Новое задание',
