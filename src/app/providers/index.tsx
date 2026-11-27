@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { isAccessDenied, PrivateReadScope } from '@shared/api';
+import { clearDownloadedPhotos } from '@shared/lib';
 import { clearPrivateImageCache } from '@shared/ui';
 import {
   QueryCache,
@@ -56,6 +57,7 @@ useSessionStore.subscribe((state, prev) => {
     queryClient.clear();
     resetTaskDrafts();
     clearPrivateImageCache();
+    clearDownloadedPhotos();
   }
 });
 

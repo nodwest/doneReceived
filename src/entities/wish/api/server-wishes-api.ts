@@ -1,5 +1,10 @@
 import { apiRequest, authorizedImage } from '@shared/api';
-import { appendPhoto, downloadPhoto } from '@shared/lib';
+import {
+  appendPhoto,
+  discardDownloadedPhoto,
+  downloadPhoto,
+  type PickedPhoto,
+} from '@shared/lib';
 import {
   WishPhotosError,
   type Wish,
@@ -100,6 +105,7 @@ async function saveServerWishPhotos(
   photos: readonly WishPhotoDraft[],
 ) {
   const path = `${base(familyId, childId)}/${id}/photos`;
+  const downloaded: PickedPhoto[] = [];
   try {
     if (photos.length === 0) {
       await apiRequest<null>(path, { method: 'DELETE' });
@@ -107,12 +113,19 @@ async function saveServerWishPhotos(
     }
     const form = new FormData();
     for (const [index, photo] of photos.entries()) {
-      const file = photo.file ?? (await downloadPhoto(photo.source, index));
+      let file = photo.file;
+      if (!file) {
+        file = await downloadPhoto(photo.source, index);
+        downloaded.push(file);
+      }
       await appendPhoto(form, 'photos', file);
     }
     await apiRequest<unknown>(path, { method: 'PUT', body: form });
   } catch (error) {
     throw new WishPhotosError(error);
+  } finally {
+    // Скачанные старые фото нужны только на время запроса.
+    downloaded.forEach(discardDownloadedPhoto);
   }
 }
 
