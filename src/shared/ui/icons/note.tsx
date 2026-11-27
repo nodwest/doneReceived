@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
 /** Облачко сообщения: заметка ребёнка к желанию. */

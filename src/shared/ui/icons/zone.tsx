@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Circle } from 'react-native-svg';
 
 export const ZoneIcon = ({ color = '#000', size = 24 }) => (

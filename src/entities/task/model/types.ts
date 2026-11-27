@@ -7,17 +7,6 @@ export enum TaskStatus {
   Cancelled = 'cancelled',
 }
 
-export interface TaskShortViewProps {
-  id: number;
-  title: string;
-  description: string;
-  penalty: number;
-  award: number;
-  status?: TaskStatus;
-  authorId?: number;
-  workerId?: number;
-}
-
 export interface CreateTaskPayload {
   title: string;
   reward: number;

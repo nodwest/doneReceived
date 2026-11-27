@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Circle } from 'react-native-svg';
 
 // Шесть точек 2×3 в сетке 14×20, как в макете.

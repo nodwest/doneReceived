@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
 /** Контурная камера: плитка «Take a photo» в фото-отчёте. */

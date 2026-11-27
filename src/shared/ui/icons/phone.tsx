@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Path, Rect } from 'react-native-svg';
 
 export const PhoneIcon = ({ color = '#000', size = 20 }) => (

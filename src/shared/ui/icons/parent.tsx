@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 export const ParentIcon = ({ color = '#000', size = 24 }) => (

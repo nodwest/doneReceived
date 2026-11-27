@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { G, Path } from 'react-native-svg';
 
 /** Рука с указательным пальцем (как в lucide «pointer»), 24×24. */

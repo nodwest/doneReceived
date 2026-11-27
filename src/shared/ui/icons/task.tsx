@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
 /** Задание: планшет с двумя строками — общая иконка для любой задачи. */

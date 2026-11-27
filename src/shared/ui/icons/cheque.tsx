@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { G, Path } from 'react-native-svg';
 
 export const ChequeIcon = ({ color = '#000', size = 24 }) => (

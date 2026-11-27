@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
 export const ArrowLeftIcon = ({ color = '#000', size = 24 }) => (

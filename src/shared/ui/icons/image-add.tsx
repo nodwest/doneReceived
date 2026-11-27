@@ -1,4 +1,3 @@
-import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
 /** Картинка с плюсом: плитка «Add from gallery» в фото-отчёте. */

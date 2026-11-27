@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { ConnectDevicePanel } from '@features/connect-device';
 import { useRevokeDevice } from '@features/revoke-device';
 import {
@@ -11,7 +11,7 @@ import { useFamilyMembers } from '@entities/family';
 import { useTranslation } from '@shared/i18n';
 import { showToast } from '@shared/lib';
 import { theme } from '@shared/theme';
-import { Icon } from '@shared/ui';
+import { BottomSheet, Icon, PillButton } from '@shared/ui';
 import { styles } from './child-devices.styled';
 
 const NO_DEVICES: Device[] = [];
@@ -53,10 +53,11 @@ export function ChildDevices({
 }: ChildDevicesProps) {
   const { t } = useTranslation();
   const [panel, setPanel] = useState<Panel>('list');
+  const [deviceToRemove, setDeviceToRemove] = useState<Device | null>(null);
   const blockRef = useRef<View>(null);
   const { data: devices = NO_DEVICES } = useChildDevices(familyId, childId);
   const hasDevices = devices.length > 0;
-  const revoke = useRevokeDevice(familyId ?? '', childId);
+  const revoke = useRevokeDevice(familyId ?? '');
   const showingDevices = expanded && panel === 'list';
   const members = useFamilyMembers(
     showingDevices && hasDevices ? familyId : null,
@@ -67,6 +68,13 @@ export function ChildDevices({
   const updateSettings = useUpdateMemberMapSettings();
   const busy = revoke.isPending || updateSettings.isPending;
   const trackedDeviceId = settings.data?.trackedDeviceId;
+  if (
+    deviceToRemove &&
+    (!showingDevices ||
+      !devices.some((device) => device.id === deviceToRemove.id))
+  ) {
+    setDeviceToRemove(null);
+  }
 
   const select = (device: Device) => {
     if (!familyId || busy || device.id === trackedDeviceId) return;
@@ -86,25 +94,14 @@ export function ChildDevices({
     );
   };
 
-  // Корзина: устройство отключается — на нём ребёнок выйдет.
-  const remove = (device: Device) => {
-    Alert.alert(
-      t('devices.removeConfirmTitle', { name: device.name }),
-      t('devices.removeConfirmMessage'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('devices.removeAction'),
-          style: 'destructive',
-          onPress: () =>
-            revoke.mutate(device.id, {
-              onSuccess: () =>
-                showToast(t('devices.removed', { name: device.name })),
-              onError: () => showToast(t('devices.removeFailed'), 'error'),
-            }),
-        },
-      ],
-    );
+  const remove = () => {
+    if (!familyId || !deviceToRemove || busy) return;
+    const { id, name } = deviceToRemove;
+    setDeviceToRemove(null);
+    revoke.mutate(id, {
+      onSuccess: () => showToast(t('devices.removed', { name })),
+      onError: () => showToast(t('devices.removeFailed'), 'error'),
+    });
   };
 
   // Каждое открытие явно выбирает, что показать: блок мог свернуться
@@ -205,7 +202,7 @@ export function ChildDevices({
                   (members.isFetching && !userId) ||
                   (settings.isFetching && !settings.data)
                 }
-                onRemove={() => remove(device)}
+                onRemove={() => setDeviceToRemove(device)}
               />
             ))}
             <Pressable
@@ -224,6 +221,34 @@ export function ChildDevices({
           </>
         )}
       </View>
+      <BottomSheet
+        visible={deviceToRemove !== null}
+        onClose={() => setDeviceToRemove(null)}
+      >
+        <View style={styles.removeConfirmation}>
+          <Text style={styles.removeTitle}>
+            {t('devices.removeConfirmTitle', {
+              name: deviceToRemove?.name ?? '',
+            })}
+          </Text>
+          <Text style={styles.removeMessage}>
+            {t('devices.removeConfirmMessage')}
+          </Text>
+          <View style={styles.removeActions}>
+            <PillButton
+              label={t('devices.removeAction')}
+              variant="danger"
+              disabled={busy || !familyId || !deviceToRemove}
+              onPress={remove}
+            />
+            <PillButton
+              label={t('common.cancel')}
+              variant="ghost"
+              onPress={() => setDeviceToRemove(null)}
+            />
+          </View>
+        </View>
+      </BottomSheet>
     </View>
   );
 }

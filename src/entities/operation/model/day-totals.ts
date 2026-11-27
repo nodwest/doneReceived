@@ -1,4 +1,4 @@
-import { addDays, startOfDay } from '@shared/lib';
+import { startOfDay } from '@shared/lib';
 import type { Operation } from './operation';
 
 /** Итоги одного дня для графика и сводки. */
@@ -9,30 +9,6 @@ export interface DayTotals {
   missed: number;
 }
 
-/**
- * Дни истории: от самой ранней операции до сегодняшнего дня включительно.
- * Будущих дней нет — сегодня всегда последний.
- */
-export function getHistoryDays(operations: Operation[], today: Date): Date[] {
-  const last = startOfDay(today);
-  const earliest = addDays(last, -364);
-  const first = operations.reduce((min, operation) => {
-    const day = startOfDay(new Date(operation.at));
-    if (!Number.isFinite(day.getTime())) return min;
-    return day < min ? day : min;
-  }, last);
-
-  const days: Date[] = [];
-  for (
-    let day = first < earliest ? earliest : first;
-    day <= last;
-    day = addDays(day, 1)
-  ) {
-    days.push(day);
-  }
-  return days;
-}
-
 /** Суммы earned и missed по всем операциям. */
 export function sumTotals(operations: Operation[]) {
   const totals = { earned: 0, missed: 0 };
@@ -41,10 +17,6 @@ export function sumTotals(operations: Operation[]) {
   }
   return totals;
 }
-
-/** Операции начиная с полуночи дня `from` (включительно). */
-export const operationsSince = (operations: Operation[], from: Date) =>
-  operations.filter((operation) => new Date(operation.at) >= from);
 
 /** Последние начисленные награды; история уже отсортирована: сначала новые. */
 export const latestRewards = (operations: Operation[], count: number) =>

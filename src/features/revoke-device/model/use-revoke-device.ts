@@ -6,7 +6,7 @@ import { syncData } from '@shared/api';
  * Отключить устройство ребёнка: сервер отзывает его сессии, список
  * устройств этого ребёнка перечитывается.
  */
-export function useRevokeDevice(familyId: string, childId: string) {
+export function useRevokeDevice(familyId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (deviceId: string) => revokeDevice(familyId, deviceId),

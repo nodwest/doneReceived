@@ -44,6 +44,8 @@ type SnapCarouselProps<T> = {
    * не влезло, прокручивается внутри карточки (экраны карточек заданий).
    */
   fill?: boolean;
+  /** Карточки разной высоты в вертикальной прокрутке. */
+  fitCards?: boolean;
 };
 
 /**
@@ -60,6 +62,7 @@ export function SnapCarousel<T>({
   peek = PEEK,
   gutter = GUTTER,
   fill,
+  fitCards,
 }: SnapCarouselProps<T>) {
   // Свободная высота под карточки и точки (только с fill).
   const [rootHeight, setRootHeight] = useState(0);
@@ -88,11 +91,14 @@ export function SnapCarousel<T>({
   });
   // Самая высокая лента, какую видели: рисуются только соседние карточки, и без
   // этого лента садилась бы, когда высокая карточка уходит из отрисовки.
-  const [tallest, setTallest] = useState({ items, height: 0 });
-  const minHeight = tallest.items === items ? tallest.height : 0;
+  const [tallest, setTallest] = useState<{
+    items: readonly T[];
+    height: number;
+  } | null>(null);
+  const minHeight = tallest?.items === items ? tallest.height : 0;
   const onTrackSizeChange = (contentWidth: number, contentHeight: number) => {
     onContentSizeChange(contentWidth);
-    if (!fill && contentHeight > minHeight) {
+    if (!fill && !fitCards && contentHeight > minHeight) {
       setTallest({ items, height: contentHeight });
     }
   };
@@ -103,7 +109,7 @@ export function SnapCarousel<T>({
   const measured = !fill || rootHeight > 0;
   return (
     <View
-      style={fill ? styles.rootFill : styles.root}
+      style={fill ? styles.rootFill : !fitCards && styles.root}
       onLayout={
         fill
           ? (event) => {
@@ -130,6 +136,7 @@ export function SnapCarousel<T>({
         // Первый кадр до замера ширины рисовал бы карточки не того размера.
         style={[
           styles.scroll,
+          fitCards && styles.fitScroll,
           { marginHorizontal: -gutter },
           fill && {
             flexGrow: 0,
@@ -141,7 +148,7 @@ export function SnapCarousel<T>({
           styles.track,
           { gap, paddingHorizontal: gutter },
           !single && { paddingRight: trackPaddingRight },
-          { minHeight },
+          fitCards ? styles.fitTrack : { minHeight },
         ]}
       >
         {items.map((item, i) => {
@@ -171,7 +178,7 @@ export function SnapCarousel<T>({
   );
 }
 
-const styles = createStyles((colors) => ({
+const styles = createStyles(() => ({
   // Лента растягивается на всю свободную высоту, карточки — вслед за ней.
   root: {
     flexGrow: 1,
@@ -192,6 +199,8 @@ const styles = createStyles((colors) => ({
     paddingTop: SHADOW_TOP,
     paddingBottom: SHADOW_BOTTOM,
   },
+  fitScroll: { flexGrow: 0 },
+  fitTrack: { alignItems: 'flex-start' },
   hidden: {
     opacity: 0,
   },
