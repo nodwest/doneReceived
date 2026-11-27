@@ -19,6 +19,14 @@ export default defineConfig([
     },
   },
   {
+    // Тесты подменяют публичный API сущности (`vi.mock('@entities/x')`) её
+    // чистой моделью: барабан слайса тянет экраны и нативные модули.
+    files: ['./src/**/*.test.ts'],
+    rules: {
+      'fsd/no-public-api-sidestep': 'off',
+    },
+  },
+  {
     // Общепринятые сегменты слоя app
     files: ['./src/app/providers/**', './src/app/styles/**'],
     rules: {

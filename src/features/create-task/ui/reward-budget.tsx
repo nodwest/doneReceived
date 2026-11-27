@@ -8,6 +8,7 @@ import {
 import { useTranslation } from '@shared/i18n';
 import { theme } from '@shared/theme';
 import { Icon } from '@shared/ui';
+import { getRewardBudget } from '../model/reward-budget';
 import { styles } from './reward-budget.styled';
 
 type RewardBudgetProps = {
@@ -29,10 +30,7 @@ type RewardBudgetProps = {
 export function RewardBudget({ funds, amount, onDeposit }: RewardBudgetProps) {
   const { t } = useTranslation();
   const { total, reserved, available } = funds;
-  const over = amount > available;
-  const left = available - amount;
-  const short = amount - available;
-  const scale = over ? reserved + amount : total;
+  const { over, left, short, scale } = getRewardBudget(funds, amount);
 
   return (
     <View style={[styles.card, over && styles.cardOver]}>

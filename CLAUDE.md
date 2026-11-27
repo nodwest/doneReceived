@@ -28,7 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Команды
 
-Тесты — Vitest (`npm test`, файлы `src/**/*.test.ts`, среда node — только чистая логика без React Native). Менеджер пакетов — npm, единственный lock-файл — `package-lock.json` (`yarn.lock` и `.yarnrc.yml` удалены по решению команды). Зависимости ставим через `npm ci` / `npx expo install <пакет>`; yarn не используем и второй lock-файл не создаём.
+Тесты — Vitest (`npm test`, файлы `src/**/*.test.ts` рядом с кодом, среда node — только чистая логика без React Native). Алиасы — из tsconfig; `vitest.setup.ts` подменяет MMKV и `expo-localization`, поэтому `@shared/i18n` и даты работают (язык — английский). Барабан слайса, который тянет экраны, тест подменяет его чистой моделью: `vi.mock('@shared/lib', () => import('../../../shared/lib/date'))` (Steiger это в тестах разрешает). Логику, которую нужно проверить, выносим из компонента в `model` (как `getRewardBudget`). Менеджер пакетов — npm, единственный lock-файл — `package-lock.json` (`yarn.lock` и `.yarnrc.yml` удалены по решению команды). Зависимости ставим через `npm ci` / `npx expo install <пакет>`; yarn не используем и второй lock-файл не создаём.
 
 - `npm start` (`expo start`) — dev-сервер. Проект использует `expo-dev-client`, поэтому для нативного запуска нужен dev-билд, Expo Go не подойдёт (нативные модули: MapLibre, Reanimated 4, MMKV, secure-store).
 - `npm run web` / `npm run ios` / `npm run android` — `ios` и `android` вызывают `expo run:*` и при первом запуске генерируют папки `ios/` и `android/`.

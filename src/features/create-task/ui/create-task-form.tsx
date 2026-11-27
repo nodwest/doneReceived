@@ -3,11 +3,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChildChip, type ChipChild } from '@entities/user';
 import type { UpdateTaskPayload } from '@entities/task';
-import {
-  formatMoney,
-  getParentFunds,
-  type ParentFunds,
-} from '@entities/wallet';
+import { formatMoney, type ParentFunds } from '@entities/wallet';
 import { isApiError } from '@shared/api';
 import { useTranslation } from '@shared/i18n';
 import { keepInViewScrollStyle, showToast, useKeepInView } from '@shared/lib';
@@ -18,6 +14,7 @@ import {
   useCreateTaskStore,
 } from '../model/create-task-store';
 import { isDeadlineValid } from '../model/deadline';
+import { fundsForTask, getRewardBudget } from '../model/reward-budget';
 import { useCreateTask } from '../model/use-create-task';
 import { useUpdateTask } from '../model/use-update-task';
 import { ChecklistField } from './checklist-field';
@@ -91,14 +88,11 @@ export function CreateTaskForm({
     return reset;
   }, [initialTask, fill, reset]);
 
-  // Награда задания с сервера уже в резерве: при правке на новую сумму
-  // доступно свободное плюс она. Моковые задания ничего не резервируют.
+  // Награда задания с сервера уже в резерве: при правке она снова доступна.
   const ownReserve = initialTask?.serverTaskId ? initialTask.reward : 0;
-  const budget = funds
-    ? getParentFunds(funds.total, funds.reserved - ownReserve)
-    : null;
+  const budget = funds ? fundsForTask(funds, ownReserve) : null;
   const amount = Number(reward) || 0;
-  const short = budget ? amount - budget.available : 0;
+  const short = budget ? getRewardBudget(budget, amount).short : 0;
   const notEnough = short > 0;
 
   const canSubmit =
