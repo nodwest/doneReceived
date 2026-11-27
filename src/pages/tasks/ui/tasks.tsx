@@ -11,16 +11,17 @@ import { ChildWordsTaskRow } from '@features/english-words';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
 import { TaskList } from '@widgets/task-list';
+import { TasksHeader, type TasksTab } from '@widgets/tasks-header';
 import {
-  TasksHeader,
-  type TasksTab,
-  type TasksView,
-} from '@widgets/tasks-header';
-import { useFamilyTasks, useTaskFamilyId } from '@features/family-tasks';
+  useFamilyTasks,
+  useTaskCards,
+  useTaskFamilyId,
+} from '@features/family-tasks';
 import { useFamilyChildren, useFamilyMembers } from '@entities/family';
 import {
   filterTasks,
   isWordsTask,
+  taskAuthor,
   TaskCard,
   TaskRow,
   type Task,
@@ -35,15 +36,6 @@ import { ViewOnlyNote } from './view-only-note';
 import { authorizedImage } from '@shared/api';
 
 const NO_TASKS: Task[] = [];
-
-/**
- * Автор задания для шапки плитки: имя и фото из участников семьи (без фото —
- * буква), не знаем — просто «Родитель».
- */
-const authorOf = (task: Task, parentLabel: string) => ({
-  name: task.authorName ?? parentLabel,
-  avatar: task.authorAvatar ?? null,
-});
 
 /**
  * Чей список: all — вкладка Tasks, задачи всех детей; child — задачи ребёнка
@@ -121,12 +113,6 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
   const [tab, setTab] = useState<TasksTab>(
     initialTab === 'review' ? 'review' : 'all',
   );
-  // Экран открывается списком; карточки — по кнопке вида или тапу по задаче.
-  const [view, setView] = useState<TasksView>('list');
-  // У каждой вкладки своя карточка: возвращаясь тоглом, видим ту, с которой ушли.
-  const [currentIds, setCurrentIds] = useState<Record<TasksTab, string | null>>(
-    { all: null, review: null },
-  );
 
   const tasks = tab === 'review' ? reviewTasks : allTasks;
   // Слова дня проверяются на вкладке Languages: в карточках их нет.
@@ -154,14 +140,14 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
     }
     return [...seen.values()];
   }, [tasks, scope, serverChildren]);
-  const currentId = currentIds[tab];
-  const setCurrentId = (id: string) =>
-    setCurrentIds((prev) => ({ ...prev, [tab]: id }));
-  const currentIndex = Math.max(
-    cardTasks.findIndex((task) => task.id === currentId),
-    0,
+  // Лента карточек и запомненная карточка каждой вкладки — общая логика.
+  const { setView, cards, currentIndex, setCurrentId, openCard } = useTaskCards(
+    {
+      cardTasks,
+      tab,
+      initialTab: initialTab === 'review' ? 'review' : 'all',
+    },
   );
-  const cards = view === 'cards' && cardTasks.length > 0;
 
   if (scope !== 'all' && !owner) {
     // Дети с сервера ещё грузятся — ждём, а не уводим на главную.
@@ -294,17 +280,14 @@ export function TasksPage({ scope = 'all' }: { scope?: TasksScope }) {
                   {cardTasks.length > 0 && (
                     <TaskList
                       tasks={cardTasks}
-                      onSelect={(task) => {
-                        setCurrentId(task.id);
-                        setView('cards');
-                      }}
+                      onSelect={openCard}
                       // Задания одного ребёнка: в шапке плитки — от кого они.
                       renderTask={
                         scope === 'child'
                           ? (task) => (
                               <TaskRow
                                 task={task}
-                                author={authorOf(task, t('member.parent'))}
+                                author={taskAuthor(task, t('member.parent'))}
                                 onPress={() => {
                                   setCurrentId(task.id);
                                   setView('cards');

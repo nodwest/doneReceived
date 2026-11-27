@@ -14,15 +14,12 @@ import {
 } from '@features/complete-task';
 import { BottomNav } from '@widgets/bottom-nav';
 import { TaskCarousel } from '@widgets/task-carousel';
-import {
-  TasksHeader,
-  type TasksTab,
-  type TasksView,
-} from '@widgets/tasks-header';
+import { TasksHeader, type TasksTab } from '@widgets/tasks-header';
 import {
   useChildTasks,
   useMyChildBalance,
   useMyWishlistOwner,
+  useTaskCards,
 } from '@features/family-tasks';
 import {
   ChildReviewRow,
@@ -30,6 +27,7 @@ import {
   ChildTaskTile,
   isWordsTask,
   sortTasksByUrgency,
+  taskAuthor,
   type Task,
 } from '@entities/task';
 import { useWishlistProgress } from '@entities/wish';
@@ -42,15 +40,6 @@ import { SectionHead } from './section-head';
 import { CARDS_PADDING_BOTTOM, styles } from './my-tasks.styled';
 
 const NO_TASKS: Task[] = [];
-
-/**
- * Кто дал задание: имя и фото из участников семьи (без фото — буква), не
- * знаем — просто «Родитель».
- */
-const authorOf = (task: Task, parentLabel: string) => ({
-  name: task.authorName ?? parentLabel,
-  avatar: task.authorAvatar ?? null,
-});
 
 /**
  * Карточка ребёнка с полем комментария: черновик живёт в сторе, чтобы его
@@ -100,20 +89,8 @@ export function MyTasksPage() {
   const { bottom } = useSafeAreaInsets();
   const gutter = useIsCompact() ? 16 : 24;
   const initialTaskId = params.task ?? null;
-  const [tab, setTab] = useState<TasksTab>(
-    params.tab === 'review' ? 'review' : 'all',
-  );
-  // С главной по заданию — сразу его карточка, иначе список.
-  const [view, setView] = useState<TasksView>(
-    initialTaskId === null ? 'list' : 'cards',
-  );
-  // У каждой вкладки своя карточка: возвращаясь тоглом, видим ту, с которой ушли.
-  const [currentIds, setCurrentIds] = useState<Record<TasksTab, string | null>>(
-    {
-      all: params.tab === 'review' ? null : initialTaskId,
-      review: params.tab === 'review' ? initialTaskId : null,
-    },
-  );
+  const initialTab: TasksTab = params.tab === 'review' ? 'review' : 'all';
+  const [tab, setTab] = useState<TasksTab>(initialTab);
 
   const tasks = tab === 'review' ? reviewTasks : allTasks;
   // Слова дня учат на вкладке Languages: в карточках их нет.
@@ -121,24 +98,15 @@ export function MyTasksPage() {
     () => tasks.filter((task) => !isWordsTask(task)),
     [tasks],
   );
-  const currentId = currentIds[tab];
-  const setCurrentId = (id: string) =>
-    setCurrentIds((prev) => ({ ...prev, [tab]: id }));
-  const currentIndex = Math.max(
-    cardTasks.findIndex((task) => task.id === currentId),
-    0,
-  );
-  const cards = view === 'cards' && cardTasks.length > 0;
+  // С главной по заданию — сразу его карточка, иначе список; у каждой вкладки
+  // своя запомненная карточка — общая логика с экраном родителя.
+  const { view, setView, cards, currentIndex, setCurrentId, openCard } =
+    useTaskCards({ cardTasks, tab, initialTaskId, initialTab });
   // Список уже был на экране: назад из карточек ведёт к нему. Открыли сразу
   // карточку (с главной) — назад туда, откуда пришли.
   const [listSeen, setListSeen] = useState(initialTaskId === null);
   if (view === 'list' && !listSeen) setListSeen(true);
   const earn = activeTasks.reduce((sum, task) => sum + task.reward, 0);
-
-  const openCard = (task: Task) => {
-    setCurrentId(task.id);
-    setView('cards');
-  };
 
   /** Слова дня — строкой, которая ведёт на вкладку Languages. */
   const wordsRow = (task: Task) => (
@@ -172,7 +140,7 @@ export function MyTasksPage() {
           <ChildReviewRow
             key={task.id}
             task={task}
-            author={authorOf(task, t('member.parent'))}
+            author={taskAuthor(task, t('member.parent'))}
             onPress={openCard}
           />
         ),
@@ -220,7 +188,7 @@ export function MyTasksPage() {
               renderTask={(task, style) => (
                 <MyTaskCard
                   task={task}
-                  author={authorOf(task, t('member.parent'))}
+                  author={taskAuthor(task, t('member.parent'))}
                   onToggleStep={(item) => toggleStep(task, item)}
                   footer={<TaskFooterAction task={task} />}
                   style={style}
@@ -278,7 +246,7 @@ export function MyTasksPage() {
                           <ChildTaskTile
                             key={task.id}
                             task={task}
-                            author={authorOf(task, t('member.parent'))}
+                            author={taskAuthor(task, t('member.parent'))}
                             onPress={openCard}
                             action={<DoneButton task={task} />}
                           />
