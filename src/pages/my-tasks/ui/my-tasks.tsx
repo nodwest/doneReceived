@@ -134,7 +134,6 @@ export function MyTasksPage() {
   const [listSeen, setListSeen] = useState(initialTaskId === null);
   if (view === 'list' && !listSeen) setListSeen(true);
   const earn = activeTasks.reduce((sum, task) => sum + task.reward, 0);
-  const allTab = tab === 'all';
 
   const openCard = (task: Task) => {
     setCurrentId(task.id);
@@ -231,109 +230,66 @@ export function MyTasksPage() {
           </View>
         ) : (
           <>
-            <View style={styles.scrollArea}>
-              <ScrollView
-                bounces={false}
-                overScrollMode="never"
-                style={styles.scroll}
-                contentContainerStyle={styles.body}
-                showsVerticalScrollIndicator={false}
-                // На вкладке проверки список закрыт непрозрачной панелью: он
-                // остаётся на месте, но не ловит тапы и не читается скринридером,
-                // пока его не видно.
-                pointerEvents={allTab ? 'auto' : 'none'}
-                accessibilityElementsHidden={!allTab}
-                importantForAccessibility={
-                  allTab ? 'auto' : 'no-hide-descendants'
-                }
-              >
-                {isPending ? (
-                  <ActivityIndicator
-                    style={styles.loading}
-                    color={theme.colors.blueInk}
-                  />
-                ) : (
-                  <>
-                    {/*
-                     * Вкладка All смонтирована и сверстана всегда: переключение
-                     * вкладок больше не пересоздаёт карточку «You can earn»,
-                     * заголовок раздела и плитки. Раньше новая вкладка строила
-                     * своё дерево с нуля, и это давало самые длинные кадры.
-                     */}
-                    {allTasks.length === 0 ? (
-                      <Text style={styles.empty}>{t('tasks.emptyAll')}</Text>
-                    ) : (
-                      <>
-                        {earn > 0 && (
-                          <EarnGoalCard
-                            earn={earn}
-                            count={activeTasks.length}
-                            goal={
-                              currentWish && {
-                                title: currentWish.wish.title,
-                                saved: currentWish.saved,
-                                price: currentWish.wish.price,
-                              }
-                            }
+            <ScrollView
+              bounces={false}
+              overScrollMode="never"
+              style={styles.scroll}
+              contentContainerStyle={styles.body}
+              showsVerticalScrollIndicator={false}
+            >
+              {isPending ? (
+                <ActivityIndicator
+                  style={styles.loading}
+                  color={theme.colors.blueInk}
+                />
+              ) : tasks.length === 0 ? (
+                <Text style={styles.empty}>
+                  {tab === 'review'
+                    ? t('tasks.emptyReview')
+                    : t('tasks.emptyAll')}
+                </Text>
+              ) : (
+                <>
+                  {tab === 'all' && earn > 0 && (
+                    <EarnGoalCard
+                      earn={earn}
+                      count={activeTasks.length}
+                      goal={
+                        currentWish && {
+                          title: currentWish.wish.title,
+                          saved: currentWish.saved,
+                          price: currentWish.wish.price,
+                        }
+                      }
+                    />
+                  )}
+                  {tab === 'all' && activeTasks.length > 0 && (
+                    <View style={styles.section}>
+                      <SectionHead
+                        tone="child"
+                        title={t('myTasks.toDo')}
+                        count={activeTasks.length}
+                        hint={t('myTasks.soonestFirst')}
+                      />
+                      {activeTasks.map((task) =>
+                        isWordsTask(task) ? (
+                          wordsRow(task)
+                        ) : (
+                          <ChildTaskTile
+                            key={task.id}
+                            task={task}
+                            author={authorOf(task, t('member.parent'))}
+                            onPress={openCard}
+                            action={<DoneButton task={task} />}
                           />
-                        )}
-                        {activeTasks.length > 0 && (
-                          <View style={styles.section}>
-                            <SectionHead
-                              tone="child"
-                              title={t('myTasks.toDo')}
-                              count={activeTasks.length}
-                              hint={t('myTasks.soonestFirst')}
-                            />
-                            {activeTasks.map((task) =>
-                              isWordsTask(task) ? (
-                                wordsRow(task)
-                              ) : (
-                                <ChildTaskTile
-                                  key={task.id}
-                                  task={task}
-                                  author={authorOf(task, t('member.parent'))}
-                                  onPress={openCard}
-                                  action={<DoneButton task={task} />}
-                                />
-                              ),
-                            )}
-                          </View>
-                        )}
-                      </>
-                    )}
-                    {/* Вкладка проверки показывает этот же раздел в панели над
-                        списком, поэтому нижняя копия не видна и не занимает
-                        места. */}
-                    {reviewSection && (
-                      <View style={!allTab && styles.hiddenTab}>
-                        {reviewSection}
-                      </View>
-                    )}
-                  </>
-                )}
-              </ScrollView>
-              {/* Вкладка проверки — непрозрачная панель над списком: верхний
-                  слой закрывает уже нарисованное содержимое, и при возврате на
-                  All его не нужно создавать и перерисовывать заново. */}
-              {!allTab && !isPending && (
-                <View style={styles.reviewOverlay}>
-                  <ScrollView
-                    bounces={false}
-                    overScrollMode="never"
-                    style={styles.scroll}
-                    contentContainerStyle={styles.body}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    {reviewTasks.length === 0 ? (
-                      <Text style={styles.empty}>{t('tasks.emptyReview')}</Text>
-                    ) : (
-                      reviewSection
-                    )}
-                  </ScrollView>
-                </View>
+                        ),
+                      )}
+                    </View>
+                  )}
+                  {reviewSection}
+                </>
               )}
-            </View>
+            </ScrollView>
             <BottomNav activeKey="tasks" />
           </>
         )}
