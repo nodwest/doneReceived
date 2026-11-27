@@ -40,10 +40,9 @@ const METERS_PER_DEGREE = 111_000;
  * точек на день может быть до 4 000.
  */
 export function prepareRoutePoints(points: HistoryPoint[]): RouteIndex {
-  const withTime = points.map((point) => ({
-    point,
-    time: Date.parse(point.recordedAt),
-  }));
+  const withTime = points
+    .map((point) => ({ point, time: Date.parse(point.recordedAt) }))
+    .filter(({ time }) => Number.isFinite(time));
   // Сервер отдаёт точки по порядку, но хронология — часть правила окна 90 с,
   // поэтому сортируем до индексации. Порядок равных моментов сохраняется.
   withTime.sort((a, b) => a.time - b.time);
@@ -61,6 +60,7 @@ export function matchTaskPoint(
   index: RouteIndex,
   at: number,
 ): HistoryPoint | null {
+  if (!Number.isFinite(at)) return null;
   // Первая точка, которая позже сдачи: смотрим назад, пока не вышли из окна.
   let low = 0;
   let high = index.times.length;

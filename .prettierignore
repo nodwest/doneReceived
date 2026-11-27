@@ -20,3 +20,6 @@ public/maplibre/
 
 # Сгенерировано openapi-typescript из openapi/calendar.json
 src/entities/family-event/api/generated/
+
+# Схема API календаря: копия с сервера, источник для openapi:types
+openapi/calendar.json

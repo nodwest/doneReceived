@@ -1,1 +1,0 @@
-export { poiLayer } from './poi';

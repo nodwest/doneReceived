@@ -25,6 +25,9 @@ const SERVER_CHANGES: Record<string, DataChange> = {
   family_changed: 'family-changed',
   profile_changed: 'profile-changed',
   email_changed: 'email-changed',
+  // Настройки или статус слов ребёнка: сменили награду, выдана порция,
+  // не хватило денег (Идеи п. 37).
+  words_changed: 'words-changed',
   calendar_changed: 'calendar-changed',
   event_created: 'calendar-changed',
   event_updated: 'calendar-changed',

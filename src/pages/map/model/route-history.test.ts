@@ -91,6 +91,13 @@ describe('prepareRoutePoints', () => {
 });
 
 describe('matchTaskPoint', () => {
+  it('ignores malformed timestamps without blocking valid points', () => {
+    const valid = point(day(10, 0));
+    const index = prepareRoutePoints([valid, point('invalid')]);
+    expect(matchTaskPoint(index, Date.parse(day(10, 0, 30)))).toBe(valid);
+    expect(matchTaskPoint(index, Number.NaN)).toBeNull();
+  });
+
   const index = prepareRoutePoints([
     point(day(10, 0)),
     point(day(10, 0, 30)),
