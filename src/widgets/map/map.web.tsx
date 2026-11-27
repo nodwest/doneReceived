@@ -1,15 +1,18 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
+import './map.web.css';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { GeoJSONSource } from 'maplibre-gl';
 import { useCurrentFamily, useFamilyMembers } from '@entities/family';
 import { useSessionFamilyId } from '@entities/session';
+import { useTheme } from '@shared/theme';
+import { useTranslation } from '@shared/i18n';
 import type { Bus, VehicleSnapshot } from '@entities/vehicle';
 import { useLocationZones } from '@entities/zone';
 import { useMap } from './model/use-map';
+import { applyMapPaint } from './model/apply-map-paint';
 import { createVehiclesLayer } from './layers/dynamic/vehicles';
 import {
   ZONE_LAYERS,
-  ZONE_LAYER_IDS,
   ZONE_SOURCE,
   zonesToGeoJson,
 } from './layers/dynamic/zones';
@@ -17,66 +20,14 @@ import {
   useFamilyLocations,
   useLiveHiddenAccess,
   useLiveLocations,
-  type LiveLocation,
 } from '@features/location';
 import { busRouteKey, BusPlayback, useBusesSocket } from '@features/buses';
 import { RoadPath } from './model/road-path';
-import {
-  defaultMapColor,
-  type MapLayerSettings,
-} from './model/layer-preferences';
+import { type MapLayerSettings } from './model/layer-preferences';
+import { collectFamilyMarkers } from './model/family-markers';
 import { UserMarker } from './ui/user-marker.web';
 import { HistoryMapLayer } from './ui/history-map.web';
 import type { HistoryMapProps } from './ui/history-map-model';
-
-type MarkerLocation = LiveLocation;
-
-/** Класс контейнера большой карты: под ним перекрашены кнопки MapLibre. */
-const MAP_CLASS = 'dr-map';
-
-const svgIcon = (path: string) =>
-  `url("data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'><path d='${path}' stroke='#1A1A2E' stroke-width='2.2' stroke-linecap='round'/></svg>`,
-  )}")`;
-
-/**
- * Кнопки масштаба как в макете: белая капсула 44 с мягкой тенью, «+» и «−»
- * цвета текста, между ними короткая черта. Стили MapLibre задаются классами
- * в DOM, поэтому правим их CSS-правилами, только внутри большой карты.
- */
-const ZOOM_CONTROL_CSS = `
-.${MAP_CLASS} .maplibregl-ctrl-top-right .maplibregl-ctrl {
-  margin: 12px 16px 0 0;
-}
-.${MAP_CLASS} .maplibregl-ctrl-group:not(:empty) {
-  border-radius: 22px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-.${MAP_CLASS} .maplibregl-ctrl-group button {
-  width: 44px;
-  height: 44px;
-}
-.${MAP_CLASS} .maplibregl-ctrl-group button + button {
-  border-top: 0;
-  background-image: linear-gradient(#ECEDF3, #ECEDF3);
-  background-size: 24px 1px;
-  background-position: center top;
-  background-repeat: no-repeat;
-}
-.${MAP_CLASS} .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
-  background-image: ${svgIcon('M10 3.64V16.36M3.64 10H16.36')};
-}
-.${MAP_CLASS} .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
-  background-image: ${svgIcon('M3.64 10H16.36')};
-}
-`;
-
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = ZOOM_CONTROL_CSS;
-  document.head.appendChild(style);
-}
 
 export function MapWeb({
   family,
@@ -88,6 +39,8 @@ export function MapWeb({
   pinnedRoutes,
   history,
 }: MapLayerSettings & { history?: HistoryMapProps }) {
+  const { mode, colors } = useTheme();
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { mapRef, deckOverlayRef, map } = useMap(containerRef);
@@ -104,15 +57,6 @@ export function MapWeb({
   const { data: savedLocations = [] } = useFamilyLocations(familyId);
   const { data: zones = [] } = useLocationZones(familyId);
 
-  const childMembers = useMemo(
-    () => members.filter((member) => member.kind === 'child' && member.childId),
-    [members],
-  );
-  const peopleById = useMemo(
-    () =>
-      new Map(childMembers.map((member) => [member.userId, member] as const)),
-    [childMembers],
-  );
   const zoneNames = useMemo(
     () => new Map(zones.map((zone) => [zone.id, zone.name] as const)),
     [zones],
@@ -122,44 +66,29 @@ export function MapWeb({
   const hiddenRoutesRef = useRef(hiddenRoutes);
   const pinnedRoutesRef = useRef(pinnedRoutes);
 
-  const markers = useMemo(() => {
-    const points = new Map<string, MarkerLocation>();
-    for (const location of savedLocations) {
-      if (!location.childId) continue;
-      points.set(location.userId, {
-        userId: location.userId,
-        childId: location.childId,
-        lat: location.lat,
-        lng: location.lng,
-        zoneId: location.zoneId,
-        deviceId: location.deviceId,
-        deviceLabel: location.deviceLabel || 'Устройство',
-        updatedAt: location.recordedAt ?? location.updatedAt,
-      });
-    }
-    for (const [userId, location] of Object.entries(liveLocations)) {
-      if (!location.childId) continue;
-      const previous = points.get(userId);
-      const measuredAt = location.recordedAt ?? location.updatedAt;
-      if (
-        previous?.updatedAt &&
-        (!measuredAt ||
-          Date.parse(measuredAt) <= Date.parse(previous.updatedAt))
-      )
-        continue;
-      points.set(userId, {
-        ...location,
-        userId,
-        updatedAt: measuredAt,
-      });
-    }
-    return [...points.values()].filter(
-      (location) =>
-        !hiddenChildren.includes(location.userId) &&
-        !hiddenAccess[location.userId] &&
-        peopleById.has(location.userId),
-    );
-  }, [hiddenAccess, hiddenChildren, liveLocations, peopleById, savedLocations]);
+  // Общий с нативом набор меток: свежесть точки, правила видимости и имя
+  // устройства по умолчанию больше не расходятся между платформами.
+  const markers = useMemo(
+    () =>
+      collectFamilyMarkers({
+        family,
+        members,
+        saved: savedLocations,
+        live: liveLocations,
+        hiddenChildren,
+        hiddenAccess,
+        deviceFallback: t('map.deviceFallback'),
+      }),
+    [
+      family,
+      hiddenAccess,
+      hiddenChildren,
+      liveLocations,
+      members,
+      savedLocations,
+      t,
+    ],
+  );
 
   const handleVehicles = useCallback(
     (vehicles: Bus[], serverTime?: number, history?: VehicleSnapshot[]) => {
@@ -294,96 +223,70 @@ export function MapWeb({
     if (!map) return;
 
     const applyZones = () => {
-      if (!map.isStyleLoaded()) return;
-
       const data = zonesToGeoJson(zones, hiddenZones);
-      const source = map.getSource(ZONE_SOURCE);
-      if (source && source.type === 'geojson') {
-        (source as GeoJSONSource).setData(data);
-      } else {
-        map.addSource(ZONE_SOURCE, { type: 'geojson', data });
-      }
+      const source = map.getSource<GeoJSONSource>(ZONE_SOURCE);
+      if (source) source.setData(data);
+      else map.addSource(ZONE_SOURCE, { type: 'geojson', data });
 
-      // Зоны под точками детей, но над подложкой карты.
-      for (const layer of ZONE_LAYERS) {
-        if (map.getLayer(layer.id)) continue;
-        map.addLayer(layer);
-        // Слой добавили уже после переключения «Областей»: применяем
-        // текущую видимость сразу, иначе он мигнёт поверх выключенного слоя.
-        map.setLayoutProperty(
-          layer.id,
-          'visibility',
-          areas ? 'visible' : 'none',
-        );
+      const visibility = areas ? 'visible' : 'none';
+      for (const layer of ZONE_LAYERS[mode]) {
+        if (!map.getLayer(layer.id)) {
+          map.addLayer({
+            ...layer,
+            layout: { ...('layout' in layer ? layer.layout : {}), visibility },
+          });
+          continue;
+        }
+        map.setLayoutProperty(layer.id, 'visibility', visibility);
+        applyMapPaint(map, layer.id, layer.paint);
       }
     };
 
-    applyZones();
-    map.on('load', applyZones);
-    map.on('styledata', applyZones);
+    if (map.getStyle()?.layers.length) applyZones();
+    else map.once('load', applyZones);
     return () => {
       map.off('load', applyZones);
-      map.off('styledata', applyZones);
     };
-  }, [areas, hiddenZones, mapRef, zones]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    const applyVisibility = () => {
-      const areasVisibility = areas ? 'visible' : 'none';
-      for (const layerId of ZONE_LAYER_IDS) {
-        if (map.getLayer(layerId))
-          map.setLayoutProperty(layerId, 'visibility', areasVisibility);
-      }
-    };
-
-    applyVisibility();
-    map.on('load', applyVisibility);
-    map.on('styledata', applyVisibility);
-    return () => {
-      map.off('load', applyVisibility);
-      map.off('styledata', applyVisibility);
-    };
-  }, [areas, mapRef]);
+  }, [areas, hiddenZones, mapRef, mode, zones]);
 
   useBusesSocket(handleVehicles);
 
   return (
     <div
       ref={containerRef}
-      className={MAP_CLASS}
+      className="dr-map"
       style={{
         width: '100%',
         height: '100%',
+        color: colors.ink,
+        ...{
+          '--map-surface': colors.surface,
+          '--map-line': colors.line,
+        },
       }}
     >
       {map && history && <HistoryMapLayer {...history} map={map} />}
       {map && family
-        ? markers.map((location) => {
-            const member = peopleById.get(location.userId)!;
-            return (
-              <UserMarker
-                key={location.userId}
-                map={map}
-                user={{
-                  id: location.userId,
-                  lat: location.lat,
-                  lng: location.lng,
-                  name: member.displayName,
-                  avatarUrl: member.avatarUrl,
-                  color: member.mapColor ?? defaultMapColor(member.kind),
-                  inZone: !!location.zoneId,
-                  zoneName: location.zoneId
-                    ? (zoneNames.get(location.zoneId) ?? null)
-                    : null,
-                  deviceLabel: location.deviceLabel,
-                  updatedAt: location.updatedAt,
-                }}
-              />
-            );
-          })
+        ? markers.map((marker) => (
+            <UserMarker
+              key={marker.userId}
+              map={map}
+              user={{
+                id: marker.userId,
+                lat: marker.lat,
+                lng: marker.lng,
+                name: marker.name,
+                avatarUrl: marker.avatarUrl,
+                color: marker.color,
+                inZone: !!marker.zoneId,
+                zoneName: marker.zoneId
+                  ? (zoneNames.get(marker.zoneId) ?? null)
+                  : null,
+                deviceLabel: marker.deviceLabel,
+                updatedAt: marker.updatedAt,
+              }}
+            />
+          ))
         : null}
     </div>
   );

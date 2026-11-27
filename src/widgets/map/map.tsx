@@ -8,7 +8,6 @@ import {
   Map as MapView,
   Marker,
   type CameraRef,
-  type StyleSpecification,
 } from '@maplibre/maplibre-react-native';
 
 import { useCurrentFamily, useFamilyMembers } from '@entities/family';
@@ -26,30 +25,18 @@ import { useTranslation } from '@shared/i18n';
 import { formatTimeAgo, useNow } from '@shared/lib';
 import { createStyles, theme, tracking } from '@shared/theme';
 import { LetterAvatar } from '@shared/ui';
-import { MAP_STYLE } from './config/map-style';
+import { useNativeMapStyle } from './model/use-native-map-style';
+import { type MapLayerSettings } from './model/layer-preferences';
+import { collectFamilyMarkers } from './model/family-markers';
 import {
-  defaultMapColor,
-  type MapLayerSettings,
-} from './model/layer-preferences';
-import { zonesToGeoJson } from './layers/dynamic/zones';
+  ZONE_LAYERS,
+  ZONE_SOURCE,
+  zonesToGeoJson,
+} from './layers/dynamic/zones';
 import { HistoryMapLayer } from './ui/history-map';
 import type { HistoryMapProps } from './ui/history-map-model';
 
-type FamilyMarker = {
-  userId: string;
-  childId: string;
-  lat: number;
-  lng: number;
-  zoneId: string | null;
-  deviceLabel: string;
-  updatedAt?: string;
-  name: string;
-  avatarUrl: string | null;
-  color: string;
-};
-
 const MAP_CENTER: [number, number] = [39.7152, 47.23325];
-const MAP_STYLE_JSON = MAP_STYLE as unknown as StyleSpecification;
 const MAP_IMAGES = { bus: require('../../../assets/bus-icon.png') };
 
 /**
@@ -67,6 +54,7 @@ export function MapWeb({
   pinnedRoutes,
   history,
 }: MapLayerSettings & { history?: HistoryMapProps }) {
+  const { mode, mapStyle } = useNativeMapStyle();
   const { t } = useTranslation();
   const now = useNow(60_000);
   const cameraRef = useRef<CameraRef>(null);
@@ -85,76 +73,34 @@ export function MapWeb({
   const liveLocations = useLiveLocations();
   const hiddenAccess = useLiveHiddenAccess();
 
-  const childMembers = useMemo(
-    () => members.filter((member) => member.kind === 'child' && member.childId),
-    [members],
-  );
-  const peopleById = useMemo(
-    () => new Map(childMembers.map((member) => [member.userId, member])),
-    [childMembers],
-  );
   const zoneNames = useMemo(
     () => new Map(zones.map((zone) => [zone.id, zone.name] as const)),
     [zones],
   );
 
-  const markers = useMemo(() => {
-    const points = new Map<string, FamilyMarker>();
-    for (const location of savedLocations) {
-      const member = peopleById.get(location.userId);
-      if (!member?.childId || !location.childId) continue;
-      points.set(location.userId, {
-        userId: location.userId,
-        childId: member.childId,
-        lat: location.lat,
-        lng: location.lng,
-        zoneId: location.zoneId,
-        deviceLabel: location.deviceLabel || t('map.deviceFallback'),
-        updatedAt: location.recordedAt ?? location.updatedAt,
-        name: member.displayName,
-        avatarUrl: member.avatarUrl,
-        color: member.mapColor ?? defaultMapColor('child'),
-      });
-    }
-    for (const [userId, location] of Object.entries(liveLocations)) {
-      const member = peopleById.get(userId);
-      if (!member?.childId || !location.childId) continue;
-      const previous = points.get(userId);
-      const measuredAt = location.recordedAt ?? location.updatedAt;
-      if (
-        previous?.updatedAt &&
-        (!measuredAt ||
-          Date.parse(measuredAt) <= Date.parse(previous.updatedAt))
-      )
-        continue;
-      points.set(userId, {
-        userId,
-        childId: member.childId,
-        lat: location.lat,
-        lng: location.lng,
-        zoneId: location.zoneId,
-        deviceLabel: location.deviceLabel || t('map.deviceFallback'),
-        updatedAt: measuredAt,
-        name: member.displayName,
-        avatarUrl: member.avatarUrl,
-        color: member.mapColor ?? defaultMapColor('child'),
-      });
-    }
-    return [...points.values()].filter(
-      (location) =>
-        family &&
-        !hiddenChildren.includes(location.userId) &&
-        !hiddenAccess[location.userId],
-    );
-  }, [
-    family,
-    hiddenAccess,
-    hiddenChildren,
-    liveLocations,
-    peopleById,
-    savedLocations,
-    t,
-  ]);
+  // Метки собираются общим для веба и натива кодом: свежесть точки, правила
+  // видимости и имя устройства по умолчанию живут в одном месте.
+  const markers = useMemo(
+    () =>
+      collectFamilyMarkers({
+        family,
+        members,
+        saved: savedLocations,
+        live: liveLocations,
+        hiddenChildren,
+        hiddenAccess,
+        deviceFallback: t('map.deviceFallback'),
+      }),
+    [
+      family,
+      hiddenAccess,
+      hiddenChildren,
+      liveLocations,
+      members,
+      savedLocations,
+      t,
+    ],
+  );
 
   useBusesSocket(
     useCallback((next: Bus[]) => setVehicles(next), []),
@@ -203,7 +149,7 @@ export function MapWeb({
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        mapStyle={MAP_STYLE_JSON}
+        mapStyle={mapStyle}
         logo={false}
         attribution={false}
         compass={false}
@@ -220,36 +166,10 @@ export function MapWeb({
         <Images images={MAP_IMAGES} />
 
         {areas ? (
-          <GeoJSONSource id="family-zones" data={zonesData}>
-            <Layer
-              id="family-zones-fill"
-              type="fill"
-              source="family-zones"
-              paint={{ 'fill-color': '#2F80DD', 'fill-opacity': 0.14 }}
-            />
-            <Layer
-              id="family-zones-outline"
-              type="line"
-              source="family-zones"
-              paint={{ 'line-color': '#2F80DD', 'line-width': 2 }}
-            />
-            <Layer
-              id="family-zone-labels"
-              type="symbol"
-              source="family-zones"
-              layout={{
-                'text-field': ['get', 'name'],
-                'text-size': 12,
-                'text-font': ['Noto Sans Medium'],
-                'text-allow-overlap': false,
-                'text-padding': 4,
-              }}
-              paint={{
-                'text-color': '#1E5FB8',
-                'text-halo-color': '#FFFFFF',
-                'text-halo-width': 1.5,
-              }}
-            />
+          <GeoJSONSource id={ZONE_SOURCE} data={zonesData}>
+            {ZONE_LAYERS[mode].map((layer) => (
+              <Layer key={layer.id} {...layer} />
+            ))}
           </GeoJSONSource>
         ) : null}
 
